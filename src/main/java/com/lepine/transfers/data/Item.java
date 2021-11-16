@@ -14,9 +14,12 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class Item {
 
+    @Builder.Default
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Id
