@@ -1,0 +1,36 @@
+#for h2
+spring:
+  h2:
+    console:
+      enabled: true
+  config:
+    activate:
+      on-profile: test
+
+  flyway:
+    url: jdbc:h2:mem:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+    baseline-on-migrate: true
+    user: sa
+    password:
+
+  datasource:
+    url: jdbc:h2:mem:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+    generate-ddl: false
+  sql:
+    init:
+      mode: never
+      platform: h2
+
+spring.datasource.hikari.initializationFailTimeout: 60000
