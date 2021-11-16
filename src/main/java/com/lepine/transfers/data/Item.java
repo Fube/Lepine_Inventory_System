@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.UUID;
 
-@Table(schema = "lepine")
+@Table(schema = "lepine", name = "items")
 @Entity
 @Getter
 @Setter
