@@ -35,12 +35,7 @@ public class ItemTests {
     void contextLoads() {
     }
 
-    @Test
-    @DisplayName("Given getItems, retrieve paginated list of Items")
-    void getAll() {
-
-        // Arrange
-        final int toInsert = 20;
+    private void createItems(int toInsert) {
         for (int i = 0; i < toInsert; i++) {
             itemRepo.save(Item.builder()
                     .name("name"+i)
@@ -48,6 +43,15 @@ public class ItemTests {
                     .SKU("SKU"+i)
                     .build());
         }
+    }
+
+    @Test
+    @DisplayName("Given getItems, retrieve paginated list of Items")
+    void getAll() {
+
+        // Arrange
+        final int toInsert = 20;
+        createItems(toInsert);
 
         // Act
         final Page<Item> items = itemController.getAll();
@@ -70,13 +74,7 @@ public class ItemTests {
 
         // Arrange
         final int toInsert = 20;
-        for (int i = 0; i < toInsert; i++) {
-            itemRepo.save(Item.builder()
-                    .name("name"+i)
-                    .description("description"+i)
-                    .SKU("SKU"+i)
-                    .build());
-        }
+        createItems(toInsert);
 
         // Act
         final Page<Item> items = itemController.getAll(1);
