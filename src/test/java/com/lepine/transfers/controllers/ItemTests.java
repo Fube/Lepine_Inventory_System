@@ -7,16 +7,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -95,7 +95,7 @@ public class ItemTests {
     }
 
     @Test
-    @DisplayName("Given negative page, return 401")
+    @DisplayName("Given negative page, throws ConstrainViolationException")
     void getAllWithBadPage() {
 
         // Arrange
@@ -106,6 +106,11 @@ public class ItemTests {
         ConstraintViolationException exception =
                 assertThrows(ConstraintViolationException.class, () -> itemController.getAll(-1));
 
-        assertEquals("Page number cannot be negative", exception.getMessage());
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+        assertEquals("Page number cannot be negative",
+                constraintViolations.iterator().next().getMessage());
     }
 }
