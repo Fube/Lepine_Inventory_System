@@ -60,4 +60,34 @@ public class ItemTests {
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
     }
+
+    @Test
+    @DisplayName("Given specific page, retrieve paginated list of Items")
+    void getAllWithPage() {
+
+        // Arrange
+        final int toInsert = 20;
+        for (int i = 0; i < toInsert; i++) {
+            itemRepo.save(Item.builder()
+                    .name("name"+i)
+                    .description("description"+i)
+                    .SKU("SKU"+i)
+                    .build());
+        }
+
+        // Act
+        final Page<Item> items = itemController.getAll(1);
+
+        // Assert
+        assertEquals(toInsert, items.getTotalElements());
+        assertEquals(toInsert / 10, items.getTotalPages());
+        assertEquals(items.getNumber(), 1);
+
+        final List<Item> content = items.getContent();
+        for (int i = 0; i < content.size(); i++) {
+            assertEquals("name" + i, content.get(i).getName());
+            assertEquals("description" + i, content.get(i).getDescription());
+            assertEquals("SKU" + i, content.get(i).getSKU());
+        }
+    }
 }
