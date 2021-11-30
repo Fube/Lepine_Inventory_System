@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -90,5 +91,20 @@ public class ItemTests {
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
+    }
+
+    @Test
+    @DisplayName("Given negative page, return 401")
+    void getAllWithBadPage() {
+
+        // Arrange
+        final int toInsert = 5;
+        createItems(toInsert);
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> itemController.getAll(-1));
+
+        assertEquals("Page number cannot be negative", exception.getMessage());
     }
 }
