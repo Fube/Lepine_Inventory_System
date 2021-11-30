@@ -47,7 +47,7 @@ public class ItemTests {
         }
 
         // Act
-        final Page<Item> items = itemController.getItems();
+        final Page<Item> items = itemController.getAll();
 
         // Assert
         assertEquals(toInsert, items.getTotalElements());
