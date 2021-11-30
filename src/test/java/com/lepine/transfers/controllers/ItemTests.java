@@ -2,6 +2,7 @@ package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.data.Item;
 import com.lepine.transfers.data.ItemRepo;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,9 @@ public class ItemTests {
     @SpyBean
     private ItemRepo itemRepo; // Not mocked because mocking a Page is hell
 
+    @BeforeEach
     void setUp() {
+        itemRepo.deleteAll();
     }
 
     @Test
@@ -84,7 +87,7 @@ public class ItemTests {
         assertEquals(items.getNumber(), 1);
 
         final List<Item> content = items.getContent();
-        for (int i = 0; i < content.size(); i++) {
+        for (int i = 10; i < content.size(); i++) {
             assertEquals("name" + i, content.get(i).getName());
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
