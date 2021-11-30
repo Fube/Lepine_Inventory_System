@@ -77,4 +77,21 @@ class ItemTest {
         assertEquals(VALID_ITEM_DESCRIPTION, got.getDescription());
         assertEquals(VALID_ITEM_SKU, got.getSKU());
     }
+
+    @Test
+    @DisplayName("Given item, delete it")
+    void deleteByUUID() {
+
+        final Item save = itemRepo.save(
+                Item.builder()
+                        .name(VALID_ITEM_NAME)
+                        .description(VALID_ITEM_DESCRIPTION)
+                        .SKU(VALID_ITEM_SKU)
+                        .build()
+        );
+
+        itemRepo.deleteById(save.getUuid());
+
+        assertEquals(0, itemRepo.count());
+    }
 }
