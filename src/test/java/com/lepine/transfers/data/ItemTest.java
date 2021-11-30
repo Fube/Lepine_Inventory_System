@@ -1,8 +1,5 @@
 package com.lepine.transfers.data;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,11 +8,12 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.UUID;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 
 @DataJpaTest
 @ActiveProfiles({"test"})
@@ -56,5 +54,27 @@ class ItemTest {
         assertEquals(VALID_ITEM_NAME, save.getName());
         assertEquals(VALID_ITEM_DESCRIPTION, save.getDescription());
         assertEquals(VALID_ITEM_SKU, save.getSKU());
+    }
+
+    @Test
+    @DisplayName("Given item, retrieve it by UUID")
+    void findByUUID() {
+
+        final Item save = itemRepo.save(
+                Item.builder()
+                        .name(VALID_ITEM_NAME)
+                        .description(VALID_ITEM_DESCRIPTION)
+                        .SKU(VALID_ITEM_SKU)
+                        .build()
+        );
+
+        final Optional<Item> byId = itemRepo.findById(save.getUuid());
+        assertTrue(byId.isPresent());
+
+        final Item got = byId.get();
+        assertTrue(UUID_PATTERN.matcher(got.getUuid().toString()).matches());
+        assertEquals(VALID_ITEM_NAME, got.getName());
+        assertEquals(VALID_ITEM_DESCRIPTION, got.getDescription());
+        assertEquals(VALID_ITEM_SKU, got.getSKU());
     }
 }
