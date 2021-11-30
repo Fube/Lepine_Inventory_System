@@ -94,4 +94,32 @@ class ItemTest {
 
         assertEquals(0, itemRepo.count());
     }
+
+    @Test
+    @DisplayName("Given item, update it")
+    void updateItem() {
+
+        final String
+                updatedName = "Updated-Name",
+                updatedDescription = "Updated-Description",
+                updatedSKU = "Updated-SKU";
+
+        final Item save = itemRepo.save(
+                Item.builder()
+                        .name(VALID_ITEM_NAME)
+                        .description(VALID_ITEM_DESCRIPTION)
+                        .SKU(VALID_ITEM_SKU)
+                        .build()
+        );
+
+        save.setDescription(updatedDescription);
+        save.setName(updatedName);
+        save.setSKU(updatedSKU);
+        final Item updated = itemRepo.save(save);
+
+        assertEquals(save.getUuid(), updated.getUuid());
+        assertEquals(updatedName, updated.getName());
+        assertEquals(updatedDescription, updated.getDescription());
+        assertEquals(updatedSKU, updated.getSKU());
+    }
 }
