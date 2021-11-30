@@ -6,13 +6,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Min;
+
 @RestController("/items")
 @RequiredArgsConstructor
-@Slf4j()
+@Slf4j
+@Validated
 public class ItemController {
 
     private final ItemRepo itemRepo;
@@ -27,7 +31,9 @@ public class ItemController {
     }
 
     @GetMapping(params = { "page" })
-    public Page<Item> getAll(@RequestParam int page) {
+    public Page<Item> getAll(
+            @RequestParam
+            @Min(value = 0, message = "Page number cannot be negative") int page) {
         log.info("ItemController::getAll retrieving all items");
         final Page<Item> all = itemRepo.findAll(PageRequest.of(page, 10));
         log.info("ItemController::getAll retrieved all items");
