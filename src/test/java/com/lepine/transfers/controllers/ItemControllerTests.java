@@ -80,15 +80,17 @@ public class ItemControllerTests {
     void getAllWithPage() {
 
         // Arrange
-        final int toInsert = 20;
+        final int
+                toInsert = 20,
+                pageSize = 1;
         createItems(toInsert);
 
         // Act
-        final Page<Item> items = itemController.getAll(1, 1);
+        final Page<Item> items = itemController.getAll(1, pageSize);
 
         // Assert
         assertEquals(toInsert, items.getTotalElements());
-        assertEquals(toInsert / 10, items.getTotalPages());
+        assertEquals(toInsert / pageSize, items.getTotalPages());
         assertEquals(0, items.getNumber());
 
         final List<Item> content = items.getContent();

@@ -37,7 +37,7 @@ public class ItemController {
             @RequestParam
             @Min(value = 1, message = "Page size cannot be less than 1") int size) {
         log.info("ItemController::getAll retrieving all items");
-        final Page<Item> all = itemService.findAll(PageRequest.of(page - 1, 10));
+        final Page<Item> all = itemService.findAll(PageRequest.of(page - 1, size));
         log.info("ItemController::getAll retrieved all items");
 
         return all;
