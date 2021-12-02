@@ -3,7 +3,6 @@ package com.lepine.transfers.controllers;
 import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
-import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.services.item.ItemService;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,14 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,34 +34,46 @@ public class ItemControllerTests {
     @Autowired
     private ItemController itemController;
 
-    @SpyBean
-    private ItemRepo itemRepo; // Not mocked because mocking a Page is hell
-
-    @SpyBean
-    private ItemService itemService; // Not mocked because mocking a Page is hell
+    @MockBean
+    private ItemService itemService;
 
     @Autowired
     private ItemMapper itemMapper;
 
+    @SuppressWarnings("unchecked")
+    private Page<Item> createPageFor(List<Item> items, PageRequest pageRequest) {
+        final Page<Item> page = mock(Page.class);
+        given(page.getContent()).willReturn(items);
+        given(page.getTotalElements()).willReturn((long) items.size());
+        given(page.getTotalPages()).willReturn((int) Math.ceil(items.size() / pageRequest.getPageSize()));
+        given(page.getNumber()).willReturn(pageRequest.getPageNumber());
+        given(page.getSize()).willReturn(pageRequest.getPageSize());
+        return page;
+    }
+
+    private Page<Item> createPageFor(List<Item> items) {
+        return createPageFor(items, PageRequest.of(0, 10));
+    }
+
     @BeforeEach
     void setUp() {
-
-        itemRepo.deleteAllInBatch();
-        reset(itemRepo);
+        reset(itemService);
     }
 
     @Test
     void contextLoads() {
     }
 
-    private void createItems(int toInsert) {
+    private List<Item> createItems(int toInsert) {
+        final List<Item> items = new ArrayList<>();
         for (int i = 0; i < toInsert; i++) {
-            itemRepo.save(Item.builder()
+            items.add(Item.builder()
                     .name("name"+i)
                     .description("description"+i)
                     .SKU("SKU"+i)
                     .build());
         }
+        return items;
     }
 
     @Test
@@ -72,7 +82,8 @@ public class ItemControllerTests {
 
         // Arrange
         final int toInsert = 20;
-        createItems(toInsert);
+        final Page<Item> page = createPageFor(createItems(toInsert));
+        given(itemService.findAll()).willReturn(page);
 
         // Act
         final Page<Item> items = itemController.getAll();
@@ -87,7 +98,7 @@ public class ItemControllerTests {
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
-        verify(itemRepo, times(1)).findAll(any(PageRequest.class));
+        verify(itemService, times(1)).findAll();
     }
 
     @Test
@@ -98,7 +109,8 @@ public class ItemControllerTests {
         final int
                 toInsert = 20,
                 pageSize = 1;
-        createItems(toInsert);
+        final Page<Item> page = createPageFor(createItems(toInsert), PageRequest.of(0, pageSize));
+        given(itemService.findAll(any(PageRequest.class))).willReturn(page);
 
         // Act
         final Page<Item> items = itemController.getAll(1, pageSize);
@@ -114,7 +126,7 @@ public class ItemControllerTests {
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
-        verify(itemRepo, times(1)).findAll(any(PageRequest.class));
+        verify(itemService, times(1)).findAll(any(PageRequest.class));
     }
 
     @Test
@@ -123,7 +135,8 @@ public class ItemControllerTests {
 
         // Arrange
         final int toInsert = 5;
-        createItems(toInsert);
+        final Page<Item> page = createPageFor(createItems(toInsert));
+        given(itemService.findAll(any(PageRequest.class))).willReturn(page);
 
         // Act
         ConstraintViolationException exception =
@@ -135,7 +148,7 @@ public class ItemControllerTests {
         assertEquals(1, constraintViolations.size());
         assertEquals("Page number cannot be less than 1",
                 constraintViolations.iterator().next().getMessage());
-        verify(itemRepo, times(0)).findAll(any(PageRequest.class));
+        verify(itemService, times(0)).findAll(any(PageRequest.class));
     }
 
     @Test
@@ -145,11 +158,13 @@ public class ItemControllerTests {
         // Arrange
         final int
                 toInsert = 20,
-                pageSize = 10;
-        createItems(toInsert);
+                pageSize = 10,
+                pageNumber = 1;
+        final Page<Item> page = createPageFor(createItems(toInsert), PageRequest.of(pageNumber, pageSize));
+        given(itemService.findAll(any(PageRequest.class))).willReturn(page);
 
         // Act
-        final Page<Item> items = itemController.getAll(1, pageSize);
+        final Page<Item> items = itemController.getAll(pageNumber, pageSize);
 
         // Assert
         assertEquals(toInsert, items.getTotalElements());
@@ -162,7 +177,7 @@ public class ItemControllerTests {
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
-        verify(itemRepo, times(1)).findAll(any(PageRequest.class));
+        verify(itemService, times(1)).findAll(any(PageRequest.class));
     }
 
     @Test
@@ -194,7 +209,8 @@ public class ItemControllerTests {
                 toInsert = 20,
                 pageSize = 5,
                 page = 1;
-        createItems(toInsert);
+        given(itemService.findAll(any(PageRequest.class)))
+                .willAnswer(invocation -> createPageFor(createItems(toInsert), invocation.getArgument(0)));
 
         // Act
         final Page<Item> items = itemController.getAll(page, pageSize);
@@ -286,6 +302,6 @@ public class ItemControllerTests {
         assertTrue(
                 collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
 
-        verify(itemRepo, never()).save(any(Item.class));
+        verify(itemService, never()).create(any(Item.class));
     }
 }
