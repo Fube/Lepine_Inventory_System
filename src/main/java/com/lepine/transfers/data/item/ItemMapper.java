@@ -7,7 +7,7 @@ import org.mapstruct.Mappings;
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
     @Mappings({
-
+        @Mapping(target = "uuid", ignore = true),
     })
     Item toEntity(ItemUUIDLessDTO itemDTO);
 }

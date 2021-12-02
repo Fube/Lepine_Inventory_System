@@ -33,10 +33,16 @@ dependencies {
     implementation 'org.flywaydb:flyway-core'
     compileOnly 'org.projectlombok:lombok'
 
+    // Order matters
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
+
     implementation("org.mapstruct:mapstruct:${mapstructVersion}")
     compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    // End of order matters
 
     implementation 'com.algolia:algoliasearch-core:3.16.1'
     implementation 'com.algolia:algoliasearch-apache:3.16.1'
@@ -46,7 +52,6 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
