@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +37,9 @@ public class ItemControllerTests {
 
     @SpyBean
     private ItemService itemService; // Not mocked because mocking a Page is hell
+
+    @MockBean
+    private SearchService searchService;
 
     @BeforeEach
     void setUp() {
@@ -202,5 +207,89 @@ public class ItemControllerTests {
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
+    }
+
+    @Test
+    @DisplayName("Given valid item dto, create new Item and send copy to SearchService")
+    void createItem() {
+
+        // Arrange
+        final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
+                .name("name")
+                .description("description")
+                .SKU("SKU")
+                .build();
+
+        // Act
+        final Item item = itemController.create(itemDTO);
+
+        // Assert
+        assertEquals("name", item.getName());
+        assertEquals("description", item.getDescription());
+        assertEquals("SKU", item.getSKU());
+        verify(itemRepo, times(1)).save(any(Item.class));
+        verify(searchService, times(1)).index(any(Item.class));
+    }
+
+    @Test
+    @DisplayName("Given empty item dto, throw ConstraintViolationException")
+    void createItemWithBadDTO() {
+
+        // Arrange
+        final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder().build();
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> itemController.create(itemDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(3, constraintViolations.size());
+
+        final Iterator<ConstraintViolation<?>> iterator = constraintViolations.iterator();
+        assertEquals("SKU cannot be empty",
+                iterator.next().getMessage());
+        assertEquals("Description cannot be empty",
+                iterator.next().getMessage());
+        assertEquals("Name cannot be empty",
+                iterator.next().getMessage());
+
+        verify(itemService, never()).create(any(Item.class));
+        verify(itemRepo, never()).save(any(Item.class));
+        verify(searchService, never()).index(any(Item.class));
+    }
+
+    @Test
+    @DisplayName("Given item dto with all null fields, throw ConstraintViolationException")
+    void createItemWithNullDTO() {
+
+        // Arrange
+        final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
+                .name(null)
+                .description(null)
+                .SKU(null)
+                .build();
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> itemController.create(itemDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(3, constraintViolations.size());
+
+        final Iterator<ConstraintViolation<?>> iterator = constraintViolations.iterator();
+        assertEquals("SKU cannot be empty",
+                iterator.next().getMessage());
+        assertEquals("Description cannot be empty",
+                iterator.next().getMessage());
+        assertEquals("Name cannot be empty",
+                iterator.next().getMessage());
+
+        verify(itemService, never()).create(any(Item.class));
+        verify(itemRepo, never()).save(any(Item.class));
+        verify(searchService, never()).index(any(Item.class));
     }
 }
