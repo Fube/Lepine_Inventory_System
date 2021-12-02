@@ -1,6 +1,7 @@
 package com.lepine.transfers.controllers.item;
 
 import com.lepine.transfers.data.item.Item;
+import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.services.item.ItemService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import javax.validation.constraints.Min;
 public class ItemController {
 
     private final ItemService itemService;
+    private final ItemMapper itemMapper;
 
     @GetMapping
     public Page<Item> getAll() {
