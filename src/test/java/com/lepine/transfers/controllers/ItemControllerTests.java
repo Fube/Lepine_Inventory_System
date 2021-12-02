@@ -2,6 +2,7 @@ package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
+import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.services.item.ItemService;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -39,6 +41,9 @@ public class ItemControllerTests {
 
     @SpyBean
     private ItemService itemService; // Not mocked because mocking a Page is hell
+
+    @Autowired
+    private ItemMapper itemMapper;
 
     @BeforeEach
     void setUp() {
@@ -218,6 +223,8 @@ public class ItemControllerTests {
                 .description("description")
                 .SKU("SKU")
                 .build();
+        given(itemService.create(any(Item.class)))
+                .willReturn(itemMapper.toEntity(itemDTO));
 
         // Act
         final Item item = itemController.create(itemDTO);
