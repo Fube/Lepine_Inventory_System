@@ -1,0 +1,26 @@
+package com.lepine.transfers.services;
+
+import com.lepine.transfers.data.Item;
+import com.lepine.transfers.data.ItemRepo;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class ItemServiceImpl implements ItemService {
+
+    private final ItemRepo itemRepo;
+
+    @Override
+    public Page<Item> findAll() {
+        log.info("ItemController::getAll retrieving all items");
+        final Page<Item> all = itemRepo.findAll(PageRequest.of(0, 10));
+        log.info("ItemController::getAll retrieved all items");
+
+        return all;
+    }
+}

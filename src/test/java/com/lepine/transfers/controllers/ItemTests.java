@@ -2,6 +2,7 @@ package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.data.Item;
 import com.lepine.transfers.data.ItemRepo;
+import com.lepine.transfers.services.ItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -2,6 +2,7 @@ package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.data.Item;
 import com.lepine.transfers.data.ItemRepo;
+import com.lepine.transfers.services.ItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,12 +20,12 @@ import javax.validation.constraints.Min;
 @Validated
 public class ItemController {
 
-    private final ItemRepo itemRepo;
+    private final ItemService itemService;
 
     @GetMapping
     public Page<Item> getAll() {
         log.info("ItemController::getAll retrieving all items");
-        final Page<Item> all = itemRepo.findAll(PageRequest.of(0, 10));
+        final Page<Item> all = itemService.findAll();
         log.info("ItemController::getAll retrieved all items");
 
         return all;
