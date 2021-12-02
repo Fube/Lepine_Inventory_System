@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -27,6 +29,9 @@ public class ItemTests {
 
     @SpyBean
     private ItemRepo itemRepo; // Not mocked because mocking a Page is hell
+
+    @SpyBean
+    private ItemService itemService; // Not mocked because mocking a Page is hell
 
     @BeforeEach
     void setUp() {
