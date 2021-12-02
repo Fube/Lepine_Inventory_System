@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
-public class ItemTests {
+public class ItemControllerTests {
 
     @Autowired
     private ItemController itemController;

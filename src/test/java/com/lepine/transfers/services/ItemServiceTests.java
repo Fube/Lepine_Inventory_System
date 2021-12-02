@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
-public class ItemTests {
+public class ItemServiceTests {
 
     @SpyBean
     private ItemRepo itemRepo;

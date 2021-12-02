@@ -20,7 +20,7 @@ import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTest
 @DataJpaTest
 @ActiveProfiles({"test"})
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-class ItemTests {
+class ItemDataTests {
 
     private final Pattern UUID_PATTERN = Pattern.compile("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})");
 
