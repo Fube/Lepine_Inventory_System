@@ -8,4 +8,6 @@ public interface ItemService {
     Page<Item> findAll();
 
     Page<Item> findAll(PageRequest pageRequest);
+
+    Item create(Item item);
 }
