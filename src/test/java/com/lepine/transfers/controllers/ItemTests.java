@@ -118,4 +118,78 @@ public class ItemTests {
         assertEquals("Page number cannot be negative",
                 constraintViolations.iterator().next().getMessage());
     }
+
+    @Test
+    @DisplayName("Given specific page size, retrieve paginated list of Items")
+    void getAllWithSize() {
+
+        // Arrange
+        final int
+                toInsert = 20,
+                pageSize = 10;
+        createItems(toInsert);
+
+        // Act
+        final Page<Item> items = itemController.getAll(0, pageSize);
+
+        // Assert
+        assertEquals(toInsert, items.getTotalElements());
+        assertEquals(toInsert / pageSize, items.getTotalPages());
+        assertEquals(items.getSize(), pageSize);
+
+        final List<Item> content = items.getContent();
+        for (int i = 0; i < content.size(); i++) {
+            assertEquals("name" + i, content.get(i).getName());
+            assertEquals("description" + i, content.get(i).getDescription());
+            assertEquals("SKU" + i, content.get(i).getSKU());
+        }
+    }
+
+    @Test
+    @DisplayName("Given negative page size, throws ConstrainViolationException")
+    void getAllWithBadSize() {
+
+        // Arrange
+        final int toInsert = 5;
+        createItems(toInsert);
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> itemController.getAll(0, -1));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+        assertEquals("Page size cannot be negative",
+                constraintViolations.iterator().next().getMessage());
+    }
+
+    @Test
+    @DisplayName("Given specific page and page size, retrieve paginated list of Items")
+    void getAllWithPageAndSize() {
+
+        // Arrange
+        final int
+                toInsert = 20,
+                pageSize = 10,
+                page = 1;
+        createItems(toInsert);
+
+        // Act
+        final Page<Item> items = itemController.getAll(page, pageSize);
+
+        // Assert
+        assertEquals(toInsert, items.getTotalElements());
+        assertEquals(toInsert / pageSize, items.getTotalPages());
+        assertEquals(items.getNumber(), page);
+        assertEquals(items.getSize(), pageSize);
+
+        final List<Item> content = items.getContent();
+        for (int i = 10; i < content.size(); i++) {
+            assertEquals("name" + i, content.get(i).getName());
+            assertEquals("description" + i, content.get(i).getDescription());
+            assertEquals("SKU" + i, content.get(i).getSKU());
+        }
+    }
 }
