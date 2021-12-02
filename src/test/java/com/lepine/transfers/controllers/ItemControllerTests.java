@@ -21,6 +21,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -244,14 +245,11 @@ public class ItemControllerTests {
         assertFalse(constraintViolations.isEmpty());
         assertEquals(3, constraintViolations.size());
 
-        final Iterator<ConstraintViolation<?>> iterator = constraintViolations.iterator();
-        assertEquals("SKU cannot be empty",
-                iterator.next().getMessage());
-        assertEquals("Description cannot be empty",
-                iterator.next().getMessage());
-        assertEquals("Name cannot be empty",
-                iterator.next().getMessage());
-
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        assertTrue(
+                collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
         verify(itemService, never()).create(any(Item.class));
     }
 
@@ -275,13 +273,11 @@ public class ItemControllerTests {
         assertFalse(constraintViolations.isEmpty());
         assertEquals(3, constraintViolations.size());
 
-        final Iterator<ConstraintViolation<?>> iterator = constraintViolations.iterator();
-        assertEquals("SKU cannot be empty",
-                iterator.next().getMessage());
-        assertEquals("Description cannot be empty",
-                iterator.next().getMessage());
-        assertEquals("Name cannot be empty",
-                iterator.next().getMessage());
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        assertTrue(
+                collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
 
         verify(itemRepo, never()).save(any(Item.class));
     }
