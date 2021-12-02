@@ -39,9 +39,6 @@ public class ItemControllerTests {
     @SpyBean
     private ItemService itemService; // Not mocked because mocking a Page is hell
 
-    @MockBean
-    private SearchService searchService;
-
     @BeforeEach
     void setUp() {
 
@@ -228,8 +225,7 @@ public class ItemControllerTests {
         assertEquals("name", item.getName());
         assertEquals("description", item.getDescription());
         assertEquals("SKU", item.getSKU());
-        verify(itemRepo, times(1)).save(any(Item.class));
-        verify(searchService, times(1)).index(any(Item.class));
+        verify(itemService, times(1)).create(any(Item.class));
     }
 
     @Test
@@ -257,8 +253,6 @@ public class ItemControllerTests {
                 iterator.next().getMessage());
 
         verify(itemService, never()).create(any(Item.class));
-        verify(itemRepo, never()).save(any(Item.class));
-        verify(searchService, never()).index(any(Item.class));
     }
 
     @Test
@@ -289,8 +283,6 @@ public class ItemControllerTests {
         assertEquals("Name cannot be empty",
                 iterator.next().getMessage());
 
-        verify(itemService, never()).create(any(Item.class));
         verify(itemRepo, never()).save(any(Item.class));
-        verify(searchService, never()).index(any(Item.class));
     }
 }
