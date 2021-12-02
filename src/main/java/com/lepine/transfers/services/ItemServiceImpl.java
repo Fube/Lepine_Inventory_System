@@ -26,6 +26,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Page<Item> findAll(PageRequest pageRequest) {
-        return null;
+        log.info("ItemController::getAll retrieving all items");
+        final Page<Item> all = itemRepo.findAll(pageRequest);
+        log.info("ItemController::getAll retrieved all items");
+
+        return all;
     }
 }
