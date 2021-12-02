@@ -172,7 +172,7 @@ public class ItemControllerTests {
         // Arrange
         final int
                 toInsert = 20,
-                pageSize = 10,
+                pageSize = 5,
                 page = 1;
         createItems(toInsert);
 
