@@ -1,5 +1,7 @@
 package com.lepine.transfers.data;
 
+import com.lepine.transfers.data.item.Item;
+import com.lepine.transfers.data.item.ItemRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

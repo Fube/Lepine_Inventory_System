@@ -1,4 +1,4 @@
-package com.lepine.transfers.data;
+package com.lepine.transfers.data.item;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

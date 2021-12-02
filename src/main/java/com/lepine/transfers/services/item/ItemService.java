@@ -1,6 +1,6 @@
-package com.lepine.transfers.services;
+package com.lepine.transfers.services.item;
 
-import com.lepine.transfers.data.Item;
+import com.lepine.transfers.data.item.Item;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 

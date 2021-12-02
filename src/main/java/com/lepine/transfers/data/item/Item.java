@@ -1,4 +1,4 @@
-package com.lepine.transfers.data;
+package com.lepine.transfers.data.item;
 
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;

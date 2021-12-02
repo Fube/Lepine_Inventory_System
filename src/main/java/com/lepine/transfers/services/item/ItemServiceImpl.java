@@ -1,7 +1,7 @@
-package com.lepine.transfers.services;
+package com.lepine.transfers.services.item;
 
-import com.lepine.transfers.data.Item;
-import com.lepine.transfers.data.ItemRepo;
+import com.lepine.transfers.data.item.Item;
+import com.lepine.transfers.data.item.ItemRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
