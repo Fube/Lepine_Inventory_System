@@ -28,6 +28,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
     implementation 'org.flywaydb:flyway-core'
     compileOnly 'org.projectlombok:lombok'
+
+    implementation 'com.algolia:algoliasearch-core:3.16.1'
+    implementation 'com.algolia:algoliasearch-apache:3.16.1'
+    implementation 'com.algolia:algoliasearch-java-net:3.16.1'
+    implementation 'com.algolia:algoliasearch-apache-uber:3.16.1'
+
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
