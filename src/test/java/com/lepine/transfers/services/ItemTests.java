@@ -69,4 +69,29 @@ public class ItemTests {
         });
         verify(itemRepo, times(1)).findAll(any(PageRequest.class));
     }
+
+    @Test
+    @DisplayName("Given findAll with page request, retrieve paginated list of items")
+    void findAllWithPageRequest() {
+
+        // Arrange
+        final int num = 100;
+        seedRepo(num);
+        final int page = 1;
+        final int size = 10;
+        final PageRequest pageRequest = PageRequest.of(page, size);
+
+        // Act
+        final Page<Item> all = itemService.findAll(pageRequest);
+
+        // Assert
+        assertEquals(num, all.getTotalElements());
+        assertEquals(size, all.getContent().size());
+        all.getContent().forEach(item -> {
+            assertTrue(item.getName().startsWith("name"));
+            assertTrue(item.getSKU().startsWith("SKU"));
+            assertTrue(item.getDescription().startsWith("description"));
+        });
+        verify(itemRepo, times(1)).findAll(pageRequest);
+    }
 }
