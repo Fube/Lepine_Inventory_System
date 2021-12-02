@@ -1,6 +1,13 @@
 package com.lepine.transfers.data.item;
 
-public interface ItemMapper {
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
+@Mapper(componentModel = "spring")
+public interface ItemMapper {
+    @Mappings({
+            @Mapping(target = "uuid", ignore = true),
+    })
     Item toEntity(ItemUUIDLessDTO itemDTO);
 }
