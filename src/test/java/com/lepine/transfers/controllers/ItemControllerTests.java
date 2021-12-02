@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolation;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -35,7 +38,9 @@ public class ItemControllerTests {
 
     @BeforeEach
     void setUp() {
-        itemRepo.deleteAll();
+
+        itemRepo.deleteAllInBatch();
+        reset(itemRepo);
     }
 
     @Test
@@ -73,6 +78,7 @@ public class ItemControllerTests {
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
+        verify(itemRepo, times(1)).findAll(any(PageRequest.class));
     }
 
     @Test
@@ -99,6 +105,7 @@ public class ItemControllerTests {
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
+        verify(itemRepo, times(1)).findAll(any(PageRequest.class));
     }
 
     @Test
@@ -119,6 +126,7 @@ public class ItemControllerTests {
         assertEquals(1, constraintViolations.size());
         assertEquals("Page number cannot be less than 1",
                 constraintViolations.iterator().next().getMessage());
+        verify(itemRepo, times(0)).findAll(any(PageRequest.class));
     }
 
     @Test
@@ -145,6 +153,7 @@ public class ItemControllerTests {
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
+        verify(itemRepo, times(1)).findAll(any(PageRequest.class));
     }
 
     @Test
