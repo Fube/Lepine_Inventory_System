@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 @RestController("/items")
@@ -48,7 +49,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public Item create(ItemUUIDLessDTO itemUUIDLessDTO) {
+    public Item create(@Valid ItemUUIDLessDTO itemUUIDLessDTO) {
         log.info("ItemController::create creating item");
         final Item mapped = itemMapper.toEntity(itemUUIDLessDTO);
         final Item created = itemService.create(mapped);

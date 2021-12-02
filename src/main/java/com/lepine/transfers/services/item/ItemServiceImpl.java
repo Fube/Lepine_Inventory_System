@@ -28,4 +28,9 @@ public class ItemServiceImpl implements ItemService {
 
         return all;
     }
+
+    @Override
+    public Item create(Item item) {
+        return null;
+    }
 }
