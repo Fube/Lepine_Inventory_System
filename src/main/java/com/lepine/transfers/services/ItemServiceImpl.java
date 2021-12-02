@@ -23,4 +23,9 @@ public class ItemServiceImpl implements ItemService {
 
         return all;
     }
+
+    @Override
+    public Page<Item> findAll(PageRequest pageRequest) {
+        return null;
+    }
 }

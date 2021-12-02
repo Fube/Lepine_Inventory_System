@@ -36,7 +36,7 @@ public class ItemController {
             @RequestParam
             @Min(value = 0, message = "Page number cannot be negative") int page) {
         log.info("ItemController::getAll retrieving all items");
-        final Page<Item> all = itemRepo.findAll(PageRequest.of(page, 10));
+        final Page<Item> all = itemService.findAll(PageRequest.of(page, 10));
         log.info("ItemController::getAll retrieved all items");
 
         return all;
