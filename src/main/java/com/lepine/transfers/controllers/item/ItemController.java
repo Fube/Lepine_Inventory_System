@@ -30,12 +30,14 @@ public class ItemController {
         return all;
     }
 
-    @GetMapping(params = { "page" })
+    @GetMapping(params = { "page", "size" })
     public Page<Item> getAll(
             @RequestParam
-            @Min(value = 0, message = "Page number cannot be negative") int page) {
+            @Min(value = 1, message = "Page number cannot be less than 1") int page,
+            @RequestParam
+            @Min(value = 1, message = "Page size cannot be less than 1") int size) {
         log.info("ItemController::getAll retrieving all items");
-        final Page<Item> all = itemService.findAll(PageRequest.of(page, 10));
+        final Page<Item> all = itemService.findAll(PageRequest.of(page - 1, 10));
         log.info("ItemController::getAll retrieved all items");
 
         return all;

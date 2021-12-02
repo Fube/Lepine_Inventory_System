@@ -84,12 +84,12 @@ public class ItemTests {
         createItems(toInsert);
 
         // Act
-        final Page<Item> items = itemController.getAll(1);
+        final Page<Item> items = itemController.getAll(1, 1);
 
         // Assert
         assertEquals(toInsert, items.getTotalElements());
         assertEquals(toInsert / 10, items.getTotalPages());
-        assertEquals(items.getNumber(), 1);
+        assertEquals(0, items.getNumber());
 
         final List<Item> content = items.getContent();
         for (int i = 10; i < content.size(); i++) {
@@ -109,13 +109,13 @@ public class ItemTests {
 
         // Act
         ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> itemController.getAll(-1));
+                assertThrows(ConstraintViolationException.class, () -> itemController.getAll(-1, 1));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
         assertFalse(constraintViolations.isEmpty());
         assertEquals(1, constraintViolations.size());
-        assertEquals("Page number cannot be negative",
+        assertEquals("Page number cannot be less than 1",
                 constraintViolations.iterator().next().getMessage());
     }
 
@@ -130,7 +130,7 @@ public class ItemTests {
         createItems(toInsert);
 
         // Act
-        final Page<Item> items = itemController.getAll(0, pageSize);
+        final Page<Item> items = itemController.getAll(1, pageSize);
 
         // Assert
         assertEquals(toInsert, items.getTotalElements());
@@ -155,13 +155,13 @@ public class ItemTests {
 
         // Act
         ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> itemController.getAll(0, -1));
+                assertThrows(ConstraintViolationException.class, () -> itemController.getAll(1, -1));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
         assertFalse(constraintViolations.isEmpty());
         assertEquals(1, constraintViolations.size());
-        assertEquals("Page size cannot be negative",
+        assertEquals("Page size cannot be less than 1",
                 constraintViolations.iterator().next().getMessage());
     }
 
@@ -182,8 +182,8 @@ public class ItemTests {
         // Assert
         assertEquals(toInsert, items.getTotalElements());
         assertEquals(toInsert / pageSize, items.getTotalPages());
-        assertEquals(items.getNumber(), page);
-        assertEquals(items.getSize(), pageSize);
+        assertEquals(page - 1, items.getNumber());
+        assertEquals(pageSize, items.getSize());
 
         final List<Item> content = items.getContent();
         for (int i = 10; i < content.size(); i++) {
