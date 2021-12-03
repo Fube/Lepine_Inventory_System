@@ -126,7 +126,9 @@ public class ItemServiceTests {
         final Item saved = itemService.create(item);
 
         // Assert
-        assertEquals(item, saved);
+        assertEquals(item.getName(), saved.getName());
+        assertEquals(item.getSKU(), saved.getSKU());
+        assertEquals(item.getDescription(), saved.getDescription());
         verify(itemRepo, times(1)).save(item);
         verify(searchService, times(1)).index(
                 argThat(i -> itemComparator.compare(item, (Item)i) == 0));

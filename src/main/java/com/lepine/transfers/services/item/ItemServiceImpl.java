@@ -31,6 +31,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item create(Item item) {
-        return null;
+        log.info("ItemController::create creating item");
+        final Item created = itemRepo.save(item);
+        log.info("ItemController::create created item");
+
+        return created;
     }
 }
