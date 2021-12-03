@@ -1,7 +1,7 @@
 #for h2
 algolia:
-  application_id: YOUR_APPLICATION_ID
-  api_key: YOUR_API_KEY
+  application_id: ${ALGOLIA_APPLICATION_ID}
+  api_key: ${ALGOLIA_API_KEY}
 spring:
   h2:
     console:
