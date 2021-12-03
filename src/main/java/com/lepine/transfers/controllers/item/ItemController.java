@@ -9,15 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
-@RestController("/items")
+@RestController
+@RequestMapping("/items")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -49,7 +47,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public Item create(@Valid ItemUUIDLessDTO itemUUIDLessDTO) {
+    public Item create(@RequestBody @Valid ItemUUIDLessDTO itemUUIDLessDTO) {
         log.info("ItemController::create creating item");
         final Item mapped = itemMapper.toEntity(itemUUIDLessDTO);
         final Item created = itemService.create(mapped);
