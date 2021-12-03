@@ -2,6 +2,7 @@ package com.lepine.transfers.services.item;
 
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
+import com.lepine.transfers.services.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepo itemRepo;
+    private final SearchService<Item> searchService;
 
     @Override
     public Page<Item> findAll() {
@@ -34,6 +36,10 @@ public class ItemServiceImpl implements ItemService {
         log.info("ItemController::create creating item");
         final Item created = itemRepo.save(item);
         log.info("ItemController::create created item");
+
+        log.info("ItemController::create sending item to search service");
+        searchService.index(created);
+        log.info("ItemController::create sent item to search service");
 
         return created;
     }
