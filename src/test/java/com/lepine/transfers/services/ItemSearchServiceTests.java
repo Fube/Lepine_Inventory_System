@@ -1,11 +1,8 @@
 package com.lepine.transfers.services;
 
-import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemSearchDTO;
-import com.lepine.transfers.services.search.SearchService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -26,6 +23,8 @@ public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO>{
 
         given(searchIndex.saveObject(itemSearchDTO))
                 .willReturn(null);
+        given(searchClient.initIndex("items", ItemSearchDTO.class))
+                .willReturn(searchIndex);
 
         // Act
         searchService.index(itemSearchDTO);

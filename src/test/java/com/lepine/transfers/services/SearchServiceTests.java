@@ -1,5 +1,6 @@
 package com.lepine.transfers.services;
 
+import com.algolia.search.SearchClient;
 import com.algolia.search.SearchIndex;
 import com.lepine.transfers.services.search.SearchService;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,9 @@ public abstract class SearchServiceTests<T> {
 
     @Autowired
     protected SearchService<T> searchService;
+
+    @MockBean
+    protected SearchClient searchClient;
 
     @Test
     public abstract void testIndex();

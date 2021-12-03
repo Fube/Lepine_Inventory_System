@@ -1,7 +1,9 @@
 package com.lepine.transfers.services.item;
 
 import com.lepine.transfers.data.item.Item;
+import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemRepo;
+import com.lepine.transfers.data.item.ItemSearchDTO;
 import com.lepine.transfers.services.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +17,8 @@ import org.springframework.stereotype.Service;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepo itemRepo;
-    private final SearchService<Item> searchService;
+    private final SearchService<ItemSearchDTO> searchService;
+    private final ItemMapper itemMapper;
 
     @Override
     public Page<Item> findAll() {
@@ -38,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
         log.info("ItemController::create created item");
 
         log.info("ItemController::create sending item to search service");
-        searchService.index(created);
+        searchService.index(itemMapper.toSearchDTO(created));
         log.info("ItemController::create sent item to search service");
 
         return created;

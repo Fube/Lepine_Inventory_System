@@ -10,4 +10,9 @@ public interface ItemMapper {
         @Mapping(target = "uuid", ignore = true),
     })
     Item toEntity(ItemUUIDLessDTO itemDTO);
+
+    @Mappings({
+            @Mapping(target = "objectID", source = "uuid"),
+    })
+    ItemSearchDTO toSearchDTO(Item item);
 }
