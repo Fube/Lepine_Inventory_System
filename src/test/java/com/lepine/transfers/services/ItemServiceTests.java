@@ -2,6 +2,7 @@ package com.lepine.transfers.services;
 
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
+import com.lepine.transfers.data.item.ItemSearchDTO;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.search.SearchService;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(classes = { Config.class })
 @ActiveProfiles({"test"})
 public class ItemServiceTests {
 
@@ -34,13 +35,7 @@ public class ItemServiceTests {
     private ItemService itemService;
 
     @MockBean
-    private SearchService<Item> searchService;
-
-    private static Comparator<Item> itemComparator;
-
-    static {
-        itemComparator = Comparator.comparing(Item::getSKU);
-    }
+    private SearchService<ItemSearchDTO> searchService;
 
     @Test
     void contextLoads(){}
@@ -119,7 +114,7 @@ public class ItemServiceTests {
                 .SKU("SKU")
                 .description("description")
                 .build();
-        doNothing().when(searchService).index(any(Item.class));
+        doNothing().when(searchService).index(any(ItemSearchDTO.class));
 
         // Act
         final Item saved = itemService.create(item);
@@ -129,7 +124,7 @@ public class ItemServiceTests {
         assertEquals(item.getSKU(), saved.getSKU());
         assertEquals(item.getDescription(), saved.getDescription());
         verify(itemRepo, times(1)).save(item);
-        verify(searchService, times(1)).index(
-                argThat(i -> itemComparator.compare(item, (Item)i) == 0));
+        verify(searchService, times(1))
+                .index(any(ItemSearchDTO.class));
     }
 }

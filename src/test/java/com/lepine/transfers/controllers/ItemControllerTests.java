@@ -4,6 +4,7 @@ import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
+import com.lepine.transfers.services.Config;
 import com.lepine.transfers.services.item.ItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(classes = {Config.class})
 @ActiveProfiles({"test"})
 public class ItemControllerTests {
 
