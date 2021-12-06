@@ -49,6 +49,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item update(Item item) {
-        return null;
+        log.info("ItemController::update updating item");
+        final Item updated = itemRepo.save(item);
+        log.info("ItemController::update updated item");
+
+        log.info("ItemController::update sending item to search service");
+        searchService.index(itemMapper.toSearchDTO(updated));
+        log.info("ItemController::update sent item to search service");
+
+        return updated;
     }
 }
