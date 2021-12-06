@@ -46,4 +46,9 @@ public class ItemServiceImpl implements ItemService {
 
         return created;
     }
+
+    @Override
+    public Item update(Item item) {
+        return null;
+    }
 }
