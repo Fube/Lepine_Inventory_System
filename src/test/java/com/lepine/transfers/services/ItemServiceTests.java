@@ -36,7 +36,7 @@ public class ItemServiceTests {
     private ItemService itemService;
 
     @MockBean
-    private SearchService<ItemSearchDTO> searchService;
+    private SearchService<ItemSearchDTO, UUID> searchService;
 
     @Test
     void contextLoads(){}
@@ -162,11 +162,11 @@ public class ItemServiceTests {
         doNothing().when(searchService).delete(uuid);
 
         // Act
-        itemService.delete(item);
+        itemService.delete(uuid);
 
         // Assert
         verify(searchService, times(1))
-                .delete(any(ItemSearchDTO.class));
+                .delete(uuid);
     }
 
     @Test
@@ -182,6 +182,6 @@ public class ItemServiceTests {
 
         // Assert
         verify(searchService, never())
-                .delete(any(ItemSearchDTO.class));
+                .delete(uuid);
     }
 }
