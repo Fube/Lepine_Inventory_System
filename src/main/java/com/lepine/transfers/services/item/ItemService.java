@@ -10,4 +10,6 @@ public interface ItemService {
     Page<Item> findAll(PageRequest pageRequest);
 
     Item create(Item item);
+
+    Item update(Item item);
 }
