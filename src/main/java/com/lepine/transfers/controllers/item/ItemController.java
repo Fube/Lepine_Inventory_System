@@ -55,4 +55,14 @@ public class ItemController {
 
         return created;
     }
+
+    @PutMapping
+    public Item update(@RequestBody @Valid ItemUUIDLessDTO itemUUIDLessDTO) {
+        log.info("ItemController::update updating item");
+        final Item mapped = itemMapper.toEntity(itemUUIDLessDTO);
+        final Item updated = itemService.update(mapped);
+        log.info("ItemController::update updated item");
+
+        return updated;
+    }
 }
