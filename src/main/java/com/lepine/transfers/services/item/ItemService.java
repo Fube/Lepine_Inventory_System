@@ -4,6 +4,8 @@ import com.lepine.transfers.data.item.Item;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.UUID;
+
 public interface ItemService {
     Page<Item> findAll();
 
@@ -12,4 +14,6 @@ public interface ItemService {
     Item create(Item item);
 
     Item update(Item item);
+
+    void delete(UUID uuid);
 }
