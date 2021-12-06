@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/items")
@@ -64,5 +65,11 @@ public class ItemController {
         log.info("ItemController::update updated item");
 
         return updated;
+    }
+
+    public void delete(UUID uuid) {
+        log.info("ItemController::delete deleting item");
+        itemService.delete(uuid);
+        log.info("ItemController::delete deleted item");
     }
 }
