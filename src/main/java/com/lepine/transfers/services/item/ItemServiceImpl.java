@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -58,5 +60,10 @@ public class ItemServiceImpl implements ItemService {
         log.info("ItemController::update sent item to search service");
 
         return updated;
+    }
+
+    @Override
+    public void delete(UUID uuid) {
+
     }
 }
