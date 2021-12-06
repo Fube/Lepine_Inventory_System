@@ -305,4 +305,80 @@ public class ItemControllerTests {
 
         verify(itemService, never()).create(any(Item.class));
     }
+
+    @Test
+    @DisplayName("Given valid item dto, update Item and send copy to SearchService")
+    void updateItem() {
+
+        // Arrange
+        final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
+                .name("name")
+                .description("description")
+                .SKU("SKU")
+                .build();
+        given(itemService.update(any(Item.class)))
+                .willReturn(itemMapper.toEntity(itemDTO));
+
+        // Act
+        final Item updatedItem = itemController.update(itemDTO);
+
+        // Assert
+        assertEquals("name", updatedItem.getName());
+        assertEquals("description", updatedItem.getDescription());
+        assertEquals("SKU", updatedItem.getSKU());
+        verify(itemService, times(1)).update(any(Item.class));
+    }
+
+    @Test
+    @DisplayName("Given empty item dto, throw ConstraintViolationException")
+    void updateItemWithBadDTO() {
+
+        // Arrange
+        final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder().build();
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> itemController.update(itemDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(3, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        assertTrue(
+                collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
+        verify(itemService, never()).update(any(Item.class));
+    }
+
+    @Test
+    @DisplayName("Given item dto with all null fields, throw ConstraintViolationException")
+    void updateItemWithNullDTO() {
+
+        // Arrange
+        final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
+                .name(null)
+                .description(null)
+                .SKU(null)
+                .build();
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> itemController.update(itemDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(3, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        assertTrue(
+                collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
+
+        verify(itemService, never()).update(any(Item.class));
+    }
 }
