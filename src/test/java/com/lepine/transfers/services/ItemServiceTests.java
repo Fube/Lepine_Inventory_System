@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Comparator;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -150,5 +151,37 @@ public class ItemServiceTests {
         verify(itemRepo, times(1)).save(item);
         verify(searchService, times(1))
                 .index(any(ItemSearchDTO.class));
+    }
+
+    @Test
+    @DisplayName("Given valid item UUID, delete item and send copy to SearchService")
+    void deleteItem() {
+
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        doNothing().when(searchService).delete(uuid);
+
+        // Act
+        itemService.delete(item);
+
+        // Assert
+        verify(searchService, times(1))
+                .delete(any(ItemSearchDTO.class));
+    }
+
+    @Test
+    @DisplayName("Given non-existent item UUID, do not invoke SearchService::delete")
+    void deleteNonExistentItem() {
+
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        doNothing().when(searchService).delete(uuid);
+
+        // Act
+        itemService.delete(uuid);
+
+        // Assert
+        verify(searchService, never())
+                .delete(any(ItemSearchDTO.class));
     }
 }
