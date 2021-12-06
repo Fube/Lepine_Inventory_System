@@ -9,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.UUID;
+
 @SpringBootTest
 @ActiveProfiles("test")
 public abstract class SearchServiceTests<T> {
@@ -17,7 +19,7 @@ public abstract class SearchServiceTests<T> {
     protected SearchIndex<T> searchIndex;
 
     @Autowired
-    protected SearchService<T> searchService;
+    protected SearchService<T, UUID> searchService;
 
     @MockBean
     protected SearchClient searchClient;

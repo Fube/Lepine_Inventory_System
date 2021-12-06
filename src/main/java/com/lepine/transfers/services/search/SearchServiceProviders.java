@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.UUID;
+
 @Configuration
 @RequiredArgsConstructor
 public class SearchServiceProviders {
@@ -13,7 +15,7 @@ public class SearchServiceProviders {
     private final SearchIndex<ItemSearchDTO> itemSearchIndex;
 
     @Bean
-    public SearchService<ItemSearchDTO> getItemSearchService() {
+    public SearchService<ItemSearchDTO, UUID> getItemSearchService() {
         return new SearchServiceImpl<>(itemSearchIndex);
     }
 }

@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class SearchServiceImpl<T> implements SearchService<T> {
+public class SearchServiceImpl<T, I> implements SearchService<T, I> {
 
     private final SearchIndex<T> searchIndex;
 
@@ -15,5 +15,10 @@ public class SearchServiceImpl<T> implements SearchService<T> {
         log.info("Indexing {}", toIndex);
         searchIndex.saveObject(toIndex);
         log.info("Indexed {}", toIndex);
+    }
+
+    @Override
+    public void delete(I identifier) {
+
     }
 }

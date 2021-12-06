@@ -19,7 +19,7 @@ import java.util.UUID;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepo itemRepo;
-    private final SearchService<ItemSearchDTO> searchService;
+    private final SearchService<ItemSearchDTO, UUID> searchService;
     private final ItemMapper itemMapper;
 
     @Override
