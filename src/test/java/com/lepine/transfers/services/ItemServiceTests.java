@@ -127,4 +127,28 @@ public class ItemServiceTests {
         verify(searchService, times(1))
                 .index(any(ItemSearchDTO.class));
     }
+
+    @Test
+    @DisplayName("Given valid item, update item and send copy to SearchService")
+    void updateItem() {
+
+        // Arrange
+        final Item item = Item.builder()
+                .name("name")
+                .SKU("SKU")
+                .description("description")
+                .build();
+        doNothing().when(searchService).index(any(ItemSearchDTO.class));
+
+        // Act
+        final Item saved = itemService.update(item);
+
+        // Assert
+        assertEquals(item.getName(), saved.getName());
+        assertEquals(item.getSKU(), saved.getSKU());
+        assertEquals(item.getDescription(), saved.getDescription());
+        verify(itemRepo, times(1)).save(item);
+        verify(searchService, times(1))
+                .index(any(ItemSearchDTO.class));
+    }
 }
