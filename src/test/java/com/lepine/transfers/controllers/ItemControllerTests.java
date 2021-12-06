@@ -21,6 +21,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -380,5 +381,20 @@ public class ItemControllerTests {
                 collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
 
         verify(itemService, never()).update(any(Item.class));
+    }
+
+    @Test
+    @DisplayName("Given valid UUID, delete Item")
+    void deleteItem() {
+
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        doNothing().when(itemService).delete(uuid);
+
+        // Act
+        itemController.delete(uuid);
+
+        // Assert
+        verify(itemService, times(1)).delete(uuid);
     }
 }
