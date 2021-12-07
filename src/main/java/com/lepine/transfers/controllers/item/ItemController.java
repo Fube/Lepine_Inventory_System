@@ -57,7 +57,7 @@ public class ItemController {
         return created;
     }
 
-    @PutMapping
+    @PutMapping("/{uuid}")
     public Item update(@RequestBody @Valid ItemUUIDLessDTO itemUUIDLessDTO) {
         log.info("ItemController::update updating item");
         final Item mapped = itemMapper.toEntity(itemUUIDLessDTO);
@@ -67,7 +67,8 @@ public class ItemController {
         return updated;
     }
 
-    public void delete(UUID uuid) {
+    @DeleteMapping("/{uuid}")
+    public void delete(@PathVariable  UUID uuid) {
         log.info("ItemController::delete deleting item");
         itemService.delete(uuid);
         log.info("ItemController::delete deleted item");
