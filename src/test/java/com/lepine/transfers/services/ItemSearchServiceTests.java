@@ -44,14 +44,15 @@ public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO, UU
 
         // Arrange
         final UUID itemUUID = UUID.randomUUID();
+        final String asString = itemUUID.toString();
 
-        given(searchIndex.deleteObject(itemUUID))
+        given(searchIndex.deleteObject(asString))
                 .willReturn(null);
 
         // Act
-        searchService.delete(itemSearchDTO);
+        searchService.delete(itemUUID);
 
         // Assert
-        verify(searchIndex, times(1)).deleteObject(itemSearchDTO);
+        verify(searchIndex, times(1)).deleteObject(asString);
     }
 }
