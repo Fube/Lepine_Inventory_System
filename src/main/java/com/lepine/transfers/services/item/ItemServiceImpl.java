@@ -78,4 +78,9 @@ public class ItemServiceImpl implements ItemService {
         searchService.delete(uuid);
         log.info("sent item to search service");
     }
+
+    @Override
+    public Item findByUuid(UUID uuid) {
+        return null;
+    }
 }

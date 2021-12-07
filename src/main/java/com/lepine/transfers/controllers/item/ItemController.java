@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @RestController
@@ -45,6 +46,15 @@ public class ItemController {
         log.info("retrieved all items");
 
         return all;
+    }
+
+    @GetMapping("/{uuid}")
+    public Item getByUuid(@PathVariable @NotNull UUID uuid) {
+        log.info("retrieving item by uuid {}", uuid);
+        final Item item = itemService.findByUuid(uuid);
+        log.info("retrieved item by uuid {}", uuid);
+
+        return item;
     }
 
     @PostMapping

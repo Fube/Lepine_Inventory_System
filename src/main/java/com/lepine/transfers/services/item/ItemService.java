@@ -16,4 +16,6 @@ public interface ItemService {
     Item update(Item item);
 
     void delete(UUID uuid);
+
+    Item findByUuid(UUID uuid);
 }

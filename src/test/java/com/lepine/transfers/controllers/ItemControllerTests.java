@@ -437,17 +437,17 @@ public class ItemControllerTests {
                 .description("description")
                 .SKU("SKU")
                 .build();
-        given(itemService.getByUuid(uuid)).willReturn(item);
+        given(itemService.findByUuid(uuid)).willReturn(item);
 
         // Act
-        final Item item = itemController.getByUuid(uuid);
+        final Item got = itemController.getByUuid(uuid);
 
         // Assert
-        assertEquals(uuid, item.getUuid());
-        assertEquals("name", item.getName());
-        assertEquals("description", item.getDescription());
-        assertEquals("SKU", item.getSKU());
-        verify(itemService, times(1)).getByUuid(uuid);
+        assertEquals(uuid, got.getUuid());
+        assertEquals("name", got.getName());
+        assertEquals("description", got.getDescription());
+        assertEquals("SKU", got.getSKU());
+        verify(itemService, times(1)).findByUuid(uuid);
     }
 
     @Test
@@ -456,7 +456,7 @@ public class ItemControllerTests {
 
         // Arrange
         final UUID uuid = UUID.randomUUID();
-        given(itemService.getByUuid(uuid)).willThrow(new NotFoundException("Item not found"));
+        given(itemService.findByUuid(uuid)).willThrow(new NotFoundException("Item not found"));
 
         // Act
         NotFoundException exception =
@@ -464,6 +464,6 @@ public class ItemControllerTests {
 
         // Assert
         assertEquals("Item not found", exception.getMessage());
-        verify(itemService, times(1)).getByUuid(uuid);
+        verify(itemService, times(1)).findByUuid(uuid);
     }
 }
