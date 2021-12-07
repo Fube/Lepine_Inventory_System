@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -80,7 +81,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item findByUuid(UUID uuid) {
-        return null;
+    public Optional<Item> findByUuid(UUID uuid) {
+        return Optional.empty();
     }
 }

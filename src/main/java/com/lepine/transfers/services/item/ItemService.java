@@ -4,6 +4,7 @@ import com.lepine.transfers.data.item.Item;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ItemService {
@@ -17,5 +18,5 @@ public interface ItemService {
 
     void delete(UUID uuid);
 
-    Item findByUuid(UUID uuid);
+    Optional<Item> findByUuid(UUID uuid);
 }

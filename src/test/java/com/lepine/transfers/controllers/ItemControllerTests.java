@@ -19,10 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -437,7 +434,7 @@ public class ItemControllerTests {
                 .description("description")
                 .SKU("SKU")
                 .build();
-        given(itemService.findByUuid(uuid)).willReturn(item);
+        given(itemService.findByUuid(uuid)).willReturn(Optional.empty());
 
         // Act
         final Item got = itemController.getByUuid(uuid);
@@ -456,7 +453,7 @@ public class ItemControllerTests {
 
         // Arrange
         final UUID uuid = UUID.randomUUID();
-        given(itemService.findByUuid(uuid)).willThrow(new NotFoundException("Item not found"));
+        given(itemService.findByUuid(uuid)).willReturn(Optional.empty());
 
         // Act
         NotFoundException exception =
