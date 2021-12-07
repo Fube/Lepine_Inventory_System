@@ -27,9 +27,9 @@ public class ItemController {
 
     @GetMapping
     public Page<Item> getAll() {
-        log.info("ItemController::getAll retrieving all items");
+        log.info("retrieving all items");
         final Page<Item> all = itemService.findAll();
-        log.info("ItemController::getAll retrieved all items");
+        log.info("retrieved all items");
 
         return all;
     }
@@ -40,37 +40,37 @@ public class ItemController {
             @Min(value = 1, message = "Page number cannot be less than 1") int page,
             @RequestParam
             @Min(value = 1, message = "Page size cannot be less than 1") int size) {
-        log.info("ItemController::getAll retrieving all items");
+        log.info("retrieving all items");
         final Page<Item> all = itemService.findAll(PageRequest.of(page - 1, size));
-        log.info("ItemController::getAll retrieved all items");
+        log.info("retrieved all items");
 
         return all;
     }
 
     @PostMapping
     public Item create(@RequestBody @Valid ItemUUIDLessDTO itemUUIDLessDTO) {
-        log.info("ItemController::create creating item");
+        log.info("creating item");
         final Item mapped = itemMapper.toEntity(itemUUIDLessDTO);
         final Item created = itemService.create(mapped);
-        log.info("ItemController::create created item");
+        log.info("created item");
 
         return created;
     }
 
     @PutMapping("/{uuid}")
     public Item update(@RequestBody @Valid ItemUUIDLessDTO itemUUIDLessDTO) {
-        log.info("ItemController::update updating item");
+        log.info("updating item");
         final Item mapped = itemMapper.toEntity(itemUUIDLessDTO);
         final Item updated = itemService.update(mapped);
-        log.info("ItemController::update updated item");
+        log.info("updated item");
 
         return updated;
     }
 
     @DeleteMapping("/{uuid}")
     public void delete(@PathVariable  UUID uuid) {
-        log.info("ItemController::delete deleting item");
+        log.info("deleting item");
         itemService.delete(uuid);
-        log.info("ItemController::delete deleted item");
+        log.info("deleted item");
     }
 }

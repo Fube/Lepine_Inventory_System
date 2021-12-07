@@ -30,35 +30,35 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Page<Item> findAll(PageRequest pageRequest) {
-        log.info("ItemController::getAll retrieving all items");
+        log.info("retrieving all items");
         final Page<Item> all = itemRepo.findAll(pageRequest);
-        log.info("ItemController::getAll retrieved all items");
+        log.info("retrieved all items");
 
         return all;
     }
 
     @Override
     public Item create(Item item) {
-        log.info("ItemController::create creating item");
+        log.info("creating item");
         final Item created = itemRepo.save(item);
-        log.info("ItemController::create created item");
+        log.info("created item");
 
-        log.info("ItemController::create sending item to search service");
+        log.info("sending item to search service");
         searchService.index(itemMapper.toSearchDTO(created));
-        log.info("ItemController::create sent item to search service");
+        log.info("sent item to search service");
 
         return created;
     }
 
     @Override
     public Item update(Item item) {
-        log.info("ItemController::update updating item");
+        log.info("updating item");
         final Item updated = itemRepo.save(item);
-        log.info("ItemController::update updated item");
+        log.info("updated item");
 
-        log.info("ItemController::update sending item to search service");
+        log.info("sending item to search service");
         searchService.index(itemMapper.toSearchDTO(updated));
-        log.info("ItemController::update sent item to search service");
+        log.info("sent item to search service");
 
         return updated;
     }
@@ -66,16 +66,16 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public void delete(UUID uuid) {
-        log.info("ItemController::delete deleting item");
+        log.info("deleting item");
         final Integer deleted = itemRepo.deleteByUuid(uuid);
         if(deleted <= 0) {
-            log.info("ItemController::delete item not found");
+            log.info("item not found");
             return;
         }
-        log.info("ItemController::delete deleted item");
+        log.info("deleted item");
 
-        log.info("ItemController::delete sending item to search service");
+        log.info("sending item to search service");
         searchService.delete(uuid);
-        log.info("ItemController::delete sent item to search service");
+        log.info("sent item to search service");
     }
 }
