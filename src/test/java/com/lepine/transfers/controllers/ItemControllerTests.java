@@ -4,6 +4,7 @@ import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
+import com.lepine.transfers.exceptions.NotFoundException;
 import com.lepine.transfers.services.Config;
 import com.lepine.transfers.services.item.ItemService;
 import org.junit.jupiter.api.BeforeEach;

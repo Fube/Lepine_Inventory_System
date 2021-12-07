@@ -58,10 +58,15 @@ public class ItemController {
     }
 
     @PutMapping("/{uuid}")
-    public Item update(@RequestBody @Valid ItemUUIDLessDTO itemUUIDLessDTO) {
+    public Item update(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid ItemUUIDLessDTO itemUUIDLessDTO) {
         log.info("updating item");
+
         final Item mapped = itemMapper.toEntity(itemUUIDLessDTO);
+        mapped.setUuid(uuid);
         final Item updated = itemService.update(mapped);
+
         log.info("updated item");
 
         return updated;
