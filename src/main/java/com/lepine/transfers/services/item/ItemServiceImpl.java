@@ -64,6 +64,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void delete(UUID uuid) {
+        log.info("ItemController::delete deleting item");
+        final Integer deleted = itemRepo.deleteByUuid(uuid);
+        if(deleted <= 0) {
+            log.info("ItemController::delete item not found");
+            return;
+        }
+        log.info("ItemController::delete deleted item");
 
+        log.info("ItemController::delete sending item to search service");
+        searchService.delete(uuid);
+        log.info("ItemController::delete sent item to search service");
     }
 }

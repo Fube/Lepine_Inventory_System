@@ -16,13 +16,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Comparator;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = { Config.class })
@@ -159,6 +158,7 @@ public class ItemServiceTests {
 
         // Arrange
         final UUID uuid = UUID.randomUUID();
+        given(itemRepo.deleteByUuid(uuid)).willReturn(1);
         doNothing().when(searchService).delete(uuid);
 
         // Act
@@ -175,6 +175,7 @@ public class ItemServiceTests {
 
         // Arrange
         final UUID uuid = UUID.randomUUID();
+        given(itemRepo.deleteByUuid(uuid)).willReturn(0);
         doNothing().when(searchService).delete(uuid);
 
         // Act
