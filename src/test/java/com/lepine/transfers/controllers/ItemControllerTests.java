@@ -308,7 +308,7 @@ public class ItemControllerTests {
     }
 
     @Test
-    @DisplayName("Given valid item dto, update Item and send copy to SearchService")
+    @DisplayName("Given valid item dto and UUID, update Item and send copy to SearchService")
     void updateItem() {
 
         // Arrange
@@ -317,17 +317,18 @@ public class ItemControllerTests {
                 .description("description")
                 .SKU("SKU")
                 .build();
+        final UUID uuid = UUID.randomUUID();
         given(itemService.update(any(Item.class)))
                 .willReturn(itemMapper.toEntity(itemDTO));
 
         // Act
-        final Item updatedItem = itemController.update(itemDTO);
+        final Item updatedItem = itemController.update(uuid, itemDTO);
 
         // Assert
         assertEquals("name", updatedItem.getName());
         assertEquals("description", updatedItem.getDescription());
         assertEquals("SKU", updatedItem.getSKU());
-        verify(itemService, times(1)).update(any(Item.class));
+        verify(itemService, times(1)).update(argThat(item -> item.getUuid().equals(uuid)));
     }
 
     @Test
@@ -336,10 +337,11 @@ public class ItemControllerTests {
 
         // Arrange
         final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder().build();
+        final UUID uuid = UUID.randomUUID();
 
         // Act
         ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> itemController.update(itemDTO));
+                assertThrows(ConstraintViolationException.class, () -> itemController.update(uuid, itemDTO));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
@@ -364,10 +366,11 @@ public class ItemControllerTests {
                 .description(null)
                 .SKU(null)
                 .build();
+        final UUID uuid = UUID.randomUUID();
 
         // Act
         ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> itemController.update(itemDTO));
+                assertThrows(ConstraintViolationException.class, () -> itemController.update(uuid, itemDTO));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
@@ -381,6 +384,29 @@ public class ItemControllerTests {
                 collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
 
         verify(itemService, never()).update(any(Item.class));
+    }
+
+    @Test
+    @DisplayName("Given Item with UUID does not exist, throw NotFoundException")
+    void updateItemWithNotFoundException() {
+
+        // Arrange
+        final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
+                .name("name")
+                .description("description")
+                .SKU("SKU")
+                .build();
+        final UUID uuid = UUID.randomUUID();
+        given(itemService.update(any(Item.class)))
+                .willThrow(new NotFoundException("Item not found"));
+
+        // Act
+        NotFoundException exception =
+                assertThrows(NotFoundException.class, () -> itemController.update(uuid, itemDTO));
+
+        // Assert
+        assertEquals("Item not found", exception.getMessage());
+        verify(itemService, times(1)).update(argThat(item -> item.getUuid().equals(uuid)));
     }
 
     @Test
