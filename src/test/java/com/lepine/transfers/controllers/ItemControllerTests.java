@@ -22,6 +22,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -434,7 +435,7 @@ public class ItemControllerTests {
                 .description("description")
                 .SKU("SKU")
                 .build();
-        given(itemService.findByUuid(uuid)).willReturn(Optional.empty());
+        given(itemService.findByUuid(uuid)).willReturn(Optional.of(item));
 
         // Act
         final Item got = itemController.getByUuid(uuid);
@@ -460,7 +461,7 @@ public class ItemControllerTests {
                 assertThrows(NotFoundException.class, () -> itemController.getByUuid(uuid));
 
         // Assert
-        assertEquals("Item not found", exception.getMessage());
+        assertEquals(format("Item with uuid %s not found", uuid), exception.getMessage());
         verify(itemService, times(1)).findByUuid(uuid);
     }
 }

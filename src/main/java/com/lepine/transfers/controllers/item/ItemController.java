@@ -3,6 +3,7 @@ package com.lepine.transfers.controllers.item;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
+import com.lepine.transfers.exceptions.NotFoundException;
 import com.lepine.transfers.services.item.ItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 import java.util.UUID;
+
+import static java.lang.String.format;
 
 @RestController
 @RequestMapping("/items")
@@ -51,8 +55,15 @@ public class ItemController {
     @GetMapping("/{uuid}")
     public Item getByUuid(@PathVariable @NotNull UUID uuid) {
         log.info("retrieving item by uuid {}", uuid);
-        final Item item = itemService.findByUuid(uuid);
-        log.info("retrieved item by uuid {}", uuid);
+
+        final Optional<Item> byUuid = itemService.findByUuid(uuid);
+        if(byUuid.isEmpty()) {
+            log.info("item with uuid {} not found", uuid);
+            throw new NotFoundException(format("Item with uuid %s not found", uuid));
+        }
+
+        final Item item = byUuid.get();
+        log.info("retrieved item by uuid {}", item.getUuid());
 
         return item;
     }
