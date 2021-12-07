@@ -4,11 +4,13 @@ import com.lepine.transfers.data.item.ItemSearchDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO>{
+public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO, UUID>{
 
     @Override
     @Test
@@ -33,5 +35,23 @@ public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO>{
         // Nothing to assert really, basically just hoping it does not throw an exception
         verify(searchIndex).saveObject(itemSearchDTO);
         verify(searchIndex, times(1)).saveObject(itemSearchDTO);
+    }
+
+    @Override
+    @Test
+    @DisplayName("Given item UUID, delete it")
+    public void testDelete() {
+
+        // Arrange
+        final UUID itemUUID = UUID.randomUUID();
+
+        given(searchIndex.deleteObject(itemUUID))
+                .willReturn(null);
+
+        // Act
+        searchService.delete(itemSearchDTO);
+
+        // Assert
+        verify(searchIndex, times(1)).deleteObject(itemSearchDTO);
     }
 }
