@@ -4,7 +4,7 @@ import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
-import com.lepine.transfers.exceptions.NotFoundException;
+import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.Config;
 import com.lepine.transfers.services.item.ItemService;
 import org.junit.jupiter.api.BeforeEach;
@@ -397,14 +397,14 @@ public class ItemControllerTests {
                 .build();
         final UUID uuid = UUID.randomUUID();
         given(itemService.update(any(Item.class)))
-                .willThrow(new NotFoundException("Item not found"));
+                .willThrow(new ItemNotFoundException(uuid));
 
         // Act
-        NotFoundException exception =
-                assertThrows(NotFoundException.class, () -> itemController.update(uuid, itemDTO));
+        ItemNotFoundException exception =
+                assertThrows(ItemNotFoundException.class, () -> itemController.update(uuid, itemDTO));
 
         // Assert
-        assertEquals("Item not found", exception.getMessage());
+        assertEquals(format("Item with uuid %s not found", uuid), exception.getMessage());
         verify(itemService, times(1)).update(argThat(item -> item.getUuid().equals(uuid)));
     }
 
@@ -457,8 +457,8 @@ public class ItemControllerTests {
         given(itemService.findByUuid(uuid)).willReturn(Optional.empty());
 
         // Act
-        NotFoundException exception =
-                assertThrows(NotFoundException.class, () -> itemController.getByUuid(uuid));
+        ItemNotFoundException exception =
+                assertThrows(ItemNotFoundException.class, () -> itemController.getByUuid(uuid));
 
         // Assert
         assertEquals(format("Item with uuid %s not found", uuid), exception.getMessage());

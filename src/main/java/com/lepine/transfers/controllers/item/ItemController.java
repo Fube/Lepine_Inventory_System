@@ -4,6 +4,7 @@ import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.exceptions.NotFoundException;
+import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class ItemController {
         final Optional<Item> byUuid = itemService.findByUuid(uuid);
         if(byUuid.isEmpty()) {
             log.info("item with uuid {} not found", uuid);
-            throw new NotFoundException(format("Item with uuid %s not found", uuid));
+            throw new ItemNotFoundException(uuid);
         }
 
         final Item item = byUuid.get();
