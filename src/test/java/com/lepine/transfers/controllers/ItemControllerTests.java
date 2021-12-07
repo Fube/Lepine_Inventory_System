@@ -424,4 +424,46 @@ public class ItemControllerTests {
         // Assert
         verify(itemService, times(1)).delete(uuid);
     }
+
+    @Test
+    @DisplayName("Given UUID, retrieve Item")
+    void retrieveItem() {
+
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        final Item item = Item.builder()
+                .uuid(uuid)
+                .name("name")
+                .description("description")
+                .SKU("SKU")
+                .build();
+        given(itemService.getByUuid(uuid)).willReturn(item);
+
+        // Act
+        final Item item = itemController.getByUuid(uuid);
+
+        // Assert
+        assertEquals(uuid, item.getUuid());
+        assertEquals("name", item.getName());
+        assertEquals("description", item.getDescription());
+        assertEquals("SKU", item.getSKU());
+        verify(itemService, times(1)).getByUuid(uuid);
+    }
+
+    @Test
+    @DisplayName("Given non-existing UUID, throw NotFoundException")
+    void retrieveItemWithNotFoundException() {
+
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        given(itemService.getByUuid(uuid)).willThrow(new NotFoundException("Item not found"));
+
+        // Act
+        NotFoundException exception =
+                assertThrows(NotFoundException.class, () -> itemController.getByUuid(uuid));
+
+        // Assert
+        assertEquals("Item not found", exception.getMessage());
+        verify(itemService, times(1)).getByUuid(uuid);
+    }
 }
