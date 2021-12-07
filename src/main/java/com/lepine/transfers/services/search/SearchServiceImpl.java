@@ -19,6 +19,8 @@ public class SearchServiceImpl<T, I> implements SearchService<T, I> {
 
     @Override
     public void delete(I identifier) {
-
+        log.info("Deleting {}", identifier);
+        searchIndex.deleteObject(identifier.toString());
+        log.info("Deleted {}", identifier);
     }
 }
