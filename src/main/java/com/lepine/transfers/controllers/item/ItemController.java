@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/items")
@@ -93,6 +94,7 @@ public class ItemController {
         return updated;
     }
 
+    @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{uuid}")
     public void delete(@PathVariable  UUID uuid) {
         log.info("deleting item");
