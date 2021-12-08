@@ -162,7 +162,7 @@ public class ItemControllerTests {
                 toInsert = 20,
                 pageSize = 10,
                 pageNumber = 1;
-        final Page<Item> page = createPageFor(createItems(toInsert), PageRequest.of(pageNumber, pageSize));
+        final Page<Item> page = createPageFor(createItems(toInsert), PageRequest.of(pageNumber - 1, pageSize));
         given(itemService.findAll(any(PageRequest.class))).willReturn(page);
 
         // Act

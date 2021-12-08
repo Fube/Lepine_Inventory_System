@@ -1,14 +1,17 @@
-#for h2
 algolia:
   application_id: ${ALGOLIA_APPLICATION_ID}
   api_key: ${ALGOLIA_API_KEY}
+
+---
 spring:
   h2:
     console:
       enabled: true
   config:
     activate:
-      on-profile: test
+      on-profile:
+        - dev
+        - test
 
   flyway:
     url: jdbc:h2:mem:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
@@ -21,6 +24,8 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
+    hikari:
+      initialization-fail-timeout: 60000
 
   jpa:
     show-sql: true
@@ -35,5 +40,3 @@ spring:
     init:
       mode: never
       platform: h2
-
-spring.datasource.hikari.initializationFailTimeout: 60000

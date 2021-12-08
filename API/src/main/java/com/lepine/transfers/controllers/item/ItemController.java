@@ -1,5 +1,6 @@
 package com.lepine.transfers.controllers.item;
 
+import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
@@ -34,7 +35,7 @@ public class ItemController {
     @GetMapping
     public Page<Item> getAll() {
         log.info("retrieving all items");
-        final Page<Item> all = itemService.findAll();
+        final Page<Item> all = OneIndexedPageAdapter.of(itemService.findAll());
         log.info("retrieved all items");
 
         return all;
@@ -47,7 +48,7 @@ public class ItemController {
             @RequestParam
             @Min(value = 1, message = "Page size cannot be less than 1") int size) {
         log.info("retrieving all items");
-        final Page<Item> all = itemService.findAll(PageRequest.of(page, size));
+        final Page<Item> all = OneIndexedPageAdapter.of(itemService.findAll(PageRequest.of(page - 1, size)));
         log.info("retrieved all items");
 
         return all;

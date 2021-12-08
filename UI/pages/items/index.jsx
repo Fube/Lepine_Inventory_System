@@ -1,7 +1,7 @@
 import Nav from "../../components/Nav";
 import Link from "next/link";
-import { useState } from "react";
 import { axiosBackend } from "../../config/axios";
+import Paginate from "../../components/Pagination";
 
 /**
  *
@@ -9,31 +9,6 @@ import { axiosBackend } from "../../config/axios";
  * @returns
  */
 export default function ShowItems({ items, totalPages, pageNumber }) {
-    const [currentPage, setCurrentPage] = useState(pageNumber);
-
-    const paginate = (currentPage, lastPage, delta = 3) => {
-        const range = [];
-        for (
-            let i = Math.max(2, currentPage - delta);
-            i <= Math.min(lastPage - 1, currentPage + delta);
-            i += 1
-        ) {
-            range.push(i);
-        }
-
-        if (currentPage - delta > 2) {
-            range.unshift("...");
-        }
-        if (currentPage + delta < lastPage - 1) {
-            range.push("...");
-        }
-
-        range.unshift(1);
-        if (lastPage !== 1) range.push(lastPage);
-
-        return range;
-    };
-
     return (
         <>
             <Nav />
@@ -67,30 +42,12 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
 
                     {totalPages > 1 && (
                         <div className="flex justify-center mt-4">
-                            <div className="btn-group">
-                                <button className="btn">Previous</button>
-
-                                {paginate(pageNumber, totalPages).map(
-                                    (page) => (
-                                        <button
-                                            key={page}
-                                            className={`btn ${
-                                                page === pageNumber
-                                                    ? "btn-primary"
-                                                    : "btn-outline-primary"
-                                            }`}
-                                            disabled={
-                                                page === pageNumber ||
-                                                page === "..."
-                                            }
-                                        >
-                                            {page}
-                                        </button>
-                                    )
-                                )}
-
-                                <button className="btn">Next</button>
-                            </div>
+                            <Paginate
+                                pageNumber={pageNumber}
+                                totalPages={totalPages}
+                                onNext={console.log}
+                                onPrevious={console.log}
+                            />
                         </div>
                     )}
                 </div>
