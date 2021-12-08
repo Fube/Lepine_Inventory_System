@@ -6,8 +6,11 @@ import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.services.item.ItemService;
+import helpers.matchers.ItemMatcher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,6 +29,7 @@ import java.util.UUID;
 import static helpers.PageHelpers.createPageFor;
 import static java.lang.String.format;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -155,7 +159,8 @@ public class ItemHttpTests {
                 .description("Description")
                 .build();
         final Item item = itemMapper.toEntity(itemUUIDLessDTO);
-        given(itemService.create(item))
+        final ArgumentMatcher<Item> matcher = new ItemMatcher(item);
+        given(itemService.create(argThat(matcher)))
                 .willReturn(item);
 
         // Act
@@ -165,14 +170,14 @@ public class ItemHttpTests {
 
         // Assert
         resultActions
-                .andExpect(status().isCreated())
+                .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(item.getName()))
                 .andExpect(jsonPath("$.sku").value(item.getSKU()))
                 .andExpect(jsonPath("$.description").value(item.getDescription()));
 
-        verify(itemService, times(1)).create(item);
+        verify(itemService, times(1)).create(argThat(matcher));
         verify(itemController, times(1)).create(itemUUIDLessDTO);
     }
 

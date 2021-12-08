@@ -3,7 +3,6 @@ package com.lepine.transfers.controllers.item;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
-import com.lepine.transfers.exceptions.NotFoundException;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.lang.String.format;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping("/items")
