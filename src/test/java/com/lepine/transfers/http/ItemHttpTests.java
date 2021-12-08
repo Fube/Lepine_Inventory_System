@@ -1,7 +1,10 @@
 package com.lepine.transfers.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
+import com.lepine.transfers.data.item.ItemMapper;
+import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.services.item.ItemService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,11 +25,13 @@ import java.util.UUID;
 
 import static helpers.PageHelpers.createPageFor;
 import static java.lang.String.format;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ItemController.class })
@@ -42,6 +47,12 @@ public class ItemHttpTests {
 
     @SpyBean
     private ItemController itemController;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private ItemMapper itemMapper;
 
     @Test
     void contextLoads(){}
@@ -132,5 +143,63 @@ public class ItemHttpTests {
 
         verify(itemService, times(1)).findByUuid(uuid);
         verify(itemController, times(1)).getByUuid(uuid);
+    }
+
+    @Test
+    @DisplayName("Given POST on /items, returns 201 CREATED and the item")
+    void postItem() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .name("Item")
+                .SKU("SKU")
+                .description("Description")
+                .build();
+        final Item item = itemMapper.toEntity(itemUUIDLessDTO);
+        given(itemService.create(item))
+                .willReturn(item);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(post("/items")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(item)));
+
+        // Assert
+        resultActions
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
+                .andExpect(jsonPath("$.name").value(item.getName()))
+                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.description").value(item.getDescription()));
+
+        verify(itemService, times(1)).create(item);
+        verify(itemController, times(1)).create(itemUUIDLessDTO);
+    }
+
+    @Test
+    @DisplayName("Given POST on /items, returns 400 BAD REQUEST if the item is invalid")
+    void postItemInvalid() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .description("")
+                .name("")
+                .SKU("")
+                .build();
+
+        // Act
+        final ResultActions resultActions = mvc.perform(post("/items")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(itemUUIDLessDTO)));
+
+        // Assert
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(itemService, times(0)).create(any(Item.class));
+        verify(itemController, times(0)).create(itemUUIDLessDTO);
     }
 }
