@@ -168,7 +168,7 @@ public class ItemHttpTests {
 
         // Assert
         resultActions
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(item.getName()))
