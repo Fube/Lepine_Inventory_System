@@ -5,12 +5,12 @@ import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
+import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
 import helpers.matchers.ItemMatcher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,8 +34,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ItemController.class })
@@ -206,5 +205,94 @@ public class ItemHttpTests {
 
         verify(itemService, times(0)).create(any(Item.class));
         verify(itemController, times(0)).create(itemUUIDLessDTO);
+    }
+
+    @Test
+    @DisplayName("Given PUT on /items/{uuid}, returns 200 OK and the item")
+    void putItem() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .name("Item")
+                .SKU("SKU")
+                .description("Description")
+                .build();
+        final Item item = itemMapper.toEntity(itemUUIDLessDTO);
+        final ArgumentMatcher<Item> matcher = new ItemMatcher(item);
+        given(itemService.update(argThat(matcher)))
+                .willReturn(item);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(put("/items/{uuid}", item.getUuid())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(item)));
+
+        // Assert
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
+                .andExpect(jsonPath("$.name").value(item.getName()))
+                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.description").value(item.getDescription()));
+
+        verify(itemService, times(1)).update(argThat(matcher));
+        verify(itemController, times(1)).update(item.getUuid(), itemUUIDLessDTO);
+    }
+
+    @Test
+    @DisplayName("Given PUT on /items/{uuid}, returns 400 BAD REQUEST if the item is invalid")
+    void putItemInvalid() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .description("")
+                .name("")
+                .SKU("")
+                .build();
+
+        // Act
+        final ResultActions resultActions = mvc.perform(put("/items/{uuid}", UUID.randomUUID())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(itemUUIDLessDTO)));
+
+        // Assert
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(itemService, times(0)).update(any(Item.class));
+        verify(itemController, times(0)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
+    }
+
+    @Test
+    @DisplayName("Given PUT on /items/{uuid}, returns 404 NOT FOUND if the item does not exist")
+    void putItemNotFound() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .name("Item")
+                .SKU("SKU")
+                .description("Description")
+                .build();
+        final Item item = itemMapper.toEntity(itemUUIDLessDTO);
+        given(itemService.update(any(Item.class)))
+                .willThrow(new ItemNotFoundException(item.getUuid()));
+
+        // Act
+        final ResultActions resultActions = mvc.perform(put("/items/{uuid}", item.getUuid())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(item)));
+
+        // Assert
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(format("Item with uuid %s not found", item.getUuid())))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(itemService, times(1)).update(any(Item.class));
+        verify(itemController, times(1)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
     }
 }
