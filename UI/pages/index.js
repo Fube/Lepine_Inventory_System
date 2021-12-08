@@ -1,5 +1,10 @@
-import styles from "../styles/Home.module.css";
+import Nav from "../components/Nav";
 
 export default function Home() {
-    return <></>;
+    return (
+        <>
+            <Nav />
+            <h1>Lorem Ipsum Or Something</h1>
+        </>
+    );
 }
