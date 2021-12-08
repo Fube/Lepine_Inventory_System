@@ -1,13 +1,16 @@
 import Nav from "../../components/Nav";
 import Link from "next/link";
 import Item from "../../components/Item";
+import getConfig from "next/config";
+import axios from "axios";
+import { axiosBackend } from "../../config/axios";
 
 /**
  *
  * @param {{ items: import("../../components/Item").ItemProps[] }}
  * @returns
  */
-export default function ShowItems({ items }) {
+export default function ShowItems({ items, url }) {
     return (
         <>
             <Nav />
@@ -39,16 +42,10 @@ export default function ShowItems({ items }) {
 }
 
 export async function getServerSideProps(ctx) {
+    const { data } = await axiosBackend.get(`/items`);
     return {
         props: {
-            items: [
-                {
-                    uuid: "1",
-                    name: "Item 1",
-                    description: "Item 1 description",
-                    sku: "2020-01-01",
-                },
-            ],
+            items: data.content,
         },
     };
 }
