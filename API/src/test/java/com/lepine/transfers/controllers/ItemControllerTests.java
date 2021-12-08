@@ -92,6 +92,7 @@ public class ItemControllerTests {
         // Assert
         assertEquals(toInsert, items.getTotalElements());
         assertEquals(toInsert / 10, items.getTotalPages());
+        assertEquals(1, items.getNumber());
 
         final List<Item> content = items.getContent();
         for (int i = 0; i < content.size(); i++) {
@@ -119,7 +120,7 @@ public class ItemControllerTests {
         // Assert
         assertEquals(toInsert, items.getTotalElements());
         assertEquals(toInsert / pageSize, items.getTotalPages());
-        assertEquals(0, items.getNumber());
+        assertEquals(1, items.getNumber());
 
         final List<Item> content = items.getContent();
         for (int i = 10; i < content.size(); i++) {
@@ -171,6 +172,7 @@ public class ItemControllerTests {
         assertEquals(toInsert, items.getTotalElements());
         assertEquals(toInsert / pageSize, items.getTotalPages());
         assertEquals(items.getSize(), pageSize);
+        assertEquals(pageNumber, items.getNumber());
 
         final List<Item> content = items.getContent();
         for (int i = 0; i < content.size(); i++) {
@@ -219,7 +221,7 @@ public class ItemControllerTests {
         // Assert
         assertEquals(toInsert, items.getTotalElements());
         assertEquals(toInsert / pageSize, items.getTotalPages());
-        assertEquals(page - 1, items.getNumber());
+        assertEquals(page, items.getNumber());
         assertEquals(pageSize, items.getSize());
 
         final List<Item> content = items.getContent();
