@@ -3,7 +3,6 @@ package com.lepine.transfers.http;
 import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.services.item.ItemService;
-import helpers.PageHelpers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static helpers.PageHelpers.createPageFor;
@@ -79,5 +79,62 @@ public class ItemHttpTests {
 
         verify(itemService, times(1)).findAll();
         verify(itemController, times(1)).getAll();
+    }
+
+    @Test
+    @DisplayName("Given GET on /items/{uuid}, returns 200 OK and the item")
+    void getItem() throws Exception {
+        // Arrange
+        final Item item = Item.builder()
+                .uuid(UUID.randomUUID())
+                .name("Item")
+                .SKU("SKU")
+                .description("Description")
+                .build();
+        given(itemService.findByUuid(item.getUuid()))
+                .willReturn(Optional.of(item));
+
+        // Act
+        final ResultActions resultActions = mvc.perform(get("/items/{uuid}", item.getUuid()));
+
+        // Assert
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
+                .andExpect(jsonPath("$.name").value(item.getName()))
+                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.description").value(item.getDescription()));
+
+        verify(itemService, times(1)).findByUuid(item.getUuid());
+        verify(itemController, times(1)).getByUuid(item.getUuid());
+    }
+
+    @Test
+    @DisplayName("Given GET on /items/{uuid}, returns 404 NOT FOUND if the item does not exist")
+    void getItemNotFound() throws Exception {
+        // Arrange
+        final Item item = Item.builder()
+                .uuid(UUID.randomUUID())
+                .name("Item")
+                .SKU("SKU")
+                .description("Description")
+                .build();
+        given(itemService.findByUuid(item.getUuid()))
+                .willReturn(Optional.empty());
+
+        // Act
+        final ResultActions resultActions = mvc.perform(get("/items/{uuid}", item.getUuid()));
+
+        // Assert
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Item not found"))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(itemService, times(1)).findByUuid(item.getUuid());
+        verify(itemController, times(1)).getByUuid(item.getUuid());
     }
 }
