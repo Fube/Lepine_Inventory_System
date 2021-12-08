@@ -69,6 +69,7 @@ public class ItemController {
         return item;
     }
 
+    @ResponseStatus(CREATED)
     @PostMapping
     public Item create(@RequestBody @Valid ItemUUIDLessDTO itemUUIDLessDTO) {
         log.info("creating item");
