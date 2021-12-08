@@ -31,8 +31,7 @@ import static java.lang.String.format;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -294,5 +293,23 @@ public class ItemHttpTests {
 
         verify(itemService, times(1)).update(any(Item.class));
         verify(itemController, times(1)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
+    }
+
+    @Test
+    @DisplayName("Given DELETE on /items/{uuid}, returns 204 NO CONTENT")
+    void deleteItem() throws Exception {
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        doNothing().when(itemService).delete(uuid);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(delete("/items/{uuid}", uuid));
+
+        // Assert
+        resultActions
+                .andExpect(status().isNoContent());
+
+        verify(itemService, times(1)).delete(uuid);
+        verify(itemController, times(1)).delete(uuid);
     }
 }
