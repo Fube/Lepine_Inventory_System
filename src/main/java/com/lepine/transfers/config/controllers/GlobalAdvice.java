@@ -17,9 +17,9 @@ public class GlobalAdvice {
 
     @Data
     @RequiredArgsConstructor
-    public class HTTPErrorMessage {
+    public static class HTTPErrorMessage {
 
-        private final int statusCode;
+        private final int status;
         private String timestamp = now( UTC ).format( ISO_INSTANT );
         private final String message;
     }

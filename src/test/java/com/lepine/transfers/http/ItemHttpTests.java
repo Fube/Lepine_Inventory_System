@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static helpers.PageHelpers.createPageFor;
+import static java.lang.String.format;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -114,27 +115,22 @@ public class ItemHttpTests {
     @DisplayName("Given GET on /items/{uuid}, returns 404 NOT FOUND if the item does not exist")
     void getItemNotFound() throws Exception {
         // Arrange
-        final Item item = Item.builder()
-                .uuid(UUID.randomUUID())
-                .name("Item")
-                .SKU("SKU")
-                .description("Description")
-                .build();
-        given(itemService.findByUuid(item.getUuid()))
+        final UUID uuid = UUID.randomUUID();
+        given(itemService.findByUuid(uuid))
                 .willReturn(Optional.empty());
 
         // Act
-        final ResultActions resultActions = mvc.perform(get("/items/{uuid}", item.getUuid()));
+        final ResultActions resultActions = mvc.perform(get("/items/{uuid}", uuid));
 
         // Assert
         resultActions
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value("Item not found"))
+                .andExpect(jsonPath("$.message").value(format("Item with uuid %s not found", uuid)))
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.timestamp").exists());
 
-        verify(itemService, times(1)).findByUuid(item.getUuid());
-        verify(itemController, times(1)).getByUuid(item.getUuid());
+        verify(itemService, times(1)).findByUuid(uuid);
+        verify(itemController, times(1)).getByUuid(uuid);
     }
 }
