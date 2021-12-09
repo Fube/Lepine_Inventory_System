@@ -3,21 +3,13 @@ import Link from "next/link";
 import { axiosBackend } from "../../config/axios";
 import Paginate from "../../components/Pagination";
 import { useRouter } from "next/router";
-import {
-    InstantSearch,
-    Hits,
-    SearchBox,
-    Pagination,
-    Highlight,
-    ClearRefinements,
-    RefinementList,
-    Configure,
-    connectHits,
-    connectPagination,
-} from "react-instantsearch-dom";
+import { InstantSearch, SearchBox, Configure } from "react-instantsearch-dom";
 import { useContext } from "react";
 import { AlgoliaContext } from "../_app";
-import Item from "../../components/Item";
+import {
+    PaginateAdapter,
+    TableHitsAdapter,
+} from "../../components/AlgoliaAdapters";
 
 /**
  *
@@ -38,10 +30,12 @@ export default function ShowItems({ totalPages, pageNumber }) {
                 <Nav />
                 <div className="overflow-x-auto justify-center flex">
                     <div className="w-1/2">
-                        <h1 className="text-4xl text-left my-4">Items</h1>
-                        <SearchBox />
+                        <div className="flex justify-around my-4">
+                            <h1 className="text-4xl">Items</h1>
+                            <SearchBox />
+                        </div>
                         <Configure hitsPerPage={10} />
-                        <ItemHitTableAdapter
+                        <TableHitsAdapter
                             headComponent={
                                 <tr>
                                     <th>Name</th>
@@ -52,7 +46,7 @@ export default function ShowItems({ totalPages, pageNumber }) {
                             hitComponent={ItemHitAdapter}
                         />
                         <div className="flex justify-center mt-4">
-                            <ItemPaginationAdapter />
+                            <PaginateAdapter />
                         </div>
                     </div>
                 </div>
@@ -72,41 +66,3 @@ function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
         </Link>
     );
 }
-
-const ItemHitTableAdapter = connectHits(function ({
-    hits: items,
-    hitComponent: HitComponent,
-    headComponent,
-}) {
-    if (items && items.length <= 0) {
-        return (
-            <h2 className="text-2xl text-center text-yellow-400">
-                Nothing to show 😢
-            </h2>
-        );
-    }
-    const mappedItems = items.map((item, key) => (
-        <HitComponent hit={item} key={key} />
-    ));
-
-    return (
-        <table className="table table-zebra w-full table-fixed">
-            <thead>{headComponent}</thead>
-            <tbody>{mappedItems}</tbody>
-        </table>
-    );
-});
-
-const ItemPaginationAdapter = connectPagination(function ({
-    nbPages: totalPages,
-    currentRefinement: pageNumber,
-    refine,
-}) {
-    return (
-        <Paginate
-            pageNumber={pageNumber}
-            totalPages={totalPages}
-            onPageChange={refine}
-        />
-    );
-});
