@@ -2,6 +2,7 @@ import Nav from "../../components/Nav";
 import Link from "next/link";
 import { axiosBackend } from "../../config/axios";
 import Paginate from "../../components/Pagination";
+import { useRouter } from "next/router";
 
 /**
  *
@@ -9,6 +10,11 @@ import Paginate from "../../components/Pagination";
  * @returns
  */
 export default function ShowItems({ items, totalPages, pageNumber }) {
+    const router = useRouter();
+
+    const loadNewPage = (newPage) => {
+        router.push(`/items?page=${newPage}`);
+    };
     return (
         <>
             <Nav />
@@ -55,10 +61,10 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
     );
 }
 
-export async function getServerSideProps(ctx) {
+export async function getServerSideProps({ query: { page = 1 } }) {
     const {
         data: { content: items, number: pageNumber, totalPages },
-    } = await axiosBackend.get(`/items`);
+    } = await axiosBackend.get(`/items?page=${page}`);
     return {
         props: {
             items,
