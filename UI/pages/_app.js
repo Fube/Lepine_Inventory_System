@@ -1,17 +1,21 @@
 import "../styles/globals.css";
-import { InstantSearch } from "react-instantsearch-dom";
 import algoliasearch from "algoliasearch/lite";
+import { createContext } from "react";
 
 const searchClient = algoliasearch(
-    "latency",
-    "6be0576ff61c053d5f9a3225e2a90f76"
+    "3VJL1MLU0K",
+    "d5abea3b2d8eff8328c34155b1713c39"
 );
+
+export const AlgoliaContext = createContext({
+    searchClient,
+});
 
 function MyApp({ Component, pageProps }) {
     return (
-        <InstantSearch searchClient={searchClient} indexName="instant_search">
+        <AlgoliaContext.Provider value={{ searchClient }}>
             <Component {...pageProps} />
-        </InstantSearch>
+        </AlgoliaContext.Provider>
     );
 }
 

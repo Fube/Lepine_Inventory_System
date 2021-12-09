@@ -3,6 +3,18 @@ import Link from "next/link";
 import { axiosBackend } from "../../config/axios";
 import Paginate from "../../components/Pagination";
 import { useRouter } from "next/router";
+import {
+    InstantSearch,
+    Hits,
+    SearchBox,
+    Pagination,
+    Highlight,
+    ClearRefinements,
+    RefinementList,
+    Configure,
+} from "react-instantsearch-dom";
+import { useContext } from "react";
+import { AlgoliaContext } from "../_app";
 
 /**
  *
@@ -11,6 +23,7 @@ import { useRouter } from "next/router";
  */
 export default function ShowItems({ items, totalPages, pageNumber }) {
     const router = useRouter();
+    const { searchClient } = useContext(AlgoliaContext);
 
     const loadNewPage = (newPage) => {
         router.push(`/items?page=${newPage}`);
@@ -50,23 +63,35 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
 
     return (
         <>
-            <Nav />
-            <div className="overflow-x-auto justify-center flex">
-                <div className="w-1/2">
-                    <h1 className="text-4xl text-left my-4">Items</h1>
-                    {getTableOrSadFace()}
-                    {totalPages > 1 && (
-                        <div className="flex justify-center mt-4">
-                            <Paginate
-                                pageNumber={pageNumber}
-                                totalPages={totalPages}
-                                onPageChange={loadNewPage}
-                            />
-                        </div>
-                    )}
+            <InstantSearch searchClient={searchClient} indexName="items">
+                <Nav />
+                <div className="overflow-x-auto justify-center flex">
+                    <div className="w-1/2">
+                        <h1 className="text-4xl text-left my-4">Items</h1>
+                        <SearchBox />
+                        {getTableOrSadFace()}
+                        {totalPages > 1 && (
+                            <div className="flex justify-center mt-4">
+                                <Paginate
+                                    pageNumber={pageNumber}
+                                    totalPages={totalPages}
+                                    onPageChange={loadNewPage}
+                                />
+                            </div>
+                        )}
+                        <Hits hitComponent={Foo} />
+                    </div>
                 </div>
-            </div>
+            </InstantSearch>
         </>
+    );
+}
+
+function Foo(props) {
+    return (
+        <Link href={`/items/${props.hit.objectID}`} passHref>
+            {props.hit.name}
+        </Link>
     );
 }
 
