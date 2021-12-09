@@ -33,20 +33,12 @@ public class ItemController {
     private final ItemMapper itemMapper;
 
     @GetMapping
-    public Page<Item> getAll() {
-        log.info("retrieving all items");
-        final Page<Item> all = OneIndexedPageAdapter.of(itemService.findAll());
-        log.info("retrieved all items");
-
-        return all;
-    }
-
-    @GetMapping(params = { "page", "size" })
     public Page<Item> getAll(
-            @RequestParam
+            @RequestParam(required = false, defaultValue = "1")
             @Min(value = 1, message = "Page number cannot be less than 1") int page,
-            @RequestParam
+            @RequestParam(required = false, defaultValue = "10")
             @Min(value = 1, message = "Page size cannot be less than 1") int size) {
+
         log.info("retrieving all items");
         final Page<Item> all = OneIndexedPageAdapter.of(itemService.findAll(PageRequest.of(page - 1, size)));
         log.info("retrieved all items");

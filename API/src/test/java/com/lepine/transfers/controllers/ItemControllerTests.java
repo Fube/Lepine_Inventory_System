@@ -84,10 +84,10 @@ public class ItemControllerTests {
         // Arrange
         final int toInsert = 20;
         final Page<Item> page = createPageFor(createItems(toInsert));
-        given(itemService.findAll()).willReturn(page);
+        given(itemService.findAll(PageRequest.of(0, 10))).willReturn(page);
 
         // Act
-        final Page<Item> items = itemController.getAll();
+        final Page<Item> items = itemController.getAll(1, 10);
 
         // Assert
         assertEquals(toInsert, items.getTotalElements());
@@ -100,7 +100,7 @@ public class ItemControllerTests {
             assertEquals("description" + i, content.get(i).getDescription());
             assertEquals("SKU" + i, content.get(i).getSKU());
         }
-        verify(itemService, times(1)).findAll();
+        verify(itemService, times(1)).findAll(any(PageRequest.class));
     }
 
     @Test

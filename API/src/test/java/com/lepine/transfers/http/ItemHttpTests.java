@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -76,7 +77,7 @@ public class ItemHttpTests {
                     .build());
         }
         final Page<Item> pageFor = createPageFor(items);
-        given(itemService.findAll())
+        given(itemService.findAll(PageRequest.of(0, PER_PAGE)))
                 .willReturn(pageFor);
 
         // Act
@@ -91,8 +92,8 @@ public class ItemHttpTests {
                 .andExpect(jsonPath("$.totalElements").value(LEN))
                 .andExpect(jsonPath("$.totalPages").value(LEN / PER_PAGE));
 
-        verify(itemService, times(1)).findAll();
-        verify(itemController, times(1)).getAll();
+        verify(itemService, times(1)).findAll(PageRequest.of(0, PER_PAGE));
+        verify(itemController, times(1)).getAll(1, 10);
     }
 
     @Test
