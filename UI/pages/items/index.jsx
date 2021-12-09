@@ -12,53 +12,24 @@ import {
     ClearRefinements,
     RefinementList,
     Configure,
+    connectHits,
+    connectPagination,
 } from "react-instantsearch-dom";
 import { useContext } from "react";
 import { AlgoliaContext } from "../_app";
+import Item from "../../components/Item";
 
 /**
  *
  * @param {{ items: import("../../components/Item").ItemProps[] }}
  * @returns
  */
-export default function ShowItems({ items, totalPages, pageNumber }) {
+export default function ShowItems({ totalPages, pageNumber }) {
     const router = useRouter();
     const { searchClient } = useContext(AlgoliaContext);
 
     const loadNewPage = (newPage) => {
         router.push(`/items?page=${newPage}`);
-    };
-
-    const getTableOrSadFace = () => {
-        if (items && items.length <= 0) {
-            return (
-                <h2 className="text-2xl text-center text-yellow-400">
-                    Nothing to show 😢
-                </h2>
-            );
-        }
-
-        const mappedItems = items.map(({ uuid, name, sku, description }) => (
-            <Link key={uuid} href={`/items/${uuid}`} passHref>
-                <tr className="hover">
-                    <td>{name}</td>
-                    <td>{sku}</td>
-                    <td>{description}</td>
-                </tr>
-            </Link>
-        ));
-        return (
-            <table className="table table-zebra w-full table-fixed">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>SKU</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>{mappedItems}</tbody>
-            </table>
-        );
     };
 
     return (
@@ -69,17 +40,20 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                     <div className="w-1/2">
                         <h1 className="text-4xl text-left my-4">Items</h1>
                         <SearchBox />
-                        {getTableOrSadFace()}
-                        {totalPages > 1 && (
-                            <div className="flex justify-center mt-4">
-                                <Paginate
-                                    pageNumber={pageNumber}
-                                    totalPages={totalPages}
-                                    onPageChange={loadNewPage}
-                                />
-                            </div>
-                        )}
-                        <Hits hitComponent={Foo} />
+                        <Configure hitsPerPage={10} />
+                        <ItemHitTableAdapter
+                            headComponent={
+                                <tr>
+                                    <th>Name</th>
+                                    <th>SKU</th>
+                                    <th>Description</th>
+                                </tr>
+                            }
+                            hitComponent={ItemHitAdapter}
+                        />
+                        <div className="flex justify-center mt-4">
+                            <ItemPaginationAdapter />
+                        </div>
                     </div>
                 </div>
             </InstantSearch>
@@ -87,23 +61,52 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
     );
 }
 
-function Foo(props) {
+function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     return (
-        <Link href={`/items/${props.hit.objectID}`} passHref>
-            {props.hit.name}
+        <Link key={uuid} href={`/items/${uuid}`} passHref>
+            <tr className="hover">
+                <td>{name}</td>
+                <td>{sku}</td>
+                <td>{description}</td>
+            </tr>
         </Link>
     );
 }
 
-export async function getServerSideProps({ query: { page = 1 } }) {
-    const {
-        data: { content: items, number: pageNumber, totalPages },
-    } = await axiosBackend.get(`/items?page=${page}`);
-    return {
-        props: {
-            items,
-            pageNumber,
-            totalPages,
-        },
-    };
-}
+const ItemHitTableAdapter = connectHits(function ({
+    hits: items,
+    hitComponent: HitComponent,
+    headComponent,
+}) {
+    if (items && items.length <= 0) {
+        return (
+            <h2 className="text-2xl text-center text-yellow-400">
+                Nothing to show 😢
+            </h2>
+        );
+    }
+    const mappedItems = items.map((item, key) => (
+        <HitComponent hit={item} key={key} />
+    ));
+
+    return (
+        <table className="table table-zebra w-full table-fixed">
+            <thead>{headComponent}</thead>
+            <tbody>{mappedItems}</tbody>
+        </table>
+    );
+});
+
+const ItemPaginationAdapter = connectPagination(function ({
+    nbPages: totalPages,
+    currentRefinement: pageNumber,
+    refine,
+}) {
+    return (
+        <Paginate
+            pageNumber={pageNumber}
+            totalPages={totalPages}
+            onPageChange={refine}
+        />
+    );
+});
