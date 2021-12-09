@@ -45,8 +45,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                             <Paginate
                                 pageNumber={pageNumber}
                                 totalPages={totalPages}
-                                onNext={console.log}
-                                onPrevious={console.log}
+                                onPageChange={(page) => loadNewPage(page)}
                             />
                         </div>
                     )}
@@ -58,11 +57,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
 
 export async function getServerSideProps(ctx) {
     const {
-        data: {
-            content: items,
-            pageable: { pageNumber },
-            totalPages,
-        },
+        data: { content: items, number: pageNumber, totalPages },
     } = await axiosBackend.get(`/items`);
     return {
         props: {
