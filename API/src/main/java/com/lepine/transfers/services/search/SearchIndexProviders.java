@@ -19,7 +19,7 @@ public class SearchIndexProviders {
     @Bean
     public SearchIndex<ItemSearchDTO> getItemSearchIndex() {
         final SearchIndex<ItemSearchDTO> index = searchClient.initIndex("items", ItemSearchDTO.class);
-        index.setSettings(new IndexSettings().setSearchableAttributes(Arrays.asList("SKU", "name")));
+        index.setSettings(new IndexSettings().setSearchableAttributes(Arrays.asList("sku", "name", "description")));
         return index;
     }
 }
