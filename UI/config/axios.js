@@ -1,10 +1,9 @@
-import getConfig from "next/config";
 import axios from "axios";
 
-const {
-    serverRuntimeConfig: { backEndUrl },
-} = getConfig();
-
 export const axiosBackend = axios.create({
-    baseURL: backEndUrl,
+    baseURL: process.env.SERVER_BACKEND_URL,
+});
+
+export const axiosAPI = axios.create({
+    baseURL: "/api",
 });

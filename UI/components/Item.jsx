@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
-import { axiosBackend } from "../config/axios";
+import { axiosAPI } from "../config/axios";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 import { AlgoliaContext } from "../pages/_app";
@@ -23,7 +23,6 @@ export default function Item({
     description,
     sku,
     editable,
-    setRefresh,
 }) {
     const router = useRouter();
     const { searchClient } = useContext(AlgoliaContext);
@@ -36,7 +35,7 @@ export default function Item({
 
     if (editable) {
         const handleDelete = async () => {
-            await axiosBackend.delete(`/items/${uuid}`);
+            await axiosAPI.delete(`/items/${uuid}`);
             router.push("/items");
         };
         return (
@@ -50,7 +49,7 @@ export default function Item({
                     validationSchema={itemSchema}
                     onSubmit={(values, { setSubmitting }) => {
                         setSubmitting(true);
-                        axiosBackend.put(`/items/${uuid}`, values).then(() => {
+                        axiosAPI.put(`/items/${uuid}`, values).then(() => {
                             setSubmitting(false);
                             router.push("/items");
                         });

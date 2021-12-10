@@ -8,7 +8,7 @@ services:
             - spring.profiles.active=prod
             - cors.origin=http://localhost:3000
             - algolia.application_id=3VJL1MLU0K
-            - algolia.api_key=8a7f68e140908c9cf8687497c1b8cd6c
+            - algolia.api_key=fuckyouandthehorseyourodeinon
         depends_on:
             db:
                 condition: service_healthy
@@ -20,6 +20,8 @@ services:
             - 3000:3000
         environment:
             - SERVER_BACKEND_URL=http://api:8080
+            - SERVER_FRONTEND_URL=http://localhost:8080
+            - NODE_ENV=dev
 
     db:
         image: postgres:9.6
