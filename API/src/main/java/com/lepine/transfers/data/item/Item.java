@@ -20,8 +20,10 @@ import java.util.UUID;
 public class Item {
 
     @Builder.Default
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    // @GeneratedValue(generator = "uuid2")
+    // @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @GeneratedValue(generator = "UUIDGenerator")
+    @GenericGenerator(name = "UUIDGenerator", strategy = "uuid2")
     @Id
     private UUID uuid = UUID.randomUUID();
 

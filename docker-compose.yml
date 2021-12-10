@@ -8,7 +8,7 @@ services:
             - spring.profiles.active=prod
             - cors.origin=http://localhost:3000
             - algolia.application_id=3VJL1MLU0K
-            - algolia.api_key=6b96eee49845885140e826936ce56b3d
+            - algolia.api_key=8a7f68e140908c9cf8687497c1b8cd6c
         depends_on:
             db:
                 condition: service_healthy
