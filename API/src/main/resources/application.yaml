@@ -8,32 +8,10 @@ spring:
     activate:
       on-profile:
         - dev
-cors:
-  origin: http://localhost:3000
----
-spring:
+        - test
   h2:
     console:
       enabled: true
-  config:
-    activate:
-      on-profile:
-        - dev
-        - test
-
-  flyway:
-    url: jdbc:h2:mem:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
-    baseline-on-migrate: true
-    user: sa
-    password:
-
-  datasource:
-    url: jdbc:h2:mem:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-    hikari:
-      initialization-fail-timeout: 60000
 
   jpa:
     show-sql: true
@@ -48,3 +26,45 @@ spring:
     init:
       mode: never
       platform: h2
+
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - test
+  flyway:
+    url: jdbc:h2:mem:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+    baseline-on-migrate: true
+    user: sa
+    password:
+
+  datasource:
+    url: jdbc:h2:mem:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    hikari:
+      initialization-fail-timeout: 60000
+
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - dev
+  flyway:
+    url: jdbc:h2:./h2db:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+    baseline-on-migrate: true
+    user: sa
+    password:
+
+  datasource:
+    url: jdbc:h2:./h2db:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    hikari:
+      initialization-fail-timeout: 60000
+cors:
+  origin: http://localhost:3000
