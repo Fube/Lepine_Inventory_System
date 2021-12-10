@@ -5,6 +5,7 @@ import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.search.SearchService;
+import org.checkerframework.checker.nullness.Opt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,10 +17,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -184,5 +185,47 @@ public class ItemServiceTests {
         // Assert
         verify(searchService, never())
                 .delete(uuid);
+    }
+
+    @Test
+    @DisplayName("Given valid item UUID, retrieve item")
+    void getByUUID() {
+
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        final Item item = Item.builder()
+                .uuid(uuid)
+                .name("name")
+                .SKU("SKU")
+                .description("description")
+                .build();
+        given(itemRepo.findById(uuid)).willReturn(Optional.of(item));
+
+        // Act
+        final Optional<Item> retrieved = itemService.findByUuid(uuid);
+
+        // Assert
+        assertTrue(retrieved.isPresent());
+        final Item retrievedItem = retrieved.get();
+        assertEquals(item.getName(), retrievedItem.getName());
+        assertEquals(item.getSKU(), retrievedItem.getSKU());
+        assertEquals(item.getDescription(), retrievedItem.getDescription());
+        verify(itemRepo, times(1)).findById(uuid);
+    }
+
+    @Test
+    @DisplayName("Given non-existent item UUID, return empty optional")
+    void getNonExistentItem() {
+
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        given(itemRepo.findById(uuid)).willReturn(Optional.empty());
+
+        // Act
+        final Optional<Item> retrieved = itemService.findByUuid(uuid);
+
+        // Assert
+        assertFalse(retrieved.isPresent());
+        verify(itemRepo, times(1)).findById(uuid);
     }
 }
