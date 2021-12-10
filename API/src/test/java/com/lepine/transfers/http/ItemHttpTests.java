@@ -148,6 +148,36 @@ public class ItemHttpTests {
         verify(itemController, times(1)).getByUuid(uuid);
     }
 
+
+    @Test
+    @DisplayName("Given GET on /items/{uuid}, returns 200 OK")
+    void getItem() throws Exception {
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        final Item item = Item.builder()
+                .uuid(uuid)
+                .name("Item")
+                .SKU("SKU")
+                .description("Description")
+                .build();
+        given(itemService.findByUuid(uuid)).willReturn(Optional.of(item));
+
+        // Act
+        final ResultActions resultActions = mvc.perform(get("/items/{uuid}", uuid));
+
+        // Assert
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
+                .andExpect(jsonPath("$.name").value(item.getName()))
+                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.description").value(item.getDescription()));
+
+        verify(itemService, times(1)).findByUuid(uuid);
+        verify(itemController, times(1)).getByUuid(uuid);
+    }
+
     @Test
     @DisplayName("Given POST on /items, returns 201 CREATED and the item")
     void postItem() throws Exception {
