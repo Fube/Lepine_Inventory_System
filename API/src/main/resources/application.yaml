@@ -4,6 +4,14 @@ algolia:
 
 ---
 spring:
+  config:
+    activate:
+      on-profile:
+        - dev
+cors:
+  origin: http://localhost:3000
+---
+spring:
   h2:
     console:
       enabled: true
