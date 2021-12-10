@@ -8,23 +8,32 @@ import {
     PaginateAdapter,
     TableHitsAdapter,
 } from "../../components/AlgoliaAdapters";
+import { axiosBackend } from "../../config/axios";
+import Paginate from "../../components/Pagination";
 
 /**
  *
  * @param {{ items: import("../../components/Item").Item[] }}
  * @returns
  */
-export default function ShowItems({ totalPages, pageNumber }) {
+export default function ShowItems({ items, totalPages, pageNumber }) {
     const router = useRouter();
     const { searchClient } = useContext(AlgoliaContext);
     const [refresh, setRefresh] = useState(true);
+    const [hasSearched, setHasSearched] = useState(false);
 
     useEffect(() => {
-        setRefresh((ignore) => (console.log(ignore), true));
-        searchClient
-            .clearCache()
-            .then(() => setRefresh((ignore) => (console.log(ignore), false)));
+        setRefresh((ignore) => true);
+        searchClient.clearCache().then(() => setRefresh((ignore) => false));
     }, []);
+
+    const head = (
+        <tr>
+            <th>Name</th>
+            <th>SKU</th>
+            <th>Description</th>
+        </tr>
+    );
 
     return (
         <>
@@ -38,21 +47,48 @@ export default function ShowItems({ totalPages, pageNumber }) {
                     <div className="w-1/2">
                         <div className="flex justify-around my-4">
                             <h1 className="text-4xl">Items</h1>
-                            <SearchBox />
+                            <SearchBox onChange={() => setHasSearched(true)} />
                         </div>
-                        <Configure hitsPerPage={10} />
-                        <TableHitsAdapter
-                            headComponent={
-                                <tr>
-                                    <th>Name</th>
-                                    <th>SKU</th>
-                                    <th>Description</th>
-                                </tr>
-                            }
-                            hitComponent={ItemHitAdapter}
-                        />
+                        {hasSearched ? (
+                            <>
+                                <Configure hitsPerPage={10} />
+                                <TableHitsAdapter
+                                    headComponent={head}
+                                    hitComponent={ItemHitAdapter}
+                                />
+                            </>
+                        ) : (
+                            <table className="table table-zebra w-full table-fixed">
+                                <thead>{head}</thead>
+                                <tbody>
+                                    {items.map(
+                                        ({ uuid, name, description, sku }) => (
+                                            <ItemHitAdapter
+                                                key={uuid}
+                                                hit={{
+                                                    objectID: uuid,
+                                                    description,
+                                                    name,
+                                                    sku,
+                                                }}
+                                            />
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
+                        )}
                         <div className="flex justify-center mt-4">
-                            <PaginateAdapter />
+                            {hasSearched ? (
+                                <PaginateAdapter />
+                            ) : (
+                                <Paginate
+                                    onPageChange={(page) =>
+                                        router.push(`/items?page=${page}`)
+                                    }
+                                    totalPages={totalPages}
+                                    pageNumber={pageNumber}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -71,4 +107,17 @@ function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
             </tr>
         </Link>
     );
+}
+
+export async function getServerSideProps(context) {
+    const {
+        data: { content: items, totalPages, number: pageNumber },
+    } = await axiosBackend("/items");
+    return {
+        props: {
+            items,
+            totalPages,
+            pageNumber,
+        },
+    };
 }
