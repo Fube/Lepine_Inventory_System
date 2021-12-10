@@ -1,7 +1,5 @@
 import Nav from "../../components/Nav";
 import Link from "next/link";
-import { axiosBackend } from "../../config/axios";
-import Paginate from "../../components/Pagination";
 import { useRouter } from "next/router";
 import { InstantSearch, SearchBox, Configure } from "react-instantsearch-dom";
 import { useContext } from "react";
@@ -13,7 +11,7 @@ import {
 
 /**
  *
- * @param {{ items: import("../../components/Item").ItemProps[] }}
+ * @param {{ items: import("../../components/Item").Item[] }}
  * @returns
  */
 export default function ShowItems({ totalPages, pageNumber }) {
