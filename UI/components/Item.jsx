@@ -2,6 +2,8 @@ import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { axiosBackend } from "../config/axios";
 import { useRouter } from "next/router";
+import { useContext } from "react";
+import { AlgoliaContext } from "../pages/_app";
 
 /**
  * @typedef Item
@@ -15,15 +17,28 @@ import { useRouter } from "next/router";
  *
  * @param {{...Item, editable: boolean}} arg0
  */
-export default function Item({ uuid, name, description, sku, editable }) {
+export default function Item({
+    uuid,
+    name,
+    description,
+    sku,
+    editable,
+    setRefresh,
+}) {
     const router = useRouter();
+    const { searchClient } = useContext(AlgoliaContext);
 
     const itemSchema = yup.object().shape({
         name: yup.string().required("Name is required"),
         description: yup.string().required("Description is required"),
         sku: yup.string().required("SKU is required"),
     });
+
     if (editable) {
+        const handleDelete = async () => {
+            await axiosBackend.delete(`/items/${uuid}`);
+            router.push("/items");
+        };
         return (
             <>
                 <Formik
@@ -37,7 +52,7 @@ export default function Item({ uuid, name, description, sku, editable }) {
                         setSubmitting(true);
                         axiosBackend.put(`/items/${uuid}`, values).then(() => {
                             setSubmitting(false);
-                            router.back();
+                            router.push("/items");
                         });
                     }}
                 >
@@ -140,6 +155,7 @@ export default function Item({ uuid, name, description, sku, editable }) {
                                             <button
                                                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
                                                 type="button"
+                                                onClick={handleDelete}
                                             >
                                                 Delete
                                             </button>

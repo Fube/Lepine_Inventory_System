@@ -2,7 +2,7 @@ import Nav from "../../components/Nav";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { InstantSearch, SearchBox, Configure } from "react-instantsearch-dom";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AlgoliaContext } from "../_app";
 import {
     PaginateAdapter,
@@ -17,14 +17,22 @@ import {
 export default function ShowItems({ totalPages, pageNumber }) {
     const router = useRouter();
     const { searchClient } = useContext(AlgoliaContext);
+    const [refresh, setRefresh] = useState(true);
 
-    const loadNewPage = (newPage) => {
-        router.push(`/items?page=${newPage}`);
-    };
+    useEffect(() => {
+        setRefresh((ignore) => (console.log(ignore), true));
+        searchClient
+            .clearCache()
+            .then(() => setRefresh((ignore) => (console.log(ignore), false)));
+    }, []);
 
     return (
         <>
-            <InstantSearch searchClient={searchClient} indexName="items">
+            <InstantSearch
+                searchClient={searchClient}
+                indexName="items"
+                refresh={refresh}
+            >
                 <Nav />
                 <div className="overflow-x-auto justify-center flex">
                     <div className="w-1/2">

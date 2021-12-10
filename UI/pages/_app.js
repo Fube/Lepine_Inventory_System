@@ -1,6 +1,7 @@
 import "../styles/globals.css";
 import algoliasearch from "algoliasearch/lite";
-import { createContext } from "react";
+import { createNullCache } from "@algolia/cache-common";
+import { createContext, useEffect, useState } from "react";
 
 const searchClient = algoliasearch(
     "3VJL1MLU0K",
