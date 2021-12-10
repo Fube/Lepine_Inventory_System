@@ -68,3 +68,22 @@ spring:
       initialization-fail-timeout: 60000
 cors:
   origin: http://localhost:3000
+
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - prod
+  flyway:
+    url: jdbc:postgresql://db:5432/
+    baseline-on-migrate: true
+    user: postgres
+    password: postgres
+  datasource:
+    url: jdbc:postgresql://db:5432/
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    hikari:
+      initialization-fail-timeout: 60000

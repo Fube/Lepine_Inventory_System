@@ -112,7 +112,7 @@ function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
 export async function getServerSideProps(context) {
     const {
         data: { content: items, totalPages, number: pageNumber },
-    } = await axiosBackend("/items");
+    } = await axiosBackend("/items").catch(console.log);
     return {
         props: {
             items,

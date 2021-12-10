@@ -2,7 +2,7 @@ import getConfig from "next/config";
 import axios from "axios";
 
 const {
-    publicRuntimeConfig: { backEndUrl },
+    serverRuntimeConfig: { backEndUrl },
 } = getConfig();
 
 export const axiosBackend = axios.create({
