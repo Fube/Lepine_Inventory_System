@@ -5,7 +5,6 @@ import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.search.SearchService;
-import org.checkerframework.checker.nullness.Opt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

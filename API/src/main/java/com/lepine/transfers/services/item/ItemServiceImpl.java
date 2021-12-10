@@ -82,6 +82,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Optional<Item> findByUuid(UUID uuid) {
-        return Optional.empty();
+        log.info("retrieving item");
+        final Optional<Item> item = itemRepo.findById(uuid);
+        log.info("retrieved item");
+
+        return item;
     }
 }
