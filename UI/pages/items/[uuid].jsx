@@ -1,6 +1,7 @@
+import { useRouter } from "next/router";
 import ItemBase from "../../components/Item";
 import Nav from "../../components/Nav";
-import { axiosBackend } from "../../config/axios";
+import { axiosAPI, axiosBackend } from "../../config/axios";
 
 /**
  *
@@ -8,6 +9,18 @@ import { axiosBackend } from "../../config/axios";
  * @returns
  */
 export default function Item({ item }) {
+    const router = useRouter();
+    const handleDelete = async () => {
+        await axiosAPI.delete(`/items/${uuid}`);
+        router.push("/items");
+    };
+    const handleSubmit = async (values, { setSubmitting }) => {
+        setSubmitting(true);
+        axiosAPI.put(`/items/${uuid}`, values).then(() => {
+            setSubmitting(false);
+            router.push("/items");
+        });
+    };
     return (
         <div className="flex flex-col h-screen">
             <div className="flex-shrink-0 flex-grow-0">
@@ -15,7 +28,12 @@ export default function Item({ item }) {
             </div>
             <div className="flex-grow flex justify-center items-center">
                 <div className="w-full">
-                    <ItemBase editable {...item} />
+                    <ItemBase
+                        editable
+                        {...item}
+                        handleDelete={handleDelete}
+                        handleSubmit={handleSubmit}
+                    />
                 </div>
             </div>
         </div>

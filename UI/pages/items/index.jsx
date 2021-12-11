@@ -2,7 +2,7 @@ import Nav from "../../components/Nav";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { InstantSearch, SearchBox, Configure } from "react-instantsearch-dom";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { AlgoliaContext } from "../_app";
 import {
     PaginateAdapter,
@@ -10,7 +10,7 @@ import {
 } from "../../components/AlgoliaAdapters";
 import { axiosBackend } from "../../config/axios";
 import Paginate from "../../components/Pagination";
-import thou from "../../../utils/thou";
+import thou from "../../utils/thou";
 
 /**
  *
