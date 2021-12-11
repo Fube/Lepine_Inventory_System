@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import Head from "next/head";
 import ItemBase from "../../components/Item";
 import Nav from "../../components/Nav";
 import { axiosAPI, axiosBackend } from "../../config/axios";
@@ -22,22 +23,27 @@ export default function Item({ item }) {
         });
     };
     return (
-        <div className="flex flex-col h-screen">
-            <div className="flex-shrink-0 flex-grow-0">
-                <Nav />
-            </div>
-            <div className="flex-grow flex justify-center items-center">
-                <div className="w-full">
-                    <ItemBase
-                        editable
-                        deletable
-                        {...item}
-                        handleDelete={handleDelete}
-                        handleSubmit={handleSubmit}
-                    />
+        <>
+            <Head>
+                <title>Item Details</title>
+            </Head>
+            <div className="flex flex-col h-screen">
+                <div className="flex-shrink-0 flex-grow-0">
+                    <Nav />
+                </div>
+                <div className="flex-grow flex justify-center items-center">
+                    <div className="w-full">
+                        <ItemBase
+                            editable
+                            deletable
+                            {...item}
+                            handleDelete={handleDelete}
+                            handleSubmit={handleSubmit}
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 
