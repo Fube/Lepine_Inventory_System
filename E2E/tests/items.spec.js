@@ -73,7 +73,7 @@ async function createItem(page) {
     return toJSON.find((item) => item.sku === SKU);
 }
 
-test("Go to /items through nav", async ({ page }) => {
+test("/items :: Go to through nav", async ({ page }) => {
     await page.goto("/");
     // Click on ITEMS XPath and wait for the page to load
     await Promise.all([
@@ -116,7 +116,7 @@ test("Go to /items through nav", async ({ page }) => {
     expect(await active.getAttribute("href")).toBe("/items");
 });
 
-test("Go to /items/new through /items", async ({ page }) => {
+test("/items/new :: Go to through /items", async ({ page }) => {
     await page.goto("/items");
 
     // Get the "Add One Now!" button
@@ -153,7 +153,7 @@ test("Go to /items/new through /items", async ({ page }) => {
     expect(inputFieldsNames).toEqual(["name", "description", "sku"]);
 });
 
-test("Create item from /items/new", async ({ page }) => {
+test("/items/new :: Create item from", async ({ page }) => {
     const { uuid } = await createItem(page);
 
     // Clean up
@@ -163,7 +163,7 @@ test("Create item from /items/new", async ({ page }) => {
     );
 });
 
-test("Delete item through /item/:uuid", async ({ page }) => {
+test("/items/:uuid :: Delete item through", async ({ page }) => {
     const created = await createItem(page);
 
     // Go to item's page
@@ -208,7 +208,7 @@ test("Delete item through /item/:uuid", async ({ page }) => {
     expect(await page.content()).toContain("No items to show");
 });
 
-test("Update item through /item/:uuid", async ({ page }) => {
+test("/items/:uuid :: Update item through ", async ({ page }) => {
     const created = await createItem(page);
 
     // Go to item's page
@@ -257,3 +257,5 @@ test("Update item through /item/:uuid", async ({ page }) => {
     expect(await tr.innerText()).toContain("New Name");
     expect(await tr.innerText()).toContain("New Description");
 });
+
+test("/items/:uuid :: Cannot update if field empty");
