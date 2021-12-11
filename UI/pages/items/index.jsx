@@ -156,9 +156,10 @@ function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
 }
 
 export async function getServerSideProps(context) {
+    const page = context.query.page || 1;
     const {
         data: { content: items, totalPages, number: pageNumber },
-    } = await axiosBackend("/items").catch(console.log);
+    } = await axiosBackend(`/items?page=${page}`).catch(console.log);
     return {
         props: {
             items,
