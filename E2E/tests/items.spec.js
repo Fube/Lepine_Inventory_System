@@ -163,15 +163,50 @@ test("Create item from /items/new", async ({ page }) => {
     );
 });
 
-test("Delete item", async ({ page }) => {
+test("Delete item through /item/:uuid", async ({ page }) => {
     const created = await createItem(page);
 
     // Go to item's page
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        await page.click(`tr[href="${created.uuid}"]`),
+        page.click(`tr[href="/items/${created.uuid}"]`),
     ]);
 
     // Check it is the expected item
     const title = await page.title();
+    expect(title).toBe("Item Details");
+    const content = await page.content();
+    expect(content).toContain(created.name);
+    expect(content).toContain(created.description);
+    expect(content).toContain(created.sku);
+
+    // Check save button is not clickable
+    const saveBtn = await page.$("button[type=submit]");
+    expect(saveBtn).toBeTruthy();
+    expect(await saveBtn.getAttribute("disabled")).toBe("true");
+
+    // Check delete button is clickable
+    const deleteBtn = await page.$("button[type=button]");
+    expect(deleteBtn).toBeTruthy();
+    expect(await deleteBtn.getAttribute("disabled")).toBe("false");
+
+    // Click on delete button
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        await deleteBtn.click(),
+    ]);
+
+    // Check we are back on the items page
+    const title2 = await page.title();
+    expect(title2).toBe("Items");
+
+    // Check item is not present when searching
+    const search = await page.$("input[type=search]");
+    await search.type(created.sku, { delay: 1000 });
+
+    const isTable = await page.$("table");
+    expect(isTable).toBeFalsy();
+
+    // Check no item message is there
+    expect(await page.content()).toContain("No items to show");
 });
