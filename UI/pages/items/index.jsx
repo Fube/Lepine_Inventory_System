@@ -1,6 +1,7 @@
 import Nav from "../../components/Nav";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Head from "next/head";
 import { InstantSearch, SearchBox, Configure } from "react-instantsearch-dom";
 import { useContext, useState } from "react";
 import { AlgoliaContext } from "../_app";
@@ -44,9 +45,16 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
         </h2>
     );
 
+    const header = (
+        <Head>
+            <title>Items</title>
+        </Head>
+    );
+
     if (items.length <= 0) {
         return (
             <>
+                {header}
                 <Nav />
                 <main className="flex justify-center">
                     <div className="text-center">
@@ -64,6 +72,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
 
     return (
         <>
+            {header}
             <InstantSearch searchClient={searchClient} indexName="items">
                 <Nav />
                 <div className="overflow-x-auto justify-center flex">
