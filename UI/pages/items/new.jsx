@@ -1,5 +1,6 @@
 import Nav from "../../components/Nav";
 import ItemBase from "../../components/Item";
+import { axiosAPI } from "../../config/axios";
 
 export default function CreateItem() {
     return (
@@ -9,7 +10,14 @@ export default function CreateItem() {
             </div>
             <div className="flex-grow flex justify-center items-center">
                 <div className="w-full">
-                    <ItemBase editable />
+                    <ItemBase
+                        editable
+                        handleSubmit={async (values, { setSubmitting }) => {
+                            setSubmitting(true);
+                            await axiosAPI.post("/items", values);
+                            setSubmitting(false);
+                        }}
+                    />
                 </div>
             </div>
         </div>

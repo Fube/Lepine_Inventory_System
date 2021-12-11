@@ -11,12 +11,12 @@ import { axiosAPI, axiosBackend } from "../../config/axios";
 export default function Item({ item }) {
     const router = useRouter();
     const handleDelete = async () => {
-        await axiosAPI.delete(`/items/${uuid}`);
+        await axiosAPI.delete(`/items/${item.uuid}`);
         router.push("/items");
     };
     const handleSubmit = async (values, { setSubmitting }) => {
         setSubmitting(true);
-        axiosAPI.put(`/items/${uuid}`, values).then(() => {
+        axiosAPI.put(`/items/${item.uuid}`, values).then(() => {
             setSubmitting(false);
             router.push("/items");
         });
@@ -30,6 +30,7 @@ export default function Item({ item }) {
                 <div className="w-full">
                     <ItemBase
                         editable
+                        deletable
                         {...item}
                         handleDelete={handleDelete}
                         handleSubmit={handleSubmit}
