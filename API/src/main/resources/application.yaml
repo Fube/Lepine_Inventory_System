@@ -45,7 +45,8 @@ spring:
     password:
     hikari:
       initialization-fail-timeout: 60000
-
+cors:
+  origin: http://some.fake.url
 ---
 spring:
   config:
