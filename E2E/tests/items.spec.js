@@ -29,7 +29,7 @@ async function createItem(page) {
             name: NAME,
             description: DESCRIPTION,
         });
-        route.continue().then(console.log);
+        route.continue();
     });
 
     await Promise.all([
@@ -87,7 +87,9 @@ test("/items :: Go to through nav", async ({ page }) => {
 
     // Check that the page has the correct content
     const content = await page.content();
-    if (content.indexOf("table") == -1) {
+    const table = await page.$("table");
+
+    if (!table) {
         expect(content).toContain("No items to show");
         expect(content).toContain("Add One Now!");
     } else {
@@ -201,8 +203,12 @@ test("/items/:uuid :: Delete item through", async ({ page }) => {
     expect(title2).toBe("Items");
 
     // Check item is not present when searching
-    const search = await page.locator("input[type=search]");
-    await search.type(created.sku, { delay: 1000 });
+    const table = await page.$("table");
+
+    if (table) {
+        const search = await page.locator("input[type=search]");
+        await search.type(created.sku, { delay: 1000 });
+    }
 
     // Check no item message is there
     expect(await page.content()).toContain("No items to show");
@@ -258,4 +264,43 @@ test("/items/:uuid :: Update item through ", async ({ page }) => {
     expect(await tr.innerText()).toContain("New Description");
 });
 
-test("/items/:uuid :: Cannot update if field empty");
+test("/items/:uuid :: Cannot update if field empty", async ({ page }) => {
+    const created = await createItem(page);
+
+    // Go to item's page
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        page.click(`tr[href="/items/${created.uuid}"]`),
+    ]);
+
+    // Check it is the expected item
+    const title = await page.title();
+    expect(title).toBe("Item Details");
+    const content = await page.content();
+    expect(content).toContain(created.name);
+    expect(content).toContain(created.description);
+    expect(content).toContain(created.sku);
+
+    // Check save button is not clickable
+    const saveBtn = page.locator("button[type=submit]");
+    expect(saveBtn.isDisabled()).toBeTruthy();
+
+    // Dirty item, but with empty fields
+    const nameInput = page.locator("input[name=name]");
+    await nameInput.click({ clickCount: 3 });
+    await page.keyboard.press("Backspace");
+    await page.keyboard.press("Tab");
+
+    // Check save button is not clickable
+    expect(saveBtn.isDisabled()).toBeTruthy();
+
+    // Check we have not changed pages
+    const title2 = await page.title();
+    expect(title2).toBe("Item Details");
+
+    // Clean up
+    await page.evaluate(
+        async (uuid) => await fetch(`/api/items/${uuid}`, { method: "DELETE" }),
+        created.uuid
+    );
+});
