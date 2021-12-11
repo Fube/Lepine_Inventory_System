@@ -181,14 +181,14 @@ test("Delete item through /item/:uuid", async ({ page }) => {
     expect(content).toContain(created.sku);
 
     // Check save button is not clickable
-    const saveBtn = await page.$("button[type=submit]");
+    const saveBtn = await page.locator("button[type=submit][disabled]");
     expect(saveBtn).toBeTruthy();
-    expect(await saveBtn.getAttribute("disabled")).toBe("true");
 
     // Check delete button is clickable
-    const deleteBtn = await page.$("button[type=button]");
+    const deleteBtn = await page.locator(
+        "form button[type=button]:not([disabled])"
+    );
     expect(deleteBtn).toBeTruthy();
-    expect(await deleteBtn.getAttribute("disabled")).toBe("false");
 
     // Click on delete button
     await Promise.all([
@@ -201,11 +201,8 @@ test("Delete item through /item/:uuid", async ({ page }) => {
     expect(title2).toBe("Items");
 
     // Check item is not present when searching
-    const search = await page.$("input[type=search]");
+    const search = await page.locator("input[type=search]");
     await search.type(created.sku, { delay: 1000 });
-
-    const isTable = await page.$("table");
-    expect(isTable).toBeFalsy();
 
     // Check no item message is there
     expect(await page.content()).toContain("No items to show");
