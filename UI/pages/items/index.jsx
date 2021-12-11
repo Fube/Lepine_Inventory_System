@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { InstantSearch, SearchBox, Configure } from "react-instantsearch-dom";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AlgoliaContext } from "../_app";
 import {
     PaginateAdapter,
@@ -23,6 +23,14 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
     const router = useRouter();
     const { searchClient } = useContext(AlgoliaContext);
     const [isSearching, setIsSearching] = useState(false);
+    const [refresh, setRefresh] = useState(false);
+
+    useEffect(() => {
+        setRefresh((ignore) => setRefresh(true));
+    }, []);
+    useEffect(() => {
+        setRefresh((ignore) => setRefresh(false));
+    }, [refresh]);
 
     const head = (
         <tr>
@@ -73,7 +81,11 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
     return (
         <>
             {header}
-            <InstantSearch searchClient={searchClient} indexName="items">
+            <InstantSearch
+                searchClient={searchClient}
+                indexName="items"
+                refresh={refresh}
+            >
                 <Nav />
                 <div className="overflow-x-auto justify-center flex">
                     <div className="md:w-1/2 w-3/4">
