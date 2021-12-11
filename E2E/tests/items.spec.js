@@ -59,7 +59,7 @@ async function createItem(page) {
             sku: await tds[0].innerText(),
             name: await tds[1].innerText(),
             description: await tds[2].innerText(),
-            uuid: await tr.getAttribute("href"),
+            uuid: (await tr.getAttribute("href")).match(/items\/(.+)/).pop(),
         });
     }
 
@@ -67,7 +67,7 @@ async function createItem(page) {
         sku: SKU,
         name: NAME,
         description: DESCRIPTION,
-        uuid: expect.stringMatching(/^\/items\/[a-z0-9-]+$/),
+        uuid: expect.stringMatching(/^[a-z0-9-]+$/),
     });
 
     return toJSON.find((item) => item.sku === SKU);
