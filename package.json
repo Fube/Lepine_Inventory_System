@@ -1,0 +1,8 @@
+{
+    "name": "@lepine/transfer",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "git@github.com:Fube/Lepine_Inventory_System.git",
+    "author": "Fube <fubeitch@gmail.com>",
+    "license": "BSD-3-Clause"
+}
