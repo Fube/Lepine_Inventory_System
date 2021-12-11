@@ -72,10 +72,10 @@ test("Go to /items/new through /items", async ({ page }) => {
     expect(form).toBeTruthy();
 
     // Check form contains input fields
-    const inputFields = await page.$("form input");
+    const inputFields = await page.$$("form input");
     expect(inputFields.length).toBe(3);
     const inputFieldsNames = await Promise.all(
-        inputFields.map((n) => n.getProperty("name"))
+        inputFields.map((n) => n.getAttribute("name"))
     );
     expect(inputFieldsNames).toEqual(["name", "description", "sku"]);
 });
