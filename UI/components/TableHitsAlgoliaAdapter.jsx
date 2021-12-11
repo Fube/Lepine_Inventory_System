@@ -15,7 +15,7 @@ function internal({
     ));
 
     return (
-        <table className="table table-zebra w-full table-fixed">
+        <table className="table table-zebra w-full sm:table-fixed">
             <thead>{headComponent}</thead>
             <tbody>{mappedItems}</tbody>
         </table>

@@ -11,6 +11,7 @@ import {
 import { axiosBackend } from "../../config/axios";
 import Paginate from "../../components/Pagination";
 import thou from "../../utils/thou";
+import { Icon } from "@iconify/react";
 
 /**
  *
@@ -26,7 +27,14 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
         <tr>
             <th>Name</th>
             <th>SKU</th>
-            <th>Description</th>
+            <th className="flex justify-between">
+                <div className="self-center">Description</div>
+                <button>
+                    <Link href="/items/new">
+                        <Icon icon="si-glyph:button-plus" width="32" />
+                    </Link>
+                </button>
+            </th>
         </tr>
     );
 
@@ -43,7 +51,6 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                 <main className="flex justify-center">
                     <div className="text-center">
                         <div className="mt-12">{fallback}</div>
-
                         <Link href="/items/new">
                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
                                 Add One Now!
@@ -60,9 +67,9 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
             <InstantSearch searchClient={searchClient} indexName="items">
                 <Nav />
                 <div className="overflow-x-auto justify-center flex">
-                    <div className="w-1/2">
-                        <div className="flex justify-around my-4">
-                            <h1 className="text-4xl">Items</h1>
+                    <div className="md:w-1/2 w-3/4">
+                        <div className="md:flex justify-around my-4">
+                            <h1 className="text-4xl md:mb-0 mb-4">Items</h1>
                             <SearchBox
                                 onChange={(a) =>
                                     setIsSearching(
@@ -82,7 +89,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                             </>
                         )
                             .or(
-                                <table className="table table-zebra w-full table-fixed">
+                                <table className="table table-zebra w-full sm:table-fixed">
                                     <thead>{head}</thead>
                                     <tbody>
                                         {items.map(
