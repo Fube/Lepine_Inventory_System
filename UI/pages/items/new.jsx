@@ -1,9 +1,11 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
 import Nav from "../../components/Nav";
 import ItemBase from "../../components/Item";
 import { axiosAPI } from "../../config/axios";
 
 export default function CreateItem() {
+    const router = useRouter();
     return (
         <>
             <Head>
@@ -21,6 +23,7 @@ export default function CreateItem() {
                                 setSubmitting(true);
                                 await axiosAPI.post("/items", values);
                                 setSubmitting(false);
+                                router.push("/items");
                             }}
                         />
                     </div>

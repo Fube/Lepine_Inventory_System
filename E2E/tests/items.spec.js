@@ -1,4 +1,5 @@
 const { test, expect } = require("@playwright/test");
+const { nanoid } = require("nanoid");
 
 test("Go to /items through nav", async ({ page }) => {
     await page.goto("/");
@@ -80,32 +81,70 @@ test("Go to /items/new through /items", async ({ page }) => {
     expect(inputFieldsNames).toEqual(["name", "description", "sku"]);
 });
 
-// test("Create item from /items/new", async ({ page }) => {
-//     await Promise.all([
-//         page.waitForNavigation({ waitUntil: "networkidle0" }),
-//         page.goto("/items/new"),
-//     ]);
+test("Create item from /items/new", async ({ page }) => {
+    const SKU = nanoid(5);
+    const NAME = "NAME";
+    const DESCRIPTION = "DESCRIPTION";
 
-//     // Get input fields
-//     const name = await page.$("form input[name=name]");
-//     const description = await page.$("form input[name=description]");
-//     const sku = await page.$("form input[name=sku]");
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        page.goto("/items/new"),
+    ]);
 
-//     // Fill input fields
-//     await name.type("Test Item");
-//     await description.type("Test Description");
-//     await sku.type("Test SKU");
+    // Get input fields
+    const name = await page.$("form input[name=name]");
+    const description = await page.$("form input[name=description]");
+    const sku = await page.$("form input[name=sku]");
 
-//     // Submit form and intercept response
-//     await page.route("**/api/items", async (route) => {
-//         console.log(route.request().postDataJSON());
-//         route.continue();
-//     });
+    // Fill input fields
+    await sku.type(SKU);
+    await name.type(NAME);
+    await description.type(DESCRIPTION);
 
-//     await Promise.all([
-//         page.waitForNavigation({ waitUntil: "networkidle0" }),
-//         await page.click("form button[type=submit]"),
-//     ]);
+    // Submit form and intercept response
+    await page.route("**/api/items", async (route) => {
+        const data = route.request().postDataJSON();
+        expect(data).toEqual({
+            sku: SKU,
+            name: NAME,
+            description: DESCRIPTION,
+        });
+        route.continue().then(console.log);
+    });
 
-//     // Check that item was created
-// });
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        await page.click("form button[type=submit]"),
+    ]);
+
+    // Check redirect
+    const title = await page.title();
+    expect(title).toBe("Items");
+
+    // Search for item
+    const search = await page.$("input[type=search]");
+    expect(search).toBeTruthy();
+    await search.type(SKU, { delay: 1000 }); // Give Algolia time to load new item
+
+    // Check that the item is in the table
+    const table = await page.$("table");
+    expect(table).toBeTruthy();
+    const trs = await page.$$("table tbody tr");
+    expect(trs.length).toBeGreaterThan(0);
+
+    const toJSON = [];
+    for (const tr of trs) {
+        const tds = await tr.$$("td");
+        toJSON.push({
+            sku: await tds[0].innerText(),
+            name: await tds[1].innerText(),
+            description: await tds[2].innerText(),
+        });
+    }
+
+    expect(toJSON).toContainEqual({
+        sku: SKU,
+        name: NAME,
+        description: DESCRIPTION,
+    });
+});

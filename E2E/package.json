@@ -6,7 +6,8 @@
     "author": "Fube",
     "license": "BSD-3",
     "devDependencies": {
-        "@playwright/test": "^1.17.1"
+        "@playwright/test": "^1.17.1",
+        "nanoid": "^3.1.30"
     },
     "scripts": {
         "test": "npx playwright test",
