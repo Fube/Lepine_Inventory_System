@@ -154,5 +154,24 @@ test("Go to /items/new through /items", async ({ page }) => {
 });
 
 test("Create item from /items/new", async ({ page }) => {
-    await createItem(page);
+    const { uuid } = await createItem(page);
+
+    // Clean up
+    await page.evaluate(
+        async (uuid) => await fetch(`/api/items/${uuid}`, { method: "DELETE" }),
+        uuid
+    );
+});
+
+test("Delete item", async ({ page }) => {
+    const created = await createItem(page);
+
+    // Go to item's page
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        await page.click(`tr[href="${created.uuid}"]`),
+    ]);
+
+    // Check it is the expected item
+    const title = await page.title();
 });
