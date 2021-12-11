@@ -26,6 +26,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
     const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
+        searchClient.clearCache();
         setRefresh((ignore) => setRefresh(true));
     }, []);
     useEffect(() => {

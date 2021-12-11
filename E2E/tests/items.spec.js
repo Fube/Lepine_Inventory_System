@@ -193,7 +193,7 @@ test("Delete item through /item/:uuid", async ({ page }) => {
     // Click on delete button
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        await deleteBtn.click(),
+        deleteBtn.click(),
     ]);
 
     // Check we are back on the items page
