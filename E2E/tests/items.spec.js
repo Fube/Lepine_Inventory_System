@@ -14,8 +14,23 @@ test("Go to /items through nav", async ({ page }) => {
 
     // Check that the page has the correct content
     const content = await page.content();
-    expect(content).toContain("No items to show");
-    expect(content).toContain("Add One Now!");
+    if (content.indexOf("table") == -1) {
+        expect(content).toContain("No items to show");
+        expect(content).toContain("Add One Now!");
+    } else {
+        const ths = await page.$$("thead tr th");
+        expect(ths.length).toBe(3);
+        expect(await ths[0].textContent()).toBe("SKU");
+        expect(await ths[1].textContent()).toBe("Name");
+        expect(await ths[2].textContent()).toBe("Description");
+
+        expect(await ths[0].innerText()).toBe("SKU");
+        expect(await ths[1].innerText()).toBe("NAME");
+        expect(await ths[2].innerText()).toBe("DESCRIPTION");
+
+        const plusBtn = await page.$("thead tr th:last-child > button");
+        expect(plusBtn).toBeTruthy();
+    }
 
     // Check "Items" in nav is active
     const navItemsActive = await page.$$(
@@ -32,8 +47,15 @@ test("Go to /items/new through /items", async ({ page }) => {
     await page.goto("/items");
 
     // Get the "Add One Now!" button
-    const addOneNow = await page.$("//html/body/div[1]/main/div/button");
-    expect(addOneNow).toBeTruthy();
+    const tableExists = await page.$("table");
+    let addOneNow = null;
+    if (tableExists) {
+        addOneNow = await page.$("thead tr th:last-child > button");
+        expect(addOneNow).toBeTruthy();
+    } else {
+        addOneNow = await page.$("//html/body/div[1]/main/div/button");
+        expect(addOneNow).toBeTruthy();
+    }
 
     // Click on "Add One Now!" button
     await Promise.all([
@@ -57,3 +79,33 @@ test("Go to /items/new through /items", async ({ page }) => {
     );
     expect(inputFieldsNames).toEqual(["name", "description", "sku"]);
 });
+
+// test("Create item from /items/new", async ({ page }) => {
+//     await Promise.all([
+//         page.waitForNavigation({ waitUntil: "networkidle0" }),
+//         page.goto("/items/new"),
+//     ]);
+
+//     // Get input fields
+//     const name = await page.$("form input[name=name]");
+//     const description = await page.$("form input[name=description]");
+//     const sku = await page.$("form input[name=sku]");
+
+//     // Fill input fields
+//     await name.type("Test Item");
+//     await description.type("Test Description");
+//     await sku.type("Test SKU");
+
+//     // Submit form and intercept response
+//     await page.route("**/api/items", async (route) => {
+//         console.log(route.request().postDataJSON());
+//         route.continue();
+//     });
+
+//     await Promise.all([
+//         page.waitForNavigation({ waitUntil: "networkidle0" }),
+//         await page.click("form button[type=submit]"),
+//     ]);
+
+//     // Check that item was created
+// });
