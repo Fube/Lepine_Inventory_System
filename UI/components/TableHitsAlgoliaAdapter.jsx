@@ -1,5 +1,4 @@
 import { connectHits } from "react-instantsearch-dom";
-import Link from "next/link";
 
 function internal({
     hits: items,
