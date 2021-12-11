@@ -262,6 +262,12 @@ test("/items/:uuid :: Update item through ", async ({ page }) => {
     const tr = page.locator(`tr[href="/items/${created.uuid}"]`);
     expect(await tr.innerText()).toContain("New Name");
     expect(await tr.innerText()).toContain("New Description");
+
+    // Clean up
+    await page.evaluate(
+        async (uuid) => await fetch(`/api/items/${uuid}`, { method: "DELETE" }),
+        created.uuid
+    );
 });
 
 test("/items/:uuid :: Cannot update if field empty", async ({ page }) => {
