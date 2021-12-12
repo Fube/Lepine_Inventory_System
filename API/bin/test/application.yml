@@ -1,0 +1,3 @@
+algolia:
+  api-key: fakeApiKey
+  application-id: fakeApplicationID
