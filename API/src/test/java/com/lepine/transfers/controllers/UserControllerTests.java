@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.given;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.MessageSource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @SpringBootTest(classes = {Config.class})
 @ActiveProfiles({"test"})

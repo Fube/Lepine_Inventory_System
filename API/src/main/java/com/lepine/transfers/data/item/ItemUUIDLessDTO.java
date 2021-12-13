@@ -13,12 +13,12 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class ItemUUIDLessDTO {
 
-    @NotBlank(message = "SKU is mandatory")
+    @NotBlank(message = "{item.sku.not_blank}")
     private String SKU;
 
-    @NotBlank(message = "Name is mandatory")
+    @NotBlank(message = "{item.name.not_blank}")
     private String name;
 
-    @NotBlank(message = "Description is mandatory")
+    @NotBlank(message = "{item.description.not_blank}")
     private String description;
 }
