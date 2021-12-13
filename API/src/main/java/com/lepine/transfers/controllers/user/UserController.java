@@ -5,7 +5,9 @@ import javax.validation.Valid;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
+import com.lepine.transfers.data.user.UserUUIDLessDTO;
 
+import com.lepine.transfers.services.user.UserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,9 +27,9 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    public UserPasswordLessDTO create(@Valid UserPasswordLessDTO userPasswordLessDTO) {
-        log.info("Creating user with email {}", userPasswordLessDTO.getEmail());
-        User created = userService.create(userMapper.toEntity(userPasswordLessDTO));
+    public UserPasswordLessDTO create(@Valid UserUUIDLessDTO userUUIDLessDTO) {
+        log.info("Creating user with email {}", userUUIDLessDTO.getEmail());
+        User created = userService.create(userUUIDLessDTO);
         log.info("Created user with UUID {}", created.getUuid());
         return userMapper.toPasswordLessDTO(created);
     }

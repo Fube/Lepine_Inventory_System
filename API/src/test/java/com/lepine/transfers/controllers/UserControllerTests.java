@@ -1,7 +1,8 @@
-package com.lepine.users.controllers;
+package com.lepine.transfers.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.given;
 
 import java.util.Set;
 
@@ -9,9 +10,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import com.lepine.transfers.controllers.user.UserController;
+import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.services.Config;
 import com.lepine.transfers.services.user.UserService;
 
 import org.junit.jupiter.api.DisplayName;
@@ -49,17 +52,17 @@ public class UserControllerTests {
                 .email(VALID_EMAIL)
                 .password(VALID_PASSWORD)
                 .build();
-        
-        UserPasswordLessDTO userPasswordLessDTO = userMapper.toPasswordLessDTO(userMapper.toEntity(userUUIDLessDTO));
+
+        User createdUser = userMapper.toEntity(userUUIDLessDTO);
 
         given(userService.create(userUUIDLessDTO))
-            .willReturn(userPasswordLessDTO);
+                .willReturn(createdUser);
 
         // Act
-        UserPasswordLessDTO got = userController.create(userPasswordLessDTO);
+        UserPasswordLessDTO got = userController.create(userUUIDLessDTO);
 
         // Assert
-        assertThat(got).isEqualTo(userPasswordLessDTO);
+        assertEquals(createdUser.getUuid(), got.getUuid());
         verify(userService, times(1)).create(userUUIDLessDTO);
     }
 
@@ -72,12 +75,10 @@ public class UserControllerTests {
                 .email(VALID_EMAIL)
                 .password("")
                 .build();
-        
-        UserPasswordLessDTO userPasswordLessDTO = userMapper.toPasswordLessDTO(userMapper.toEntity(userUUIDLessDTO));
 
         // Act
-        ConstraintViolationException exception = 
-            assertThrows(ConstraintViolationException.class, () -> userController.create(userPasswordLessDTO));
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
@@ -98,12 +99,10 @@ public class UserControllerTests {
                 .email("")
                 .password(VALID_PASSWORD)
                 .build();
-        
-        UserPasswordLessDTO userPasswordLessDTO = userMapper.toPasswordLessDTO(userMapper.toEntity(userUUIDLessDTO));
 
         // Act
-        ConstraintViolationException exception = 
-            assertThrows(ConstraintViolationException.class, () -> userController.create(userPasswordLessDTO));
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
