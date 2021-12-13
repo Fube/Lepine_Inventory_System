@@ -17,6 +17,8 @@ public class UserUUIDLessDTO {
     @Email(message = "Email must be a valid email address")
     @NotBlank(message = "Email must not be blank")
     private String email;
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must be at least 8 characters long, include a number, inclue a capital letter, inclue a special character")
+
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must be at least 8 characters long, include a number, include a capital letter, include a special character")
+    @NotBlank(message = "Password must not be blank")
     private String password;  
 }

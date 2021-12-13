@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.given;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -31,6 +33,7 @@ public class UserControllerTests {
     private static final String VALID_EMAIL = "some@domain.com";
     private static final String INVALID_EMAIL = "oogabooga";
     private static final String VALID_PASSWORD = "S0m3P@ssw0rd";
+    private static final String INVALID_PASSWORD = "invalidpassword";
 
     @Autowired
     private UserController userController;
@@ -42,7 +45,9 @@ public class UserControllerTests {
     private UserService userService;
 
     @Test
-    void contextLoads(){}
+    void contextLoads(){
+        reset(userService);
+    }
 
     @Test
     @DisplayName("Given user with valid email and password, then register user")
@@ -68,6 +73,54 @@ public class UserControllerTests {
     }
 
     @Test
+    @DisplayName("Given user with valid email but empty password, then throw ConstrainViolationException")
+    void registerUser_emptyPassword() {
+
+        // Arrange
+        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password(INVALID_PASSWORD)
+                .build();
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+        assertEquals("Password must be at least 8 characters long, include a number, include a capital letter, include a special character",
+                constraintViolations.iterator().next().getMessage());
+
+        verify(userService, times(0)).create(userUUIDLessDTO);
+    }
+
+    @Test
+    @DisplayName("Given user with valid email but null password, then throw ConstrainViolationException")
+    void registerUser_nullPassword() {
+
+        // Arrange
+        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password(null)
+                .build();
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+        assertEquals("Password must not be blank",
+                constraintViolations.iterator().next().getMessage());
+
+        verify(userService, times(0)).create(userUUIDLessDTO);
+    }
+
+    @Test
     @DisplayName("Given user with valid email but invalid password, then throw ConstrainViolationException")
     void registerUser_invalidPassword() {
 
@@ -84,9 +137,15 @@ public class UserControllerTests {
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
         assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-        assertEquals("Password must be at least 8 characters long, include a number, inclue a capital letter, inclue a special character",
-                constraintViolations.iterator().next().getMessage());
+        assertEquals(2, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        assertTrue(
+                collect.containsAll(List.of(
+                        "Password must be at least 8 characters long, include a number, include a capital letter, include a special character",
+                        "Password must not be blank")));
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
