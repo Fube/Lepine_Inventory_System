@@ -4,8 +4,8 @@ import { createNullCache } from "@algolia/cache-common";
 import { createContext, useEffect, useState } from "react";
 
 const searchClient = algoliasearch(
-    "3VJL1MLU0K",
-    "d5abea3b2d8eff8328c34155b1713c39"
+    "OGNEYVQBFT",
+    "780a6f12d6cab55b9c650ae1a4340a64"
 );
 
 export const AlgoliaContext = createContext({

@@ -89,7 +89,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
             >
                 <Nav />
                 <div className="overflow-x-auto justify-center flex">
-                    <div className="md:w-1/2 w-3/4">
+                    <div className="md:w-4/5 w-3/4">
                         <div className="md:flex justify-around my-4">
                             <h1 className="text-4xl md:mb-0 mb-4">Items</h1>
                             <SearchBox
@@ -111,7 +111,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                             </>
                         )
                             .or(
-                                <table className="table table-zebra w-full sm:table-fixed">
+                                <table className="table table-zebra w-full !whitespace-normal !break-words sm:table-fixed">
                                     <thead>{head}</thead>
                                     <tbody>
                                         {items.map(
@@ -159,10 +159,10 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
 function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     return (
         <Link key={uuid} href={`/items/${uuid}`} passHref>
-            <tr className="hover">
-                <td>{sku}</td>
-                <td>{name}</td>
-                <td>{description}</td>
+            <tr className="hover ">
+                <td className="!whitespace-normal !break-words">{sku}</td>
+                <td className="!whitespace-normal !break-words">{name}</td>
+                <td className="!whitespace-normal !break-words">{description}</td>
             </tr>
         </Link>
     );
