@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import com.lepine.transfers.controllers.user.UserController;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 
@@ -53,7 +54,7 @@ public class UserControllerTests {
             .willReturn(userPasswordLessDTO);
 
         // Act
-        UserPasswordLessDTO got = userController.registerUser(userPasswordLessDTO);
+        UserPasswordLessDTO got = userController.create(userPasswordLessDTO);
 
         // Assert
         assertThat(got).isEqualTo(userPasswordLessDTO);
