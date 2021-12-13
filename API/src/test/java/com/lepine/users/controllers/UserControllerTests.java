@@ -12,6 +12,7 @@ import com.lepine.transfers.controllers.user.UserController;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.services.user.UserService;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
