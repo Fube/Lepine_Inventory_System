@@ -3,6 +3,7 @@ package com.lepine.transfers.controllers.user;
 import javax.validation.Valid;
 
 import com.lepine.transfers.data.user.User;
+import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +27,7 @@ public class UserController {
 
     public UserPasswordLessDTO create(@Valid UserPasswordLessDTO userPasswordLessDTO) {
         log.info("Creating user with email {}", userPasswordLessDTO.getEmail());
-        User created = userService.create(userPasswordLessDTO);
+        User created = userService.create(userMapper.toEntity(userPasswordLessDTO));
         log.info("Created user with UUID {}", created.getUuid());
         return userMapper.toPasswordLessDTO(created);
     }
