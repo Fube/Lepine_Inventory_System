@@ -8,6 +8,9 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import com.lepine.transfers.data.user.UserPasswordLessDTO;
+import com.lepine.transfers.data.user.UserUUIDLessDTO;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
