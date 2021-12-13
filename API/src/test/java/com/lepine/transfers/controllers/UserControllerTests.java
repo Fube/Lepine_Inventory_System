@@ -108,7 +108,7 @@ public class UserControllerTests {
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
         assertFalse(constraintViolations.isEmpty());
         assertEquals(1, constraintViolations.size());
-        assertEquals("Email must be a valid email address",
+        assertEquals("Email must not be blank",
                 constraintViolations.iterator().next().getMessage());
 
         verify(userService, times(0)).create(userUUIDLessDTO);
