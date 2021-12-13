@@ -76,12 +76,12 @@ spring:
       on-profile:
         - prod
   flyway:
-    url: jdbc:postgresql://db:5432/
+    url: ${DATABASE_URL:jdbc:postgresql://db:5432/}
     baseline-on-migrate: true
     user: postgres
     password: postgres
   datasource:
-    url: jdbc:postgresql://db:5432/
+    url: ${DATABASE_URL:jdbc:postgresql://db:5432/}
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
