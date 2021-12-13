@@ -1,4 +1,4 @@
-package com.lepine.transfers.data.item;
+package com.lepine.transfers.data.user;
 
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.UUID;
 
-@Table(schema = "lepine", name = "items")
+@Table(schema = "lepine", name = "users")
 @Entity
 @Getter
 @Setter
@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class Item {
+public class User {
 
     @Builder.Default
     @GeneratedValue(generator = "UUIDGenerator")
@@ -25,7 +25,6 @@ public class Item {
     @Id
     private UUID uuid = UUID.randomUUID();
 
-    private String SKU;
-    private String description;
-    private String name;
+     private String email;
+     private String password;
 }
