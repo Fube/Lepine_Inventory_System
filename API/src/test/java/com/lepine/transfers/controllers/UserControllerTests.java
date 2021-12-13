@@ -29,6 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class UserControllerTests {
 
     private static final String VALID_EMAIL = "some@domain.com";
+    private static final String INVALID_EMAIL = "oogabooga";
     private static final String VALID_PASSWORD = "S0m3P@ssw0rd";
 
     @Autowired
@@ -91,8 +92,8 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with valid password but invalid email, then throw ConstrainViolationException")
-    void registerUser_invalidEmail() {
+    @DisplayName("Given user with valid password but empty email, then throw ConstrainViolationException")
+    void registerUser_emptyEmail() {
 
         // Arrange
         UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
@@ -109,6 +110,54 @@ public class UserControllerTests {
         assertFalse(constraintViolations.isEmpty());
         assertEquals(1, constraintViolations.size());
         assertEquals("Email must not be blank",
+                constraintViolations.iterator().next().getMessage());
+
+        verify(userService, times(0)).create(userUUIDLessDTO);
+    }
+
+    @Test
+    @DisplayName("Given user with valid password but null email, then throw ConstrainViolationException")
+    void registerUser_nullEmail() {
+
+        // Arrange
+        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(null)
+                .password(VALID_PASSWORD)
+                .build();
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+        assertEquals("Email must not be blank",
+                constraintViolations.iterator().next().getMessage());
+
+        verify(userService, times(0)).create(userUUIDLessDTO);
+    }
+
+    @Test
+    @DisplayName("Given user with valid password but invalid email, then throw ConstrainViolationException")
+    void registerUser_invalidEmail() {
+
+        // Arrange
+        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(INVALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        // Act
+        ConstraintViolationException exception =
+                assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+        assertEquals("Email must be a valid email address",
                 constraintViolations.iterator().next().getMessage());
 
         verify(userService, times(0)).create(userUUIDLessDTO);
