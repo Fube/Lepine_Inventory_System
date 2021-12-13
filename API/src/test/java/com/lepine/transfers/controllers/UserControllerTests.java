@@ -1,17 +1,5 @@
 package com.lepine.transfers.controllers;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.given;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
 import com.lepine.transfers.controllers.user.UserController;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
@@ -19,15 +7,22 @@ import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.services.Config;
 import com.lepine.transfers.services.user.UserService;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.MessageSource;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {Config.class})
 @ActiveProfiles({"test"})

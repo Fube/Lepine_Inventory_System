@@ -18,6 +18,7 @@ public class MessageSourceConfig {
         slr.setDefaultLocale(Locale.US);
         return slr;
     }
+
     @Bean
     public ReloadableResourceBundleMessageSource getMessageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();

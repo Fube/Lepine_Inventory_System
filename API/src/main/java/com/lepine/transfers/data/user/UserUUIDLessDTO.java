@@ -14,11 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class UserUUIDLessDTO {
-    @Email(message = "Email must be a valid email address")
-    @NotBlank(message = "Email must not be blank")
+    @Email(message = "{user.email.not_valid}")
+    @NotBlank(message = "{user.email.not_blank}")
     private String email;
 
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must be at least 8 characters long, include a number, include a capital letter, include a special character")
-    @NotBlank(message = "Password must not be blank")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+            message = "{user.password.not_valid}")
+    @NotBlank(message = "{user.password.not_blank}")
     private String password;  
 }
