@@ -16,7 +16,10 @@ import javax.persistence.PersistenceException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+
+import java.util.Optional;
 
 @DataJpaTest
 @ActiveProfiles({"test"})
@@ -105,5 +108,28 @@ public class UserDataTests {
         // Assert
         Throwable exception = Throwables.getRootCause(persistenceException);
         assertThat(exception.getMessage()).contains("Unique");
+    }
+
+    @Test
+    @DisplayName("Given email, retrieve user")
+    void findByEmail() {
+
+        // Arrange
+        final User user = userRepo.save(
+                User.builder()
+                        .email(VALID_EMAIL)
+                        .password(VALID_PASSWORD)
+                        .build()
+        );
+        entityManager.flush();
+
+        // Act
+        final Optional<User> found = userRepo.findByEmail(VALID_EMAIL);
+
+        // Assert
+        assertTrue(found.isPresent());
+        final User got = found.get();
+        assertEquals(user.getEmail(), got.getEmail());
+        assertEquals(user.getPassword(), got.getPassword());
     }
 }
