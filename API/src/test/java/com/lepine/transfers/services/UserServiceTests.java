@@ -124,4 +124,28 @@ public class UserServiceTests {
         assertEquals(pageFor, all);
         verify(userRepo, times(1)).findAll(any(PageRequest.class));
     }
+
+    @Test
+    @DisplayName("Given findAll with a PageRequest, then return the appropriate page")
+    void findAll_WithPageRequest() {
+
+
+        // Arrange
+        final int
+                num = 100,
+                size = 15,
+                page = 2;
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        final Page<User> pageFor = createPageFor(generateUsers(num), pageRequest);
+        given(userRepo.findAll(pageRequest)).willReturn(pageFor);
+
+        // Act
+        Page<User> all = userService.findAll(pageRequest);
+
+        // Assert
+        assertEquals(pageFor, all);
+
+        verify(userRepo, times(1)).findAll(pageRequest);
+    }
 }
