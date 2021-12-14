@@ -42,8 +42,8 @@ public class UserController {
     }
     
     public Page<UserPasswordLessDTO> getAll(
-            @Min(value = 1, message = "Page number cannot be less than 1") int page,
-            @Min(value = 1, message = "Page size cannot be less than 1") int size
+            @Min(value = 1, message = "{pagination.page.min}") int page,
+            @Min(value = 1, message = "{pagination.size.min}") int size
     ) {
         log.info("Getting all users");
 
