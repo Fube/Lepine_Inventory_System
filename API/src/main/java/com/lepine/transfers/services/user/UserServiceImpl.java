@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> findAll() {
-        return null;
+        return findAll(PageRequest.of(0, 10));
     }
 
     @Override
