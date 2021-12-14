@@ -6,6 +6,7 @@ import com.lepine.transfers.controllers.user.UserController;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.helpers.matchers.UserUUIDLessDTOMatcher;
 import com.lepine.transfers.services.user.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.mockito.ArgumentMatchers.any;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -61,9 +66,15 @@ public class UserHttpTests {
                 .email(VALID_EMAIL)
                 .password(VALID_PASSWORD)
                 .build();
-        final User asEntity = userMapper.toEntity(userUUIDLessDTO);
 
-        given(userService.create(any(UserUUIDLessDTO.class)))
+        final UUID uuid = UUID.randomUUID();
+        final User asEntity = userMapper.toEntity(userUUIDLessDTO)
+                .toBuilder()
+                .uuid(uuid)
+                .build();
+
+        final UserUUIDLessDTOMatcher userUUIDLessDTOMatcher = new UserUUIDLessDTOMatcher(userUUIDLessDTO);
+        given(userService.create(argThat(userUUIDLessDTOMatcher)))
             .willReturn(asEntity);
 
         // Act
@@ -75,9 +86,10 @@ public class UserHttpTests {
         // Assert
         resultActions.andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.uuid").exists())
+                .andExpect(jsonPath("$.uuid").value(uuid.toString()))
                 .andExpect(jsonPath("$.email").value(VALID_EMAIL))
                 .andExpect(jsonPath("$.password").doesNotExist());
 
+        verify(userController, times(1)).create(argThat(userUUIDLessDTOMatcher));
     }
 }
