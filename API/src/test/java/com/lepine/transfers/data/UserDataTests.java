@@ -86,4 +86,24 @@ public class UserDataTests {
         Throwable exception = Throwables.getRootCause(persistenceException);
         assertThat(exception.getMessage()).contains("NULL not allowed");
     }
+
+    @Test
+    @DisplayName("Given user with duplicate email, throw Exception")
+    void save_DuplicateEmail() {
+
+        // Arrange
+        final User user = User.builder()
+            .email(VALID_EMAIL)
+            .password(VALID_PASSWORD)
+            .build();
+
+        // Act
+        userRepo.save(user);
+        userRepo.save(user.toBuilder().build());
+        final PersistenceException persistenceException =
+                assertThrows(PersistenceException.class, () -> entityManager.flush());
+        // Assert
+        Throwable exception = Throwables.getRootCause(persistenceException);
+        assertThat(exception.getMessage()).contains("Unique");
+    }
 }
