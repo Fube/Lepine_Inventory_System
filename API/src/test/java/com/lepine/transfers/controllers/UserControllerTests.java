@@ -338,7 +338,7 @@ public class UserControllerTests {
                 page = 0,
                 size = 10;
         final Page<User> pageFor = createPageFor(seedUsers(total));
-        given(userService.getAll(page, size)).willReturn(pageFor);
+        given(userService.findAll(page, size)).willReturn(pageFor);
 
         // Act
         Page<UserUUIDLessDTO> got = userController.getAll(pageable);
@@ -362,7 +362,7 @@ public class UserControllerTests {
                 page = -1,
                 size = 10;
         final Page<User> pageFor = createPageFor(seedUsers(total));
-        given(userService.getAll(page, size)).willReturn(pageFor);
+        given(userService.findAll(page, size)).willReturn(pageFor);
 
         // Act
         ConstraintViolationException exception =
@@ -392,7 +392,7 @@ public class UserControllerTests {
                 page = 0,
                 size = -1;
         final Page<User> pageFor = createPageFor(seedUsers(total));
-        given(userService.getAll(page, size)).willReturn(pageFor);
+        given(userService.findAll(page, size)).willReturn(pageFor);
 
         // Act
         ConstraintViolationException exception =
@@ -422,7 +422,7 @@ public class UserControllerTests {
                 page = -1,
                 size = -1;
         final Page<User> pageFor = createPageFor(seedUsers(total));
-        given(userService.getAll(page, size)).willReturn(pageFor);
+        given(userService.findAll(page, size)).willReturn(pageFor);
 
         // Act
         ConstraintViolationException exception =

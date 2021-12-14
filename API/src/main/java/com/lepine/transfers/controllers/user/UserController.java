@@ -1,6 +1,7 @@
 package com.lepine.transfers.controllers.user;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
@@ -11,10 +12,13 @@ import com.lepine.transfers.services.user.UserService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -34,5 +38,16 @@ public class UserController {
         return userMapper.toPasswordLessDTO(created);
     }
     
+    public List<UserPasswordLessDTO> getAll(
+            @RequestParam(required = false, defaultValue = "1")
+            @Min(value = 1, message = "Page number cannot be less than 1") int page,
+            @RequestParam(required = false, defaultValue = "10")
+            @Min(value = 1, message = "Page size cannot be less than 1") int size
+    ) {
+        log.info("Getting all users");
+        List<UserPasswordLessDTO> passwordLessDTOS = userMapper.toPasswordLessDTOs(userService.findAll());
+        log.info("Got all users, count {}", passwordLessDTOS.size());
 
+        return passwordLessDTOS;
+    }
 }
