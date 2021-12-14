@@ -1,11 +1,16 @@
 package com.lepine.transfers.services;
 
+import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.SecurityConfig;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.services.user.UserService;
+import com.lepine.transfers.services.user.UserServiceImpl;
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
@@ -25,15 +31,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(classes = { MapperConfig.class, UserServiceImpl.class })
 @ActiveProfiles("test")
 public class UserServiceTests {
 
     private final static String VALID_EMAIL = "some@email.com";
     private final static String VALID_PASSWORD = "S0m3P@ssw0rd";
+    private final static String VALID_HASHED_PASSWORD = "some.hashed.password.or.something";
 
     private static List<User> generateUsers(int num) {
         List<User> items = new ArrayList<>();
@@ -53,7 +59,16 @@ public class UserServiceTests {
     private UserMapper userMapper;
 
     @MockBean
+    private PasswordEncoder passwordEncoder;
+
+    @MockBean
     private UserRepo userRepo;
+
+    @BeforeEach
+    void setup() {
+        reset(userRepo);
+        reset(passwordEncoder);
+    }
 
     @Test
     void contextLoads() {}
@@ -69,6 +84,7 @@ public class UserServiceTests {
                 .build();
         final User asEntity = userMapper.toEntity(userUUIDLessDTO);
         given(userRepo.save(any())).willReturn(asEntity);
+        given(passwordEncoder.encode(VALID_PASSWORD)).willReturn(VALID_HASHED_PASSWORD);
 
         // Act
         final User user = userService.create(userUUIDLessDTO);
@@ -77,11 +93,12 @@ public class UserServiceTests {
         assertNotNull(user);
         assertEquals(VALID_EMAIL, user.getEmail());
         assertNotNull(user.getPassword());
-        assertNotEquals(VALID_PASSWORD, user.getPassword());
+        assertEquals(VALID_HASHED_PASSWORD, user.getPassword());
 
         verify(userRepo, times(1)).findByEmail(VALID_EMAIL);
         verify(userRepo, times(0)).save(argThat(u -> u.getPassword().equals(VALID_PASSWORD)));
         verify(userRepo, times(1)).save(user);
+        verify(passwordEncoder, times(1)).encode(VALID_PASSWORD);
     }
 
     @Test
