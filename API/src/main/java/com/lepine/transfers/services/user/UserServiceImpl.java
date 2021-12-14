@@ -4,6 +4,7 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,11 @@ public class UserServiceImpl implements UserService {
 
         final User user = userMapper.toEntity(userUUIDLessDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        if(userRepo.findByEmail(user.getEmail()).isPresent()) {
+            log.error("User with email {} already exists", user.getEmail());
+            throw new DuplicateEmailException(user.getEmail());
+        }
         final User save = userRepo.save(user);
 
         log.info("Created user {} with email and UUID {}", save.getEmail(), save.getUuid());
