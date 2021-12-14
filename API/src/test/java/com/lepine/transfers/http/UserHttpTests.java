@@ -57,9 +57,9 @@ public class UserHttpTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("Given POST on /users with valid data, then return 201")
+    @DisplayName("Given POST on /users with valid data as manager, then return 201")
     @WithMockUser(username = "some-manager", authorities = "MANAGER")
-    void create() throws Exception {
+    void create_AsManager() throws Exception {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
@@ -91,5 +91,29 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.password").doesNotExist());
 
         verify(userController, times(1)).create(argThat(userUUIDLessDTOMatcher));
+    }
+
+    @Test
+    @DisplayName("Given POST on /users with valid data as clerk, then return 403")
+    @WithMockUser(username = "some-user", authorities = "CLERK")
+    void create_AsClerk() throws Exception {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+        final UserUUIDLessDTOMatcher userUUIDLessDTOMatcher = new UserUUIDLessDTOMatcher(userUUIDLessDTO);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                post("/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userUUIDLessDTO)));
+
+        // Assert
+        resultActions.andExpect(status().isForbidden());
+
+        verify(userController, times(0)).create(argThat(userUUIDLessDTOMatcher));
     }
 }
