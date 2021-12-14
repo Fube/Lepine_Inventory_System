@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 public interface UserService {
 
-    User create(@NotNull @Valid UserUUIDLessDTO userUUIDLessDTO);
+    User create(@NotNull(message = "{user.not_null}") @Valid UserUUIDLessDTO userUUIDLessDTO);
 
     Page<User> findAll();
 

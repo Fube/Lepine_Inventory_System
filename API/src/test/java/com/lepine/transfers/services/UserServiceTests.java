@@ -195,7 +195,9 @@ public class UserServiceTests {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toSet());
         
-        assertTrue(collect.containsAll(List.of("UserUUIDLessDTO cannot be null")));
+        assertTrue(collect.contains(
+                messageSourceHelper.apply("user.not_null")
+        ));
 
         verify(userRepo, times(0)).save(any());
     }
@@ -221,7 +223,7 @@ public class UserServiceTests {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toSet());
         
-        assertTrue(collect.contains(messageSourceHelper.apply("user.email.not_blink")));
+        assertTrue(collect.contains(messageSourceHelper.apply("user.email.not_blank")));
 
         verify(userRepo, times(0)).save(any());
     }
@@ -248,7 +250,7 @@ public class UserServiceTests {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toSet());
         
-        assertTrue(collect.containsAll(List.of("Email cannot be empty")));
+        assertTrue(collect.contains(messageSourceHelper.apply("user.email.not_blank")));
 
         verify(userRepo, times(0)).save(any());
     }
@@ -302,7 +304,9 @@ public class UserServiceTests {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toSet());
         
-        assertTrue(collect.containsAll(List.of("Password cannot be null")));
+        assertTrue(collect.contains(
+                messageSourceHelper.apply("user.password.not_blank")
+        ));
 
         verify(userRepo, times(0)).save(any());
     }
@@ -360,7 +364,7 @@ public class UserServiceTests {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toSet());
         
-        assertTrue(collect.containsAll(List.of("Password must be at least 8 characters long")));
+        assertTrue(collect.contains(messageSourceHelper.apply("user.password.not_valid")));
 
         verify(userRepo, times(0)).save(any());
     }
