@@ -10,6 +10,7 @@ import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 
 import com.lepine.transfers.services.user.UserService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -40,16 +41,17 @@ public class UserController {
         return userMapper.toPasswordLessDTO(created);
     }
     
-    public List<UserPasswordLessDTO> getAll(
-            @RequestParam(required = false, defaultValue = "1")
+    public Page<UserPasswordLessDTO> getAll(
             @Min(value = 1, message = "Page number cannot be less than 1") int page,
-            @RequestParam(required = false, defaultValue = "10")
             @Min(value = 1, message = "Page size cannot be less than 1") int size
     ) {
         log.info("Getting all users");
-        List<UserPasswordLessDTO> passwordLessDTOS = OneIndexedPageAdapter.of(userMapper.toPasswordLessDTOs(userService.findAll(PageRequest.of(page - 1, size))));
-        log.info("Got all users, count {}", passwordLessDTOS.size());
 
-        return passwordLessDTOS;
+        final Page<UserPasswordLessDTO> passwordLessDTOPage = OneIndexedPageAdapter.of(userService.findAll(PageRequest.of(page - 1, size))
+                .map(userMapper::toPasswordLessDTO));
+
+        log.info("Got all users, count {}", passwordLessDTOPage.getTotalElements());
+
+        return passwordLessDTOPage;
     }
 }

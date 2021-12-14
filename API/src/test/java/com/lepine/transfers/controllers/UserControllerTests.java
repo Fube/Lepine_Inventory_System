@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -329,46 +330,17 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given no page number or size, then retrieve first page of Users")
-    void retrieveAllUsers_noPageRequest() {
-
-        // Arrange
-        final int
-                total = 100,
-                page = 0,
-                size = 10;
-        final Page<User> pageFor = createPageFor(seedUsers(total));
-        given(userService.findAll(page, size)).willReturn(pageFor);
-
-        // Act
-        Page<UserUUIDLessDTO> got = userController.getAll(pageable);
-
-        // Assert
-        assertEquals(0, got.getNumber());
-        assertEquals(10, got.getSize());
-        assertEquals(1, got.getTotalPages());
-        assertEquals(1, got.getTotalElements());
-        assertEquals(0, got.getNumberOfElements());
-        assertEquals(0, got.getContent().size());
-
-        verify(userService, times(1)).findAll(page, size);
-    }
-
-    @Test
     @DisplayName("Given negative page number and valid size, then throw ConstraintViolationException")
     void retrieveAllUsers_negativePageNumber() {
 
         // Arrange
         final int
-                total = 100,
                 page = -1,
                 size = 10;
-        final Page<User> pageFor = createPageFor(seedUsers(total));
-        given(userService.findAll(page, size)).willReturn(pageFor);
 
         // Act
         ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> userController.getAll(pageable));
+                assertThrows(ConstraintViolationException.class, () -> userController.getAll(page, size));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
@@ -379,9 +351,9 @@ public class UserControllerTests {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toSet());
         assertTrue(
-                collect.contains("Page number must be greater than or equal to 0"));
+                collect.contains("Page number cannot be less than 1"));
 
-        verify(userService, times(0)).findAll(page, size);
+        verify(userService, times(0)).findAll(any());
     }
 
     @Test
@@ -390,15 +362,12 @@ public class UserControllerTests {
 
         // Arrange
         final int
-                total = 100,
-                page = 0,
+                page = 1,
                 size = -1;
-        final Page<User> pageFor = createPageFor(seedUsers(total));
-        given(userService.findAll(page, size)).willReturn(pageFor);
 
         // Act
         ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> userController.getAll(pageable));
+                assertThrows(ConstraintViolationException.class, () -> userController.getAll(page, size));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
@@ -409,9 +378,9 @@ public class UserControllerTests {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toSet());
         assertTrue(
-                collect.contains("Page size must be greater than or equal to 1"));
+                collect.contains("Page size cannot be less than 1"));
 
-        verify(userService, times(0)).findAll(page, size);
+        verify(userService, times(0)).findAll(any());
     }
 
     @Test
@@ -420,15 +389,12 @@ public class UserControllerTests {
 
         // Arrange
         final int
-                total = 100,
                 page = -1,
                 size = -1;
-        final Page<User> pageFor = createPageFor(seedUsers(total));
-        given(userService.findAll(page, size)).willReturn(pageFor);
 
         // Act
         ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> userController.getAll(pageable));
+                assertThrows(ConstraintViolationException.class, () -> userController.getAll(page, size));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
@@ -440,9 +406,9 @@ public class UserControllerTests {
                 .collect(Collectors.toSet());
         assertTrue(
                 collect.containsAll(List.of(
-                        "Page number must be greater than or equal to 0",
-                        "Page size must be greater than or equal to 1")));
+                        "Page number cannot be less than 1",
+                        "Page size cannot be less than 1")));
 
-        verify(userService, times(0)).findAll(page, size);
+        verify(userService, times(0)).findAll(any());
     }
 }
