@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -63,6 +64,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given GET on /items, returns 200 OK and a paginated list of items")
+    @WithMockUser(username = "test-user")
     void getItems() throws Exception {
         // Arrange
         final int
@@ -99,6 +101,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given GET on /items/{uuid}, returns 200 OK and the item")
+    @WithMockUser(username = "test-user")
     void getItem() throws Exception {
         // Arrange
         final Item item = Item.builder()
@@ -128,6 +131,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given GET on /items/{uuid}, returns 404 NOT FOUND if the item does not exist")
+    @WithMockUser(username = "test-user")
     void getItemNotFound() throws Exception {
         // Arrange
         final UUID uuid = UUID.randomUUID();
@@ -152,6 +156,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given POST on /items, returns 201 CREATED and the item")
+    @WithMockUser(username = "test-user")
     void postItem() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
@@ -184,6 +189,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given POST on /items, returns 400 BAD REQUEST if the item is invalid")
+    @WithMockUser(username = "test-user")
     void postItemInvalid() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
@@ -211,6 +217,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given PUT on /items/{uuid}, returns 200 OK and the item")
+    @WithMockUser(username = "test-user")
     void putItem() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
@@ -243,6 +250,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given PUT on /items/{uuid}, returns 400 BAD REQUEST if the item is invalid")
+    @WithMockUser(username = "test-user")
     void putItemInvalid() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
@@ -270,6 +278,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given PUT on /items/{uuid}, returns 404 NOT FOUND if the item does not exist")
+    @WithMockUser(username = "test-user")
     void putItemNotFound() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
@@ -300,6 +309,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given DELETE on /items/{uuid}, returns 204 NO CONTENT")
+    @WithMockUser(username = "test-user")
     void deleteItem() throws Exception {
         // Arrange
         final UUID uuid = UUID.randomUUID();
