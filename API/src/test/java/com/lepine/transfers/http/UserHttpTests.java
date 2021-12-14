@@ -58,7 +58,7 @@ public class UserHttpTests {
 
     @Test
     @DisplayName("Given POST on /users with valid data as manager, then return 201")
-    @WithMockUser(username = "some-manager", authorities = "MANAGER")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager() throws Exception {
 
         // Arrange
@@ -95,7 +95,7 @@ public class UserHttpTests {
 
     @Test
     @DisplayName("Given POST on /users with valid data as clerk, then return 403")
-    @WithMockUser(username = "some-user", authorities = "CLERK")
+    @WithMockUser(username = "some-user", roles = "CLERK")
     void create_AsClerk() throws Exception {
 
         // Arrange
@@ -119,7 +119,7 @@ public class UserHttpTests {
 
     @Test
     @DisplayName("Given POST on /users with valid data as salesperson, then return 403")
-    @WithMockUser(username = "some-salesperson", authorities = "SALESPERSON")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void create_AsSalesperson() throws Exception {
 
         // Arrange

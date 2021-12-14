@@ -13,6 +13,7 @@ import com.lepine.transfers.services.user.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +37,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(CREATED)
+    @Secured("ROLE_MANAGER")
     public UserPasswordLessDTO create(@Valid @RequestBody UserUUIDLessDTO userUUIDLessDTO) {
         log.info("Creating user with email {}", userUUIDLessDTO.getEmail());
         User created = userService.create(userUUIDLessDTO);
