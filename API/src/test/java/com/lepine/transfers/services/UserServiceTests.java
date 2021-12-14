@@ -1,7 +1,29 @@
 package com.lepine.transfers.services;
 
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
+import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import com.lepine.transfers.config.MapperConfig;
-import com.lepine.transfers.config.SecurityConfig;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
@@ -9,7 +31,7 @@ import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.services.user.UserServiceImpl;
-import org.aspectj.lang.annotation.Before;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,24 +43,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
-import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
 @SpringBootTest(classes = { MapperConfig.class, UserServiceImpl.class })
 @ActiveProfiles("test")
 public class UserServiceTests {
 
     private final static String VALID_EMAIL = "some@email.com";
+    private final static String INVALID_EMAIL = "aaa";
     private final static String VALID_PASSWORD = "S0m3P@ssw0rd";
+    private final static String INVALID_PASSWORD = "bad";
     private final static String VALID_HASHED_PASSWORD = "some.hashed.password.or.something";
 
     private static List<User> generateUsers(int num) {
@@ -164,5 +176,190 @@ public class UserServiceTests {
         assertEquals(pageFor, all);
 
         verify(userRepo, times(1)).findAll(pageRequest);
+    }
+
+    @Test
+    @DisplayName("Given null UserUUIDLessDTO on create, then throw ConstraintViolationException")
+    void update_NullUserUUIDLessDTO() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = null;
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        
+        assertTrue(collect.containsAll(List.of("UserUUIDLessDTO cannot be null")));
+
+        verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("Given UserUUIDLessDTO with null email but valid password on create, then throw ConstraintViolationException")
+    void update_NullEmail() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .password(VALID_PASSWORD)
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        
+        assertTrue(collect.containsAll(List.of("Email cannot be null")));
+
+        verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("Given UserUUIDLessDTO with empty email but valid password on create, then throw ConstraintViolationException")
+    void update_EmptyEmail() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email("")
+                .password(VALID_PASSWORD)
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        
+        assertTrue(collect.containsAll(List.of("Email cannot be empty")));
+
+        verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("Given UserUUIDLessDTO with invalid email but valid password on create, then throw ConstraintViolationException")
+    void update_InvalidEmail() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(INVALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        
+        assertTrue(collect.containsAll(List.of("Email must be a valid email address")));
+
+        verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("Given UserUUIDLessDTO with valid email but null password on create, then throw ConstraintViolationException")
+    void update_NullPassword() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password(null)
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        
+        assertTrue(collect.containsAll(List.of("Password cannot be null")));
+
+        verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("Given UserUUIDLessDTO with valid email but empty password on create, then throw ConstraintViolationException")
+    void update_EmptyPassword() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password("")
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        
+        assertTrue(collect.containsAll(List.of("Password cannot be empty")));
+
+        verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("Given UserUUIDLessDTO with valid email but invalid password on create, then throw ConstraintViolationException")
+    void update_InvalidPassword() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password(INVALID_PASSWORD)
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        
+        assertTrue(collect.containsAll(List.of("Password must be at least 8 characters long")));
+
+        verify(userRepo, times(0)).save(any());
     }
 }
