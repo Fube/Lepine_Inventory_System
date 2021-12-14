@@ -12,16 +12,16 @@ import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.services.user.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/users")
@@ -34,7 +34,9 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    public UserPasswordLessDTO create(@Valid UserUUIDLessDTO userUUIDLessDTO) {
+    @PostMapping
+    @ResponseStatus(CREATED)
+    public UserPasswordLessDTO create(@Valid @RequestBody UserUUIDLessDTO userUUIDLessDTO) {
         log.info("Creating user with email {}", userUUIDLessDTO.getEmail());
         User created = userService.create(userUUIDLessDTO);
         log.info("Created user with UUID {}", created.getUuid());

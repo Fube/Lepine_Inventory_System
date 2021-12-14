@@ -1,15 +1,5 @@
 package com.lepine.transfers.http;
 
-import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
-import static java.lang.String.format;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.controllers.user.UserController;
@@ -17,7 +7,6 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.services.user.UserService;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +19,19 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @WebMvcTest(controllers = { UserController.class })
 @ContextConfiguration(classes = { MapperConfig.class })
 @ActiveProfiles("test")
 public class UserHttpTests {
 
-    private static final String VALID_EMAIL = "valid@email.com";
-    private static final String VALID_PASSWORD = "S0m3P@ssw0rd";
+    private static final String VALID_EMAIL = "valid@gmail.com";
+    private static final String VALID_PASSWORD = "S0m3P@ssword";
     
     @Autowired
     private MockMvc mvc;
@@ -74,7 +69,7 @@ public class UserHttpTests {
         // Act
         final ResultActions resultActions = mvc.perform(
                 post("/users")
-                        .contentType("application/json")
+                        .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userUUIDLessDTO)));
 
         // Assert
