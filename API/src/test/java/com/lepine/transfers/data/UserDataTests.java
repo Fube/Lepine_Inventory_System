@@ -50,13 +50,32 @@ public class UserDataTests {
     }
 
     @Test
-    @DisplayName("Given user with null email, throw ConstraintViolationException")
+    @DisplayName("Given user with null email, throw Exception")
     void save_NullEmail() {
 
         // Arrange
         final User user = User.builder()
             .email(null)
             .password(VALID_PASSWORD)
+            .build();
+
+        // Act
+        userRepo.save(user);
+        final PersistenceException persistenceException =
+                assertThrows(PersistenceException.class, () -> entityManager.flush());
+        // Assert
+        Throwable exception = Throwables.getRootCause(persistenceException);
+        assertThat(exception.getMessage()).contains("NULL not allowed");
+    }
+
+    @Test
+    @DisplayName("Given user with null password, throw Exception")
+    void save_NullPassword() {
+
+        // Arrange
+        final User user = User.builder()
+            .email(VALID_EMAIL)
+            .password(null)
             .build();
 
         // Act
