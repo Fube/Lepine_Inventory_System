@@ -46,6 +46,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> findAll(PageRequest pageRequest) {
-        return null;
+        log.info("Getting {} page of Users with size {}", pageRequest.getPageNumber(), pageRequest.getPageSize());
+        Page<User> got = userRepo.findAll(pageRequest);
+        log.info("Got {} Users in total, {} in first page", got.getTotalElements(), got.getContent().size());
+
+        return got;
     }
 }
