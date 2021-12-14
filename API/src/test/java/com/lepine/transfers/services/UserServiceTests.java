@@ -3,6 +3,7 @@ package com.lepine.transfers.services;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
+import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.services.user.UserServiceImpl;
