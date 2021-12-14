@@ -350,6 +350,8 @@ public class UserControllerTests {
         assertEquals(1, got.getTotalElements());
         assertEquals(0, got.getNumberOfElements());
         assertEquals(0, got.getContent().size());
+
+        verify(userService, times(1)).findAll(page, size);
     }
 
     @Test
@@ -379,7 +381,7 @@ public class UserControllerTests {
         assertTrue(
                 collect.contains("Page number must be greater than or equal to 0"));
 
-        verify(userService, times(0)).getAll(page, size);
+        verify(userService, times(0)).findAll(page, size);
     }
 
     @Test
@@ -409,7 +411,7 @@ public class UserControllerTests {
         assertTrue(
                 collect.contains("Page size must be greater than or equal to 1"));
 
-        verify(userService, times(0)).getAll(page, size);
+        verify(userService, times(0)).findAll(page, size);
     }
 
     @Test
@@ -441,6 +443,6 @@ public class UserControllerTests {
                         "Page number must be greater than or equal to 0",
                         "Page size must be greater than or equal to 1")));
 
-        verify(userService, times(0)).getAll(page, size);
+        verify(userService, times(0)).findAll(page, size);
     }
 }

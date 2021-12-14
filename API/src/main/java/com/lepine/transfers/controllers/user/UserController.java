@@ -3,12 +3,14 @@ package com.lepine.transfers.controllers.user;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
+import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 
 import com.lepine.transfers.services.user.UserService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +47,7 @@ public class UserController {
             @Min(value = 1, message = "Page size cannot be less than 1") int size
     ) {
         log.info("Getting all users");
-        List<UserPasswordLessDTO> passwordLessDTOS = userMapper.toPasswordLessDTOs(userService.findAll());
+        List<UserPasswordLessDTO> passwordLessDTOS = OneIndexedPageAdapter.of(userMapper.toPasswordLessDTOs(userService.findAll(PageRequest.of(page - 1, size))));
         log.info("Got all users, count {}", passwordLessDTOS.size());
 
         return passwordLessDTOS;
