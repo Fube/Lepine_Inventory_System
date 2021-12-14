@@ -24,6 +24,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
@@ -43,7 +44,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(classes = { MapperConfig.class, UserServiceImpl.class })
+@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, UserServiceImpl.class })
 @ActiveProfiles("test")
 public class UserServiceTests {
 

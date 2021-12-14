@@ -11,10 +11,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
