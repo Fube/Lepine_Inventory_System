@@ -3,10 +3,7 @@ package com.lepine.transfers.data.user;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Table(schema = "lepine", name = "users")
@@ -25,6 +22,7 @@ public class User {
     @Id
     private UUID uuid = UUID.randomUUID();
 
-     private String email;
-     private String password;
+    @Column(unique = true)
+    private String email;
+    private String password;
 }
