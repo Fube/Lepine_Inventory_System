@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 @TestConfiguration
-public class ValidationConfig extends MessageSourceConfig{
+public class ValidationConfig extends MessageSourceConfig {
 
     @Bean
     public MethodValidationPostProcessor getMethodValidationPostProcessor() {

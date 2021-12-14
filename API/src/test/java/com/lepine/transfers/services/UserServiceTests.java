@@ -1,28 +1,5 @@
 package com.lepine.transfers.services;
 
-import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
-import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.user.User;
@@ -32,17 +9,31 @@ import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.services.user.UserServiceImpl;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
+import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, UserServiceImpl.class })
 @ActiveProfiles("test")
@@ -53,6 +44,9 @@ public class UserServiceTests {
     private final static String VALID_PASSWORD = "S0m3P@ssw0rd";
     private final static String INVALID_PASSWORD = "bad";
     private final static String VALID_HASHED_PASSWORD = "some.hashed.password.or.something";
+
+    private final Function<String, String> messageSourceHelper = name ->
+            this.messageSource.getMessage("user.email.not_blank", null, Locale.getDefault());
 
     private static List<User> generateUsers(int num) {
         List<User> items = new ArrayList<>();
@@ -70,6 +64,9 @@ public class UserServiceTests {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
 
     @MockBean
     private PasswordEncoder passwordEncoder;
@@ -224,7 +221,7 @@ public class UserServiceTests {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toSet());
         
-        assertTrue(collect.containsAll(List.of("Email cannot be null")));
+        assertTrue(collect.contains(messageSourceHelper.apply("user.email.not_blink")));
 
         verify(userRepo, times(0)).save(any());
     }
