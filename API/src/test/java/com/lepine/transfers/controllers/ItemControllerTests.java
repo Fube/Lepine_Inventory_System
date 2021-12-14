@@ -2,13 +2,11 @@ package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.item.ItemController;
-import com.lepine.transfers.controllers.user.UserController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
-import com.lepine.transfers.config.AlgoliaConfig;
 import com.lepine.transfers.config.MapperConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
