@@ -1,9 +1,11 @@
 package com.lepine.transfers.services;
 
+import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
 import com.lepine.transfers.services.item.ItemService;
+import com.lepine.transfers.services.item.ItemServiceImpl;
 import com.lepine.transfers.services.search.SearchService;
 import com.lepine.transfers.config.AlgoliaConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,24 +14,26 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = { AlgoliaConfig.class })
+@SpringBootTest(classes = {MapperConfig.class, ItemServiceImpl.class})
 @ActiveProfiles({"test"})
 public class ItemServiceTests {
 
-    @SpyBean
+    @MockBean
     private ItemRepo itemRepo;
 
     @Autowired
@@ -47,15 +51,16 @@ public class ItemServiceTests {
     }
 
 
-    private void seedRepo(int num) {
+    private static List<Item> generateItems(int num) {
+        List<Item> items = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            itemRepo.save(
-                    Item.builder()
+            items.add(Item.builder()
                             .name("name"+i)
                             .SKU("SKU"+i)
                             .description("description"+i)
                             .build());
         }
+        return items;
     }
 
     @Test
@@ -64,7 +69,8 @@ public class ItemServiceTests {
 
         // Arrange
         final int num = 100;
-        seedRepo(num);
+        final Page<Item> pageFor = createPageFor(generateItems(num), PageRequest.of(0, 10));
+        given(itemRepo.findAll(any(PageRequest.class))).willReturn(pageFor);
 
         // Act
         final Page<Item> all = itemService.findAll();
@@ -86,10 +92,11 @@ public class ItemServiceTests {
 
         // Arrange
         final int num = 100;
-        seedRepo(num);
         final int page = 1;
         final int size = 10;
         final PageRequest pageRequest = PageRequest.of(page, size);
+        final Page<Item> pageFor = createPageFor(generateItems(num), pageRequest);
+        given(itemRepo.findAll(pageRequest)).willReturn(pageFor);
 
         // Act
         final Page<Item> all = itemService.findAll(pageRequest);
@@ -116,6 +123,7 @@ public class ItemServiceTests {
                 .description("description")
                 .build();
         doNothing().when(searchService).index(any(ItemSearchDTO.class));
+        given(itemRepo.save(item)).willReturn(item);
 
         // Act
         final Item saved = itemService.create(item);
@@ -140,6 +148,7 @@ public class ItemServiceTests {
                 .description("description")
                 .build();
         doNothing().when(searchService).index(any(ItemSearchDTO.class));
+        given(itemRepo.save(item)).willReturn(item);
 
         // Act
         final Item saved = itemService.update(item);
