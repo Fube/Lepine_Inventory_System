@@ -16,13 +16,13 @@ import java.util.UUID;
 @ActiveProfiles("test")
 public abstract class SearchServiceTests<T, I> {
 
-    @MockBean
+    @Autowired
     protected SearchIndex<T> searchIndex;
 
     @Autowired
     protected SearchService<T, I> searchService;
 
-    @MockBean
+    @Autowired
     protected SearchClient searchClient;
 
     @Test

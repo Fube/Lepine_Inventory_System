@@ -5,8 +5,9 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
-import com.lepine.transfers.services.Config;
 import com.lepine.transfers.services.user.UserService;
+import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.ValidationConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {Config.class})
+@SpringBootTest(classes = {ValidationConfig.class, MapperConfig.class, UserController.class})
 @ActiveProfiles({"test"})
 public class UserControllerTests {
 

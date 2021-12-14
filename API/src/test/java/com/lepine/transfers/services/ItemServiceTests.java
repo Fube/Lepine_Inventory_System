@@ -5,6 +5,7 @@ import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.search.SearchService;
+import com.lepine.transfers.config.AlgoliaConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = { Config.class })
+@SpringBootTest(classes = { AlgoliaConfig.class })
 @ActiveProfiles({"test"})
 public class ItemServiceTests {
 

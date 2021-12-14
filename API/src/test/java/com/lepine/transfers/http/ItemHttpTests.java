@@ -7,7 +7,8 @@ import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
-import helpers.matchers.ItemMatcher;
+import com.lepine.transfers.helpers.matchers.ItemMatcher;
+import com.lepine.transfers.config.MapperConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
@@ -27,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static helpers.PageHelpers.createPageFor;
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static java.lang.String.format;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -38,7 +39,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ItemController.class })
-@ContextConfiguration(classes = { Config.class })
+@ContextConfiguration(classes = { MapperConfig.class })
 @ActiveProfiles("test")
 public class ItemHttpTests {
 

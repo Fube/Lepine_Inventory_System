@@ -1,4 +1,4 @@
-package com.lepine.transfers.services;
+package com.lepine.transfers.config;
 
 import com.algolia.search.SearchClient;
 import com.algolia.search.SearchIndex;
@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @TestConfiguration
-public class Config {
+public class AlgoliaConfig {
     @MockBean
     public SearchClient searchClient;
     @MockBean

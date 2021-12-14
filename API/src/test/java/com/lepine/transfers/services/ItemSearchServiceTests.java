@@ -1,8 +1,10 @@
 package com.lepine.transfers.services;
 
+import com.lepine.transfers.config.AlgoliaConfig;
 import com.lepine.transfers.data.item.ItemSearchDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.util.UUID;
 
@@ -10,6 +12,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@ContextConfiguration(classes = {AlgoliaConfig.class})
 public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO, UUID>{
 
     @Override

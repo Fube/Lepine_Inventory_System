@@ -1,4 +1,4 @@
-package com.lepine.transfers;
+package com.lepine.transfers.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
