@@ -19,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -51,6 +53,8 @@ public class UserServiceTests {
                 .email(VALID_EMAIL)
                 .password(VALID_PASSWORD)
                 .build();
+        final User asEntity = userMapper.toEntity(userUUIDLessDTO);
+        given(userRepo.save(any())).willReturn(asEntity);
 
         // Act
         final User user = userService.create(userUUIDLessDTO);
@@ -61,6 +65,8 @@ public class UserServiceTests {
         assertNotNull(user.getPassword());
         assertNotEquals(VALID_PASSWORD, user.getPassword());
 
+        // Verify userRepo.save was not called with VALID_PASSWORD
+        verify(userRepo, times(0)).save(argThat(u -> u.getPassword().equals(VALID_PASSWORD)));
         verify(userRepo, times(1)).save(user);
     }
 
