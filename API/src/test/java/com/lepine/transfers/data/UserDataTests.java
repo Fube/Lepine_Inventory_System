@@ -1,18 +1,22 @@
 package com.lepine.transfers.data;
 
+import com.lepine.transfers.data.user.User;
+import com.lepine.transfers.data.user.UserRepo;
+import org.assertj.core.util.Throwables;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-
-import com.lepine.transfers.data.user.User;
-import com.lepine.transfers.data.user.UserRepo;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @DataJpaTest
 @ActiveProfiles({"test"})
@@ -24,6 +28,9 @@ public class UserDataTests {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Test
     void contextLoads(){}
@@ -40,5 +47,24 @@ public class UserDataTests {
 
         assertEquals(VALID_EMAIL, save.getEmail());
         assertEquals(VALID_PASSWORD, save.getPassword());
+    }
+
+    @Test
+    @DisplayName("Given user with null email, throw ConstraintViolationException")
+    void save_NullEmail() {
+
+        // Arrange
+        final User user = User.builder()
+            .email(null)
+            .password(VALID_PASSWORD)
+            .build();
+
+        // Act
+        userRepo.save(user);
+        final PersistenceException persistenceException =
+                assertThrows(PersistenceException.class, () -> entityManager.flush());
+        // Assert
+        Throwable exception = Throwables.getRootCause(persistenceException);
+        assertThat(exception.getMessage()).contains("NULL not allowed");
     }
 }
