@@ -11,8 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,7 +63,7 @@ public class UserServiceTests {
         assertNotNull(user.getPassword());
         assertNotEquals(VALID_PASSWORD, user.getPassword());
 
-        // Verify userRepo.save was not called with VALID_PASSWORD
+        verify(userRepo, times(1)).findByEmail(VALID_EMAIL);
         verify(userRepo, times(0)).save(argThat(u -> u.getPassword().equals(VALID_PASSWORD)));
         verify(userRepo, times(1)).save(user);
     }
@@ -77,14 +78,17 @@ public class UserServiceTests {
                 .password(VALID_PASSWORD)
                 .build();
         final User user = userMapper.toEntity(userUUIDLessDTO);
-        given(userRepo.save(any()))
-                .willThrow(new DataIntegrityViolationException("Duplicate email or something"));
+
+        given(userRepo.findByEmail(VALID_EMAIL))
+                .willReturn(Optional.of(user));
 
         // Act
         final DuplicateEmailException dex = assertThrows(DuplicateEmailException.class, () -> userService.create(userUUIDLessDTO));
 
         // Assert
         assertEquals(format("Email %s already in use", VALID_EMAIL), dex.getMessage());
-        verify(userRepo, times(1)).save(user);
+
+        verify(userRepo, times(1)).findByEmail(VALID_EMAIL);
+        verify(userRepo, times(0)).save(any());
     }
 }
