@@ -1,6 +1,7 @@
 package com.lepine.transfers.services;
 
 import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.SecurityConfig;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
@@ -22,7 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(classes = {MapperConfig.class, UserServiceImpl.class })
+@SpringBootTest
 @ActiveProfiles("test")
 public class UserServiceTests {
 
