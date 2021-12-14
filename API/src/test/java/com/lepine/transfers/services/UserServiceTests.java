@@ -5,6 +5,7 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.services.user.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
