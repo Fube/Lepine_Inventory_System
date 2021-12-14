@@ -80,7 +80,7 @@ public class UserServiceTests {
                 .password(VALID_PASSWORD)
                 .build();
         final User user = userMapper.toEntity(userUUIDLessDTO);
-        given(userRepo.save(user))
+        given(userRepo.save(any()))
                 .willThrow(new DataIntegrityViolationException("Duplicate email or something"));
 
         // Act
