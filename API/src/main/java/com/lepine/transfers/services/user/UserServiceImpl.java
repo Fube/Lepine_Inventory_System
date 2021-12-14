@@ -1,16 +1,36 @@
 package com.lepine.transfers.services.user;
 
 import com.lepine.transfers.data.user.User;
+import com.lepine.transfers.data.user.UserMapper;
+import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private final UserRepo userRepo;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     public User create(UserUUIDLessDTO userUUIDLessDTO) {
-        return null;
+        log.info("Creating user {} with email", userUUIDLessDTO.getEmail());
+
+        final User user = userMapper.toEntity(userUUIDLessDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        final User save = userRepo.save(user);
+
+        log.info("Created user {} with email and UUID {}", save.getEmail(), save.getUuid());
+
+        return user;
     }
 
     @Override
