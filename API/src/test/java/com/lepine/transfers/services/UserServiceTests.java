@@ -46,7 +46,7 @@ public class UserServiceTests {
     private final static String VALID_HASHED_PASSWORD = "some.hashed.password.or.something";
 
     private final Function<String, String> messageSourceHelper = name ->
-            this.messageSource.getMessage("user.email.not_blank", null, Locale.getDefault());
+            this.messageSource.getMessage(name, null, Locale.getDefault());
 
     private static List<User> generateUsers(int num) {
         List<User> items = new ArrayList<>();
@@ -178,7 +178,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Given null UserUUIDLessDTO on create, then throw ConstraintViolationException")
-    void update_NullUserUUIDLessDTO() {
+    void create_NullUserUUIDLessDTO() {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = null;
@@ -202,7 +202,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Given UserUUIDLessDTO with null email but valid password on create, then throw ConstraintViolationException")
-    void update_NullEmail() {
+    void create_NullEmail() {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
@@ -228,7 +228,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Given UserUUIDLessDTO with empty email but valid password on create, then throw ConstraintViolationException")
-    void update_EmptyEmail() {
+    void create_EmptyEmail() {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
@@ -255,7 +255,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Given UserUUIDLessDTO with invalid email but valid password on create, then throw ConstraintViolationException")
-    void update_InvalidEmail() {
+    void create_InvalidEmail() {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
@@ -282,7 +282,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Given UserUUIDLessDTO with valid email but null password on create, then throw ConstraintViolationException")
-    void update_NullPassword() {
+    void create_NullPassword() {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
@@ -309,7 +309,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Given UserUUIDLessDTO with valid email but empty password on create, then throw ConstraintViolationException")
-    void update_EmptyPassword() {
+    void create_EmptyPassword() {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
@@ -318,25 +318,29 @@ public class UserServiceTests {
                 .build();
 
         // Act
-        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+        final ConstraintViolationException cve =
+                assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
 
         // Assert
         final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
         assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
+        assertEquals(2, constraintViolations.size());
 
         final Set<String> collect = constraintViolations.stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toSet());
-        
-        assertTrue(collect.containsAll(List.of("Password cannot be empty")));
+
+        assertTrue(collect.containsAll(List.of(
+                messageSourceHelper.apply("user.password.not_blank"),
+                messageSourceHelper.apply("user.password.not_valid")
+        )));
 
         verify(userRepo, times(0)).save(any());
     }
 
     @Test
     @DisplayName("Given UserUUIDLessDTO with valid email but invalid password on create, then throw ConstraintViolationException")
-    void update_InvalidPassword() {
+    void create_InvalidPassword() {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
