@@ -1,21 +1,18 @@
 package com.lepine.transfers.controllers;
 
+import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.user.UserController;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.services.user.UserService;
-import com.lepine.transfers.config.MapperConfig;
-import com.lepine.transfers.config.ValidationConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolation;
@@ -26,7 +23,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
