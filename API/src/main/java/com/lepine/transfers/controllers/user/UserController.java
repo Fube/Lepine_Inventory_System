@@ -44,9 +44,12 @@ public class UserController {
         log.info("Created user with UUID {}", created.getUuid());
         return userMapper.toPasswordLessDTO(created);
     }
-    
+
+    @GetMapping
     public Page<UserPasswordLessDTO> getAll(
+            @RequestParam(value = "page", defaultValue = "1")
             @Min(value = 1, message = "{pagination.page.min}") int page,
+            @RequestParam(value = "size", defaultValue = "10")
             @Min(value = 1, message = "{pagination.size.min}") int size
     ) {
         log.info("Getting all users");

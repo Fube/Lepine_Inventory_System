@@ -451,10 +451,13 @@ public class UserHttpTests {
     void getAll_AsManager() throws Exception {
 
         // Arrange
-        final int num = 100;
-        final Page<User> page = createPageFor(generateUsers(num));
-        given(userService.findAll())
-                .willReturn(page);
+        final int
+                num = 100,
+                page = 0,
+                size = 10;
+        final Page<User> pageFor = createPageFor(generateUsers(num));
+        given(userService.findAll(PageRequest.of(page, size)))
+                .willReturn(pageFor);
 
         // Act
         final ResultActions resultActions = mvc.perform(
@@ -464,7 +467,7 @@ public class UserHttpTests {
         // Assert
         resultActions.andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content.length()").value(10))
                 .andExpect(jsonPath("$.content[*].uuid").exists())
                 .andExpect(jsonPath("$.content[*].email").exists())
                 .andExpect(jsonPath("$.content[*].password").doesNotExist())
