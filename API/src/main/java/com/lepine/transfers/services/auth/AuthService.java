@@ -1,8 +1,8 @@
 package com.lepine.transfers.services.auth;
 
 import com.lepine.transfers.data.auth.UserLogin;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.lepine.transfers.data.user.User;
 
 public interface AuthService {
-    UserDetails login(UserLogin userLogin);
+    User login(UserLogin userLogin);
 }

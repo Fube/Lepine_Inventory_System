@@ -1,5 +1,6 @@
 package com.lepine.transfers.controllers;
 
+import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.controllers.auth.AuthController;
 import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
@@ -22,7 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(classes = { AuthController.class })
+@SpringBootTest(classes = {MapperConfig.class, AuthController.class })
 @ActiveProfiles({"test"})
 public class AuthControllerTests {
 

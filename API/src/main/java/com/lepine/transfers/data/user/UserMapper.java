@@ -18,22 +18,4 @@ public interface UserMapper {
     User toEntity(UserUUIDLessDTO userDTO);
     
     UserPasswordLessDTO toPasswordLessDTO(User user);
-
-    @Mappings({
-            @Mapping(source = "authorities", target = "role", qualifiedByName = "getRoleFromGrants")
-    })
-    UserPasswordLessDTO toPasswordLessDTO(UserDetails user);
-
-    List<UserPasswordLessDTO> toPasswordLessDTOs(List<User> users);
-
-    @Named("getRoleFromGrants")
-    default String getRoleFromGrants(Collection<? extends GrantedAuthority> authorities) {
-        for (GrantedAuthority authority : authorities) {
-            final String candidate = authority.getAuthority();
-            if(candidate.startsWith("ROLE_)")){
-                return candidate;
-            }
-        }
-        return null;
-    }
 }
