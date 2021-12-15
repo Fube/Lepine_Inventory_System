@@ -1,6 +1,7 @@
 package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.controllers.auth.AuthController;
+import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
