@@ -44,6 +44,13 @@ public class UserServiceTests {
     private final static String VALID_PASSWORD = "S0m3P@ssw0rd";
     private final static String INVALID_PASSWORD = "bad";
     private final static String VALID_HASHED_PASSWORD = "some.hashed.password.or.something";
+    private final static String VALID_ROLE_NAME = "SOME_ROLE";
+
+    private final static UserUUIDLessDTO VALID_USER_DTO = UserUUIDLessDTO.builder()
+            .email(VALID_EMAIL)
+            .password(VALID_PASSWORD)
+            .role(VALID_ROLE_NAME)
+            .build();
 
     private final Function<String, String> messageSourceHelper = name ->
             this.messageSource.getMessage(name, null, Locale.getDefault());
@@ -88,7 +95,7 @@ public class UserServiceTests {
     void createUser() {
 
         // Arrange
-        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password(VALID_PASSWORD)
                 .build();
@@ -116,7 +123,7 @@ public class UserServiceTests {
     void createUser_DuplicateEmail() {
 
         // Arrange
-        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password(VALID_PASSWORD)
                 .build();
@@ -203,12 +210,12 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with null email but valid password on create, then throw ConstraintViolationException")
+    @DisplayName("Given UserUUIDLessDTO with null email, then throw ConstraintViolationException")
     void create_NullEmail() {
 
         // Arrange
-        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
-                .password(VALID_PASSWORD)
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(null)
                 .build();
 
         // Act
@@ -229,11 +236,11 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with empty email but valid password on create, then throw ConstraintViolationException")
+    @DisplayName("Given UserUUIDLessDTO with empty email, then throw ConstraintViolationException")
     void create_EmptyEmail() {
 
         // Arrange
-        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email("")
                 .password(VALID_PASSWORD)
                 .build();
@@ -256,11 +263,11 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with invalid email but valid password on create, then throw ConstraintViolationException")
+    @DisplayName("Given UserUUIDLessDTO with invalid email, then throw ConstraintViolationException")
     void create_InvalidEmail() {
 
         // Arrange
-        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(INVALID_EMAIL)
                 .password(VALID_PASSWORD)
                 .build();
@@ -283,11 +290,11 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with valid email but null password on create, then throw ConstraintViolationException")
+    @DisplayName("Given UserUUIDLessDTO with null password on create, then throw ConstraintViolationException")
     void create_NullPassword() {
 
         // Arrange
-        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password(null)
                 .build();
@@ -312,11 +319,11 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with valid email but empty password on create, then throw ConstraintViolationException")
+    @DisplayName("Given UserUUIDLessDTO with empty password on create, then throw ConstraintViolationException")
     void create_EmptyPassword() {
 
         // Arrange
-        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password("")
                 .build();
@@ -343,11 +350,11 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with valid email but invalid password on create, then throw ConstraintViolationException")
+    @DisplayName("Given UserUUIDLessDTO with invalid password on create, then throw ConstraintViolationException")
     void create_InvalidPassword() {
 
         // Arrange
-        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password(INVALID_PASSWORD)
                 .build();
