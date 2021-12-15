@@ -8,6 +8,7 @@ import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
+import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
