@@ -1,6 +1,7 @@
 package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.auth.AuthController;
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
@@ -13,18 +14,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(classes = {MapperConfig.class, AuthController.class })
+@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, AuthController.class })
 @ActiveProfiles({"test"})
 public class AuthControllerTests {
 
@@ -37,6 +44,9 @@ public class AuthControllerTests {
 
     @Autowired
     private AuthController authController;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
 
     @MockBean
     private AuthService authService;
@@ -70,7 +80,7 @@ public class AuthControllerTests {
         // Assert
         assertEquals(userDetails.getUuid(), user.getUuid());
         assertEquals(userDetails.getEmail(), user.getEmail());
-        assertEquals(userDetails.getRole(), user.getRole());
+        assertEquals(userDetails.getRole().getName(), user.getRole());
 
         verify(authService, times(1)).login(userLogin);
     }
@@ -86,7 +96,7 @@ public class AuthControllerTests {
                 .build();
 
         given(authService.login(userLogin))
-                .willThrow(InvalidLoginException.class);
+                .willThrow(new InvalidLoginException());
 
         // Act
         final InvalidLoginException invalidLoginException =
@@ -108,15 +118,20 @@ public class AuthControllerTests {
                 .password(null)
                 .build();
 
-        given(authService.login(userLogin))
-                .willThrow(ConstraintViolationException.class);
-
         // Act
         final ConstraintViolationException constraintViolationException =
                 assertThrows(ConstraintViolationException.class, () -> authController.login(userLogin));
 
         // Assert
-        assertEquals("Invalid login", constraintViolationException.getMessage());
+        final Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+        assertThat(collect)
+                .containsExactlyInAnyOrder(
+                        messageSource.getMessage("user.email.not_blank", null, Locale.getDefault()),
+                        messageSource.getMessage("user.password.not_blank", null, Locale.getDefault())
+                );
 
         verify(authService, times(0)).login(userLogin);
     }
