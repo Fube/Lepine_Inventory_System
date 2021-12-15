@@ -67,7 +67,9 @@ public class AuthControllerTests {
         final UserPasswordLessDTO user = authController.login(userLogin);
 
         // Assert
-        assertEquals(VALID_USER, user);
+        assertEquals(userDetails.getUuid(), user.getUuid());
+        assertEquals(userDetails.getEmail(), user.getEmail());
+        assertEquals(userDetails.getRole(), user.getRole());
 
         verify(authService, times(1)).login(userLogin);
     }
