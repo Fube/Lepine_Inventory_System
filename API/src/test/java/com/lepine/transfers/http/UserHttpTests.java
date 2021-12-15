@@ -285,6 +285,37 @@ public class UserHttpTests {
     }
 
     @Test
+    @DisplayName("Given POST on /users with invalid password and invalid email as manager, then return 400")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void create_AsManager_InvalidEmailAndPassword() throws Exception {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(INVALID_EMAIL)
+                .password(INVALID_PASSWORD)
+                .build();
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                post("/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userUUIDLessDTO)));
+
+        // Assert
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.email.length()").value(1))
+                .andExpect(jsonPath("$.errors.email[0]")
+                        .value(messageSource.getMessage("user.email.not_valid", null, Locale.getDefault())))
+                .andExpect(jsonPath("$.errors.password.length()").value(1))
+                .andExpect(jsonPath("$.errors.password[0]")
+                        .value(messageSource.getMessage("user.password.not_valid", null, Locale.getDefault())));
+    }
+
+    @Test
     @DisplayName("Given POST on /users with valid data as clerk, then return 403")
     @WithMockUser(username = "some-user", roles = "CLERK")
     void create_AsClerk() throws Exception {
