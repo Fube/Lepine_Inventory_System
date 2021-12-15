@@ -2,6 +2,7 @@ package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.controllers.auth.AuthController;
+import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
@@ -29,6 +30,10 @@ public class AuthControllerTests {
 
     private static final String VALID_EMAIL = "foo@bar.com";
     private static final String VALID_PASSWORD = "S0meP@ssw0rd";
+    private static final Role MANAGER_ROLE = Role.builder()
+            .uuid(UUID.randomUUID())
+            .name("MANAGER")
+            .build();
 
     @Autowired
     private AuthController authController;
@@ -53,7 +58,7 @@ public class AuthControllerTests {
         final User userDetails = User.builder()
                 .uuid(UUID.randomUUID())
                 .email(VALID_EMAIL)
-                .role("MANAGER")
+                .role(MANAGER_ROLE)
                 .build();
 
         given(authService.login(userLogin))

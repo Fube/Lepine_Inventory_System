@@ -1,5 +1,6 @@
 package com.lepine.transfers.data.user;
 
+import com.lepine.transfers.data.auth.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -18,4 +19,8 @@ public interface UserMapper {
     User toEntity(UserUUIDLessDTO userDTO);
     
     UserPasswordLessDTO toPasswordLessDTO(User user);
+
+    default String map(Role value) {
+        return value.getName();
+    }
 }

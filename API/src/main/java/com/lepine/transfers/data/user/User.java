@@ -35,15 +35,14 @@ public class User implements UserDetails {
     private String email;
     private String password;
 
-    @OneToOne(
-            targetEntity = Role.class
-    )
-    private String role;
+    @ManyToOne
+    @JoinColumn(name = "role")
+    private Role role;
 
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(format("ROLE_%s", role)));
+        return Collections.singletonList(new SimpleGrantedAuthority(format("ROLE_%s", role.getName())));
     }
 
     @JsonIgnore
