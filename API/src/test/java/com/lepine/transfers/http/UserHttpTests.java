@@ -477,4 +477,50 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.totalElements").value(num))
                 .andExpect(jsonPath("$.number").value(1));
     }
+
+    @Test
+    @DisplayName("Given GET on /users with no size or page as clerk, then return 403")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void getAll_AsClerk() throws Exception {
+
+        // Arrange
+        final int
+                num = 100,
+                page = 0,
+                size = 10;
+        final Page<User> pageFor = createPageFor(generateUsers(num));
+        given(userService.findAll(PageRequest.of(page, size)))
+                .willReturn(pageFor);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                get("/users")
+                        .contentType(APPLICATION_JSON));
+
+        // Assert
+        resultActions.andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Given GET on /users with no size or page as salesperson, then return 403")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void getAll_AsSalesperson() throws Exception {
+
+        // Arrange
+        final int
+                num = 100,
+                page = 0,
+                size = 10;
+        final Page<User> pageFor = createPageFor(generateUsers(num));
+        given(userService.findAll(PageRequest.of(page, size)))
+                .willReturn(pageFor);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                get("/users")
+                        .contentType(APPLICATION_JSON));
+
+        // Assert
+        resultActions.andExpect(status().isForbidden());
+    }
 }
