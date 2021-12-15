@@ -16,22 +16,28 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { UserController.class })
@@ -43,6 +49,18 @@ public class UserHttpTests {
     private static final String INVALID_EMAIL = "invalid";
     private static final String VALID_PASSWORD = "S0m3P@ssword";
     private static final String INVALID_PASSWORD = "a";
+
+    private static List<User> generateUsers(int num) {
+        List<User> users = new ArrayList<>(num);
+        for (int i = 0; i < num; i++) {
+            users.add(User.builder()
+                    .uuid(UUID.randomUUID())
+                    .email(i + VALID_EMAIL)
+                    .password(VALID_PASSWORD)
+                    .build());
+        }
+        return users;
+    }
 
     @Autowired
     private MockMvc mvc;
@@ -425,5 +443,35 @@ public class UserHttpTests {
         resultActions.andExpect(status().isForbidden());
 
         verify(userController, times(0)).create(argThat(userUUIDLessDTOMatcher));
+    }
+
+    @Test
+    @DisplayName("Given GET on /users with no size or page as manager, then return 200 and first Page of Users")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void getAll_AsManager() throws Exception {
+
+        // Arrange
+        final int num = 100;
+        final Page<User> page = createPageFor(generateUsers(num));
+        given(userService.findAll())
+                .willReturn(page);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                get("/users")
+                        .contentType(APPLICATION_JSON));
+
+        // Assert
+        resultActions.andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[*].uuid").exists())
+                .andExpect(jsonPath("$.content[*].email").exists())
+                .andExpect(jsonPath("$.content[*].password").doesNotExist())
+                .andExpect(jsonPath("$.first").value(true))
+                .andExpect(jsonPath("$.last").value(false))
+                .andExpect(jsonPath("$.totalPages").value(10))
+                .andExpect(jsonPath("$.totalElements").value(num))
+                .andExpect(jsonPath("$.number").value(1));
     }
 }
