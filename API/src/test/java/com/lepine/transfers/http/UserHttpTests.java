@@ -127,6 +127,7 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors.email").doesNotExist())
+                .andExpect(jsonPath("$.errors.password.length()").value(2))
                 .andExpect(jsonPath("$.errors.password[*]")
                     .value(contains(
                             messageSource.getMessage("user.password.not_blank", null, Locale.getDefault()),
@@ -160,6 +161,7 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors.email").doesNotExist())
+                .andExpect(jsonPath("$.errors.password.length()").value(1))
                 .andExpect(jsonPath("$.errors.password[*]")
                     .value(contains(
                             messageSource.getMessage("user.password.not_valid", null, Locale.getDefault()))));
@@ -188,6 +190,7 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.email.length()").value(1))
                 .andExpect(jsonPath("$.errors.email[0]")
                         .value(messageSource.getMessage("user.email.not_valid", null, Locale.getDefault())))
                 .andExpect(jsonPath("$.errors.password").doesNotExist());
@@ -216,9 +219,9 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.email.length()").value(1))
                 .andExpect(jsonPath("$.errors.email[0]")
                         .value(messageSource.getMessage("user.email.not_blank", null, Locale.getDefault())))
-                .andExpect(jsonPath("$.errors.email.length()").value(1))
                 .andExpect(jsonPath("$.errors.password").doesNotExist());
     }
 
