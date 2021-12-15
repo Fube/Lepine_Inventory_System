@@ -36,7 +36,7 @@ public class User implements UserDetails {
     private String password;
 
     @ManyToOne
-    @JoinColumn(name = "role")
+    @JoinColumn(name = "role_uuid")
     private Role role;
 
     @JsonIgnore

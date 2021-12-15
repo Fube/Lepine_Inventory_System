@@ -43,7 +43,7 @@ public class UserControllerTests {
             .role(VALID_ROLE)
             .build();
 
-    private static List<User> seedUsers(int num) {
+    private static List<User> generateUsers(int num) {
         return IntStream.range(0, num)
                 .mapToObj(i -> User.builder()
                         .uuid(UUID.randomUUID())

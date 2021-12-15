@@ -1,5 +1,6 @@
 package com.lepine.transfers.data;
 
+import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
 import org.assertj.core.util.Throwables;
@@ -28,6 +29,10 @@ public class UserDataTests {
     
     private static final String VALID_EMAIL = "abc@def.com";
     private static final String VALID_PASSWORD = "S0meP@ssw0rd";
+    private static final String VALID_ROLE_NAME = "SOME_ROLE";
+    private static final Role VALID_ROLE = Role.builder()
+            .name(VALID_ROLE_NAME)
+            .build();
 
     @Autowired
     private UserRepo userRepo;
@@ -45,6 +50,7 @@ public class UserDataTests {
                 User.builder()
                         .email(VALID_EMAIL)
                         .password(VALID_PASSWORD)
+                        .role(VALID_ROLE)
                         .build()
         );
 
