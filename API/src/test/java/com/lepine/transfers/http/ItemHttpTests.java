@@ -1,14 +1,15 @@
 package com.lepine.transfers.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
-import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.helpers.matchers.ItemMatcher;
-import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.services.item.ItemService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.support.DelegatingMessageSource;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -24,10 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static java.lang.String.format;
@@ -40,24 +40,27 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ItemController.class })
-@ContextConfiguration(classes = { MapperConfig.class })
+@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class})
 @ActiveProfiles("test")
 public class ItemHttpTests {
 
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
-    private ItemService itemService;
-
-    @SpyBean
-    private ItemController itemController;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private ItemMapper itemMapper;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
+
+    @SpyBean
+    private ItemController itemController;
+
+    @MockBean
+    private ItemService itemService;
 
     @Test
     void contextLoads(){}
@@ -209,7 +212,17 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.timestamp").exists());
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.name").exists())
+                .andExpect(jsonPath("$.errors.name[0]")
+                        .value(messageSource.getMessage("item.name.not_blank", null, Locale.getDefault())))
+                .andExpect(jsonPath("$.errors.description").exists())
+                .andExpect(jsonPath("$.errors.description[0]")
+                        .value(messageSource.getMessage("item.description.not_blank", null, Locale.getDefault())))
+                .andExpect(jsonPath("$.errors.sku").exists())
+                .andExpect(jsonPath("$.errors.sku[0]")
+                        .value(messageSource.getMessage("item.sku.not_blank", null, Locale.getDefault())));
 
         verify(itemService, times(0)).create(any(Item.class));
         verify(itemController, times(0)).create(itemUUIDLessDTO);
