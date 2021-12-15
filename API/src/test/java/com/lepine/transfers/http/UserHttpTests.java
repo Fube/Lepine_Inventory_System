@@ -9,6 +9,7 @@ import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.helpers.matchers.UserUUIDLessDTOMatcher;
 import com.lepine.transfers.services.user.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,7 @@ import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -79,6 +79,11 @@ public class UserHttpTests {
 
     @MockBean
     private UserService userService;
+
+    @BeforeEach
+    public void setUp() {
+        reset(userService);
+    }
 
     @Test
     void contextLoads(){}
@@ -183,6 +188,8 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.errors.password.length()").value(1))
                 .andExpect(jsonPath("$.errors.password[0]")
                     .value(messageSource.getMessage("user.password.not_blank", null, Locale.getDefault())));
+
+        verify(userController, times(0)).create(argThat(new UserUUIDLessDTOMatcher(userUUIDLessDTO)));
     }
 
     @Test
@@ -213,6 +220,8 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.errors.password[*]")
                     .value(contains(
                             messageSource.getMessage("user.password.not_valid", null, Locale.getDefault()))));
+
+        verify(userController, times(0)).create(argThat(new UserUUIDLessDTOMatcher(userUUIDLessDTO)));
     }
 
     @Test
@@ -242,6 +251,8 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.errors.email[0]")
                         .value(messageSource.getMessage("user.email.not_valid", null, Locale.getDefault())))
                 .andExpect(jsonPath("$.errors.password").doesNotExist());
+
+        verify(userController, times(0)).create(argThat(new UserUUIDLessDTOMatcher(userUUIDLessDTO)));
     }
 
     @Test
@@ -271,6 +282,8 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.errors.email[0]")
                         .value(messageSource.getMessage("user.email.not_blank", null, Locale.getDefault())))
                 .andExpect(jsonPath("$.errors.password").doesNotExist());
+
+        verify(userController, times(0)).create(argThat(new UserUUIDLessDTOMatcher(userUUIDLessDTO)));
     }
 
     @Test
@@ -331,6 +344,8 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.errors.password.length()").value(1))
                 .andExpect(jsonPath("$.errors.password[0]")
                         .value(messageSource.getMessage("user.password.not_valid", null, Locale.getDefault())));
+
+        verify(userController, times(0)).create(argThat(new UserUUIDLessDTOMatcher(userUUIDLessDTO)));
     }
 
     @Test
@@ -364,6 +379,9 @@ public class UserHttpTests {
                         .value(contains(
                                 messageSource.getMessage("user.password.not_blank", null, Locale.getDefault()),
                                 messageSource.getMessage("user.password.not_valid", null, Locale.getDefault()))));
+
+        verify(userController, times(0)).create(argThat(new UserUUIDLessDTOMatcher(userUUIDLessDTO)));
+
     }
 
     @Test
@@ -395,6 +413,8 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.errors.password.length()").value(1))
                 .andExpect(jsonPath("$.errors.password[0]")
                         .value(messageSource.getMessage("user.password.not_blank", null, Locale.getDefault())));
+
+        verify(userController, times(0)).create(argThat(new UserUUIDLessDTOMatcher(userUUIDLessDTO)));
     }
 
     @Test
@@ -476,6 +496,8 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.totalPages").value(10))
                 .andExpect(jsonPath("$.totalElements").value(num))
                 .andExpect(jsonPath("$.number").value(1));
+
+        verify(userService, times(1)).findAll(PageRequest.of(page, size));
     }
 
     @Test
@@ -499,6 +521,8 @@ public class UserHttpTests {
 
         // Assert
         resultActions.andExpect(status().isForbidden());
+
+        verify(userService, times(0)).findAll(PageRequest.of(page, size));
     }
 
     @Test
@@ -522,5 +546,7 @@ public class UserHttpTests {
 
         // Assert
         resultActions.andExpect(status().isForbidden());
+
+        verify(userService, times(0)).findAll(PageRequest.of(page, size));
     }
 }
