@@ -282,7 +282,17 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.timestamp").exists());
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.name").exists())
+                .andExpect(jsonPath("$.errors.name[0]")
+                        .value(messageSource.getMessage("item.name.not_blank", null, Locale.getDefault())))
+                .andExpect(jsonPath("$.errors.description").exists())
+                .andExpect(jsonPath("$.errors.description[0]")
+                        .value(messageSource.getMessage("item.description.not_blank", null, Locale.getDefault())))
+                .andExpect(jsonPath("$.errors.sku").exists())
+                .andExpect(jsonPath("$.errors.sku[0]")
+                        .value(messageSource.getMessage("item.sku.not_blank", null, Locale.getDefault())));
 
         verify(itemService, times(0)).update(any(Item.class));
         verify(itemController, times(0)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
