@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserHttpTests {
 
     private static final String VALID_EMAIL = "valid@gmail.com";
+    private static final String INVALID_EMAIL = "invalid";
     private static final String VALID_PASSWORD = "S0m3P@ssword";
     
     @Autowired
@@ -91,6 +92,29 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.password").doesNotExist());
 
         verify(userController, times(1)).create(argThat(userUUIDLessDTOMatcher));
+    }
+
+    @Test
+    @DisplayName("Given POST on /users with invalid email but valid password as manager, then return 400")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void create_AsManager_InvalidEmail() throws Exception {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(INVALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+        final UserUUIDLessDTOMatcher userUUIDLessDTOMatcher = new UserUUIDLessDTOMatcher(userUUIDLessDTO);
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                post("/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userUUIDLessDTO)));
+
+        // Assert
+        resultActions.andExpect(status().isBadRequest());
+
+        verify(userController, times(0)).create(argThat(userUUIDLessDTOMatcher));
     }
 
     @Test
