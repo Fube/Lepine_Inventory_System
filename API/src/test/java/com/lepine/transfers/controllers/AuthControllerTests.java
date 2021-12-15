@@ -135,4 +135,27 @@ public class AuthControllerTests {
 
         verify(authService, times(0)).login(userLogin);
     }
+
+    @Test
+    @DisplayName("Given fully valid UserLogin for non-existing user, then throw InvalidLoginException")
+    void login_UserNotFound() {
+
+        // Arrange
+        final UserLogin userLogin = UserLogin.builder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        given(authService.login(userLogin))
+                .willThrow(new UserNotFoundException(userLogin.getEmail()));
+
+        // Act
+        final InvalidLoginException invalidLoginException =
+                assertThrows(InvalidLoginException.class, () -> authController.login(userLogin));
+
+        // Assert
+        assertEquals("Invalid login", invalidLoginException.getMessage());
+
+        verify(authService, times(1)).login(userLogin);
+    }
 }
