@@ -151,4 +151,26 @@ public class UserDataTests {
         assertEquals(user.getEmail(), got.getEmail());
         assertEquals(user.getPassword(), got.getPassword());
     }
+
+    @Test
+    @DisplayName("Given user with no role, throw DataIntegrityViolationException")
+    void save_NoRole() {
+
+        // Arrange
+        final User user = User.builder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        // Act
+        final PersistenceException persistenceException =
+                assertThrows(PersistenceException.class, () -> {
+                    userRepo.save(user);
+                    entityManager.flush();
+                });
+
+        // Assert
+        Throwable exception = Throwables.getRootCause(persistenceException);
+        assertThat(exception.getMessage()).contains("NULL not allowed");
+    }
 }
