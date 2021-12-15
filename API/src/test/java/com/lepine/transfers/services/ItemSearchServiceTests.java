@@ -12,7 +12,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@ContextConfiguration(classes = {AlgoliaConfig.class})
+@ContextConfiguration(classes = { AlgoliaConfig.class })
 public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO, UUID>{
 
     @Override
