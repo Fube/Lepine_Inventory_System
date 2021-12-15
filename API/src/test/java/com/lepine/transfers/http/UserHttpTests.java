@@ -9,7 +9,6 @@ import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.helpers.matchers.UserUUIDLessDTOMatcher;
 import com.lepine.transfers.services.user.UserService;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +105,7 @@ public class UserHttpTests {
     @Test
     @DisplayName("Given POST on /users with valid email but blank password as manager, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
-    void create_AsManager_InvalidEmail() throws Exception {
+    void create_AsManager_BlankPassword() throws Exception {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
@@ -135,6 +134,35 @@ public class UserHttpTests {
 
 
         verify(userController, times(0)).create(argThat(userUUIDLessDTOMatcher));
+    }
+
+    @Test
+    @DisplayName("Given POST on /users with valid email but invalid password as manager, then return 400")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void create_AsManager_InvalidPassword() throws Exception {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password(INVALID_PASSWORD)
+                .build();
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                post("/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userUUIDLessDTO)));
+
+        // Assert
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.email").doesNotExist())
+                .andExpect(jsonPath("$.errors.password[*]")
+                    .value(contains(
+                            messageSource.getMessage("user.password.not_valid", null, Locale.getDefault()))));
     }
 
     @Test
