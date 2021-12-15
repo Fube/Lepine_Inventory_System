@@ -3,6 +3,7 @@ package com.lepine.transfers.controllers;
 import com.lepine.transfers.controllers.auth.AuthController;
 import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
+import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.services.auth.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
