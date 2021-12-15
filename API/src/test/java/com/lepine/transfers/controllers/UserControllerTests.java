@@ -35,6 +35,13 @@ public class UserControllerTests {
     private static final String INVALID_EMAIL = "oogabooga";
     private static final String VALID_PASSWORD = "S0m3P@ssw0rd";
     private static final String INVALID_PASSWORD = "invalidpassword";
+    private static final String VALID_ROLE = "SOME_ROLE";
+
+    private static final UserUUIDLessDTO VALID_USER_DTO = UserUUIDLessDTO.builder()
+            .email(VALID_EMAIL)
+            .password(VALID_PASSWORD)
+            .role(VALID_ROLE)
+            .build();
 
     private static List<User> seedUsers(int num) {
         return IntStream.range(0, num)
@@ -62,34 +69,29 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with valid email and password, then register user")
+    @DisplayName("Given user with valid data, then register user")
     void registerUser() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
-                .email(VALID_EMAIL)
-                .password(VALID_PASSWORD)
-                .build();
+        User createdUser = userMapper.toEntity(VALID_USER_DTO);
 
-        User createdUser = userMapper.toEntity(userUUIDLessDTO);
-
-        given(userService.create(userUUIDLessDTO))
+        given(userService.create(VALID_USER_DTO))
                 .willReturn(createdUser);
 
         // Act
-        UserPasswordLessDTO got = userController.create(userUUIDLessDTO);
+        UserPasswordLessDTO got = userController.create(VALID_USER_DTO);
 
         // Assert
         assertEquals(createdUser.getUuid(), got.getUuid());
-        verify(userService, times(1)).create(userUUIDLessDTO);
+        verify(userService, times(1)).create(VALID_USER_DTO);
     }
 
     @Test
-    @DisplayName("Given user with valid email but empty password, then throw ConstrainViolationException")
+    @DisplayName("Given user with empty password, then throw ConstrainViolationException")
     void registerUser_emptyPassword() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password(INVALID_PASSWORD)
                 .build();
@@ -109,13 +111,14 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with valid email but null password, then throw ConstrainViolationException")
+    @DisplayName("Given user with null password, then throw ConstrainViolationException")
     void registerUser_nullPassword() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password(null)
+                .role(VALID_ROLE)
                 .build();
 
         // Act
@@ -133,11 +136,11 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with valid email but invalid password, then throw ConstrainViolationException")
+    @DisplayName("Given user with invalid password, then throw ConstrainViolationException")
     void registerUser_invalidPassword() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password("")
                 .build();
@@ -163,11 +166,11 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with valid password but empty email, then throw ConstrainViolationException")
+    @DisplayName("Given user with empty email, then throw ConstrainViolationException")
     void registerUser_emptyEmail() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email("")
                 .password(VALID_PASSWORD)
                 .build();
@@ -187,11 +190,11 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with valid password but null email, then throw ConstrainViolationException")
+    @DisplayName("Given user with null email, then throw ConstrainViolationException")
     void registerUser_nullEmail() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(null)
                 .password(VALID_PASSWORD)
                 .build();
@@ -211,11 +214,11 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with valid password but invalid email, then throw ConstrainViolationException")
+    @DisplayName("Given user with invalid email, then throw ConstrainViolationException")
     void registerUser_invalidEmail() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(INVALID_EMAIL)
                 .password(VALID_PASSWORD)
                 .build();
@@ -239,7 +242,7 @@ public class UserControllerTests {
     void registerUser_invalidEmailAndInvalidPassword() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(INVALID_EMAIL)
                 .password(INVALID_PASSWORD)
                 .build();
@@ -269,7 +272,7 @@ public class UserControllerTests {
     void registerUser_emptyEmailAndEmptyPassword() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email("")
                 .password("")
                 .build();
@@ -300,7 +303,7 @@ public class UserControllerTests {
     void registerUser_nullEmailAndNullPassword() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(null)
                 .password(null)
                 .build();
@@ -326,7 +329,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given negative page number and valid size, then throw ConstraintViolationException")
+    @DisplayName("Given negative page number, then throw ConstraintViolationException")
     void retrieveAllUsers_negativePageNumber() {
 
         // Arrange
@@ -353,7 +356,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given valid page but negative size, then throw ConstraintViolationException")
+    @DisplayName("Given negative size, then throw ConstraintViolationException")
     void retrieveAllUsers_negativeLimit() {
 
         // Arrange
