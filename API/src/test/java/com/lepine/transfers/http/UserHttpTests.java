@@ -19,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,12 +31,13 @@ import java.util.Locale;
 import java.util.UUID;
 
 import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { UserController.class })
@@ -152,7 +152,7 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.errors.email").doesNotExist())
                 .andExpect(jsonPath("$.errors.password.length()").value(2))
                 .andExpect(jsonPath("$.errors.password[*]")
-                    .value(contains(
+                    .value(containsInAnyOrder(
                             messageSource.getMessage("user.password.not_blank", null, Locale.getDefault()),
                             messageSource.getMessage("user.password.not_valid", null, Locale.getDefault()))));
 
@@ -218,7 +218,7 @@ public class UserHttpTests {
                 .andExpect(jsonPath("$.errors.email").doesNotExist())
                 .andExpect(jsonPath("$.errors.password.length()").value(1))
                 .andExpect(jsonPath("$.errors.password[*]")
-                    .value(contains(
+                    .value(containsInAnyOrder(
                             messageSource.getMessage("user.password.not_valid", null, Locale.getDefault()))));
 
         verify(userController, times(0)).create(argThat(new UserUUIDLessDTOMatcher(userUUIDLessDTO)));
@@ -376,7 +376,7 @@ public class UserHttpTests {
                         .value(messageSource.getMessage("user.email.not_blank", null, Locale.getDefault())))
                 .andExpect(jsonPath("$.errors.password.length()").value(2))
                 .andExpect(jsonPath("$.errors.password[*]")
-                        .value(contains(
+                        .value(containsInAnyOrder(
                                 messageSource.getMessage("user.password.not_blank", null, Locale.getDefault()),
                                 messageSource.getMessage("user.password.not_valid", null, Locale.getDefault()))));
 
