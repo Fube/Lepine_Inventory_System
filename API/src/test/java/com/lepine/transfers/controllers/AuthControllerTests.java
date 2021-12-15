@@ -29,11 +29,6 @@ public class AuthControllerTests {
     private static final String VALID_EMAIL = "foo@bar.com";
     private static final String VALID_PASSWORD = "S0meP@ssw0rd";
 
-    private static final UserPasswordLessDTO VALID_USER = UserPasswordLessDTO.builder()
-            .uuid(UUID.randomUUID())
-            .email(VALID_EMAIL)
-            .build();
-
     @Autowired
     private AuthController authController;
 

@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class UserPasswordLessDTO {
     private UUID uuid;
     private String email;
+    private String role;
 }
