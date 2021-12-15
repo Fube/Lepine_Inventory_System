@@ -22,4 +22,7 @@ public class UserUUIDLessDTO {
             message = "{user.password.not_valid}")
     @NotBlank(message = "{user.password.not_blank}")
     private String password;
+
+    @NotBlank(message = "{user.role.not_blank}")
+    private String role;
 }

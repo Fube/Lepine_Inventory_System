@@ -13,13 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-@EnableGlobalMethodSecurity(
-        prePostEnabled = true,
-        securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final Map<HttpMethod, List<String>> whiteListByMethod =
-            Map.of(HttpMethod.POST, List.of("/users"));
+    private static final Map<HttpMethod, List<String>> whiteListByMethod = Map.of();
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -28,8 +24,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry expressionInterceptUrlRegistry = http.csrf().disable()
-                .authorizeRequests();
+        final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry expressionInterceptUrlRegistry =
+                http.csrf().disable()
+                .authorizeRequests()
+                    .antMatchers("/users").hasRole("MANAGER");
 
         for(Map.Entry<HttpMethod, List<String>> entry : whiteListByMethod.entrySet()) {
             expressionInterceptUrlRegistry.antMatchers(entry.getValue().toArray(new String[0]));

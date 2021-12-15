@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.user.UserController;
+import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
@@ -49,6 +50,11 @@ public class UserHttpTests {
     private static final String INVALID_EMAIL = "invalid";
     private static final String VALID_PASSWORD = "S0m3P@ssword";
     private static final String INVALID_PASSWORD = "a";
+    private static final String VALID_ROLE_NAME = "SOME_ROLE";
+    private static final Role VALID_ROLE = Role.builder()
+            .uuid(UUID.randomUUID())
+            .name(VALID_ROLE_NAME)
+            .build();
 
     private static List<User> generateUsers(int num) {
         List<User> users = new ArrayList<>(num);
@@ -57,6 +63,7 @@ public class UserHttpTests {
                     .uuid(UUID.randomUUID())
                     .email(i + VALID_EMAIL)
                     .password(VALID_PASSWORD)
+                    .role(VALID_ROLE)
                     .build());
         }
         return users;
@@ -97,6 +104,7 @@ public class UserHttpTests {
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
                 .email(VALID_EMAIL)
                 .password(VALID_PASSWORD)
+                .role(VALID_ROLE_NAME)
                 .build();
 
         final UUID uuid = UUID.randomUUID();

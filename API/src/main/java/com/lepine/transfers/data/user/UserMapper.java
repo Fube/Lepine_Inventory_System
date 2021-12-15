@@ -23,4 +23,10 @@ public interface UserMapper {
     default String map(Role value) {
         return value.getName();
     }
+
+    default Role map(String value) {
+        return Role.builder()
+            .name(value)
+            .build();
+    }
 }

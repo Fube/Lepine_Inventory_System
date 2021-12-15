@@ -1,28 +1,22 @@
 package com.lepine.transfers.controllers.user;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-
 import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
-
 import com.lepine.transfers.services.user.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
-import java.util.List;
-
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping("/users")
@@ -37,7 +31,6 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    @Secured("ROLE_MANAGER")
     public UserPasswordLessDTO create(@Valid @RequestBody UserUUIDLessDTO userUUIDLessDTO) {
         log.info("Creating user with email {}", userUUIDLessDTO.getEmail());
         User created = userService.create(userUUIDLessDTO);
@@ -46,7 +39,6 @@ public class UserController {
     }
 
     @GetMapping
-    @Secured("ROLE_MANAGER")
     public Page<UserPasswordLessDTO> getAll(
             @RequestParam(value = "page", defaultValue = "1")
             @Min(value = 1, message = "{pagination.page.min}") int page,
