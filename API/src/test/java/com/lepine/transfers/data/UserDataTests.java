@@ -1,9 +1,11 @@
 package com.lepine.transfers.data;
 
 import com.lepine.transfers.data.auth.Role;
+import com.lepine.transfers.data.role.RoleRepo;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
 import org.assertj.core.util.Throwables;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +15,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-
-import java.util.Optional;
 
 @DataJpaTest
 @ActiveProfiles({"test"})
@@ -49,11 +48,14 @@ public class UserDataTests {
     @Test
     @DisplayName("Given user, persist")
     void save() {
+
+        final Role savedRole = roleRepo.save(VALID_ROLE);
+        entityManager.flush();
         final User save = userRepo.save(
                 User.builder()
                         .email(VALID_EMAIL)
                         .password(VALID_PASSWORD)
-                        .role(VALID_ROLE)
+                        .role(savedRole)
                         .build()
         );
 
@@ -104,9 +106,13 @@ public class UserDataTests {
     void save_DuplicateEmail() {
 
         // Arrange
+        final Role savedRole = roleRepo.save(VALID_ROLE);
+        entityManager.flush();
+
         final User user = User.builder()
             .email(VALID_EMAIL)
             .password(VALID_PASSWORD)
+            .role(savedRole)
             .build();
 
         // Act
@@ -124,10 +130,14 @@ public class UserDataTests {
     void findByEmail() {
 
         // Arrange
+        final Role savedRole = roleRepo.save(VALID_ROLE);
+        entityManager.flush();
+
         final User user = userRepo.save(
                 User.builder()
                         .email(VALID_EMAIL)
                         .password(VALID_PASSWORD)
+                        .role(savedRole)
                         .build()
         );
         entityManager.flush();
