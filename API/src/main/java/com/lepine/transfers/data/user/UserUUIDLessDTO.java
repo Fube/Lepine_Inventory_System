@@ -21,5 +21,5 @@ public class UserUUIDLessDTO {
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
             message = "{user.password.not_valid}")
     @NotBlank(message = "{user.password.not_blank}")
-    private String password;  
+    private String password;
 }

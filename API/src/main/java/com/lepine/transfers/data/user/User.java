@@ -1,6 +1,7 @@
 package com.lepine.transfers.data.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lepine.transfers.data.auth.Role;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,6 +34,10 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String email;
     private String password;
+
+    @OneToOne(
+            targetEntity = Role.class
+    )
     private String role;
 
     @JsonIgnore
