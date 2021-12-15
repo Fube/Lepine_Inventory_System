@@ -38,6 +38,9 @@ public class UserDataTests {
     private UserRepo userRepo;
 
     @Autowired
+    private RoleRepo roleRepo;
+
+    @Autowired
     private EntityManager entityManager;
 
     @Test
