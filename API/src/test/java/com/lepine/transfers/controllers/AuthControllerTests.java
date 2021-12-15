@@ -2,6 +2,7 @@ package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.controllers.auth.AuthController;
 import com.lepine.transfers.data.auth.UserLogin;
+import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.services.auth.AuthService;
@@ -44,8 +45,8 @@ public class AuthControllerTests {
     }
 
     @Test
-    @DisplayName("Given fully valid UserLogin, then return UserPasswordLessDTO")
-    void login_Valid() {
+    @DisplayName("Given fully valid manager UserLogin, then return UserPasswordLessDTO with manager role")
+    void login_ValidManager() {
 
         // Arrange
         final UserLogin userLogin = UserLogin.builder()
@@ -53,8 +54,14 @@ public class AuthControllerTests {
                 .password(VALID_PASSWORD)
                 .build();
 
+        final User userDetails = User.builder()
+                .uuid(UUID.randomUUID())
+                .email(VALID_EMAIL)
+                .role("MANAGER")
+                .build();
+
         given(authService.login(userLogin))
-                .willReturn(VALID_USER);
+                .willReturn(userDetails);
 
         // Act
         final UserPasswordLessDTO user = authController.login(userLogin);
