@@ -46,6 +46,7 @@ public class UserController {
     }
 
     @GetMapping
+    @Secured("ROLE_MANAGER")
     public Page<UserPasswordLessDTO> getAll(
             @RequestParam(value = "page", defaultValue = "1")
             @Min(value = 1, message = "{pagination.page.min}") int page,
