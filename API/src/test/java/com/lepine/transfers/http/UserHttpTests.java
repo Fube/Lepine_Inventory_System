@@ -2,26 +2,31 @@ package com.lepine.transfers.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.user.UserController;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.helpers.matchers.UserUUIDLessDTOMatcher;
 import com.lepine.transfers.services.user.UserService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Locale;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -31,25 +36,29 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { UserController.class })
-@ContextConfiguration(classes = { MapperConfig.class })
+@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class})
 @ActiveProfiles("test")
 public class UserHttpTests {
 
     private static final String VALID_EMAIL = "valid@gmail.com";
     private static final String INVALID_EMAIL = "invalid";
     private static final String VALID_PASSWORD = "S0m3P@ssword";
-    
+    private static final String INVALID_PASSWORD = "a";
+
     @Autowired
     private MockMvc mvc;
-
-    @SpyBean
-    private UserController userController;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
+
+    @SpyBean
+    private UserController userController;
 
     @MockBean
     private UserService userService;
@@ -95,14 +104,14 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with invalid email but valid password as manager, then return 400")
+    @DisplayName("Given POST on /users with valid email but blank password as manager, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_InvalidEmail() throws Exception {
 
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = UserUUIDLessDTO.builder()
-                .email(INVALID_EMAIL)
-                .password(VALID_PASSWORD)
+                .email(VALID_EMAIL)
+                .password("")
                 .build();
         final UserUUIDLessDTOMatcher userUUIDLessDTOMatcher = new UserUUIDLessDTOMatcher(userUUIDLessDTO);
         // Act
@@ -112,7 +121,18 @@ public class UserHttpTests {
                         .content(objectMapper.writeValueAsString(userUUIDLessDTO)));
 
         // Assert
-        resultActions.andExpect(status().isBadRequest());
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.email").doesNotExist())
+                .andExpect(jsonPath("$.errors.password[*]")
+                    .value(contains(
+                            messageSource.getMessage("user.password.not_blank", null, Locale.getDefault()),
+                            messageSource.getMessage("user.password.not_valid", null, Locale.getDefault()))));
+
 
         verify(userController, times(0)).create(argThat(userUUIDLessDTOMatcher));
     }
