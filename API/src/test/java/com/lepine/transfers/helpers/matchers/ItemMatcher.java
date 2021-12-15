@@ -13,7 +13,7 @@ public class ItemMatcher implements ArgumentMatcher<Item> {
 
     @Override
     public boolean matches(Item argument) {
-        return argument.getSKU().equals(item.getSKU()) &&
+        return argument.getSku().equals(item.getSku()) &&
                 argument.getDescription().equals(item.getDescription()) &&
                 argument.getName().equals(item.getName());
     }

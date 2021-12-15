@@ -48,14 +48,14 @@ class ItemDataTests {
                 Item.builder()
                         .name(VALID_ITEM_NAME)
                         .description(VALID_ITEM_DESCRIPTION)
-                        .SKU(VALID_ITEM_SKU)
+                        .sku(VALID_ITEM_SKU)
                         .build()
         );
 
         assertTrue(UUID_PATTERN.matcher(save.getUuid().toString()).matches());
         assertEquals(VALID_ITEM_NAME, save.getName());
         assertEquals(VALID_ITEM_DESCRIPTION, save.getDescription());
-        assertEquals(VALID_ITEM_SKU, save.getSKU());
+        assertEquals(VALID_ITEM_SKU, save.getSku());
     }
 
     @Test
@@ -66,7 +66,7 @@ class ItemDataTests {
                 Item.builder()
                         .name(VALID_ITEM_NAME)
                         .description(VALID_ITEM_DESCRIPTION)
-                        .SKU(VALID_ITEM_SKU)
+                        .sku(VALID_ITEM_SKU)
                         .build()
         );
 
@@ -77,7 +77,7 @@ class ItemDataTests {
         assertTrue(UUID_PATTERN.matcher(got.getUuid().toString()).matches());
         assertEquals(VALID_ITEM_NAME, got.getName());
         assertEquals(VALID_ITEM_DESCRIPTION, got.getDescription());
-        assertEquals(VALID_ITEM_SKU, got.getSKU());
+        assertEquals(VALID_ITEM_SKU, got.getSku());
     }
 
     @Test
@@ -88,7 +88,7 @@ class ItemDataTests {
                 Item.builder()
                         .name(VALID_ITEM_NAME)
                         .description(VALID_ITEM_DESCRIPTION)
-                        .SKU(VALID_ITEM_SKU)
+                        .sku(VALID_ITEM_SKU)
                         .build()
         );
 
@@ -110,18 +110,18 @@ class ItemDataTests {
                 Item.builder()
                         .name(VALID_ITEM_NAME)
                         .description(VALID_ITEM_DESCRIPTION)
-                        .SKU(VALID_ITEM_SKU)
+                        .sku(VALID_ITEM_SKU)
                         .build()
         );
 
         save.setDescription(updatedDescription);
         save.setName(updatedName);
-        save.setSKU(updatedSKU);
+        save.setSku(updatedSKU);
         final Item updated = itemRepo.save(save);
 
         assertEquals(save.getUuid(), updated.getUuid());
         assertEquals(updatedName, updated.getName());
         assertEquals(updatedDescription, updated.getDescription());
-        assertEquals(updatedSKU, updated.getSKU());
+        assertEquals(updatedSKU, updated.getSku());
     }
 }

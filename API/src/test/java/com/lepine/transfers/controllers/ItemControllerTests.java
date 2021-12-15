@@ -72,7 +72,7 @@ public class ItemControllerTests {
             items.add(Item.builder()
                     .name("name"+i)
                     .description("description"+i)
-                    .SKU("SKU"+i)
+                    .sku("SKU"+i)
                     .build());
         }
         return items;
@@ -99,7 +99,7 @@ public class ItemControllerTests {
         for (int i = 0; i < content.size(); i++) {
             assertEquals("name" + i, content.get(i).getName());
             assertEquals("description" + i, content.get(i).getDescription());
-            assertEquals("SKU" + i, content.get(i).getSKU());
+            assertEquals("SKU" + i, content.get(i).getSku());
         }
         verify(itemService, times(1)).findAll(any(PageRequest.class));
     }
@@ -127,7 +127,7 @@ public class ItemControllerTests {
         for (int i = 10; i < content.size(); i++) {
             assertEquals("name" + i, content.get(i).getName());
             assertEquals("description" + i, content.get(i).getDescription());
-            assertEquals("SKU" + i, content.get(i).getSKU());
+            assertEquals("SKU" + i, content.get(i).getSku());
         }
         verify(itemService, times(1)).findAll(any(PageRequest.class));
     }
@@ -179,7 +179,7 @@ public class ItemControllerTests {
         for (int i = 0; i < content.size(); i++) {
             assertEquals("name" + i, content.get(i).getName());
             assertEquals("description" + i, content.get(i).getDescription());
-            assertEquals("SKU" + i, content.get(i).getSKU());
+            assertEquals("SKU" + i, content.get(i).getSku());
         }
         verify(itemService, times(1)).findAll(any(PageRequest.class));
     }
@@ -229,7 +229,7 @@ public class ItemControllerTests {
         for (int i = 10; i < content.size(); i++) {
             assertEquals("name" + i, content.get(i).getName());
             assertEquals("description" + i, content.get(i).getDescription());
-            assertEquals("SKU" + i, content.get(i).getSKU());
+            assertEquals("SKU" + i, content.get(i).getSku());
         }
     }
 
@@ -241,7 +241,7 @@ public class ItemControllerTests {
         final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
                 .name("name")
                 .description("description")
-                .SKU("SKU")
+                .sku("SKU")
                 .build();
         given(itemService.create(any(Item.class)))
                 .willReturn(itemMapper.toEntity(itemDTO));
@@ -252,7 +252,7 @@ public class ItemControllerTests {
         // Assert
         assertEquals("name", item.getName());
         assertEquals("description", item.getDescription());
-        assertEquals("SKU", item.getSKU());
+        assertEquals("SKU", item.getSku());
         verify(itemService, times(1)).create(any(Item.class));
     }
 
@@ -288,7 +288,7 @@ public class ItemControllerTests {
         final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
                 .name(null)
                 .description(null)
-                .SKU(null)
+                .sku(null)
                 .build();
 
         // Act
@@ -317,7 +317,7 @@ public class ItemControllerTests {
         final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
                 .name("name")
                 .description("description")
-                .SKU("SKU")
+                .sku("SKU")
                 .build();
         final UUID uuid = UUID.randomUUID();
         given(itemService.update(any(Item.class)))
@@ -329,7 +329,7 @@ public class ItemControllerTests {
         // Assert
         assertEquals("name", updatedItem.getName());
         assertEquals("description", updatedItem.getDescription());
-        assertEquals("SKU", updatedItem.getSKU());
+        assertEquals("SKU", updatedItem.getSku());
         verify(itemService, times(1)).update(argThat(item -> item.getUuid().equals(uuid)));
     }
 
@@ -366,7 +366,7 @@ public class ItemControllerTests {
         final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
                 .name(null)
                 .description(null)
-                .SKU(null)
+                .sku(null)
                 .build();
         final UUID uuid = UUID.randomUUID();
 
@@ -396,7 +396,7 @@ public class ItemControllerTests {
         final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
                 .name("name")
                 .description("description")
-                .SKU("SKU")
+                .sku("SKU")
                 .build();
         final UUID uuid = UUID.randomUUID();
         given(itemService.update(any(Item.class)))
@@ -436,7 +436,7 @@ public class ItemControllerTests {
                 .uuid(uuid)
                 .name("name")
                 .description("description")
-                .SKU("SKU")
+                .sku("SKU")
                 .build();
         given(itemService.findByUuid(uuid)).willReturn(Optional.of(item));
 
@@ -447,7 +447,7 @@ public class ItemControllerTests {
         assertEquals(uuid, got.getUuid());
         assertEquals("name", got.getName());
         assertEquals("description", got.getDescription());
-        assertEquals("SKU", got.getSKU());
+        assertEquals("SKU", got.getSku());
         verify(itemService, times(1)).findByUuid(uuid);
     }
 

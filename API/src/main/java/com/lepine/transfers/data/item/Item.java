@@ -25,7 +25,7 @@ public class Item {
     @Id
     private UUID uuid = UUID.randomUUID();
 
-    private String SKU;
+    private String sku;
     private String description;
     private String name;
 }

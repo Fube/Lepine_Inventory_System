@@ -23,7 +23,7 @@ public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO, UU
         // Arrange
         final ItemSearchDTO itemSearchDTO = ItemSearchDTO.builder()
                 .name("item")
-                .SKU("sku")
+                .sku("sku")
                 .build();
 
         given(searchIndex.saveObject(itemSearchDTO))

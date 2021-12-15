@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.support.DelegatingMessageSource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -78,7 +77,7 @@ public class ItemHttpTests {
             items.add(Item.builder()
                     .uuid(UUID.randomUUID())
                     .name("Item " + i)
-                    .SKU("SKU " + i)
+                    .sku("SKU " + i)
                     .description("Description " + i)
                     .build());
         }
@@ -110,7 +109,7 @@ public class ItemHttpTests {
         final Item item = Item.builder()
                 .uuid(UUID.randomUUID())
                 .name("Item")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("Description")
                 .build();
         given(itemService.findByUuid(item.getUuid()))
@@ -125,7 +124,7 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(item.getName()))
-                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.sku").value(item.getSku()))
                 .andExpect(jsonPath("$.description").value(item.getDescription()));
 
         verify(itemService, times(1)).findByUuid(item.getUuid());
@@ -164,7 +163,7 @@ public class ItemHttpTests {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .name("Item")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("Description")
                 .build();
         final Item item = itemMapper.toEntity(itemUUIDLessDTO);
@@ -183,7 +182,7 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(item.getName()))
-                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.sku").value(item.getSku()))
                 .andExpect(jsonPath("$.description").value(item.getDescription()));
 
         verify(itemService, times(1)).create(argThat(matcher));
@@ -198,7 +197,7 @@ public class ItemHttpTests {
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .description("")
                 .name("")
-                .SKU("")
+                .sku("")
                 .build();
 
         // Act
@@ -235,7 +234,7 @@ public class ItemHttpTests {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .name("Item")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("Description")
                 .build();
         final Item item = itemMapper.toEntity(itemUUIDLessDTO);
@@ -254,7 +253,7 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(item.getName()))
-                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.sku").value(item.getSku()))
                 .andExpect(jsonPath("$.description").value(item.getDescription()));
 
         verify(itemService, times(1)).update(argThat(matcher));
@@ -269,7 +268,7 @@ public class ItemHttpTests {
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .description("")
                 .name("")
-                .SKU("")
+                .sku("")
                 .build();
 
         // Act
@@ -296,7 +295,7 @@ public class ItemHttpTests {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .name("Item")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("Description")
                 .build();
         final Item item = itemMapper.toEntity(itemUUIDLessDTO);

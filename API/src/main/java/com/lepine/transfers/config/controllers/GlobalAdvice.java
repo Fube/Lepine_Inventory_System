@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.time.ZoneOffset.UTC;
@@ -35,14 +36,16 @@ public class GlobalAdvice {
     public static class HTTPConstraintViolationError extends HTTPErrorMessage {
 
         @Getter
-        private final Map<String, String> errors;
+        private final Map<String, List<String>> errors;
 
         public HTTPConstraintViolationError(BindingResult bindingResult) {
             super(BAD_REQUEST.value(), "Invalid request");
 
             errors = new HashMap<>();
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+                errors
+                        .computeIfAbsent(fieldError.getField(), k -> new java.util.ArrayList<>())
+                        .add(fieldError.getDefaultMessage());
             }
         }
     }
