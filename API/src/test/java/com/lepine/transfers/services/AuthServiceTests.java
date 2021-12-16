@@ -1,5 +1,6 @@
 package com.lepine.transfers.services;
 
+import com.lepine.transfers.config.AuthConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.auth.Role;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, UserServiceImpl.class })
+@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class, UserServiceImpl.class })
 @ActiveProfiles({ "test" })
 public class AuthServiceTests {
 
@@ -64,14 +65,14 @@ public class AuthServiceTests {
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
 
-    @MockBean
-    private UserRepo userRepo;
-
-    @MockBean
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @MockBean
+    @Autowired
     private JWTUtil<User> jwtUtil;
+
+    @MockBean
+    private UserRepo userRepo;
 
     @Test
     public void contextLoads() {

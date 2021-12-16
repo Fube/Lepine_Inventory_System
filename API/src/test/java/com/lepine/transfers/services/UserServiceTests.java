@@ -1,5 +1,6 @@
 package com.lepine.transfers.services;
 
+import com.lepine.transfers.config.AuthConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.user.User;
@@ -36,7 +37,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, UserServiceImpl.class })
+@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class, UserServiceImpl.class })
 @ActiveProfiles("test")
 public class UserServiceTests {
 
@@ -76,11 +77,8 @@ public class UserServiceTests {
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
 
-    @MockBean
+    @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @MockBean
-    private JWTUtil<User> jwtUtil;
 
     @MockBean
     private UserRepo userRepo;
