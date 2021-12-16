@@ -2,6 +2,7 @@ package com.lepine.transfers.filters.auth;
 
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.utils.auth.JWTUtil;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
