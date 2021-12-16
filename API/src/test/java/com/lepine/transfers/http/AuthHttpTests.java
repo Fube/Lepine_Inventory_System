@@ -7,6 +7,7 @@ import com.lepine.transfers.controllers.auth.AuthController;
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
+import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.services.auth.AuthService;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -61,6 +63,9 @@ public class AuthHttpTests {
     @MockBean
     private AuthService authService;
 
+    @MockBean
+    private UserRepo userRepo;
+
     @Test
     public void contextLoads() {
     }
@@ -70,6 +75,9 @@ public class AuthHttpTests {
     public void login_ValidUser() throws Exception {
 
         // Arrange
+        given(userRepo.findByEmail(VALID_EMAIL))
+                .willReturn(Optional.ofNullable(VALID_USER));
+
         given(authService.login(VALID_USER_LOGIN))
                 .willReturn(Pair.with(VALID_USER, VALID_JWT));
 
