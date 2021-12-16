@@ -1,6 +1,8 @@
 package com.lepine.transfers.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.config.AuthConfig;
+import com.lepine.transfers.config.JWTConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.auth.AuthController;
@@ -8,7 +10,9 @@ import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
+import com.lepine.transfers.filters.auth.JWTFilter;
 import com.lepine.transfers.services.auth.AuthService;
+import com.lepine.transfers.utils.auth.UserJWTUtilImpl;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { AuthController.class })
-@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class})
+@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, JWTConfig.class, UserJWTUtilImpl.class })
 @ActiveProfiles("test")
 public class AuthHttpTests {
 
