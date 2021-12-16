@@ -6,6 +6,7 @@ import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
+import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +60,20 @@ public class UserServiceImpl implements UserService, AuthService {
 
     @Override
     public User login(UserLogin userLogin) {
-        return null;
+
+        final String email = userLogin.getEmail();
+        log.info("Logging in user {}", email);
+
+        final User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
+
+        if(!passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
+            log.error("Password does not match");
+            throw new RuntimeException("Password does not match");
+        }
+
+        log.info("Logged in user {}", email);
+
+        return user;
     }
 }

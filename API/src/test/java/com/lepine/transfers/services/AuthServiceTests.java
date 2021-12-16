@@ -71,9 +71,10 @@ public class AuthServiceTests {
                 .password(VALID_PASSWORD)
                 .build();
 
-        given(userRepo.findByEmail("user"))
+        given(userRepo.findByEmail(userLogin.getEmail()))
                 .willReturn(Optional.of(VALID_USER));
-        given(passwordEncoder.matches("password", VALID_PASSWORD))
+
+        given(passwordEncoder.matches(userLogin.getPassword(), VALID_PASSWORD))
                 .willReturn(true);
 
         // Act
