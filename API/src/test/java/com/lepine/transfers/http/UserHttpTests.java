@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { UserController.class })
-@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class})
+@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class })
 @ActiveProfiles("test")
 public class UserHttpTests {
 

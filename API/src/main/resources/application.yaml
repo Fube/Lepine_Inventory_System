@@ -46,6 +46,9 @@ spring:
             initialization-fail-timeout: 60000
 cors:
     origin: http://some.fake.url
+jwt:
+    secret: someveryveryveryveryveryveryverylongsecretorsomethingihavenoideaman
+    expiration: 3600
 ---
 spring:
     config:
