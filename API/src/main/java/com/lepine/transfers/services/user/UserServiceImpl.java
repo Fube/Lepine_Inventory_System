@@ -9,6 +9,7 @@ import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
+import com.lepine.transfers.utils.auth.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
@@ -80,7 +81,7 @@ public class UserServiceImpl implements UserService, AuthService {
         return new Pair<User, String>(user, getJWT(user));
     }
 
-    private getJWT(User user) {
+    private String getJWT(User user) {
         log.info("Getting JWT for user {}", user.getEmail());
         final String jwt = jwtUtil.encode(user);
         log.info("Got JWT for user {}", user.getEmail());
