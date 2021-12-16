@@ -11,6 +11,7 @@ import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,7 @@ public class UserServiceImpl implements UserService, AuthService {
     private final UserRepo userRepo;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JWTUtil<User> jwtUtil;
 
     @Override
     public User create(UserUUIDLessDTO userUUIDLessDTO) {
@@ -60,7 +62,7 @@ public class UserServiceImpl implements UserService, AuthService {
     }
 
     @Override
-    public User login(UserLogin userLogin) {
+    public Pair<User, String> login(UserLogin userLogin) {
 
         final String email = userLogin.getEmail();
         log.info("Logging in user {}", email);
@@ -75,6 +77,14 @@ public class UserServiceImpl implements UserService, AuthService {
 
         log.info("Logged in user {}", email);
 
-        return user;
+        return new Pair<User, String>(user, getJWT(user));
+    }
+
+    private getJWT(User user) {
+        log.info("Getting JWT for user {}", user.getEmail());
+        final String jwt = jwtUtil.encode(user);
+        log.info("Got JWT for user {}", user.getEmail());
+
+        return jwt;
     }
 }
