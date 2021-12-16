@@ -1,10 +1,12 @@
 package com.lepine.transfers.services.user;
 
+import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
+import com.lepine.transfers.services.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,7 +19,7 @@ import org.springframework.validation.annotation.Validated;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, AuthService {
 
     private final UserRepo userRepo;
     private final UserMapper userMapper;
@@ -53,5 +55,10 @@ public class UserServiceImpl implements UserService {
         log.info("Got {} Users in total, {} in first page", got.getTotalElements(), got.getContent().size());
 
         return got;
+    }
+
+    @Override
+    public User login(UserLogin userLogin) {
+        return null;
     }
 }
