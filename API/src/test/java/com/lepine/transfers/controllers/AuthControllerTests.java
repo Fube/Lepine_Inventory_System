@@ -17,19 +17,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.servlet.http.Cookie;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.Locale;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -83,6 +82,16 @@ public class AuthControllerTests {
 
         // Assert
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertTrue(responseEntity.getHeaders().containsKey(HttpHeaders.SET_COOKIE));
+
+        final Map<String, Cookie> collect = responseEntity.getHeaders().get(HttpHeaders.SET_COOKIE).stream().map(cookie -> {
+            final String[] cookieParts = cookie.split("=", 2);
+            return Map.entry(cookieParts[0], new Cookie(cookieParts[0], cookieParts[1]));
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        assertTrue(collect.containsKey("token"));
+        assertThat(collect.get("token").getValue()).contains(VALID_JWT);
+
 
         final UserPasswordLessDTO body = responseEntity.getBody();
         assertEquals(userDetails.getUuid(), body.getUuid());
