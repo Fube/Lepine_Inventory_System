@@ -5,6 +5,7 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService, AuthService {
 
         if(!passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
             log.error("Password does not match");
-            throw new RuntimeException("Password does not match");
+            throw new InvalidLoginException();
         }
 
         log.info("Logged in user {}", email);

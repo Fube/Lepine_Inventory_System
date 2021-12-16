@@ -6,6 +6,7 @@ import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
+import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.services.auth.AuthService;
 import com.lepine.transfers.services.user.UserServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -100,7 +101,7 @@ public class AuthServiceTests {
     }
 
     @Test
-    @DisplayName("Given login with invalid user data, then return throw ConstrainViolationException")
+    @DisplayName("Given login with invalid user data, then throw ConstrainViolationException")
     public void login_Invalid() {
 
         // Arrange
@@ -126,5 +127,32 @@ public class AuthServiceTests {
 
         verify(userRepo, times(0)).findByEmail(VALID_EMAIL);
         verify(passwordEncoder, times(0)).matches(VALID_PASSWORD, VALID_PASSWORD);
+    }
+
+    @Test
+    @DisplayName("Given login with invalid match, then throw InvalidLoginException")
+    public void login_InvalidMatch() {
+
+        // Arrange
+        final String wrongPassword = "somewrongpassword";
+        final UserLogin userLogin = VALID_LOGIN.toBuilder()
+                .password(wrongPassword)
+                .build();
+
+        given(userRepo.findByEmail(userLogin.getEmail()))
+                .willReturn(Optional.of(VALID_USER));
+
+        given(passwordEncoder.matches(userLogin.getPassword(), VALID_PASSWORD))
+                .willReturn(false);
+
+        // Act
+        final InvalidLoginException exception =
+                assertThrows(InvalidLoginException.class, () -> authService.login(userLogin));
+
+        // Assert
+        assertThat(exception.getMessage()).isEqualTo("Invalid login");
+
+        verify(userRepo, times(1)).findByEmail(VALID_EMAIL);
+        verify(passwordEncoder, times(1)).matches(wrongPassword, VALID_PASSWORD);
     }
 }
