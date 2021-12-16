@@ -9,6 +9,7 @@ import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.services.auth.AuthService;
 import com.lepine.transfers.services.user.UserServiceImpl;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles({ "test" })
 public class AuthServiceTests {
 
+    private static final String VALID_JWT = "some.valid.jwt";
     private static final String VALID_EMAIL = "foo@bar.com";
     private static final String VALID_PASSWORD = "S0meP@ssw0rd";
     private static final String VALID_ROLE_NAME = "SOME_ROLE";
@@ -78,7 +80,7 @@ public class AuthServiceTests {
     }
 
     @Test
-    @DisplayName("Given login with valid user data, then return User")
+    @DisplayName("Given login with valid user data, then return Pair<User, String> representing user and JWT")
     public void login_Valid() {
 
         // Arrange
@@ -90,11 +92,15 @@ public class AuthServiceTests {
         given(passwordEncoder.matches(userLogin.getPassword(), VALID_PASSWORD))
                 .willReturn(true);
 
+        given(jwtUtil.encode(VALID_USER))
+                .willReturn(VALID_JWT);
+
         // Act
-        final User login = authService.login(userLogin);
+        final Pair<User, String> login = authService.login(userLogin);
 
         // Assert
-        assertThat(login).isEqualTo(VALID_USER);
+        assertThat(login.getValue0()).isEqualTo(VALID_USER);
+        assertThat(login.getValue1()).isEqualTo(VALID_JWT);
 
         verify(userRepo, times(1)).findByEmail(VALID_EMAIL);
         verify(passwordEncoder, times(1)).matches(VALID_PASSWORD, VALID_PASSWORD);

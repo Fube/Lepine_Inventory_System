@@ -10,12 +10,14 @@ import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolation;
@@ -36,6 +38,7 @@ import static org.mockito.Mockito.verify;
 @ActiveProfiles({"test"})
 public class AuthControllerTests {
 
+    private static final String VALID_JWT = "some.valid.jwt";
     private static final String VALID_EMAIL = "foo@bar.com";
     private static final String VALID_PASSWORD = "S0meP@ssw0rd";
     private static final Role MANAGER_ROLE = Role.builder()
@@ -73,15 +76,18 @@ public class AuthControllerTests {
                 .build();
 
         given(authService.login(userLogin))
-                .willReturn(userDetails);
+                .willReturn(Pair.with(userDetails, VALID_JWT));
 
         // Act
-        final UserPasswordLessDTO user = authController.login(userLogin);
+        final ResponseEntity<UserPasswordLessDTO> responseEntity = authController.login(userLogin);
 
         // Assert
-        assertEquals(userDetails.getUuid(), user.getUuid());
-        assertEquals(userDetails.getEmail(), user.getEmail());
-        assertEquals(userDetails.getRole().getName(), user.getRole());
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+
+        final UserPasswordLessDTO body = responseEntity.getBody();
+        assertEquals(userDetails.getUuid(), body.getUuid());
+        assertEquals(userDetails.getEmail(), body.getEmail());
+        assertEquals(userDetails.getRole().getName(), body.getRole());
 
         verify(authService, times(1)).login(userLogin);
     }
