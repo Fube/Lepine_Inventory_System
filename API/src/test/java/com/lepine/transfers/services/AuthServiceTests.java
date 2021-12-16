@@ -9,6 +9,7 @@ import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.services.auth.AuthService;
 import com.lepine.transfers.services.user.UserServiceImpl;
+import com.lepine.transfers.utils.auth.JWTUtil;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,6 +69,9 @@ public class AuthServiceTests {
 
     @MockBean
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private JWTUtil<User> jwtUtil;
 
     @Test
     public void contextLoads() {

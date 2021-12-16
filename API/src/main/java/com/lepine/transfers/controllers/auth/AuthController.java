@@ -9,6 +9,10 @@ import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.javatuples.Pair;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,10 +27,10 @@ public class AuthController {
     private final AuthService authService;
     private final UserMapper userMapper;
 
-    public UserPasswordLessDTO login(@Valid UserLogin userLogin) {
+    public ResponseEntity<UserPasswordLessDTO> login(@Valid UserLogin userLogin) {
         log.info("Logging in user {}", userLogin.getEmail());
 
-        User login;
+        Pair<User, String> login;
         try {
             login = authService.login(userLogin);
         } catch (UserNotFoundException e) {
@@ -34,8 +38,21 @@ public class AuthController {
             throw new InvalidLoginException();
         }
 
-        log.info("User {} logged in", login.getUsername());
+        final User principle = login.getValue0();
+        final String jwt = login.getValue1();
 
-        return userMapper.toPasswordLessDTO(login);
+        log.info("User {} logged in", principle.getUsername());
+
+        final UserPasswordLessDTO userPasswordLessDTO = userMapper.toPasswordLessDTO(principle);
+        final ResponseCookie jwtAsCookie = ResponseCookie.from("token", jwt)
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(60 * 60 * 24)
+                .path("/")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtAsCookie.toString())
+                .body(userPasswordLessDTO);
     }
 }
