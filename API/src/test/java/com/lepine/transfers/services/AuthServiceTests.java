@@ -18,13 +18,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -73,6 +75,9 @@ public class AuthServiceTests {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @Test
     public void contextLoads() {
     }
@@ -90,14 +95,11 @@ public class AuthServiceTests {
         // Arrange
         final UserLogin userLogin = VALID_LOGIN;
 
-        given(userRepo.findByEmail(userLogin.getEmail()))
-                .willReturn(Optional.of(VALID_USER));
-
-        given(passwordEncoder.matches(userLogin.getPassword(), VALID_PASSWORD))
-                .willReturn(true);
-
         given(jwtUtil.encode(VALID_USER))
                 .willReturn(VALID_JWT);
+
+        given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .willReturn(new UsernamePasswordAuthenticationToken(VALID_USER, VALID_PASSWORD));
 
         // Act
         final Pair<User, String> login = authService.login(userLogin);
@@ -106,8 +108,8 @@ public class AuthServiceTests {
         assertThat(login.getValue0()).isEqualTo(VALID_USER);
         assertThat(login.getValue1()).isEqualTo(VALID_JWT);
 
-        verify(userRepo, times(1)).findByEmail(VALID_EMAIL);
-        verify(passwordEncoder, times(1)).matches(VALID_PASSWORD, VALID_PASSWORD);
+        verify(authenticationManager, atLeastOnce())
+                .authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 
     @Test
@@ -149,11 +151,8 @@ public class AuthServiceTests {
                 .password(wrongPassword)
                 .build();
 
-        given(userRepo.findByEmail(userLogin.getEmail()))
-                .willReturn(Optional.of(VALID_USER));
-
-        given(passwordEncoder.matches(userLogin.getPassword(), VALID_PASSWORD))
-                .willReturn(false);
+        given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .willThrow(new BadCredentialsException(""));
 
         // Act
         final InvalidLoginException exception =
@@ -162,7 +161,7 @@ public class AuthServiceTests {
         // Assert
         assertThat(exception.getMessage()).isEqualTo("Invalid login");
 
-        verify(userRepo, times(1)).findByEmail(VALID_EMAIL);
-        verify(passwordEncoder, times(1)).matches(wrongPassword, VALID_PASSWORD);
+        verify(authenticationManager, atLeastOnce())
+                .authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 }

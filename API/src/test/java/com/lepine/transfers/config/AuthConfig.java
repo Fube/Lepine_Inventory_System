@@ -5,6 +5,7 @@ import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.utils.auth.JWTUtil;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @TestConfiguration
@@ -18,4 +19,7 @@ public class AuthConfig {
 
     @MockBean
     private UserRepo userRepo;
+
+    @MockBean
+    private AuthenticationManager authenticationManager;
 }
