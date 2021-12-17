@@ -1,6 +1,7 @@
 package com.lepine.transfers.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.config.AuthConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.item.ItemController;
@@ -39,7 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ItemController.class })
-@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class})
+@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
 @ActiveProfiles("test")
 public class ItemHttpTests {
 

@@ -79,7 +79,7 @@ public class UserServiceTests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @MockBean
+    @Autowired
     private UserRepo userRepo;
 
     @BeforeEach

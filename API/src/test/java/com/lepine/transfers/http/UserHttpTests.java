@@ -1,12 +1,14 @@
 package com.lepine.transfers.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.config.AuthConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.user.UserController;
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
+import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.helpers.matchers.UserUUIDLessDTOMatcher;
 import com.lepine.transfers.services.user.UserService;
@@ -42,7 +44,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { UserController.class })
-@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class })
+@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
 @ActiveProfiles("test")
 public class UserHttpTests {
 

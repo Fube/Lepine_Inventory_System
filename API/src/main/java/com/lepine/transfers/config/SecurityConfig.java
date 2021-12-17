@@ -38,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry expressionInterceptUrlRegistry =
                 http.csrf().disable()
+                .formLogin().disable()
                 .authorizeRequests()
                     .antMatchers("/users").hasRole("MANAGER");
 
