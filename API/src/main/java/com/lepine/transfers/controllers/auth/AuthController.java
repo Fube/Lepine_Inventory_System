@@ -14,11 +14,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
 @RestController
+@RequestMapping("/auth")
 @Slf4j
 @RequiredArgsConstructor
 @Validated
@@ -27,7 +31,8 @@ public class AuthController {
     private final AuthService authService;
     private final UserMapper userMapper;
 
-    public ResponseEntity<UserPasswordLessDTO> login(@Valid UserLogin userLogin) {
+    @PostMapping("/login")
+    public ResponseEntity<UserPasswordLessDTO> login(@Valid @RequestBody UserLogin userLogin) {
         log.info("Logging in user {}", userLogin.getEmail());
 
         Pair<User, String> login;

@@ -1,10 +1,11 @@
 package com.lepine.transfers.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lepine.transfers.config.AuthConfig;
 import com.lepine.transfers.config.JWTConfig;
 import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.SecurityConfig;
 import com.lepine.transfers.config.ValidationConfig;
+import com.lepine.transfers.config.controllers.GlobalAdvice;
 import com.lepine.transfers.controllers.auth.AuthController;
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
@@ -13,29 +14,41 @@ import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.filters.auth.JWTFilter;
 import com.lepine.transfers.services.auth.AuthService;
 import com.lepine.transfers.utils.auth.UserJWTUtilImpl;
+import org.hamcrest.Matcher;
+import org.hamcrest.core.StringContains;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Optional;
 import java.util.UUID;
 
-import static java.lang.String.format;
-import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = { AuthController.class })
-@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, JWTConfig.class, UserJWTUtilImpl.class })
+@WebMvcTest(AuthController.class)
+@ContextConfiguration(classes = {
+        AuthController.class,
+        MapperConfig.class,
+        ValidationConfig.class,
+        JWTConfig.class,
+        UserJWTUtilImpl.class,
+        SecurityConfig.class,
+        GlobalAdvice.class,
+        JWTFilter.class
+})
 @ActiveProfiles("test")
 public class AuthHttpTests {
 
@@ -61,6 +74,9 @@ public class AuthHttpTests {
     @Autowired
     private MockMvc mvc;
 
+    @SpyBean
+    private AuthController authController;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -75,23 +91,23 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST /login with a valid UserLogin, then return UserPasswordLessDTO and JWT in header as HTTP-Only cookie")
+    @DisplayName("Given POST /auth/login with a valid UserLogin, then return UserPasswordLessDTO and JWT in header as HTTP-Only cookie")
     public void login_ValidUser() throws Exception {
 
         // Arrange
-        given(userRepo.findByEmail(VALID_EMAIL))
-                .willReturn(Optional.ofNullable(VALID_USER));
 
         given(authService.login(VALID_USER_LOGIN))
                 .willReturn(Pair.with(VALID_USER, VALID_JWT));
 
         // Act
         final ResultActions resultActions = mvc.perform(
-                post("/login")
+                post("/auth/login")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(VALID_USER_LOGIN)));
+                        .content(objectMapper.writeValueAsString(VALID_USER_LOGIN))
+        );
 
         // Assert
+        final Matcher<String> jwtMatcher = StringContains.containsStringIgnoringCase(VALID_JWT);
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.uuid").value(VALID_USER.getUuid().toString()))
                 .andExpect(jsonPath("$.role.uuid").doesNotExist())
@@ -99,6 +115,10 @@ public class AuthHttpTests {
                 .andExpect(jsonPath("$.role").value(VALID_ROLE_NAME))
                 .andExpect(jsonPath("$.email").value(VALID_EMAIL))
                 .andExpect(jsonPath("$.password").doesNotExist())
-                .andExpect(header().string(HttpHeaders.SET_COOKIE, contains(format("token=%s", VALID_JWT))));
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, jwtMatcher));
+
+
+        verify(authController, times(1)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
+        verify(userRepo, times(0)).findByEmail(VALID_EMAIL); // Ensure the filter was not called
     }
 }
