@@ -28,6 +28,9 @@ spring:
 jwt:
     secret: someveryveryveryveryveryveryverylongsecretorsomethingihavenoideaman
     expiration: 3600
+default-manager:
+    username: manager
+    password: manager
 ---
 spring:
     config:

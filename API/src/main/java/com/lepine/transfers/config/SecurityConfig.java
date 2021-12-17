@@ -3,10 +3,12 @@ package com.lepine.transfers.config;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.filters.auth.JWTFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -24,6 +26,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserRepo userRepo;
     private final JWTFilter jwtFilter;
+
+    @Value("${default-manager.username:admin}")
+    private String DEFAULT_MANAGER_USERNAME;
+    @Value("${default-manager.password:admin}")
+    private String DEFAULT_MANAGER_PASSWORD;
 
     private static final Map<HttpMethod, List<String>> whiteListByMethod = Map.of(
             HttpMethod.POST, List.of("/auth/login")
@@ -67,6 +74,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         dao.passwordEncoder(passwordEncoder());
 
+        final InMemoryUserDetailsManagerConfigurer inMem = new InMemoryUserDetailsManagerConfigurer();
+        inMem.withUser(DEFAULT_MANAGER_USERNAME)
+                .password("{noop}" + DEFAULT_MANAGER_PASSWORD)
+                .roles("ADMIN");
+
+        auth.apply(inMem);
         auth.apply(dao);
     }
 
