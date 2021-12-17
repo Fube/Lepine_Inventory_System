@@ -177,6 +177,8 @@ public class UserServiceTests {
 
         given(userRepo.findByEmail(VALID_EMAIL))
                 .willReturn(Optional.of(user));
+        given(roleRepo.findByName(VALID_ROLE_NAME))
+                .willReturn(Optional.of(VALID_ROLE));
 
         // Act
         final DuplicateEmailException dex = assertThrows(DuplicateEmailException.class, () -> userService.create(userUUIDLessDTO));
