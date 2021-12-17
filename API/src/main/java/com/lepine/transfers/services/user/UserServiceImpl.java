@@ -1,5 +1,6 @@
 package com.lepine.transfers.services.user;
 
+import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
@@ -7,7 +8,6 @@ import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
-import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
 import com.lepine.transfers.utils.auth.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +34,7 @@ public class UserServiceImpl implements UserService, AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JWTUtil<User> jwtUtil;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public User create(UserUUIDLessDTO userUUIDLessDTO) {
@@ -65,20 +71,37 @@ public class UserServiceImpl implements UserService, AuthService {
     @Override
     public Pair<User, String> login(UserLogin userLogin) {
 
-        final String email = userLogin.getEmail();
-        log.info("Logging in user {}", email);
+        log.info("Logging in user {}", userLogin.getEmail());
 
-        final User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword())
+            );
 
-        if(!passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
+            final Object rawPrincipal = authentication.getPrincipal();
+            User principal;
+            if(rawPrincipal instanceof User) {
+
+                principal = (User) authentication.getPrincipal();
+            } else {
+                final UserDetails userDetails = (UserDetails) rawPrincipal;
+                principal = User.builder()
+                        .email(userDetails.getUsername())
+                        .password(userDetails.getPassword())
+                        .role(Role.builder()
+                                .name(userDetails.getAuthorities().iterator().next().getAuthority())
+                                .build())
+                        .build();
+            }
+
+            log.info("Logged in user {}", principal.getEmail());
+
+            return new Pair<>(principal, getJWT(principal));
+
+        } catch (BadCredentialsException ex) {
             log.error("Password does not match");
             throw new InvalidLoginException();
         }
-
-        log.info("Logged in user {}", email);
-
-        return new Pair<User, String>(user, getJWT(user));
     }
 
     private String getJWT(User user) {

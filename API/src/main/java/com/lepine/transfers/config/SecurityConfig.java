@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer;
@@ -77,10 +78,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         final InMemoryUserDetailsManagerConfigurer inMem = new InMemoryUserDetailsManagerConfigurer();
         inMem.withUser(DEFAULT_MANAGER_USERNAME)
                 .password("{noop}" + DEFAULT_MANAGER_PASSWORD)
-                .roles("ADMIN");
+                .roles("MANAGER");
 
         auth.apply(inMem);
         auth.apply(dao);
     }
 
+    @Override @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 }
