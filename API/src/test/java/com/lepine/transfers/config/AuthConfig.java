@@ -1,5 +1,6 @@
 package com.lepine.transfers.config;
 
+import com.lepine.transfers.data.role.RoleRepo;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.utils.auth.JWTUtil;
@@ -19,6 +20,9 @@ public class AuthConfig {
 
     @MockBean
     private UserRepo userRepo;
+
+    @MockBean
+    private RoleRepo roleRepo;
 
     @MockBean
     private AuthenticationManager authenticationManager;

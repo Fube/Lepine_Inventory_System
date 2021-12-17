@@ -90,7 +90,7 @@ public class UserServiceTests {
     @Autowired
     private UserRepo userRepo;
 
-    @MockBean
+    @Autowired
     private RoleRepo roleRepo;
 
     @AfterEach
