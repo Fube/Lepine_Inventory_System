@@ -2,7 +2,10 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import Nav from "../../components/Nav";
 import ItemBase from "../../components/Item";
-import { axiosAPI } from "../../config/axios";
+import { axiosAPI, axiosBackend } from "../../config/axios";
+import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
+import axios from "axios";
+import checkEmptyAuth from "../../utils/checkEmptyAuth";
 
 export default function CreateItem() {
     const router = useRouter();
@@ -31,4 +34,8 @@ export default function CreateItem() {
             </div>
         </>
     );
+}
+
+export async function getServerSideProps(ctx) {
+    return serverSideRedirectOnUnauth(() => checkEmptyAuth(axiosBackend, ctx));
 }
