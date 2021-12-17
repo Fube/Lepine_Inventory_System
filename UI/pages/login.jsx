@@ -13,7 +13,6 @@ export default function Login() {
     });
 
     useEffect(() => {
-        console.log("trigger");
         localStorage.removeItem("role");
         localStorage.removeItem("email");
     }, []);
@@ -24,13 +23,11 @@ export default function Login() {
         setSubmitting(true);
         try {
             const { data } = await axiosAPI.post("/auth/login", values);
-            console.log(data);
             localStorage.setItem("role", data.role);
             localStorage.setItem("email", data.email);
             setStatus({ isError: false, message: "Successfully logged in" });
             router.push("/");
         } catch (e) {
-            console.log(e);
             setStatus({
                 isError: true,
                 message: e?.response?.data?.message ?? "Something went wrong",
@@ -175,7 +172,6 @@ export async function getServerSideProps(context) {
                 data: { status },
             },
         } = e;
-        console.log(status);
         if (status === 401 || status === 403) {
             return { props: {} };
         }
