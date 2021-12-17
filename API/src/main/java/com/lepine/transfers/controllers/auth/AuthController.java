@@ -60,4 +60,16 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, jwtAsCookie.toString())
                 .body(userPasswordLessDTO);
     }
+
+    public ResponseEntity<Void> logout() {
+        log.info("Logging out user");
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, ResponseCookie.from("token", "")
+                        .httpOnly(true)
+                        .secure(true)
+                        .maxAge(0)
+                        .path("/")
+                        .build().toString())
+                .build();
+    }
 }

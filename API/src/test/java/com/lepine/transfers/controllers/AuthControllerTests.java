@@ -24,7 +24,11 @@ import org.springframework.test.context.ActiveProfiles;
 import javax.servlet.http.Cookie;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.*;
+import java.net.HttpCookie;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -185,17 +189,17 @@ public class AuthControllerTests {
         final ResponseEntity<Void> responseEntity = authController.logout();
 
         // Assert
-        final Map<String, Cookie> collect = responseEntity.getHeaders().get(HttpHeaders.SET_COOKIE)
+        final Map<String, HttpCookie> collect = responseEntity.getHeaders().get(HttpHeaders.SET_COOKIE)
                 .stream().map(cookie -> {
-                    final String[] cookieParts = cookie.split("=", 2);
-                    return Map.entry(cookieParts[0], new Cookie(cookieParts[0], cookieParts[1]));
+                    final HttpCookie httpCookie = HttpCookie.parse(cookie).get(0);
+                    return Map.entry(httpCookie.getName(), httpCookie);
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         assertTrue(collect.containsKey("token"));
-        assertThat(collect.get("token").getValue()).isNull();
+        assertThat(collect.get("token").getValue()).isBlank();
         assertThat(collect.get("token").getMaxAge()).isEqualTo(0);
-
-        verify(authService, times(1)).logout();
+        assertThat(collect.get("token").getPath()).isEqualTo("/");
+        assertThat(collect.get("token").getSecure()).isTrue();
     }
 }
