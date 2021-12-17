@@ -26,9 +26,11 @@ public class V5__Add_Roles extends BaseJavaMigration {
 
         final String insertIntoRoles = "INSERT INTO lepine.roles (uuid, name) VALUES (?, ?)";
         PreparedStatement preparedStatement = jdbcTemplate.getDataSource().getConnection().prepareStatement(insertIntoRoles);
+
         for (String role : roles) {
             preparedStatement.setString(1, UUID.randomUUID().toString());
             preparedStatement.setString(2, role);
+            preparedStatement.execute();
         }
     }
 }
