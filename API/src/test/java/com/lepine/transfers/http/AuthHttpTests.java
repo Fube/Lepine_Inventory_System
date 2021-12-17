@@ -103,7 +103,6 @@ public class AuthHttpTests {
     public void login_ValidUser() throws Exception {
 
         // Arrange
-
         given(authService.login(VALID_USER_LOGIN))
                 .willReturn(Pair.with(VALID_USER, VALID_JWT));
 
@@ -131,7 +130,7 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST /auth/login with a invalid UserLogin, then return HTTP 400")
+    @DisplayName("Given POST /auth/login with an invalid UserLogin, then return HTTP 400")
     public void login_InvalidUser() throws Exception {
 
         // Arrange
@@ -159,6 +158,38 @@ public class AuthHttpTests {
                 .andExpect(jsonPath("$.errors.password.length()").value(1))
                 .andExpect(jsonPath("$.errors.password[*]",
                         containsInAnyOrder(messageSource.getMessage("user.password.not_blank", null, Locale.getDefault()))
+                ));
+
+        verify(authController, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
+        verify(authService, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
+        verify(userRepo, times(0)).findByEmail(VALID_EMAIL); // Ensure the filter was not called
+    }
+
+    @Test
+    @DisplayName("Given POST /auth/login with an invalid match, then return HTTP 401")
+    public void login_InvalidMatch() throws Exception {
+
+        // Arrange
+        final UserLogin invalidUserLogin = VALID_USER_LOGIN.toBuilder()
+                .email(VALID_EMAIL)
+                .password(INVALID_PASSWORD)
+                .build();
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                post("/auth/login")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(invalidUserLogin))
+        );
+
+        // Assert
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors.length()").value(1))
+                .andExpect(jsonPath("$.errors[*]",
+                        containsInAnyOrder(messageSource.getMessage("user.password.invalid", null, Locale.getDefault()))
                 ));
 
         verify(authController, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
