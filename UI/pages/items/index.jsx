@@ -173,7 +173,7 @@ async function naiveGetServerSideProps(context) {
     const page = context.query.page || 1;
     const {
         data: { content: items, totalPages, number: pageNumber },
-    } = await axiosBackend(`/items?page=${page}`, {
+    } = await axiosBackend.get(`/items?page=${page}`, {
         headers: { ...context.req.headers },
     });
     return {
