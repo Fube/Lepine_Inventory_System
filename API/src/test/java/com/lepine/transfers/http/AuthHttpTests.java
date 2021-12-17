@@ -224,4 +224,24 @@ public class AuthHttpTests {
         verify(jwtUtil, times(1)).decode(jwt);
     }
 
+    @Test
+    @DisplayName("Given request with JWT, trigger JWT filter with invalid JWT")
+    public void jwtFilter_InvalidJWT() throws Exception {
+
+        // Arrange
+        final String jwt = "invalidJWT";
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                get("/some/protected/path")
+                        .cookie(new Cookie("token", jwt))
+        );
+
+        // Assert
+        verify(jwtFilter, atLeastOnce()).doFilter(any(), any(), any());
+        verify(jwtUtil, times(1)).decode(jwt);
+
+        resultActions.andExpect(status().isForbidden());
+    }
+
 }
