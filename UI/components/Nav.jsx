@@ -30,7 +30,7 @@ export default function Nav() {
                         <Link href="/">Lepine</Link>
                     </span>
                 </div>
-                <div className="flex-1 px-2 mx-2">
+                <div className="flex-1 px-2 mx-2 lg:justify-between">
                     <div className="items-stretch hidden lg:flex">
                         {pages.map((path, key) => (
                             <Link key={key} href={`/${path}`}>
@@ -43,6 +43,8 @@ export default function Nav() {
                                 </a>
                             </Link>
                         ))}
+                    </div>
+                    <div>
                         {isLoggedIn && (
                             <a
                                 className={`btn btn-ghost btn-sm rounded-btn`}
