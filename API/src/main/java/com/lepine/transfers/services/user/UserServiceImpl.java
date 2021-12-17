@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService, AuthService {
             log.error("User with email {} already exists", user.getEmail());
             throw new DuplicateEmailException(user.getEmail());
         }
+
         final User save = userRepo.save(user);
 
         log.info("Created user {} with email and UUID {}", save.getEmail(), save.getUuid());

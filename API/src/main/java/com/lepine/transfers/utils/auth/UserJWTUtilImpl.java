@@ -53,6 +53,10 @@ public class UserJWTUtilImpl implements JWTUtil<User> {
         final Claims body = claimsJws.getBody();
         final User mappedUser = objectMapper.convertValue(body, User.class);
 
+        if(mappedUser.getRole().getName().startsWith("ROLE_")) {
+            mappedUser.getRole().setName(mappedUser.getRole().getName().substring(5));
+        }
+
         return mappedUser.toBuilder()
                 .email(body.getSubject())
                 .build();

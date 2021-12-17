@@ -27,7 +27,7 @@ spring:
             platform: h2
 jwt:
     secret: someveryveryveryveryveryveryverylongsecretorsomethingihavenoideaman
-    expiration: 3600
+    expiration: 900000 # 15 minutes
 default-manager:
     username: manager
     password: manager

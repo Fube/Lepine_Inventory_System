@@ -21,12 +21,19 @@ public interface UserMapper {
     UserPasswordLessDTO toPasswordLessDTO(User user);
 
     default String map(Role value) {
+        if(value.getName().startsWith("ROLE_")) {
+            return value.getName().substring(5);
+        }
         return value.getName();
     }
 
     default Role map(String value) {
+        if(value.startsWith("ROLE_")) {
+            value = value.substring(5);
+        }
         return Role.builder()
             .name(value)
+            .uuid(null)
             .build();
     }
 }
