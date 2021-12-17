@@ -25,6 +25,17 @@ function MyApp({ Component, pageProps }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [role, setRole] = useState("");
     const [email, setEmail] = useState("");
+
+    useEffect(() => {
+        const role = localStorage.getItem("role");
+        const email = localStorage.getItem("email");
+        if (role && email) {
+            setIsLoggedIn(true);
+            setRole(role);
+            setEmail(email);
+        }
+    }, []);
+
     return (
         <AuthContext.Provider
             value={{
