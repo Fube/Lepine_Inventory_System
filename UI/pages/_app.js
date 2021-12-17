@@ -19,6 +19,7 @@ export const AuthContext = createContext({
     setIsLoggedIn: () => {},
     setRole: () => {},
     setEmail: () => {},
+    logout: () => {},
 });
 
 function MyApp({ Component, pageProps }) {
@@ -45,6 +46,13 @@ function MyApp({ Component, pageProps }) {
                 setIsLoggedIn,
                 setRole,
                 setEmail,
+                logout: () => {
+                    localStorage.removeItem("role");
+                    localStorage.removeItem("email");
+                    setIsLoggedIn(false);
+                    setRole("");
+                    setEmail("");
+                },
             }}
         >
             <AlgoliaContext.Provider value={{ searchClient }}>

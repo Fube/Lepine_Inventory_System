@@ -18,6 +18,7 @@ import com.lepine.transfers.services.auth.AuthService;
 import com.lepine.transfers.utils.auth.JWTUtil;
 import com.lepine.transfers.utils.auth.UserJWTUtilImpl;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.hamcrest.core.StringContains;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.DisplayName;
@@ -248,5 +249,28 @@ public class AuthHttpTests {
         verify(jwtUtil, times(1)).decode(jwt);
 
         resultActions.andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Given logout request, return HTTP 200 and clear JWT cookie")
+    public void logout_ValidRequest() throws Exception {
+
+        // Arrange
+        final String jwt = jwtUtil.encode(VALID_USER);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                get("/auth/logout")
+                        .cookie(new Cookie("token", jwt))
+        );
+
+        // Assert
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(cookie().maxAge("token", 0))
+                .andExpect(cookie().value("token", Matchers.nullValue()));
+
+        verify(jwtFilter, atLeastOnce()).doFilter(any(), any(), any());
+        verify(jwtUtil, times(1)).decode(jwt);
     }
 }

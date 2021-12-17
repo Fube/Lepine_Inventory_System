@@ -174,4 +174,28 @@ public class AuthControllerTests {
 
         verify(authService, times(1)).login(userLogin);
     }
+
+    @Test
+    @DisplayName("Given logout request, return ResponseEntity containing Cookie with name token, value null and maxAge 0")
+    void logout() {
+
+        // Arrange
+
+        // Act
+        final ResponseEntity<Void> responseEntity = authController.logout();
+
+        // Assert
+        final Map<String, Cookie> collect = responseEntity.getHeaders().get(HttpHeaders.SET_COOKIE)
+                .stream().map(cookie -> {
+                    final String[] cookieParts = cookie.split("=", 2);
+                    return Map.entry(cookieParts[0], new Cookie(cookieParts[0], cookieParts[1]));
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        assertTrue(collect.containsKey("token"));
+        assertThat(collect.get("token").getValue()).isNull();
+        assertThat(collect.get("token").getMaxAge()).isEqualTo(0);
+
+        verify(authService, times(1)).logout();
+    }
 }
