@@ -4,9 +4,11 @@ import Nav from "../components/Nav";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { axiosAPI, axiosBackend } from "../config/axios";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "./_app";
 
 export default function Login() {
+    const { setEmail, setIsLoggedIn, setRole } = useContext(AuthContext);
     const loginSchema = yup.object().shape({
         email: yup.string().required("Email is required"),
         password: yup.string().required("Password is required"),
@@ -23,8 +25,14 @@ export default function Login() {
         setSubmitting(true);
         try {
             const { data } = await axiosAPI.post("/auth/login", values);
+
             localStorage.setItem("role", data.role);
             localStorage.setItem("email", data.email);
+
+            setIsLoggedIn(true);
+            setEmail(data.email);
+            setRole(data.role);
+
             setStatus({ isError: false, message: "Successfully logged in" });
             router.push("/");
         } catch (e) {
@@ -46,7 +54,7 @@ export default function Login() {
             <main className="flex justify-center">
                 <div className="text-center">
                     <div className="mt-12">
-                        <h2 className="text-2xl text-center text-yellow-400">
+                        <h2 className="text-2xl text-center text-yellow-400 mb-6">
                             Login
                         </h2>
                         <Formik

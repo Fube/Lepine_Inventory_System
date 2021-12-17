@@ -12,11 +12,34 @@ export const AlgoliaContext = createContext({
     searchClient,
 });
 
+export const AuthContext = createContext({
+    isLoggedIn: false,
+    role: "",
+    email: "",
+    setIsLoggedIn: () => {},
+    setRole: () => {},
+    setEmail: () => {},
+});
+
 function MyApp({ Component, pageProps }) {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [role, setRole] = useState("");
+    const [email, setEmail] = useState("");
     return (
-        <AlgoliaContext.Provider value={{ searchClient }}>
-            <Component {...pageProps} />
-        </AlgoliaContext.Provider>
+        <AuthContext.Provider
+            value={{
+                isLoggedIn,
+                role,
+                email,
+                setIsLoggedIn,
+                setRole,
+                setEmail,
+            }}
+        >
+            <AlgoliaContext.Provider value={{ searchClient }}>
+                <Component {...pageProps} />
+            </AlgoliaContext.Provider>
+        </AuthContext.Provider>
     );
 }
 
