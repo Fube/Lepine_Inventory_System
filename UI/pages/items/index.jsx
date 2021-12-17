@@ -173,7 +173,9 @@ async function naiveGetServerSideProps(context) {
     const page = context.query.page || 1;
     const {
         data: { content: items, totalPages, number: pageNumber },
-    } = await axiosBackend(`/items?page=${page}`);
+    } = await axiosBackend(`/items?page=${page}`, {
+        headers: { ...context.req.headers },
+    });
     return {
         props: {
             items,
@@ -184,8 +186,7 @@ async function naiveGetServerSideProps(context) {
 }
 
 export async function getServerSideProps(context) {
-    return await serverSideRedirectOnUnauth(
-        () => naiveGetServerSideProps(context),
-        "/"
+    return await serverSideRedirectOnUnauth(() =>
+        naiveGetServerSideProps(context)
     );
 }

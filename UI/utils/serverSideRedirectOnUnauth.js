@@ -1,6 +1,6 @@
 export default async function serverSideRedirectOnUnauth(
     act,
-    destination = "login"
+    destination = "/login"
 ) {
     try {
         return await act();
@@ -9,7 +9,7 @@ export default async function serverSideRedirectOnUnauth(
             return {
                 redirect: {
                     destination,
-                    permanent: true,
+                    permanent: false,
                 },
             };
         }
