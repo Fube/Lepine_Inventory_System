@@ -265,9 +265,9 @@ public class AuthHttpTests {
 
         // Assert
         resultActions
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andExpect(cookie().maxAge("token", 0))
-                .andExpect(cookie().value("token", Matchers.nullValue()));
+                .andExpect(cookie().value("token", Matchers.blankOrNullString()));
 
         verify(jwtFilter, atLeastOnce()).doFilter(any(), any(), any());
         verify(jwtUtil, times(1)).decode(jwt);

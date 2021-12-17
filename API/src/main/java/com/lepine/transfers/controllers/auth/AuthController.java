@@ -57,7 +57,7 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, jwtAsCookie.toString())
                 .body(userPasswordLessDTO);
     }
-
+    @RequestMapping(method = {RequestMethod.HEAD}, value = "/logout")
     public ResponseEntity<Void> logout() {
         log.info("Logging out user");
         return ResponseEntity.noContent()
