@@ -12,6 +12,7 @@ import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
+import com.lepine.transfers.filters.ExceptionHandlerFilter;
 import com.lepine.transfers.filters.auth.JWTFilter;
 import com.lepine.transfers.services.auth.AuthService;
 import com.lepine.transfers.utils.auth.JWTUtil;
@@ -55,7 +56,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         UserJWTUtilImpl.class,
         SecurityConfig.class,
         GlobalAdvice.class,
-        JWTFilter.class
+        JWTFilter.class,
+        ExceptionHandlerFilter.class,
 })
 @ActiveProfiles("test")
 public class AuthHttpTests {
