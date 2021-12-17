@@ -13,6 +13,7 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.filters.auth.JWTFilter;
 import com.lepine.transfers.services.auth.AuthService;
+import com.lepine.transfers.utils.auth.JWTUtil;
 import com.lepine.transfers.utils.auth.UserJWTUtilImpl;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.StringContains;
@@ -30,14 +31,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import javax.servlet.http.Cookie;
 import java.util.Locale;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -86,7 +89,13 @@ public class AuthHttpTests {
     private ReloadableResourceBundleMessageSource messageSource;
 
     @SpyBean
+    private JWTUtil<User> jwtUtil;
+
+    @SpyBean
     private AuthController authController;
+
+    @SpyBean
+    private JWTFilter jwtFilter;
 
     @MockBean
     private AuthService authService;
@@ -195,6 +204,24 @@ public class AuthHttpTests {
         verify(authController, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
         verify(authService, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
         verify(userRepo, times(0)).findByEmail(VALID_EMAIL); // Ensure the filter was not called
+    }
+
+    @Test
+    @DisplayName("Given request with JWT, trigger JWT filter")
+    public void jwtFilter_ValidJWT() throws Exception {
+
+        // Arrange
+        final String jwt = jwtUtil.encode(VALID_USER);
+
+        // Act
+        mvc.perform(
+                get("/some/protected/path")
+                        .cookie(new Cookie("token", jwt))
+        );
+
+        // Assert
+        verify(jwtFilter, atLeastOnce()).doFilter(any(), any(), any());
+        verify(jwtUtil, times(1)).decode(jwt);
     }
 
 }
