@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Nav from "../components/Nav";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
-import { axiosAPI } from "../config/axios";
+import { axiosAPI, axiosBackend } from "../config/axios";
 
 export default function Login() {
     const loginSchema = yup.object().shape({
@@ -155,4 +155,22 @@ export default function Login() {
             </main>
         </>
     );
+}
+
+export async function getServerSideProps(context) {
+    try {
+        const res = await axiosBackend.get("/auth/fake/path", {
+            headers: { ...context.req.headers },
+        });
+    } catch (e) {
+        const { response: res } = e;
+        if (res.status !== 401 && res.status !== 403) {
+            return {
+                redirect: {
+                    destination: "/",
+                    permanent: true,
+                },
+            };
+        }
+    }
 }
