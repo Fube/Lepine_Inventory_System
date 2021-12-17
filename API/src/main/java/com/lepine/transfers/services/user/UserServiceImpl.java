@@ -2,12 +2,14 @@ package com.lepine.transfers.services.user;
 
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
+import com.lepine.transfers.data.role.RoleRepo;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
+import com.lepine.transfers.exceptions.user.RoleNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
 import com.lepine.transfers.utils.auth.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -35,10 +39,19 @@ public class UserServiceImpl implements UserService, AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JWTUtil<User> jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final RoleRepo roleRepo;
 
     @Override
     public User create(UserUUIDLessDTO userUUIDLessDTO) {
         log.info("Creating user {} with email", userUUIDLessDTO.getEmail());
+
+        log.info("Looking for role {}...", userUUIDLessDTO.getRole());
+        Optional<Role> role = roleRepo.findByName(userUUIDLessDTO.getRole());
+        if (role.isEmpty()) {
+            log.error("Role {} not found", userUUIDLessDTO.getRole());
+            throw new RoleNotFoundException(userUUIDLessDTO.getRole());
+        }
+        log.info("Role {} found", userUUIDLessDTO.getRole());
 
         final User user = userMapper.toEntity(userUUIDLessDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -48,6 +61,7 @@ public class UserServiceImpl implements UserService, AuthService {
             throw new DuplicateEmailException(user.getEmail());
         }
 
+        user.setRole(role.get());
         final User save = userRepo.save(user);
 
         log.info("Created user {} with email and UUID {}", save.getEmail(), save.getUuid());
