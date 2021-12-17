@@ -11,6 +11,7 @@ import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
+import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.filters.auth.JWTFilter;
 import com.lepine.transfers.services.auth.AuthService;
 import com.lepine.transfers.utils.auth.JWTUtil;
@@ -26,6 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -181,8 +183,12 @@ public class AuthHttpTests {
         // Arrange
         final UserLogin invalidUserLogin = VALID_USER_LOGIN.toBuilder()
                 .email(VALID_EMAIL)
-                .password(INVALID_PASSWORD)
+                .password(VALID_PASSWORD)
                 .build();
+
+        final InvalidLoginException invalidLoginException = new InvalidLoginException();
+        given(authService.login(invalidUserLogin))
+                .willThrow(invalidLoginException);
 
         // Act
         final ResultActions resultActions = mvc.perform(
@@ -194,15 +200,13 @@ public class AuthHttpTests {
         // Assert
         resultActions
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.status").value(HttpStatus.UNAUTHORIZED.value()))
                 .andExpect(jsonPath("$.timestamp").exists())
-                .andExpect(jsonPath("$.errors.length()").value(1))
-                .andExpect(jsonPath("$.errors[*]",
-                        containsInAnyOrder(messageSource.getMessage("user.password.invalid", null, Locale.getDefault()))
-                ));
+                .andExpect(jsonPath("$.message").value(invalidLoginException.getMessage()));
 
+        verify(authService, times(1)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
+        verify(jwtFilter, atLeastOnce()).doFilter(any(), any(), any());
         verify(authController, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
-        verify(authService, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
         verify(userRepo, times(0)).findByEmail(VALID_EMAIL); // Ensure the filter was not called
     }
 
@@ -243,5 +247,4 @@ public class AuthHttpTests {
 
         resultActions.andExpect(status().isForbidden());
     }
-
 }
