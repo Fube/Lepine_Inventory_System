@@ -2,6 +2,7 @@ import "../styles/globals.css";
 import algoliasearch from "algoliasearch/lite";
 import { createNullCache } from "@algolia/cache-common";
 import { createContext, useEffect, useState } from "react";
+import { axiosAPI } from "../config/axios";
 
 const searchClient = algoliasearch(
     "3VJL1MLU0K",
@@ -46,7 +47,8 @@ function MyApp({ Component, pageProps }) {
                 setIsLoggedIn,
                 setRole,
                 setEmail,
-                logout: () => {
+                logout: async () => {
+                    await axiosAPI.head("/auth/logout");
                     localStorage.removeItem("role");
                     localStorage.removeItem("email");
                     setIsLoggedIn(false);
