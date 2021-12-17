@@ -4,12 +4,19 @@ import Nav from "../components/Nav";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { axiosAPI, axiosBackend } from "../config/axios";
+import { useEffect } from "react";
 
 export default function Login() {
     const loginSchema = yup.object().shape({
         email: yup.string().required("Email is required"),
         password: yup.string().required("Password is required"),
     });
+
+    useEffect(() => {
+        console.log("trigger");
+        localStorage.removeItem("role");
+        localStorage.removeItem("email");
+    }, []);
 
     const router = useRouter();
 
@@ -163,14 +170,20 @@ export async function getServerSideProps(context) {
             headers: { ...context.req.headers },
         });
     } catch (e) {
-        const { response: res } = e;
-        if (res.status !== 401 && res.status !== 403) {
-            return {
-                redirect: {
-                    destination: "/",
-                    permanent: true,
-                },
-            };
+        const {
+            response: {
+                data: { status },
+            },
+        } = e;
+        console.log(status);
+        if (status === 401 || status === 403) {
+            return { props: {} };
         }
     }
+    return {
+        redirect: {
+            destination: "/",
+            permanent: true,
+        },
+    };
 }
