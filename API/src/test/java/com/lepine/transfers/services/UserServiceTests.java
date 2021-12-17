@@ -3,6 +3,8 @@ package com.lepine.transfers.services;
 import com.lepine.transfers.config.AuthConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
+import com.lepine.transfers.data.auth.Role;
+import com.lepine.transfers.data.role.RoleRepo;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
@@ -10,7 +12,7 @@ import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.services.user.UserServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,11 @@ public class UserServiceTests {
             .role(VALID_ROLE_NAME)
             .build();
 
+    private final static Role VALID_ROLE = Role.builder()
+            .uuid(UUID.randomUUID())
+            .name(VALID_ROLE_NAME)
+            .build();
+
     private final Function<String, String> messageSourceHelper = name ->
             this.messageSource.getMessage(name, null, Locale.getDefault());
 
@@ -82,8 +89,11 @@ public class UserServiceTests {
     @Autowired
     private UserRepo userRepo;
 
-    @BeforeEach
-    void setup() {
+    @MockBean
+    private RoleRepo roleRepo;
+
+    @AfterEach
+    void tearDown() {
         reset(userRepo);
         reset(passwordEncoder);
     }
@@ -101,8 +111,15 @@ public class UserServiceTests {
                 .password(VALID_PASSWORD)
                 .build();
         final User asEntity = userMapper.toEntity(userUUIDLessDTO);
-        given(userRepo.save(any())).willReturn(asEntity);
-        given(passwordEncoder.encode(VALID_PASSWORD)).willReturn(VALID_HASHED_PASSWORD);
+
+        given(userRepo.save(any()))
+                .willReturn(asEntity);
+
+        given(passwordEncoder.encode(VALID_PASSWORD))
+                .willReturn(VALID_HASHED_PASSWORD);
+
+        given(roleRepo.findByName(VALID_ROLE_NAME))
+                .willReturn(Optional.of(VALID_ROLE));
 
         // Act
         final User user = userService.create(userUUIDLessDTO);
@@ -117,6 +134,33 @@ public class UserServiceTests {
         verify(userRepo, times(0)).save(argThat(u -> u.getPassword().equals(VALID_PASSWORD)));
         verify(userRepo, times(1)).save(user);
         verify(passwordEncoder, times(1)).encode(VALID_PASSWORD);
+        verify(roleRepo, times(1)).findByName(VALID_ROLE_NAME);
+    }
+
+    @Test
+    @DisplayName("Given a UserUUIDLessDTO with non-existent role, then throw RoleNotFoundException")
+    void createUser_RoleNotFound() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .role(VALID_ROLE_NAME)
+                .build();
+
+        given(roleRepo.findByName(VALID_ROLE_NAME))
+                .willReturn(Optional.empty());
+
+        // Act
+        final Throwable thrown = assertThrows(RoleNotFoundException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        assertNotNull(thrown);
+        assertEquals(format("Role %s not found", VALID_ROLE_NAME), thrown.getMessage());
+
+        verify(userRepo, times(0)).save(any());
+        verify(passwordEncoder, times(0)).encode(any());
+        verify(roleRepo, times(1)).findByName(VALID_ROLE_NAME);
     }
 
     @Test
