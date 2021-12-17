@@ -201,14 +201,14 @@ public class AuthHttpTests {
 
         // Assert
         resultActions
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.status").value(HttpStatus.UNAUTHORIZED.value()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(HttpStatus.FORBIDDEN.value()))
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.message").value(invalidLoginException.getMessage()));
 
         verify(authService, times(1)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
+        verify(authController, times(1)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
         verify(jwtFilter, atLeastOnce()).doFilter(any(), any(), any());
-        verify(authController, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
         verify(userRepo, times(0)).findByEmail(VALID_EMAIL); // Ensure the filter was not called
     }
 
