@@ -23,14 +23,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Locale;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -53,7 +56,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthHttpTests {
 
     private static final String VALID_EMAIL = "foo@bar.com";
+    private static final String INVALID_EMAIL = "";
     private static final String VALID_PASSWORD = "S0meP@ssw0rd";
+    private static final String INVALID_PASSWORD = "";
     private static final String VALID_ROLE_NAME = "SOME_ROLE";
     private static final String VALID_JWT = "some.valid.jwt";
 
@@ -74,11 +79,14 @@ public class AuthHttpTests {
     @Autowired
     private MockMvc mvc;
 
-    @SpyBean
-    private AuthController authController;
-
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
+
+    @SpyBean
+    private AuthController authController;
 
     @MockBean
     private AuthService authService;
@@ -121,4 +129,41 @@ public class AuthHttpTests {
         verify(authController, times(1)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
         verify(userRepo, times(0)).findByEmail(VALID_EMAIL); // Ensure the filter was not called
     }
+
+    @Test
+    @DisplayName("Given POST /auth/login with a invalid UserLogin, then return HTTP 400")
+    public void login_InvalidUser() throws Exception {
+
+        // Arrange
+        final UserLogin invalidUserLogin = VALID_USER_LOGIN.toBuilder()
+                .email(INVALID_EMAIL)
+                .password(INVALID_PASSWORD)
+                .build();
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                post("/auth/login")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(invalidUserLogin))
+        );
+
+        // Assert
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors.email.length()").value(1))
+                .andExpect(jsonPath("$.errors.email[*]",
+                        containsInAnyOrder(messageSource.getMessage("user.email.not_blank", null, Locale.getDefault()))
+                ))
+                .andExpect(jsonPath("$.errors.password.length()").value(1))
+                .andExpect(jsonPath("$.errors.password[*]",
+                        containsInAnyOrder(messageSource.getMessage("user.password.not_blank", null, Locale.getDefault()))
+                ));
+
+        verify(authController, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
+        verify(authService, times(0)).login(argThat(n -> n.getEmail().equals(VALID_EMAIL)));
+        verify(userRepo, times(0)).findByEmail(VALID_EMAIL); // Ensure the filter was not called
+    }
+
 }
