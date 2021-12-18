@@ -30,7 +30,7 @@ test("/users :: Go to from /index", async ({ page, browser }) => {
         const rows = await page.$$("table tbody tr");
         expect(rows.length).toBeGreaterThan(0);
     } else {
-        const message = await page.$eval("p", (n) => n.innerText);
+        const message = await page.$eval("h2", (n) => n.innerText);
         expect(message).toBeTruthy();
         expect(message.toLowerCase()).toContain("no users");
     }
