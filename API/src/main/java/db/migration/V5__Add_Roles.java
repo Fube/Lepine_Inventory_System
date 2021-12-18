@@ -9,8 +9,6 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.UUID;
 
-import static java.lang.String.format;
-
 public class V5__Add_Roles extends BaseJavaMigration {
 
     private final List<String> roles = List.of(
@@ -28,7 +26,7 @@ public class V5__Add_Roles extends BaseJavaMigration {
         PreparedStatement preparedStatement = jdbcTemplate.getDataSource().getConnection().prepareStatement(insertIntoRoles);
 
         for (String role : roles) {
-            preparedStatement.setString(1, UUID.randomUUID().toString());
+            preparedStatement.setObject(1, UUID.randomUUID());
             preparedStatement.setString(2, role);
             preparedStatement.execute();
         }

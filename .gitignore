@@ -345,3 +345,4 @@ sketch
 **/packages/playwright-core/api.json
 **/bin/
 E2E/storage.json
+**.env

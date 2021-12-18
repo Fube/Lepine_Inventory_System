@@ -186,11 +186,8 @@ export async function getServerSideProps(context) {
             headers: { ...context.req.headers },
         });
     } catch (e) {
-        const {
-            response: {
-                data: { status },
-            },
-        } = e;
+        console.log(e);
+        const status = e?.response?.data?.status ?? null;
         if (status === 401 || status === 403) {
             return { props: {} };
         }
