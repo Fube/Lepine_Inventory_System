@@ -1,0 +1,29 @@
+{
+  "cookies": [
+    {
+      "name": "token",
+      "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYW5hZ2VyIiwicm9sZSI6eyJ1dWlkIjoiNDA2YTRjMjItMmI4YS00ZDBmLWJlNjItZjZjMTk1ZDA4NDBiIiwibmFtZSI6IlJPTEVfTUFOQUdFUiJ9LCJpYXQiOjE2Mzk4NTUzNDgsImV4cCI6MTYzOTg1NjI0OH0.jGrGXjNbI7PilVBY5K0ly1ffzyRQQY-LNviU_njcSYkAcECa5vlhFPwsld1irRA2bFrIhawSF0hWke4tSZqE7w",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1639856248,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "role",
+          "value": "MANAGER"
+        },
+        {
+          "name": "email",
+          "value": "manager"
+        }
+      ]
+    }
+  ]
+}
