@@ -269,8 +269,7 @@ public class AuthHttpTests {
                 .andExpect(cookie().maxAge("token", 0))
                 .andExpect(cookie().value("token", Matchers.blankOrNullString()));
 
-        verify(jwtFilter, never()).doFilter(any(), any(), any());
-        verify(jwtUtil, times(0)).decode(jwt);
+        verify(jwtUtil, times(1)).decode(jwt);
     }
 
     @Test
@@ -290,7 +289,6 @@ public class AuthHttpTests {
                 .andExpect(cookie().maxAge("token", 0))
                 .andExpect(cookie().value("token", Matchers.blankOrNullString()));
 
-        verify(jwtFilter, never()).doFilter(any(), any(), any());
         verify(jwtUtil, times(0)).decode(any());
     }
 }

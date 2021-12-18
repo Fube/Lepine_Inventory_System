@@ -35,7 +35,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private String DEFAULT_MANAGER_PASSWORD;
 
     private static final Map<HttpMethod, List<String>> whiteListByMethod = Map.of(
-            HttpMethod.POST, List.of("/auth/login")
+            HttpMethod.POST, List.of("/auth/login"),
+            HttpMethod.HEAD, List.of("/auth/logout")
     );
 
     @Bean
