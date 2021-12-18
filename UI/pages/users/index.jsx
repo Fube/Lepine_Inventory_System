@@ -6,9 +6,17 @@ import Nav from "../../components/Nav";
 import Paginate from "../../components/Pagination";
 import { axiosBackend } from "../../config/axios";
 import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
+import thou from "../../utils/thou";
 
 export default function ShowUsers({ users, totalPages, pageNumber }) {
     const router = useRouter();
+
+    const header = (
+        <Head>
+            <title>Users</title>
+        </Head>
+    );
+
     const head = (
         <tr>
             <th>Email</th>
@@ -22,11 +30,35 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
             </th>
         </tr>
     );
+
+    const fallback = (
+        <h2 className="text-2xl text-center text-yellow-400">
+            No users to show 😢
+        </h2>
+    );
+
+    if (users.length <= 0) {
+        return (
+            <>
+                {header}
+                <Nav />
+                <main className="flex justify-center">
+                    <div className="text-center">
+                        <div className="mt-12">{fallback}</div>
+                        <Link href="/users/new" passHref>
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
+                                Add One Now!
+                            </button>
+                        </Link>
+                    </div>
+                </main>
+            </>
+        );
+    }
+
     return (
         <>
-            <Head>
-                <title>Users</title>
-            </Head>
+            {header}
             <Nav />
             <div className="overflow-x-auto justify-center flex">
                 <div className="md:w-1/2 w-3/4">
