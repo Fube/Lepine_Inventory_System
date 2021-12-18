@@ -251,7 +251,7 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given logout request, return HTTP 200 and clear JWT cookie")
+    @DisplayName("Given logout request, return HTTP 204 and clear JWT cookie")
     public void logout_ValidRequest() throws Exception {
 
         // Arrange
@@ -269,7 +269,28 @@ public class AuthHttpTests {
                 .andExpect(cookie().maxAge("token", 0))
                 .andExpect(cookie().value("token", Matchers.blankOrNullString()));
 
-        verify(jwtFilter, atLeastOnce()).doFilter(any(), any(), any());
-        verify(jwtUtil, times(1)).decode(jwt);
+        verify(jwtFilter, never()).doFilter(any(), any(), any());
+        verify(jwtUtil, times(0)).decode(jwt);
+    }
+
+    @Test
+    @DisplayName("Given HEAD on /logout, regardless of authentication or authorization, return HTTP 204 and clear JWT cookie")
+    public void logout_AnyoneHeadRequest() throws Exception {
+
+        // Arrange
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                head("/auth/logout")
+        );
+
+        // Assert
+        resultActions
+                .andExpect(status().isNoContent())
+                .andExpect(cookie().maxAge("token", 0))
+                .andExpect(cookie().value("token", Matchers.blankOrNullString()));
+
+        verify(jwtFilter, never()).doFilter(any(), any(), any());
+        verify(jwtUtil, times(0)).decode(any());
     }
 }
