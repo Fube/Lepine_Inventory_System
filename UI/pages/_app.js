@@ -6,8 +6,8 @@ import { axiosAPI } from "../config/axios";
 import injectYupMethods from "../utils/injectYupMethods";
 
 const searchClient = algoliasearch(
-    "3VJL1MLU0K",
-    "d5abea3b2d8eff8328c34155b1713c39"
+    process.env.ALGOLIA_APP_ID,
+    process.env.ALGOLIA_SEARCH_KEY
 );
 
 export const AlgoliaContext = createContext({
