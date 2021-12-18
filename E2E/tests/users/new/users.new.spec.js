@@ -1,5 +1,11 @@
 const { test, expect } = require("@playwright/test");
 
+const validUser = {
+    email: "foo@bar.com",
+    password: "F00b@rbaz",
+    role: "Clerk",
+};
+
 test("/users/new :: Go to through /users", async ({ page }) => {
     // Go to users
     await Promise.all([
@@ -41,4 +47,38 @@ test("/users/new :: Go to through /users", async ({ page }) => {
     const registerButton = page.locator("form button[type=submit]");
     const registerButtonText = await registerButton.innerText();
     expect(registerButtonText.toLowerCase()).toBe("register");
+});
+
+test("/users/new :: Create new user", async ({ page }) => {
+    // Go to users/new
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        page.goto("/users/new"),
+    ]);
+
+    // Fill in form
+    const { email, password, role } = validUser;
+    await page.type('input[name="email"]', email);
+    await page.type('input[name="password"]', password);
+    await page.type('input[name="confirmPassword"]', password);
+    await page.selectOption('select[name="role"]', role);
+
+    // Submit form
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        page.click("button[type=submit]"),
+    ]);
+
+    // Check that the page is loaded
+    const title = await page.title();
+    expect(title).toBe("Users");
+
+    // Check table exists
+    const table = await page.$("table");
+    expect(table).toBeTruthy();
+
+    // Check table contains the new user
+    const content = await page.content();
+    expect(content).toContain(email);
+    expect(content).toContain(role);
 });
