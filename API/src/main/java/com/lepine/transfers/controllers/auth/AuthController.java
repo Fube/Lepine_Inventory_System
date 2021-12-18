@@ -1,5 +1,6 @@
 package com.lepine.transfers.controllers.auth;
 
+import com.lepine.transfers.config.JWTConfig;
 import com.lepine.transfers.data.auth.UserLogin;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
@@ -27,6 +28,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserMapper userMapper;
+    private final JWTConfig jwtConfig;
 
     @PostMapping("/login")
     public ResponseEntity<UserPasswordLessDTO> login(@Valid @RequestBody UserLogin userLogin) {
@@ -49,7 +51,7 @@ public class AuthController {
         final ResponseCookie jwtAsCookie = ResponseCookie.from("token", jwt)
                 .httpOnly(true)
                 .secure(true)
-                .maxAge(60 * 60 * 24)
+                .maxAge(jwtConfig.getExpiration() / 1000)
                 .path("/")
                 .build();
 

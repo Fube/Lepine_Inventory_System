@@ -1,25 +1,30 @@
+import { Form, Formik, Field } from "formik";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Nav from "../components/Nav";
 import * as yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { axiosAPI, axiosBackend } from "../config/axios";
-import { useContext, useEffect } from "react";
-import { AuthContext } from "./_app";
+import Nav from "../../components/Nav";
 
-export default function Login() {
-    const { setEmail, setIsLoggedIn, setRole } = useContext(AuthContext);
-    const loginSchema = yup.object().shape({
-        email: yup.string().required("Email is required"),
-        password: yup.string().required("Password is required"),
-    });
+// TODO: Fetch this from DB
+const roles = ["Manager", "Clerk", "Salesperson"];
 
-    useEffect(() => {
-        localStorage.removeItem("role");
-        localStorage.removeItem("email");
-    }, []);
-
+export default function CreateUser() {
     const router = useRouter();
+
+    const userSchema = yup.object().shape({
+        email: yup
+            .string()
+            .email("Must be a valid email")
+            .required("Email is required"),
+        password: yup
+            .string()
+            .strongPassword()
+            .required("Password is required"),
+        confirmPassword: yup
+            .string()
+            .test("passwords-match", "Passwords must match", function (value) {
+                return this.parent.password === value;
+            }),
+    });
 
     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         setSubmitting(true);
@@ -47,23 +52,22 @@ export default function Login() {
     return (
         <>
             <Head>
-                <title>Login</title>
+                <title>Add User</title>
             </Head>
-            <Nav />
-
-            <main className="flex justify-center">
-                <div className="text-center">
-                    <div className="mt-12">
-                        <h2 className="text-2xl text-center text-yellow-400 mb-6">
-                            Login
-                        </h2>
+            <div className="flex flex-col h-screen">
+                <div className="flex-shrink-0 flex-grow-0">
+                    <Nav />
+                </div>
+                <div className="flex-grow flex justify-center items-center">
+                    <div className="w-full">
                         <Formik
                             initialValues={{
                                 email: "",
                                 password: "",
+                                passwordConfirm: "",
+                                role: "",
                             }}
-                            validationSchema={loginSchema}
-                            onSubmit={handleSubmit}
+                            validationSchema={userSchema}
                         >
                             {({
                                 errors,
@@ -78,7 +82,7 @@ export default function Login() {
                                         <div className="w-full max-w-sm">
                                             <div className="flex flex-col break-words bg-white border-2 rounded shadow-md">
                                                 <div className="font-semibold bg-gray-200 text-gray-700 py-3 px-6 mb-0">
-                                                    Login
+                                                    Register
                                                 </div>
                                                 {dirty && status && (
                                                     <div
@@ -144,6 +148,73 @@ export default function Login() {
                                                             </div>
                                                         )}
 
+                                                    <label
+                                                        className="block text-gray-700 text-sm font-bold mb-2"
+                                                        htmlFor="confirmPassword"
+                                                    >
+                                                        Confirm Password
+                                                    </label>
+                                                    <Field
+                                                        className={
+                                                            "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" +
+                                                            (errors.confirmPassword &&
+                                                            touched.confirmPassword
+                                                                ? " border-red-500"
+                                                                : "")
+                                                        }
+                                                        name="confirmPassword"
+                                                        type="password"
+                                                        placeholder="Confirm Password"
+                                                    />
+                                                    {errors.confirmPassword &&
+                                                        touched.confirmPassword && (
+                                                            <div className="text-red-500 text-xs italic">
+                                                                {
+                                                                    errors.confirmPassword
+                                                                }
+                                                            </div>
+                                                        )}
+
+                                                    {/* Formik select element */}
+                                                    <label
+                                                        className="block text-gray-700 text-sm font-bold mb-2"
+                                                        htmlFor="role"
+                                                    >
+                                                        Role
+                                                    </label>
+                                                    <Field
+                                                        className={
+                                                            "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" +
+                                                            (errors.role &&
+                                                            touched.role
+                                                                ? " border-red-500"
+                                                                : "")
+                                                        }
+                                                        name="role"
+                                                        component="select"
+                                                    >
+                                                        <option
+                                                            value=""
+                                                            disabled
+                                                        >
+                                                            Select Role
+                                                        </option>
+                                                        {roles.map((role) => (
+                                                            <option
+                                                                key={role}
+                                                                value={role}
+                                                            >
+                                                                {role}
+                                                            </option>
+                                                        ))}
+                                                    </Field>
+                                                    {errors.role &&
+                                                        touched.role && (
+                                                            <div className="text-red-500 text-xs italic">
+                                                                {errors.role}
+                                                            </div>
+                                                        )}
+
                                                     <div className="flex items-center justify-end p-6">
                                                         <button
                                                             className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
@@ -172,30 +243,7 @@ export default function Login() {
                         </Formik>
                     </div>
                 </div>
-            </main>
+            </div>
         </>
     );
-}
-
-export async function getServerSideProps(context) {
-    try {
-        const res = await axiosBackend.get("/auth/fake/path", {
-            headers: { ...context.req.headers },
-        });
-    } catch (e) {
-        const {
-            response: {
-                data: { status },
-            },
-        } = e;
-        if (status === 401 || status === 403) {
-            return { props: {} };
-        }
-    }
-    return {
-        redirect: {
-            destination: "/",
-            permanent: true,
-        },
-    };
 }

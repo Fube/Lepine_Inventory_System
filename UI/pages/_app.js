@@ -3,6 +3,7 @@ import algoliasearch from "algoliasearch/lite";
 import { createNullCache } from "@algolia/cache-common";
 import { createContext, useEffect, useState } from "react";
 import { axiosAPI } from "../config/axios";
+import injectYupMethods from "../utils/injectYupMethods";
 
 const searchClient = algoliasearch(
     "3VJL1MLU0K",
