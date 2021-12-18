@@ -344,3 +344,4 @@ sketch
 **/packages/playwright/README.md
 **/packages/playwright-core/api.json
 **/bin/
+E2E/storage.json
