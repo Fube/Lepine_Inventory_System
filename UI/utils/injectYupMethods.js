@@ -9,27 +9,27 @@ function strongPasswordMethod() {
             case !/^(?=.*[a-z])/.test(value):
                 return createError({
                     path,
-                    message: "password must include lowercase letter",
+                    message: "Password must include lowercase letter",
                 });
             case !/^(?=.*[A-Z])/.test(value):
                 return createError({
                     path,
-                    message: "password must include uppercase letter",
+                    message: "Password must include uppercase letter",
                 });
             case !/^(?=.*[0-9])/.test(value):
                 return createError({
                     path,
-                    message: "password must include digit",
+                    message: "Password must include digit",
                 });
             case !/^(?=.*[!@#\$%\^&\*])/.test(value):
                 return createError({
                     path,
-                    message: "password must include special character",
+                    message: "Password must include special character",
                 });
             case value.length < 8:
                 return createError({
                     path,
-                    message: "password must be at least 8 characters",
+                    message: "Password must be at least 8 characters",
                 });
             default:
                 return true;
