@@ -233,7 +233,7 @@ export default function CreateUser() {
                                                                 isSubmitting
                                                             }
                                                         >
-                                                            Login
+                                                            Register
                                                         </button>
                                                     </div>
                                                 </div>
