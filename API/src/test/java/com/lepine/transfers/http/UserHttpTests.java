@@ -577,6 +577,7 @@ public class UserHttpTests {
 
     @Test
     @DisplayName("Given POST on /users with duplicate email, then return 400")
+    @WithMockUser(username = "some-salesperson", roles = "MANAGER")
     void create_DuplicateEmail() throws Exception {
 
         // Arrange
