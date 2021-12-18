@@ -7,6 +7,11 @@ const validUser = {
     role: "Clerk",
 };
 
+const invalidUser = {
+    email: "abc",
+    password: "123",
+};
+
 test("/users/new :: Go to through /users", async ({ page }) => {
     // Go to users
     await Promise.all([
@@ -82,4 +87,50 @@ test("/users/new :: Create new user", async ({ page }) => {
     });
 
     expect(localStorage.email).toEqual(validUser.email);
+});
+
+test("/users/new :: Try to create with invalid data", async ({ page }) => {
+    // Go to users/new
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        page.goto("/users/new"),
+    ]);
+
+    // Dirty the form
+    const { email, password } = invalidUser;
+    await page.type('input[name="email"]', email);
+    await page.type('input[name="password"]', password);
+
+    const roleLocator = page.locator('select[name="role"]');
+    await roleLocator.click();
+
+    const emailLocator = page.locator('input[name="email"]');
+    await emailLocator.click();
+
+    const confirmLocator = page.locator('input[name="confirmPassword"]');
+    await confirmLocator.click();
+    await emailLocator.click();
+
+    // Check that the page is loaded
+    const title = await page.title();
+    expect(title).toBe("Add User");
+
+    // Check form is present
+    const form = await page.$("form");
+    expect(form).toBeTruthy();
+
+    // Check form contains error messages
+    const errorMessages = await page.$$("form .text-red-500");
+    expect(errorMessages.length).toBe(4);
+
+    const errorMessagesText = await Promise.all(
+        errorMessages.map((n) => n.innerText())
+    );
+
+    expect(errorMessagesText).toContain("Must be a valid email");
+    expect(
+        errorMessagesText.find((n) => /Password must include.*/.test(n))
+    ).toBeTruthy();
+    expect(errorMessagesText).toContain("Role is required");
+    expect(errorMessagesText).toContain("Passwords must match");
 });
