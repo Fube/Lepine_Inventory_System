@@ -17,6 +17,9 @@ export default function Login() {
     useEffect(() => {
         localStorage.removeItem("role");
         localStorage.removeItem("email");
+        setEmail("");
+        setRole("");
+        setIsLoggedIn(false);
     }, []);
 
     const router = useRouter();

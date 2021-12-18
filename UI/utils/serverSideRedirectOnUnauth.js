@@ -6,15 +6,13 @@
  */
 export default async function serverSideRedirectOnUnauth(
     act,
-    destination = "/login",
-    logoutRequest = () => {}
+    destination = "/login"
 ) {
     try {
         return await act();
     } catch (e) {
         console.log(e);
         if (e.response.status === 401 || e.response.status === 403) {
-            await logoutRequest();
             return {
                 redirect: {
                     destination,
