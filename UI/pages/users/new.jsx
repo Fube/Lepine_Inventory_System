@@ -92,7 +92,7 @@ export default function CreateUser() {
                                                             status.isError
                                                                 ? "red"
                                                                 : "green"
-                                                        }-500 text-lg`}
+                                                        }-500 text-lg text-center`}
                                                     >
                                                         {status.message}
                                                     </div>
