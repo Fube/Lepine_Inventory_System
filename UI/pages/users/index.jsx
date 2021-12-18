@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import capitalize from "capitalize";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -6,7 +7,6 @@ import Nav from "../../components/Nav";
 import Paginate from "../../components/Pagination";
 import { axiosBackend } from "../../config/axios";
 import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
-import thou from "../../utils/thou";
 
 export default function ShowUsers({ users, totalPages, pageNumber }) {
     const router = useRouter();
@@ -93,7 +93,7 @@ function UserTableRow({ uuid, email, role }) {
         // <Link href={`/users/${uuid}`} passHref>
         <tr className="hover">
             <td>{email}</td>
-            <td>{role}</td>
+            <td>{capitalize(role.toLowerCase())}</td>
         </tr>
         // </Link>
     );
