@@ -35,6 +35,7 @@ async function logout(page, context = null) {
     await context.clearCookies();
     await page.reload();
 }
+
 module.exports = {
     loginAs,
     logout,
