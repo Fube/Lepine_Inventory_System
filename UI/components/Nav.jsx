@@ -49,7 +49,7 @@ export default function Nav() {
                             <a
                                 className={`btn btn-ghost btn-sm rounded-btn`}
                                 onClick={() =>
-                                    logout() && router.push("/login")
+                                    logout().then(() => router.push("/"))
                                 }
                             >
                                 logout

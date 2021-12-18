@@ -21,7 +21,7 @@ export const AuthContext = createContext({
     setIsLoggedIn: () => {},
     setRole: () => {},
     setEmail: () => {},
-    logout: () => {},
+    logout: async () => {},
 });
 
 function MyApp({ Component, pageProps }) {
