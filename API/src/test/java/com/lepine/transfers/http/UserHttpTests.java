@@ -8,8 +8,8 @@ import com.lepine.transfers.controllers.user.UserController;
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
-import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.helpers.matchers.UserUUIDLessDTOMatcher;
 import com.lepine.transfers.services.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -53,9 +54,23 @@ public class UserHttpTests {
     private static final String VALID_PASSWORD = "S0m3P@ssword";
     private static final String INVALID_PASSWORD = "a";
     private static final String VALID_ROLE_NAME = "SOME_ROLE";
+
     private static final Role VALID_ROLE = Role.builder()
             .uuid(UUID.randomUUID())
             .name(VALID_ROLE_NAME)
+            .build();
+
+    private static final User VALID_USER = User.builder()
+            .uuid(UUID.randomUUID())
+            .email(VALID_EMAIL)
+            .password(VALID_PASSWORD)
+            .role(VALID_ROLE)
+            .build();
+
+    private static final UserUUIDLessDTO VALID_USER_DTO = UserUUIDLessDTO.builder()
+            .email(VALID_EMAIL)
+            .password(VALID_PASSWORD)
+            .role(VALID_ROLE_NAME)
             .build();
 
     private static List<User> generateUsers(int num) {
@@ -558,5 +573,31 @@ public class UserHttpTests {
         resultActions.andExpect(status().isForbidden());
 
         verify(userService, times(0)).findAll(PageRequest.of(page, size));
+    }
+
+    @Test
+    @DisplayName("Given POST on /users with duplicate email, then return 400")
+    void create_DuplicateEmail() throws Exception {
+
+        // Arrange
+        final UserUUIDLessDTOMatcher userUUIDLessDTOMatcher = new UserUUIDLessDTOMatcher(VALID_USER_DTO);
+        final DuplicateEmailException duplicateEmailException = new DuplicateEmailException(VALID_USER_DTO.getEmail());
+        given(userService.create(argThat(userUUIDLessDTOMatcher)))
+                .willThrow(duplicateEmailException);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(
+                post("/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(VALID_USER_DTO)));
+
+        // Assert
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(duplicateEmailException.getMessage()))
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()));
+
+        verify(userService, times(1)).create(argThat(userUUIDLessDTOMatcher));
     }
 }

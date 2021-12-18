@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 import Nav from "../../components/Nav";
+import { axiosAPI } from "../../config/axios";
 
 // TODO: Fetch this from DB
 const roles = ["Manager", "Clerk", "Salesperson"];
@@ -24,23 +25,23 @@ export default function CreateUser() {
             .test("passwords-match", "Passwords must match", function (value) {
                 return this.parent.password === value;
             }),
+        role: yup.string().required("Role is required").oneOf(roles),
     });
 
     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         setSubmitting(true);
         try {
-            const { data } = await axiosAPI.post("/auth/login", values);
-
-            localStorage.setItem("role", data.role);
-            localStorage.setItem("email", data.email);
-
-            setIsLoggedIn(true);
-            setEmail(data.email);
-            setRole(data.role);
+            const { password, email, role } = values;
+            const { data } = await axiosAPI.post("/users", {
+                password,
+                email,
+                role: role.toUpperCase(),
+            });
 
             setStatus({ isError: false, message: "Successfully logged in" });
-            router.push("/");
+            router.push("/users");
         } catch (e) {
+            console.log(e);
             setStatus({
                 isError: true,
                 message: e?.response?.data?.message ?? "Something went wrong",
@@ -68,6 +69,7 @@ export default function CreateUser() {
                                 role: "",
                             }}
                             validationSchema={userSchema}
+                            onSubmit={handleSubmit}
                         >
                             {({
                                 errors,
