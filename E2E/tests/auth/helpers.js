@@ -4,11 +4,11 @@
  * @param {{ email:string , password:string }} param1
  */
 async function loginAs(page, { email, password }) {
-    await logout();
+    await logout(page);
 
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        page.goto("/login"),
+        page.click("[href*=login]"),
     ]);
 
     await page.type('input[name="email"]', email);

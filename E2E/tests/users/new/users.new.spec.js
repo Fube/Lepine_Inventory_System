@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const { loginAs } = require("../helpers");
+const { loginAs } = require("../../auth/helpers");
 
 const validUser = {
     email: "foo@bar.com",
@@ -75,12 +75,11 @@ test("/users/new :: Create new user", async ({ page }) => {
     expect(title).toBe("Users");
 
     await loginAs(page, validUser);
-    // // Check table exists
-    // const table = await page.$("table");
-    // expect(table).toBeTruthy();
 
-    // // Check table contains the new user
-    // const content = await page.content();
-    // expect(content).toContain(email);
-    // expect(content).toContain(role);
+    // Check that the user is logged in
+    const localStorage = await page.evaluate(() => {
+        return localStorage;
+    });
+
+    expect(localStorage.email).toEqual(validUser.email);
 });
