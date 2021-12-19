@@ -11,6 +11,7 @@ export default async function serverSideRedirectOnUnauth(
     try {
         return await act();
     } catch (e) {
+        console.log(e);
         const status = e?.response?.status || null;
         if (status === 401 || status === 403) {
             return {
