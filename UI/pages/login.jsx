@@ -186,7 +186,7 @@ export async function getServerSideProps(context) {
             headers: { cookie: context.req.headers.cookie },
         });
     } catch (e) {
-        // console.log(e);
+        console.log(e);
         const status = e?.response?.data?.status ?? null;
         if (status === 401 || status === 403) {
             return { props: {} };
