@@ -22,7 +22,7 @@ test("/users/new :: Go to through /users", async ({ page }) => {
     // Click on "New User" button
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        page.click("[href*=new]"),
+        page.click("th > button"),
     ]);
 
     // Check that the page is loaded

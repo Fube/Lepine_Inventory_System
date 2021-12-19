@@ -3,7 +3,8 @@ import { useRouter } from "next/router";
 import Nav from "../components/Nav";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
-import { axiosAPI, axiosBackend } from "../config/axios";
+import { axiosAPI } from "../config/axios";
+import { axiosBackend } from "../config/backendAxios";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "./_app";
 

@@ -5,12 +5,12 @@ test("/items :: Go to through nav", async ({ page }) => {
     // Click on ITEMS XPath and wait for the page to load
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        await page.click("//html/body/div[1]/div[1]/div[2]/div/a"),
+        await page.click("a[href*=items]"),
     ]);
 
     // Check that the page is loaded
     const title = await page.title();
-    expect(title).toBe("Items");
+    expect(title.toLowerCase()).toBe("items");
 
     // Check that the page has the correct content
     const content = await page.content();
@@ -41,6 +41,6 @@ test("/items :: Go to through nav", async ({ page }) => {
 
     expect(navItemsActive.length).toBe(1);
     const active = await navItemsActive[0];
-    expect(await active.textContent()).toBe("Items");
+    expect(await (await active.textContent()).toLowerCase()).toBe("items");
     expect(await active.getAttribute("href")).toBe("/items");
 });

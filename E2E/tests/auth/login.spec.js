@@ -13,7 +13,7 @@ test("/login :: Go to through /index", async ({ page, browser }) => {
     // Click on "Login" button
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        page.click("[href*=login]"),
+        page.click("a[href*=login]"),
     ]);
 
     // Check that the page is loaded
@@ -39,7 +39,7 @@ test("/login :: Login with valid information", async ({ page }) => {
     // Goto login
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        page.click("[href*=login]"),
+        page.click("a[href*=login]"),
     ]);
 
     // Fill in form

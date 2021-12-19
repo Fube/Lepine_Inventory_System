@@ -14,7 +14,6 @@ test("Logout", async ({ page }) => {
     let logout = null;
     for (const item of navItems) {
         const text = await item.innerText();
-        console.log(text);
         if (text.toLowerCase() === "logout") {
             logout = item;
             break;

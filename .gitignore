@@ -346,3 +346,4 @@ sketch
 **/bin/
 E2E/storage.json
 **.env
+**.env**

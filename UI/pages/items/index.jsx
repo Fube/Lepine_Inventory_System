@@ -9,11 +9,11 @@ import {
     PaginateAdapter,
     TableHitsAdapter,
 } from "../../components/AlgoliaAdapters";
-import { axiosBackend } from "../../config/axios";
 import Paginate from "../../components/Pagination";
 import thou from "../../utils/thou";
 import { Icon } from "@iconify/react";
 import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
+import { axiosBackend } from "../../config/backendAxios";
 
 /**
  *

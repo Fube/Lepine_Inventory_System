@@ -2,8 +2,9 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import ItemBase from "../../components/Item";
 import Nav from "../../components/Nav";
-import { axiosAPI, axiosBackend } from "../../config/axios";
+import { axiosAPI } from "../../config/axios";
 import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
+import { axiosBackend } from "../../config/backendAxios";
 
 /**
  *

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Nav from "../../components/Nav";
 import Paginate from "../../components/Pagination";
-import { axiosBackend } from "../../config/axios";
+import { axiosBackend } from "../../config/backendAxios";
 import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
 
 export default function ShowUsers({ users, totalPages, pageNumber }) {

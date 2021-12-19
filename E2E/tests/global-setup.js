@@ -7,7 +7,7 @@ module.exports = async (config) => {
 
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        page.click("[href*=login]"),
+        page.click("a[href*=login]"),
     ]);
 
     await page.type('input[name="email"]', process.env.USERNAME ?? "manager");

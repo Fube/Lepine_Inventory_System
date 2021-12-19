@@ -10,7 +10,7 @@ test("/users :: Go to from /index", async ({ page, browser }) => {
     // Click on "Users" button
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        page.click("[href*=users]"),
+        page.click("a[href*=users]"),
     ]);
 
     // Check that the page is loaded
