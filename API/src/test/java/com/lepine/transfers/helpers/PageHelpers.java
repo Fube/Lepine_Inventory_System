@@ -1,4 +1,4 @@
-package helpers;
+package com.lepine.transfers.helpers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

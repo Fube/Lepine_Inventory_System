@@ -25,6 +25,12 @@ spring:
         init:
             mode: never
             platform: h2
+jwt:
+    secret: someveryveryveryveryveryveryverylongsecretorsomethingihavenoideaman
+    expiration: 900000 # 15 minutes
+default-manager:
+    username: manager
+    password: manager
 ---
 spring:
     config:

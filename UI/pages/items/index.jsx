@@ -9,10 +9,11 @@ import {
     PaginateAdapter,
     TableHitsAdapter,
 } from "../../components/AlgoliaAdapters";
-import { axiosBackend } from "../../config/axios";
 import Paginate from "../../components/Pagination";
 import thou from "../../utils/thou";
 import { Icon } from "@iconify/react";
+import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
+import { axiosBackend } from "../../config/axios";
 
 /**
  *
@@ -168,11 +169,13 @@ function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     );
 }
 
-export async function getServerSideProps(context) {
+async function naiveGetServerSideProps(context) {
     const page = context.query.page || 1;
     const {
         data: { content: items, totalPages, number: pageNumber },
-    } = await axiosBackend(`/items?page=${page}`).catch(console.log);
+    } = await axiosBackend.get(`/items?page=${page}`, {
+        headers: { cookie: context.req.headers.cookie },
+    });
     return {
         props: {
             items,
@@ -180,4 +183,10 @@ export async function getServerSideProps(context) {
             pageNumber,
         },
     };
+}
+
+export async function getServerSideProps(context) {
+    return await serverSideRedirectOnUnauth(() =>
+        naiveGetServerSideProps(context)
+    );
 }
