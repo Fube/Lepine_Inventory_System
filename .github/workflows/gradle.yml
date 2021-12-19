@@ -28,3 +28,6 @@ jobs:
                   distribution: "adopt"
             - name: Build with Gradle
               run: ./gradlew API:build
+
+            - name: Create boot jar
+              run: ./gradlew bootJar
