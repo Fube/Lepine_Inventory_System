@@ -182,8 +182,9 @@ export default function Login() {
 
 export async function getServerSideProps(context) {
     try {
+        const cookie = context?.req?.header?.cookie ?? "";
         const res = await axiosBackend.get("/auth/fake/path", {
-            headers: { ...context.req.headers },
+            headers: { cookie },
         });
     } catch (e) {
         console.log(e);
