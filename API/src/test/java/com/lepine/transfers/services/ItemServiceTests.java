@@ -1,9 +1,11 @@
 package com.lepine.transfers.services;
 
+import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
 import com.lepine.transfers.services.item.ItemService;
+import com.lepine.transfers.services.item.ItemServiceImpl;
 import com.lepine.transfers.services.search.SearchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,24 +13,26 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = { Config.class })
+@SpringBootTest(classes = {MapperConfig.class, ItemServiceImpl.class})
 @ActiveProfiles({"test"})
 public class ItemServiceTests {
 
-    @SpyBean
+    @MockBean
     private ItemRepo itemRepo;
 
     @Autowired
@@ -46,15 +50,16 @@ public class ItemServiceTests {
     }
 
 
-    private void seedRepo(int num) {
+    private static List<Item> generateItems(int num) {
+        List<Item> items = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            itemRepo.save(
-                    Item.builder()
+            items.add(Item.builder()
                             .name("name"+i)
-                            .SKU("SKU"+i)
+                            .sku("SKU"+i)
                             .description("description"+i)
                             .build());
         }
+        return items;
     }
 
     @Test
@@ -63,7 +68,8 @@ public class ItemServiceTests {
 
         // Arrange
         final int num = 100;
-        seedRepo(num);
+        final Page<Item> pageFor = createPageFor(generateItems(num), PageRequest.of(0, 10));
+        given(itemRepo.findAll(any(PageRequest.class))).willReturn(pageFor);
 
         // Act
         final Page<Item> all = itemService.findAll();
@@ -73,7 +79,7 @@ public class ItemServiceTests {
         assertEquals(num / 10, all.getContent().size());
         all.getContent().forEach(item -> {
             assertTrue(item.getName().startsWith("name"));
-            assertTrue(item.getSKU().startsWith("SKU"));
+            assertTrue(item.getSku().startsWith("SKU"));
             assertTrue(item.getDescription().startsWith("description"));
         });
         verify(itemRepo, times(1)).findAll(any(PageRequest.class));
@@ -85,10 +91,11 @@ public class ItemServiceTests {
 
         // Arrange
         final int num = 100;
-        seedRepo(num);
         final int page = 1;
         final int size = 10;
         final PageRequest pageRequest = PageRequest.of(page, size);
+        final Page<Item> pageFor = createPageFor(generateItems(num), pageRequest);
+        given(itemRepo.findAll(pageRequest)).willReturn(pageFor);
 
         // Act
         final Page<Item> all = itemService.findAll(pageRequest);
@@ -98,7 +105,7 @@ public class ItemServiceTests {
         assertEquals(size, all.getContent().size());
         all.getContent().forEach(item -> {
             assertTrue(item.getName().startsWith("name"));
-            assertTrue(item.getSKU().startsWith("SKU"));
+            assertTrue(item.getSku().startsWith("SKU"));
             assertTrue(item.getDescription().startsWith("description"));
         });
         verify(itemRepo, times(1)).findAll(pageRequest);
@@ -111,17 +118,18 @@ public class ItemServiceTests {
         // Arrange
         final Item item = Item.builder()
                 .name("name")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("description")
                 .build();
         doNothing().when(searchService).index(any(ItemSearchDTO.class));
+        given(itemRepo.save(item)).willReturn(item);
 
         // Act
         final Item saved = itemService.create(item);
 
         // Assert
         assertEquals(item.getName(), saved.getName());
-        assertEquals(item.getSKU(), saved.getSKU());
+        assertEquals(item.getSku(), saved.getSku());
         assertEquals(item.getDescription(), saved.getDescription());
         verify(itemRepo, times(1)).save(item);
         verify(searchService, times(1))
@@ -135,17 +143,18 @@ public class ItemServiceTests {
         // Arrange
         final Item item = Item.builder()
                 .name("name")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("description")
                 .build();
         doNothing().when(searchService).index(any(ItemSearchDTO.class));
+        given(itemRepo.save(item)).willReturn(item);
 
         // Act
         final Item saved = itemService.update(item);
 
         // Assert
         assertEquals(item.getName(), saved.getName());
-        assertEquals(item.getSKU(), saved.getSKU());
+        assertEquals(item.getSku(), saved.getSku());
         assertEquals(item.getDescription(), saved.getDescription());
         verify(itemRepo, times(1)).save(item);
         verify(searchService, times(1))
@@ -195,7 +204,7 @@ public class ItemServiceTests {
         final Item item = Item.builder()
                 .uuid(uuid)
                 .name("name")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("description")
                 .build();
         given(itemRepo.findById(uuid)).willReturn(Optional.of(item));
@@ -207,7 +216,7 @@ public class ItemServiceTests {
         assertTrue(retrieved.isPresent());
         final Item retrievedItem = retrieved.get();
         assertEquals(item.getName(), retrievedItem.getName());
-        assertEquals(item.getSKU(), retrievedItem.getSKU());
+        assertEquals(item.getSku(), retrievedItem.getSku());
         assertEquals(item.getDescription(), retrievedItem.getDescription());
         verify(itemRepo, times(1)).findById(uuid);
     }

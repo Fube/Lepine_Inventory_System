@@ -36,9 +36,9 @@ public class ItemController {
     @GetMapping
     public Page<Item> getAll(
             @RequestParam(required = false, defaultValue = "1")
-            @Min(value = 1, message = "Page number cannot be less than 1") int page,
+            @Min(value = 1, message = "{pagination.page.min}") int page,
             @RequestParam(required = false, defaultValue = "10")
-            @Min(value = 1, message = "Page size cannot be less than 1") int size) {
+            @Min(value = 1, message = "{pagination.size.min}") int size) {
 
         log.info("retrieving all items");
         final Page<Item> all = OneIndexedPageAdapter.of(itemService.findAll(PageRequest.of(page - 1, size)));

@@ -1,6 +1,7 @@
 package com.lepine.transfers.config.controllers;
 
 import com.lepine.transfers.exceptions.NotFoundException;
+import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.time.ZoneOffset.UTC;
@@ -35,14 +37,16 @@ public class GlobalAdvice {
     public static class HTTPConstraintViolationError extends HTTPErrorMessage {
 
         @Getter
-        private final Map<String, String> errors;
+        private final Map<String, List<String>> errors;
 
         public HTTPConstraintViolationError(BindingResult bindingResult) {
             super(BAD_REQUEST.value(), "Invalid request");
 
             errors = new HashMap<>();
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+                errors
+                        .computeIfAbsent(fieldError.getField(), k -> new java.util.ArrayList<>())
+                        .add(fieldError.getDefaultMessage());
             }
         }
     }
@@ -57,5 +61,11 @@ public class GlobalAdvice {
     @ResponseStatus(value = BAD_REQUEST)
     public HTTPConstraintViolationError handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         return new HTTPConstraintViolationError(e.getBindingResult());
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    @ResponseStatus(value = BAD_REQUEST)
+    public HTTPErrorMessage handleDuplicateEmailException(DuplicateEmailException e) {
+        return new HTTPErrorMessage(BAD_REQUEST.value(), e.getMessage());
     }
 }

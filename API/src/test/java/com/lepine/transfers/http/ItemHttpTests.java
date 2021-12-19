@@ -1,13 +1,16 @@
 package com.lepine.transfers.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.config.AuthConfig;
+import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
+import com.lepine.transfers.helpers.matchers.ItemMatcher;
 import com.lepine.transfers.services.item.ItemService;
-import helpers.matchers.ItemMatcher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
@@ -15,19 +18,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-import static helpers.PageHelpers.createPageFor;
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static java.lang.String.format;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -38,18 +40,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ItemController.class })
-@ContextConfiguration(classes = { Config.class })
+@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
 @ActiveProfiles("test")
 public class ItemHttpTests {
 
     @Autowired
     private MockMvc mvc;
-
-    @MockBean
-    private ItemService itemService;
-
-    @SpyBean
-    private ItemController itemController;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -57,11 +53,21 @@ public class ItemHttpTests {
     @Autowired
     private ItemMapper itemMapper;
 
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
+
+    @SpyBean
+    private ItemController itemController;
+
+    @MockBean
+    private ItemService itemService;
+
     @Test
     void contextLoads(){}
 
     @Test
     @DisplayName("Given GET on /items, returns 200 OK and a paginated list of items")
+    @WithMockUser(username = "test-user")
     void getItems() throws Exception {
         // Arrange
         final int
@@ -72,7 +78,7 @@ public class ItemHttpTests {
             items.add(Item.builder()
                     .uuid(UUID.randomUUID())
                     .name("Item " + i)
-                    .SKU("SKU " + i)
+                    .sku("SKU " + i)
                     .description("Description " + i)
                     .build());
         }
@@ -98,12 +104,13 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given GET on /items/{uuid}, returns 200 OK and the item")
+    @WithMockUser(username = "test-user")
     void getItem() throws Exception {
         // Arrange
         final Item item = Item.builder()
                 .uuid(UUID.randomUUID())
                 .name("Item")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("Description")
                 .build();
         given(itemService.findByUuid(item.getUuid()))
@@ -118,7 +125,7 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(item.getName()))
-                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.sku").value(item.getSku()))
                 .andExpect(jsonPath("$.description").value(item.getDescription()));
 
         verify(itemService, times(1)).findByUuid(item.getUuid());
@@ -127,6 +134,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given GET on /items/{uuid}, returns 404 NOT FOUND if the item does not exist")
+    @WithMockUser(username = "test-user")
     void getItemNotFound() throws Exception {
         // Arrange
         final UUID uuid = UUID.randomUUID();
@@ -151,11 +159,12 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given POST on /items, returns 201 CREATED and the item")
+    @WithMockUser(username = "test-user")
     void postItem() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .name("Item")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("Description")
                 .build();
         final Item item = itemMapper.toEntity(itemUUIDLessDTO);
@@ -174,7 +183,7 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(item.getName()))
-                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.sku").value(item.getSku()))
                 .andExpect(jsonPath("$.description").value(item.getDescription()));
 
         verify(itemService, times(1)).create(argThat(matcher));
@@ -183,12 +192,13 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given POST on /items, returns 400 BAD REQUEST if the item is invalid")
+    @WithMockUser(username = "test-user")
     void postItemInvalid() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .description("")
                 .name("")
-                .SKU("")
+                .sku("")
                 .build();
 
         // Act
@@ -202,7 +212,17 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.timestamp").exists());
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.name").exists())
+                .andExpect(jsonPath("$.errors.name[0]")
+                        .value(messageSource.getMessage("item.name.not_blank", null, Locale.getDefault())))
+                .andExpect(jsonPath("$.errors.description").exists())
+                .andExpect(jsonPath("$.errors.description[0]")
+                        .value(messageSource.getMessage("item.description.not_blank", null, Locale.getDefault())))
+                .andExpect(jsonPath("$.errors.sku").exists())
+                .andExpect(jsonPath("$.errors.sku[0]")
+                        .value(messageSource.getMessage("item.sku.not_blank", null, Locale.getDefault())));
 
         verify(itemService, times(0)).create(any(Item.class));
         verify(itemController, times(0)).create(itemUUIDLessDTO);
@@ -210,11 +230,12 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given PUT on /items/{uuid}, returns 200 OK and the item")
+    @WithMockUser(username = "test-user")
     void putItem() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .name("Item")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("Description")
                 .build();
         final Item item = itemMapper.toEntity(itemUUIDLessDTO);
@@ -233,7 +254,7 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.uuid").value(item.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(item.getName()))
-                .andExpect(jsonPath("$.sku").value(item.getSKU()))
+                .andExpect(jsonPath("$.sku").value(item.getSku()))
                 .andExpect(jsonPath("$.description").value(item.getDescription()));
 
         verify(itemService, times(1)).update(argThat(matcher));
@@ -242,12 +263,13 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given PUT on /items/{uuid}, returns 400 BAD REQUEST if the item is invalid")
+    @WithMockUser(username = "test-user")
     void putItemInvalid() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .description("")
                 .name("")
-                .SKU("")
+                .sku("")
                 .build();
 
         // Act
@@ -261,7 +283,17 @@ public class ItemHttpTests {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.timestamp").exists());
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.name").exists())
+                .andExpect(jsonPath("$.errors.name[0]")
+                        .value(messageSource.getMessage("item.name.not_blank", null, Locale.getDefault())))
+                .andExpect(jsonPath("$.errors.description").exists())
+                .andExpect(jsonPath("$.errors.description[0]")
+                        .value(messageSource.getMessage("item.description.not_blank", null, Locale.getDefault())))
+                .andExpect(jsonPath("$.errors.sku").exists())
+                .andExpect(jsonPath("$.errors.sku[0]")
+                        .value(messageSource.getMessage("item.sku.not_blank", null, Locale.getDefault())));
 
         verify(itemService, times(0)).update(any(Item.class));
         verify(itemController, times(0)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
@@ -269,11 +301,12 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given PUT on /items/{uuid}, returns 404 NOT FOUND if the item does not exist")
+    @WithMockUser(username = "test-user")
     void putItemNotFound() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .name("Item")
-                .SKU("SKU")
+                .sku("SKU")
                 .description("Description")
                 .build();
         final Item item = itemMapper.toEntity(itemUUIDLessDTO);
@@ -299,6 +332,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("Given DELETE on /items/{uuid}, returns 204 NO CONTENT")
+    @WithMockUser(username = "test-user")
     void deleteItem() throws Exception {
         // Arrange
         final UUID uuid = UUID.randomUUID();

@@ -3,6 +3,7 @@ import Head from "next/head";
 import ItemBase from "../../components/Item";
 import Nav from "../../components/Nav";
 import { axiosAPI, axiosBackend } from "../../config/axios";
+import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
 
 /**
  *
@@ -47,8 +48,14 @@ export default function Item({ item }) {
     );
 }
 
-export async function getServerSideProps(ctx) {
+async function naiveGetServerSideProps(ctx) {
     const { uuid } = ctx.query;
-    const { data: item } = await axiosBackend(`/items/${uuid}`);
+    const { data: item } = await axiosBackend(`/items/${uuid}`, {
+        headers: { ...ctx.req.headers },
+    });
     return { props: { item } };
+}
+
+export async function getServerSideProps(ctx) {
+    return serverSideRedirectOnUnauth(() => naiveGetServerSideProps(ctx));
 }

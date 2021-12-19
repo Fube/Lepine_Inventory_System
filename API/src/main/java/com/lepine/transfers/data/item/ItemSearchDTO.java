@@ -15,6 +15,6 @@ public class ItemSearchDTO {
 
     private UUID objectID;
     private String name;
-    private String SKU;
+    private String sku;
     private String description;
 }
