@@ -2,10 +2,9 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import Nav from "../../components/Nav";
 import ItemBase from "../../components/Item";
-import { axiosAPI } from "../../config/axios";
+import { axiosAPI, axiosBackend } from "../../config/axios";
 import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
 import checkEmptyAuth from "../../utils/checkEmptyAuth";
-import { axiosBackend } from "../../config/backendAxios";
 
 export default function CreateItem() {
     const router = useRouter();
