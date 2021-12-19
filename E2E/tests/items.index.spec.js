@@ -1,11 +1,17 @@
 const { test, expect } = require("@playwright/test");
 
 test("/items :: Go to through nav", async ({ page }) => {
-    await page.goto("/");
-    // Click on ITEMS XPath and wait for the page to load
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        await page.click("//html/body/div[1]/div[1]/div[2]/div/a"),
+        page.goto("/"),
+    ]);
+    // Click on ITEMS XPath and wait for the page to load
+    await Promise.all([
+        Promise.race([
+            page.waitForSelector("table"),
+            page.waitForSelector("h2"),
+        ]),
+        page.click("a[href*=items]"),
     ]);
 
     // Check that the page is loaded
@@ -41,6 +47,6 @@ test("/items :: Go to through nav", async ({ page }) => {
 
     expect(navItemsActive.length).toBe(1);
     const active = await navItemsActive[0];
-    expect(await active.textContent()).toBe("Items");
+    expect(await (await active.textContent()).toLowerCase()).toBe("items");
     expect(await active.getAttribute("href")).toBe("/items");
 });
