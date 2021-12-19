@@ -27,7 +27,6 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-@CrossOrigin(origins = "${cors.origin}")
 public class ItemController {
 
     private final ItemService itemService;

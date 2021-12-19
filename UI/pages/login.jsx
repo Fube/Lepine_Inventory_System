@@ -183,10 +183,10 @@ export default function Login() {
 export async function getServerSideProps(context) {
     try {
         const res = await axiosBackend.get("/auth/fake/path", {
-            headers: { ...context.req.headers },
+            headers: { cookie: context.req.headers.cookie },
         });
     } catch (e) {
-        console.log(e);
+        // console.log(e);
         const status = e?.response?.data?.status ?? null;
         if (status === 401 || status === 403) {
             return { props: {} };

@@ -347,3 +347,4 @@ sketch
 E2E/storage.json
 **.env
 **.env**
+.vercel
