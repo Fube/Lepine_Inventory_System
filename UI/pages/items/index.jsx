@@ -160,9 +160,9 @@ function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     return (
         <Link key={uuid} href={`/items/${uuid}`} passHref>
             <tr className="hover ">
-                <td className="!whitespace-normal !break-words">{sku}</td>
-                <td className="!whitespace-normal !break-words">{name}</td>
-                <td className="!whitespace-normal !break-words">{description}</td>
+                <td>{sku}</td>
+                <td>{name}</td>
+                <td>{description}</td>
             </tr>
         </Link>
     );
