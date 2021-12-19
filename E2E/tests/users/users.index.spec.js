@@ -9,9 +9,13 @@ test("/users :: Go to from /index", async ({ page, browser }) => {
 
     // Click on "Users" button
     await Promise.all([
-        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        Promise.race([
+            page.waitForSelector("table"),
+            page.waitForSelector("h2"),
+        ]),
         page.click("a[href*=users]"),
     ]);
+    // await page.waitForTimeout(2000);
 
     // Check that the page is loaded
     const title = await page.title();

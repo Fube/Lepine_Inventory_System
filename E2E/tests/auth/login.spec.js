@@ -1,18 +1,21 @@
-const { test, expect, chromium } = require("@playwright/test");
+const { test, expect } = require("@playwright/test");
 
 test.beforeEach(async ({ page, context }) => {
     await page.goto("/");
-    await page.evaluate(() => {
-        localStorage.clear();
-    });
-    await context.clearCookies();
-    await page.reload();
+    await page.click("div.navbar div div:last-of-type a:last-child"); // Logout
+    await page.waitForSelector("a[href*=login]");
 });
 
 test("/login :: Go to through /index", async ({ page, browser }) => {
+    // Go to home
+    await Promise.all([
+        page.waitForNavigation({ waitUntil: "networkidle" }),
+        page.goto("/"),
+    ]);
+
     // Click on "Login" button
     await Promise.all([
-        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        page.waitForSelector("form"),
         page.click("a[href*=login]"),
     ]);
 
@@ -38,11 +41,13 @@ test("/login :: Go to through /index", async ({ page, browser }) => {
 test("/login :: Login with valid information", async ({ page }) => {
     // Goto login
     await Promise.all([
-        page.waitForNavigation({ waitUntil: "networkidle0" }),
+        page.waitForSelector("form"),
         page.click("a[href*=login]"),
     ]);
 
     // Fill in form
+    const loginTitle = await page.title();
+    expect(loginTitle).toBe("Login");
     await page.type('input[name="email"]', process.env.USERNAME ?? "manager");
     await page.type(
         'input[name="password"]',

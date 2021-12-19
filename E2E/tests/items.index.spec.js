@@ -1,16 +1,22 @@
 const { test, expect } = require("@playwright/test");
 
 test("/items :: Go to through nav", async ({ page }) => {
-    await page.goto("/");
-    // Click on ITEMS XPath and wait for the page to load
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),
-        await page.click("a[href*=items]"),
+        page.goto("/"),
+    ]);
+    // Click on ITEMS XPath and wait for the page to load
+    await Promise.all([
+        Promise.race([
+            page.waitForSelector("table"),
+            page.waitForSelector("h2"),
+        ]),
+        page.click("a[href*=items]"),
     ]);
 
     // Check that the page is loaded
     const title = await page.title();
-    expect(title.toLowerCase()).toBe("items");
+    expect(title).toBe("Items");
 
     // Check that the page has the correct content
     const content = await page.content();
