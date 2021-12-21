@@ -69,7 +69,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with valid data, then register user")
+    @DisplayName("zEnzmoaiCu: Given user with valid data, then register user")
     void registerUser() {
 
         // Arrange
@@ -87,7 +87,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with empty password, then throw ConstrainViolationException")
+    @DisplayName("UFXmqrgZTo: Given user with empty password, then throw ConstrainViolationException")
     void registerUser_emptyPassword() {
 
         // Arrange
@@ -111,7 +111,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with null password, then throw ConstrainViolationException")
+    @DisplayName("YDHAuZwJac: Given user with null password, then throw ConstrainViolationException")
     void registerUser_nullPassword() {
 
         // Arrange
@@ -136,7 +136,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with invalid password, then throw ConstrainViolationException")
+    @DisplayName("SuOhbzazUd: Given user with invalid password, then throw ConstrainViolationException")
     void registerUser_invalidPassword() {
 
         // Arrange
@@ -166,7 +166,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with empty email, then throw ConstrainViolationException")
+    @DisplayName("MHNCOzncRO: Given user with empty email, then throw ConstrainViolationException")
     void registerUser_emptyEmail() {
 
         // Arrange
@@ -190,7 +190,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with null email, then throw ConstrainViolationException")
+    @DisplayName("CNKLYFCeTg: Given user with null email, then throw ConstrainViolationException")
     void registerUser_nullEmail() {
 
         // Arrange
@@ -214,7 +214,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given user with invalid email, then throw ConstrainViolationException")
+    @DisplayName("wMhwytjmfd: Given user with invalid email, then throw ConstrainViolationException")
     void registerUser_invalidEmail() {
 
         // Arrange
@@ -238,7 +238,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given invalid email and invalid password, then throw ConstrainViolationException")
+    @DisplayName("daHxsQgYKd: Given invalid email and invalid password, then throw ConstrainViolationException")
     void registerUser_invalidEmailAndInvalidPassword() {
 
         // Arrange
@@ -268,7 +268,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given empty email and empty password, then throw ConstrainViolationException")
+    @DisplayName("ORbiVwNHYb: Given empty email and empty password, then throw ConstrainViolationException")
     void registerUser_emptyEmailAndEmptyPassword() {
 
         // Arrange
@@ -299,7 +299,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given null email and null password, then throw ConstrainViolationException")
+    @DisplayName("ZMvzBKGuQY: Given null email and null password, then throw ConstrainViolationException")
     void registerUser_nullEmailAndNullPassword() {
 
         // Arrange
@@ -329,7 +329,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given negative page number, then throw ConstraintViolationException")
+    @DisplayName("sRzGktiLsH: Given negative page number, then throw ConstraintViolationException")
     void retrieveAllUsers_negativePageNumber() {
 
         // Arrange
@@ -356,7 +356,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given negative size, then throw ConstraintViolationException")
+    @DisplayName("sKmzcIaBxP: Given negative size, then throw ConstraintViolationException")
     void retrieveAllUsers_negativeLimit() {
 
         // Arrange
@@ -383,7 +383,7 @@ public class UserControllerTests {
     }
 
     @Test
-    @DisplayName("Given negative page number and negative size, then throw ConstraintViolationException")
+    @DisplayName("fkVKnZglMi: Given negative page number and negative size, then throw ConstraintViolationException")
     void retrieveAllUsers_negativePageNumberAndNegativeSize() {
 
         // Arrange

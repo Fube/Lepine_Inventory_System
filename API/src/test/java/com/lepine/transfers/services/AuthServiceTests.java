@@ -89,7 +89,7 @@ public class AuthServiceTests {
     }
 
     @Test
-    @DisplayName("Given login with valid user data, then return Pair<User, String> representing user and JWT")
+    @DisplayName("gRWyKHiZyu: Given login with valid user data, then return Pair<User, String> representing user and JWT")
     public void login_Valid() {
 
         // Arrange
@@ -113,7 +113,7 @@ public class AuthServiceTests {
     }
 
     @Test
-    @DisplayName("Given login with invalid user data, then throw ConstrainViolationException")
+    @DisplayName("QLVLqNyvpn: Given login with invalid user data, then throw ConstrainViolationException")
     public void login_Invalid() {
 
         // Arrange
@@ -142,7 +142,7 @@ public class AuthServiceTests {
     }
 
     @Test
-    @DisplayName("Given login with invalid match, then throw InvalidLoginException")
+    @DisplayName("QljRaiQcqU: Given login with invalid match, then throw InvalidLoginException")
     public void login_InvalidMatch() {
 
         // Arrange

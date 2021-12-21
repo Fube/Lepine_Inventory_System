@@ -28,7 +28,7 @@ public class RoleDataTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("Given migrations, retrieve all 3 roles")
+    @DisplayName("QLFmXRmJcH: Given migrations, retrieve all 3 roles")
     void retrieveAllRoles(){
         // Arrange
 
@@ -42,7 +42,7 @@ public class RoleDataTests {
     }
 
     @Test
-    @DisplayName("Given existing role, retrieve by name")
+    @DisplayName("OdwSeiqTby: Given existing role, retrieve by name")
     void retrieveByName(){
         // Arrange
         final String name = "MANAGER";

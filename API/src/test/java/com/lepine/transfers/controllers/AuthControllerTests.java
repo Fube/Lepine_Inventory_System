@@ -64,7 +64,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    @DisplayName("Given fully valid manager UserLogin, then return UserPasswordLessDTO with manager role")
+    @DisplayName("ErlEdCUDmS: Given fully valid manager UserLogin, then return UserPasswordLessDTO with manager role")
     void login_ValidManager() {
 
         // Arrange
@@ -107,7 +107,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    @DisplayName("Given invalid match with valid data UserLogin, then throw InvalidLoginException")
+    @DisplayName("NjlKKQYTaO: Given invalid match with valid data UserLogin, then throw InvalidLoginException")
     void login_Invalid() {
 
         // Arrange
@@ -130,7 +130,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    @DisplayName("Given fully invalid UserLogin, then throw ConstraintViolationException")
+    @DisplayName("LvOgdpKhCh: Given fully invalid UserLogin, then throw ConstraintViolationException")
     void login_Invalid_ConstraintViolation() {
 
         // Arrange
@@ -158,7 +158,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    @DisplayName("Given fully valid UserLogin for non-existing user, then throw InvalidLoginException")
+    @DisplayName("PWADrSasqx: Given fully valid UserLogin for non-existing user, then throw InvalidLoginException")
     void login_UserNotFound() {
 
         // Arrange
@@ -181,7 +181,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    @DisplayName("Given logout request, return ResponseEntity containing Cookie with name token, value null and maxAge 0")
+    @DisplayName("nicfgpCapt: Given logout request, return ResponseEntity containing Cookie with name token, value null and maxAge 0")
     void logout() {
 
         // Arrange
