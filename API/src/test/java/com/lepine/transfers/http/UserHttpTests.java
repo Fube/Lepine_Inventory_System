@@ -113,7 +113,7 @@ public class UserHttpTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("Given POST on /users with valid data as manager, then return 201")
+    @DisplayName("qbGyHUhESg: Given POST on /users with valid data as manager, then return 201")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager() throws Exception {
 
@@ -151,7 +151,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with valid email but blank password as manager, then return 400")
+    @DisplayName("RmptPIrsWe: Given POST on /users with valid email but blank password as manager, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_BlankPassword() throws Exception {
 
@@ -186,7 +186,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with valid email but null password as manager , then return 400")
+    @DisplayName("frIhksLSfi: Given POST on /users with valid email but null password as manager , then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_NullPassword() throws Exception {
 
@@ -218,7 +218,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with valid email but invalid password as manager, then return 400")
+    @DisplayName("vLrHOobZKR: Given POST on /users with valid email but invalid password as manager, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_InvalidPassword() throws Exception {
 
@@ -250,7 +250,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with valid password but invalid email as manager, then return 400")
+    @DisplayName("DdpYDUZUha: Given POST on /users with valid password but invalid email as manager, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_InvalidEmail() throws Exception {
 
@@ -281,7 +281,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with valid password but blank email as manager, then return 400")
+    @DisplayName("nNVdAKxiyG: Given POST on /users with valid password but blank email as manager, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_BlankEmail() throws Exception {
 
@@ -312,7 +312,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with valid password but null email as manager , then return 400")
+    @DisplayName("VdkByvnZei: Given POST on /users with valid password but null email as manager , then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_NullEmail() throws Exception {
 
@@ -341,7 +341,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with invalid password and invalid email as manager, then return 400")
+    @DisplayName("oUlwJOTeaC: Given POST on /users with invalid password and invalid email as manager, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_InvalidEmailAndPassword() throws Exception {
 
@@ -374,7 +374,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with blank password and blank email as manager, then return 400")
+    @DisplayName("EDOfpjxkSB: Given POST on /users with blank password and blank email as manager, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_BlankEmailAndPassword() throws Exception {
 
@@ -410,7 +410,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with null password and null email as manager, then return 400")
+    @DisplayName("ElzAqJduRe: Given POST on /users with null password and null email as manager, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_NullEmailAndPassword() throws Exception {
 
@@ -443,7 +443,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with valid data as clerk, then return 403")
+    @DisplayName("mCvMOXPrQz: Given POST on /users with valid data as clerk, then return 403")
     @WithMockUser(username = "some-user", roles = "CLERK")
     void create_AsClerk() throws Exception {
 
@@ -467,7 +467,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with valid data as salesperson, then return 403")
+    @DisplayName("mwAxkIoods: Given POST on /users with valid data as salesperson, then return 403")
     @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void create_AsSalesperson() throws Exception {
 
@@ -491,7 +491,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given GET on /users with no size or page as manager, then return 200 and first Page of Users")
+    @DisplayName("drXdaKKHXS: Given GET on /users with no size or page as manager, then return 200 and first Page of Users")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void getAll_AsManager() throws Exception {
 
@@ -526,7 +526,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given GET on /users with no size or page as clerk, then return 403")
+    @DisplayName("OLBKyFJRIY: Given GET on /users with no size or page as clerk, then return 403")
     @WithMockUser(username = "some-clerk", roles = "CLERK")
     void getAll_AsClerk() throws Exception {
 
@@ -551,7 +551,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given GET on /users with no size or page as salesperson, then return 403")
+    @DisplayName("hytaoIMBZR: Given GET on /users with no size or page as salesperson, then return 403")
     @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void getAll_AsSalesperson() throws Exception {
 
@@ -576,7 +576,7 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /users with duplicate email, then return 400")
+    @DisplayName("xRlpVlNRbL: Given POST on /users with duplicate email, then return 400")
     @WithMockUser(username = "some-salesperson", roles = "MANAGER")
     void create_DuplicateEmail() throws Exception {
 

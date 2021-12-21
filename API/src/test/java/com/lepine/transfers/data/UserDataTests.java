@@ -46,7 +46,7 @@ public class UserDataTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("Given user, persist")
+    @DisplayName("bsTWJKmVzI: Given user, persist")
     void save() {
 
         final Role savedRole = roleRepo.save(VALID_ROLE);
@@ -64,7 +64,7 @@ public class UserDataTests {
     }
 
     @Test
-    @DisplayName("Given user with null email, throw Exception")
+    @DisplayName("BDeaUDSiJo: Given user with null email, throw Exception")
     void save_NullEmail() {
 
         // Arrange
@@ -83,7 +83,7 @@ public class UserDataTests {
     }
 
     @Test
-    @DisplayName("Given user with null password, throw Exception")
+    @DisplayName("rXNSwMDoLA: Given user with null password, throw Exception")
     void save_NullPassword() {
 
         // Arrange
@@ -102,7 +102,7 @@ public class UserDataTests {
     }
 
     @Test
-    @DisplayName("Given user with duplicate email, throw Exception")
+    @DisplayName("UWYgbdJOmu: Given user with duplicate email, throw Exception")
     void save_DuplicateEmail() {
 
         // Arrange
@@ -126,7 +126,7 @@ public class UserDataTests {
     }
 
     @Test
-    @DisplayName("Given email, retrieve user")
+    @DisplayName("KkWqqImfVp: Given email, retrieve user")
     void findByEmail() {
 
         // Arrange
@@ -153,7 +153,7 @@ public class UserDataTests {
     }
 
     @Test
-    @DisplayName("Given user with no role, throw DataIntegrityViolationException")
+    @DisplayName("fzVDaKGmYw: Given user with no role, throw DataIntegrityViolationException")
     void save_NoRole() {
 
         // Arrange

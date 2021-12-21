@@ -112,7 +112,7 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST /auth/login with a valid UserLogin, then return UserPasswordLessDTO and JWT in header as HTTP-Only cookie")
+    @DisplayName("icawrdfeWI: Given POST /auth/login with a valid UserLogin, then return UserPasswordLessDTO and JWT in header as HTTP-Only cookie")
     public void login_ValidUser() throws Exception {
 
         // Arrange
@@ -143,7 +143,7 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST /auth/login with an invalid UserLogin, then return HTTP 400")
+    @DisplayName("zSgFUaVqxB: Given POST /auth/login with an invalid UserLogin, then return HTTP 400")
     public void login_InvalidUser() throws Exception {
 
         // Arrange
@@ -179,7 +179,7 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST /auth/login with an invalid match, then return HTTP 401")
+    @DisplayName("KhCRyxyOqH: Given POST /auth/login with an invalid match, then return HTTP 401")
     public void login_InvalidMatch() throws Exception {
 
         // Arrange
@@ -213,7 +213,7 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given request with JWT, trigger JWT filter")
+    @DisplayName("sxpmAjeMZa: Given request with JWT, trigger JWT filter")
     public void jwtFilter_ValidJWT() throws Exception {
 
         // Arrange
@@ -231,7 +231,7 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given request with JWT, trigger JWT filter with invalid JWT")
+    @DisplayName("iyYluellAl: Given request with JWT, trigger JWT filter with invalid JWT")
     public void jwtFilter_InvalidJWT() throws Exception {
 
         // Arrange
@@ -251,7 +251,7 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given logout request, return HTTP 204 and clear JWT cookie")
+    @DisplayName("uSKbUCaWdE: Given logout request, return HTTP 204 and clear JWT cookie")
     public void logout_ValidRequest() throws Exception {
 
         // Arrange
@@ -273,7 +273,7 @@ public class AuthHttpTests {
     }
 
     @Test
-    @DisplayName("Given HEAD on /logout, regardless of authentication or authorization, return HTTP 204 and clear JWT cookie")
+    @DisplayName("txnqWMGwNt: Given HEAD on /logout, regardless of authentication or authorization, return HTTP 204 and clear JWT cookie")
     public void logout_AnyoneHeadRequest() throws Exception {
 
         // Arrange

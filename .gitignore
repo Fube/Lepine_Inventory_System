@@ -348,3 +348,5 @@ E2E/storage.json
 **.env
 **.env**
 .vercel
+TestIder/*
+TestIder/

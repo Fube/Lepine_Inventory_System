@@ -103,7 +103,7 @@ public class UserServiceTests {
     void contextLoads() {}
 
     @Test
-    @DisplayName("Given a UserUUIDLessDTO, then create a User with a hashed password")
+    @DisplayName("VuVJsyfGna: Given a UserUUIDLessDTO, then create a User with a hashed password")
     void createUser() {
 
         // Arrange
@@ -139,7 +139,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given a UserUUIDLessDTO with non-existent role, then throw RoleNotFoundException")
+    @DisplayName("AvmtcSFAnV: Given a UserUUIDLessDTO with non-existent role, then throw RoleNotFoundException")
     void createUser_RoleNotFound() {
 
         // Arrange
@@ -165,7 +165,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given existing email on create, then throw DuplicateEmailException")
+    @DisplayName("yXAonWktLf: Given existing email on create, then throw DuplicateEmailException")
     void createUser_DuplicateEmail() {
 
         // Arrange
@@ -191,7 +191,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given no PageRequest, then return first page of Users")
+    @DisplayName("sDdLZfnrAf: Given no PageRequest, then return first page of Users")
     void findAll() {
 
         // Arrange
@@ -208,7 +208,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given findAll with a PageRequest, then return the appropriate page")
+    @DisplayName("mtOjWWqQeT: Given findAll with a PageRequest, then return the appropriate page")
     void findAll_WithPageRequest() {
 
 
@@ -232,7 +232,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given null UserUUIDLessDTO on create, then throw ConstraintViolationException")
+    @DisplayName("swZEaHTsEJ: Given null UserUUIDLessDTO on create, then throw ConstraintViolationException")
     void create_NullUserUUIDLessDTO() {
 
         // Arrange
@@ -258,7 +258,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with null email, then throw ConstraintViolationException")
+    @DisplayName("ixxEWTgDTK: Given UserUUIDLessDTO with null email, then throw ConstraintViolationException")
     void create_NullEmail() {
 
         // Arrange
@@ -284,7 +284,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with empty email, then throw ConstraintViolationException")
+    @DisplayName("ZQkspYqlEm: Given UserUUIDLessDTO with empty email, then throw ConstraintViolationException")
     void create_EmptyEmail() {
 
         // Arrange
@@ -311,7 +311,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with invalid email, then throw ConstraintViolationException")
+    @DisplayName("XqskfIXqFb: Given UserUUIDLessDTO with invalid email, then throw ConstraintViolationException")
     void create_InvalidEmail() {
 
         // Arrange
@@ -338,7 +338,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with null password on create, then throw ConstraintViolationException")
+    @DisplayName("kkxvdeQoVx: Given UserUUIDLessDTO with null password on create, then throw ConstraintViolationException")
     void create_NullPassword() {
 
         // Arrange
@@ -367,7 +367,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with empty password on create, then throw ConstraintViolationException")
+    @DisplayName("oDIZjDxRQd: Given UserUUIDLessDTO with empty password on create, then throw ConstraintViolationException")
     void create_EmptyPassword() {
 
         // Arrange
@@ -398,7 +398,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("Given UserUUIDLessDTO with invalid password on create, then throw ConstraintViolationException")
+    @DisplayName("PUzjTTvnin: Given UserUUIDLessDTO with invalid password on create, then throw ConstraintViolationException")
     void create_InvalidPassword() {
 
         // Arrange
