@@ -158,9 +158,9 @@ public class ItemHttpTests {
 
 
     @Test
-    @DisplayName("Given POST on /items, returns 201 CREATED and the item")
-    @WithMockUser(username = "test-user")
-    void postItem() throws Exception {
+    @DisplayName("IbPLePcvkQ: Given POST on /items as MANAGER, returns 201 CREATED and the item")
+    @WithMockUser(username = "test-user", roles = {"MANAGER"})
+    void postItem_AsManager() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .name("Item")
@@ -188,6 +188,37 @@ public class ItemHttpTests {
 
         verify(itemService, times(1)).create(argThat(matcher));
         verify(itemController, times(1)).create(itemUUIDLessDTO);
+    }
+
+    @Test
+    @DisplayName("OiCLZKJPjG: Given POST on /items as anyone but MANAGER, returns 403 FORBIDDEN")
+    @WithMockUser(username = "test-user", roles = {"CLERK"})
+    void postItem_AsNotManager() throws Exception {
+
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .name("Item")
+                .sku("SKU")
+                .description("Description")
+                .build();
+        final Item item = itemMapper.toEntity(itemUUIDLessDTO);
+        final ArgumentMatcher<Item> matcher = new ItemMatcher(item);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(post("/items")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(item)));
+
+        // Assert
+        resultActions
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Forbidden"))
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(itemService, times(0)).create(argThat(matcher));
+        verify(itemController, times(0)).create(itemUUIDLessDTO);
     }
 
     @Test
