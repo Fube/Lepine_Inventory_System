@@ -397,7 +397,7 @@ public class ItemHttpTests {
 
     @Test
     @DisplayName("kUvGTJAiWh: Given PUT on /items/{uuid} as MANAGER, returns 404 NOT FOUND if the item does not exist")
-    @WithMockUser(username = "test-user")
+    @WithMockUser(username = "test-user", roles = {"MANAGER"})
     void putItem_NotFound_AsManager() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
@@ -446,12 +446,7 @@ public class ItemHttpTests {
                 .content(objectMapper.writeValueAsString(item)));
 
         // Assert
-        resultActions
-                .andExpect(status().isForbidden())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value("Forbidden"))
-                .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.timestamp").exists());
+        resultActions.andExpect(status().isForbidden());
 
         verify(itemService, times(0)).update(any(Item.class));
         verify(itemController, times(0)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
