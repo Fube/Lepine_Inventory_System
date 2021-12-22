@@ -453,9 +453,9 @@ public class ItemHttpTests {
     }
 
     @Test
-    @DisplayName("Given DELETE on /items/{uuid}, returns 204 NO CONTENT")
-    @WithMockUser(username = "test-user")
-    void deleteItem() throws Exception {
+    @DisplayName("WdywCQcVII: Given DELETE on /items/{uuid} as MANAGER, returns 204 NO CONTENT")
+    @WithMockUser(username = "test-user", roles = {"MANAGER"})
+    void deleteItem_AsManager() throws Exception {
         // Arrange
         final UUID uuid = UUID.randomUUID();
         doNothing().when(itemService).delete(uuid);
@@ -469,5 +469,23 @@ public class ItemHttpTests {
 
         verify(itemService, times(1)).delete(uuid);
         verify(itemController, times(1)).delete(uuid);
+    }
+
+    @Test
+    @DisplayName("KCJjpJiutY: Given DELETE on /items/{uuid} as anyone but MANAGER, returns 403 FORBIDDEN")
+    @WithMockUser(username = "test-user", roles = {"CLERK"})
+    void deleteItem_NotManager() throws Exception {
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+        doNothing().when(itemService).delete(uuid);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(delete("/items/{uuid}", uuid));
+
+        // Assert
+        resultActions.andExpect(status().isForbidden());
+
+        verify(itemService, times(0)).delete(uuid);
+        verify(itemController, times(0)).delete(uuid);
     }
 }
