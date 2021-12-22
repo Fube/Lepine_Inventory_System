@@ -217,9 +217,9 @@ public class ItemHttpTests {
     }
 
     @Test
-    @DisplayName("Given POST on /items, returns 400 BAD REQUEST if the item is invalid")
-    @WithMockUser(username = "test-user")
-    void postItemInvalid() throws Exception {
+    @DisplayName("AKNDXBYUUJ: Given POST on /items as MANAGER, returns 400 BAD REQUEST if the item is invalid")
+    @WithMockUser(username = "test-user", roles = {"MANAGER"})
+    void postItemInvalid_AsManager() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .description("")
@@ -249,6 +249,29 @@ public class ItemHttpTests {
                 .andExpect(jsonPath("$.errors.sku").exists())
                 .andExpect(jsonPath("$.errors.sku[0]")
                         .value(messageSource.getMessage("item.sku.not_blank", null, Locale.getDefault())));
+
+        verify(itemService, times(0)).create(any(Item.class));
+        verify(itemController, times(0)).create(itemUUIDLessDTO);
+    }
+
+    @Test
+    @DisplayName("PBUHnvoTjA: Given POST on /items as anyone but MANAGER with invalid item, returns 403 FORBIDDEN")
+    @WithMockUser(username = "test-user", roles = {"CLERK"})
+    void postItemInvalid_AsNotManager() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .description("")
+                .name("")
+                .sku("")
+                .build();
+
+        // Act
+        final ResultActions resultActions = mvc.perform(post("/items")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(itemUUIDLessDTO)));
+
+        // Assert
+        resultActions.andExpect(status().isForbidden());
 
         verify(itemService, times(0)).create(any(Item.class));
         verify(itemController, times(0)).create(itemUUIDLessDTO);
