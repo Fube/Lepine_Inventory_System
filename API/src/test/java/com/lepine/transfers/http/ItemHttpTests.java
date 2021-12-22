@@ -278,9 +278,9 @@ public class ItemHttpTests {
     }
 
     @Test
-    @DisplayName("Given PUT on /items/{uuid}, returns 200 OK and the item")
-    @WithMockUser(username = "test-user")
-    void putItem() throws Exception {
+    @DisplayName("HCrFDGHZEW: Given PUT on /items/{uuid}, returns 200 OK and the item")
+    @WithMockUser(username = "test-user", roles = {"MANAGER"})
+    void putItem_AsManager() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .name("Item")
@@ -311,9 +311,33 @@ public class ItemHttpTests {
     }
 
     @Test
-    @DisplayName("Given PUT on /items/{uuid}, returns 400 BAD REQUEST if the item is invalid")
-    @WithMockUser(username = "test-user")
-    void putItemInvalid() throws Exception {
+    @DisplayName("APdJIdwsvE: Given put on /items/{uuid} as anyone but MANAGER, returns 403 FORBIDDEN")
+    @WithMockUser(username = "test-user", roles = {"CLERK"})
+    void putItem_AsNotManager() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .name("Item")
+                .sku("SKU")
+                .description("Description")
+                .build();
+        final Item item = itemMapper.toEntity(itemUUIDLessDTO);
+
+        // Act
+        final ResultActions resultActions = mvc.perform(put("/items/{uuid}", item.getUuid())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(item)));
+
+        // Assert
+        resultActions.andExpect(status().isForbidden());
+
+        verify(itemService, times(0)).update(any(Item.class));
+        verify(itemController, times(0)).update(item.getUuid(), itemUUIDLessDTO);
+    }
+
+    @Test
+    @DisplayName("FbSHvDjKod: Given PUT on /items/{uuid} as MANAGER, returns 400 BAD REQUEST if the item is invalid")
+    @WithMockUser(username = "test-user", roles = {"MANAGER"})
+    void putItemInvalid_AsManager() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .description("")
@@ -349,9 +373,32 @@ public class ItemHttpTests {
     }
 
     @Test
-    @DisplayName("Given PUT on /items/{uuid}, returns 404 NOT FOUND if the item does not exist")
+    @DisplayName("ioYFTsZugU: Given PUT on /items/{uuid} as anyone but MANAGER, returns 403 FORBIDDEN")
+    @WithMockUser(username = "test-user", roles = {"CLERK"})
+    void putItemInvalid_AsNotManager() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .description("")
+                .name("")
+                .sku("")
+                .build();
+
+        // Act
+        final ResultActions resultActions = mvc.perform(put("/items/{uuid}", UUID.randomUUID())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(itemUUIDLessDTO)));
+
+        // Assert
+        resultActions.andExpect(status().isForbidden());
+
+        verify(itemService, times(0)).update(any(Item.class));
+        verify(itemController, times(0)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
+    }
+
+    @Test
+    @DisplayName("kUvGTJAiWh: Given PUT on /items/{uuid} as MANAGER, returns 404 NOT FOUND if the item does not exist")
     @WithMockUser(username = "test-user")
-    void putItemNotFound() throws Exception {
+    void putItem_NotFound_AsManager() throws Exception {
         // Arrange
         final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
                 .name("Item")
@@ -377,6 +424,37 @@ public class ItemHttpTests {
 
         verify(itemService, times(1)).update(any(Item.class));
         verify(itemController, times(1)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
+    }
+
+    @Test
+    @DisplayName("ixZWXNEZjM: Given PUT /items/{uuid} as anyone but manager, returns 403 FORBIDDEN even if the item does not exists")
+    @WithMockUser(username = "test-user", roles = {"CLERK"})
+    void putItem_NotFound_AsNotManager() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .name("Item")
+                .sku("SKU")
+                .description("Description")
+                .build();
+        final Item item = itemMapper.toEntity(itemUUIDLessDTO);
+        given(itemService.update(any(Item.class)))
+                .willThrow(new ItemNotFoundException(item.getUuid()));
+
+        // Act
+        final ResultActions resultActions = mvc.perform(put("/items/{uuid}", item.getUuid())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(item)));
+
+        // Assert
+        resultActions
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Forbidden"))
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(itemService, times(0)).update(any(Item.class));
+        verify(itemController, times(0)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
     }
 
     @Test
