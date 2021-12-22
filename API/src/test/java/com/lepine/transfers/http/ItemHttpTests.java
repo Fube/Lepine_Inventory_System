@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ItemController.class })
-@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
+@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class})
 @ActiveProfiles("test")
 public class ItemHttpTests {
 
@@ -210,12 +210,7 @@ public class ItemHttpTests {
                 .content(objectMapper.writeValueAsString(item)));
 
         // Assert
-        resultActions
-                .andExpect(status().isForbidden())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value("Forbidden"))
-                .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.timestamp").exists());
+        resultActions.andExpect(status().isForbidden());
 
         verify(itemService, times(0)).create(argThat(matcher));
         verify(itemController, times(0)).create(itemUUIDLessDTO);
