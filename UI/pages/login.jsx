@@ -8,18 +8,14 @@ import { useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 
 export default function Login() {
-    const { setEmail, setIsLoggedIn, setRole } = useAuth();
+    const { setEmail, setIsLoggedIn, setRole, logout } = useAuth();
     const loginSchema = yup.object().shape({
         email: yup.string().required("Email is required"),
         password: yup.string().required("Password is required"),
     });
 
     useEffect(() => {
-        localStorage.removeItem("role");
-        localStorage.removeItem("email");
-        setEmail("");
-        setRole("");
-        setIsLoggedIn(false);
+        logout();
     }, []);
 
     const router = useRouter();
