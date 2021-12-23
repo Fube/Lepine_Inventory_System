@@ -6,4 +6,10 @@ const targetItem = {
     sku: "",
 };
 
-test("emptyaaaa", () => {});
+test.describe.parallel("fIvHGIlnwi: Clerk /items tests", () => {
+    test.use({
+        storageState: "./storage/clerk.json",
+    });
+
+    test("", () => {});
+});
