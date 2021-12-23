@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Nav from "../../components/Nav";
-import ItemBase from "../../components/Item";
+import ItemBase from "../../components/ItemForm";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import checkEmptyAuth from "../../utils/checkEmptyAuth";
 

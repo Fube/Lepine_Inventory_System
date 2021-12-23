@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Head from "next/head";
-import ItemBase from "../../components/Item";
+import ItemForm from "../../components/ItemForm";
 import Nav from "../../components/Nav";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 
@@ -33,7 +33,7 @@ export default function Item({ item }) {
                 </div>
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
-                        <ItemBase
+                        <ItemForm
                             editable
                             deletable
                             {...item}

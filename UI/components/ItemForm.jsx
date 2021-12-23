@@ -4,7 +4,7 @@ import {
     GenericForm,
     GenericFormInputErrorCombo,
     GenericSubmitButton,
-} from "../components/FormikGenericComponents";
+} from "./FormikGenericComponents";
 
 /**
  * @typedef Item
@@ -18,7 +18,7 @@ import {
  *
  * @param {{...Item, editable: boolean, deletable: boolean, handleDelete: (uuid: string) => void, handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => }} arg0
  */
-export default function Item({
+export default function ItemForm({
     uuid,
     name,
     description,
