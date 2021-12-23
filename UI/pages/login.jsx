@@ -4,11 +4,11 @@ import Nav from "../components/Nav";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { axiosAPI, axiosBackendNoAuth } from "../config/axios";
-import { useContext, useEffect } from "react";
-import { AuthContext } from "./_app";
+import { useEffect } from "react";
+import useAuth from "../hooks/useAuth";
 
 export default function Login() {
-    const { setEmail, setIsLoggedIn, setRole } = useContext(AuthContext);
+    const { setEmail, setIsLoggedIn, setRole } = useAuth();
     const loginSchema = yup.object().shape({
         email: yup.string().required("Email is required"),
         password: yup.string().required("Password is required"),
