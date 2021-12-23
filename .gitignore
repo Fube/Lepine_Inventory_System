@@ -324,7 +324,6 @@ sketch
 *.pyc
 **.vscode
 **.idea
-**yarn.lock
 **/packages/playwright-core/src/generated/*
 **lib/
 **drivers/
