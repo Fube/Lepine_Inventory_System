@@ -53,12 +53,13 @@ export default function ItemForm({
                                 type="text"
                                 placeholder="Name"
                             />
+
                             <GenericFormInputErrorCombo
                                 name="description"
                                 type="text"
                                 placeholder="Description"
                             />
-                            1
+
                             <GenericFormInputErrorCombo
                                 name="sku"
                                 type="text"

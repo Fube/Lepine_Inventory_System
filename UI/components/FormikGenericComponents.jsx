@@ -1,21 +1,27 @@
 import { Form, Field, useField, useFormikContext } from "formik";
-export function GenericFormInputErrorCombo({ name, type, placeholder }) {
-    const [inputProps, { error, touched }, helperProps] = useField(name);
+
+/**
+ *
+ * @param {import("formik").FieldAttributes<any>} param0
+ * @returns
+ */
+export function GenericFormInputErrorCombo(fieldAttributes) {
+    const [inputProps, { error, touched }, helperProps] = useField(
+        fieldAttributes.name
+    );
     return (
         <>
             <label
                 className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor={name}
+                htmlFor={fieldAttributes.name}
             >
-                Description
+                {fieldAttributes.placeholder}
             </label>
             <Field
                 className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                     error && touched ? "border-red-500" : ""
                 }`}
-                name={name}
-                type={type}
-                placeholder={placeholder}
+                {...fieldAttributes}
             />
             {error && touched && (
                 <div className="text-red-500 text-xs italic">{error}</div>
