@@ -3,6 +3,7 @@ import Head from "next/head";
 import ItemForm from "../../components/ItemForm";
 import Nav from "../../components/Nav";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
+import useAuth from "../../hooks/useAuth";
 
 /**
  *
@@ -10,7 +11,9 @@ import { axiosAPI, axiosBackendAuth } from "../../config/axios";
  * @returns
  */
 export default function Item({ item }) {
+    const { role } = useAuth();
     const router = useRouter();
+
     const handleDelete = async () => {
         await axiosAPI.delete(`/items/${item.uuid}`);
         router.push("/items");
@@ -34,8 +37,8 @@ export default function Item({ item }) {
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
                         <ItemForm
-                            editable
-                            deletable
+                            editable={role === "MANAGER"}
+                            deletable={role === "MANAGER"}
                             {...item}
                             handleDelete={handleDelete}
                             handleSubmit={handleSubmit}
