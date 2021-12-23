@@ -13,7 +13,7 @@ import Paginate from "../../components/Pagination";
 import thou from "../../utils/thou";
 import { Icon } from "@iconify/react";
 import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
-import { axiosBackend } from "../../config/axios";
+import { axiosBackendAuth } from "../../config/axios";
 
 /**
  *
@@ -169,24 +169,20 @@ function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     );
 }
 
-async function naiveGetServerSideProps(context) {
+export async function getServerSideProps(context) {
     const page = context.query.page || 1;
-    const {
-        data: { content: items, totalPages, number: pageNumber },
-    } = await axiosBackend.get(`/items?page=${page}`, {
+
+    const res = await axiosBackendAuth.get(`/items?page=${page}`, {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
-    return {
-        props: {
-            items,
-            totalPages,
-            pageNumber,
-        },
-    };
-}
 
-export async function getServerSideProps(context) {
-    return await serverSideRedirectOnUnauth(() =>
-        naiveGetServerSideProps(context)
-    );
+    return res
+        .refine(({ content: items, totalPages, number: pageNumber }) => ({
+            props: {
+                items,
+                totalPages,
+                pageNumber,
+            },
+        }))
+        .get();
 }

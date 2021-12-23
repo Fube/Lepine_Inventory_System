@@ -1,17 +1,12 @@
+const emptyProps = { props: {} };
+
 export default async function checkEmptyAuth(axios, context) {
     try {
-        await axios.get("/auth/fake/path", {
+        const res = await axios.get("/auth/fake/path", {
             headers: { cookie: context?.req?.headers?.cookie ?? "" },
         });
+        return res.refine(() => emptyProps).get();
     } catch (e) {
-        if (e.response.status === 401 || e.response.status === 403) {
-            return {
-                redirect: {
-                    destination: "/login",
-                    permanent: false,
-                },
-            };
-        }
+        return emptyProps;
     }
-    return { props: {} };
 }

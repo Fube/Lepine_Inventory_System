@@ -2,8 +2,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import ItemBase from "../../components/Item";
 import Nav from "../../components/Nav";
-import { axiosAPI, axiosBackend } from "../../config/axios";
-import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
+import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 
 /**
  *
@@ -48,14 +47,11 @@ export default function Item({ item }) {
     );
 }
 
-async function naiveGetServerSideProps(context) {
+export async function getServerSideProps(context) {
     const { uuid } = context.query;
-    const { data: item } = await axiosBackend(`/items/${uuid}`, {
+    const res = await axiosBackendAuth(`/items/${uuid}`, {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
-    return { props: { item } };
-}
 
-export async function getServerSideProps(ctx) {
-    return serverSideRedirectOnUnauth(() => naiveGetServerSideProps(ctx));
+    return res.refine((item) => ({ props: { item } })).get();
 }
