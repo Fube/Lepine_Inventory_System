@@ -49,18 +49,21 @@ export default function ItemForm({
                     {() => (
                         <GenericForm title="Item Details">
                             <GenericFormInputErrorCombo
+                                disabled={!editable}
                                 name="name"
                                 type="text"
                                 placeholder="Name"
                             />
 
                             <GenericFormInputErrorCombo
+                                disabled={!editable}
                                 name="description"
                                 type="text"
                                 placeholder="Description"
                             />
 
                             <GenericFormInputErrorCombo
+                                disabled={!editable}
                                 name="sku"
                                 type="text"
                                 placeholder="SKU"
