@@ -13,6 +13,7 @@ import Paginate from "../../components/Pagination";
 import thou from "../../utils/thou";
 import { Icon } from "@iconify/react";
 import { axiosBackendAuth } from "../../config/axios";
+import useAuth from "../../hooks/useAuth";
 
 /**
  *
@@ -20,7 +21,9 @@ import { axiosBackendAuth } from "../../config/axios";
  * @returns
  */
 export default function ShowItems({ items, totalPages, pageNumber }) {
+    const { role } = useAuth();
     const router = useRouter();
+
     const { searchClient } = useContext(AlgoliaContext);
     const [isSearching, setIsSearching] = useState(false);
     const [refresh, setRefresh] = useState(false);
@@ -38,12 +41,18 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
             <th>SKU</th>
             <th>Name</th>
             <th className="flex justify-between">
-                <div className="self-center">Description</div>
-                <button>
-                    <Link href="/items/new" passHref>
-                        <Icon icon="si-glyph:button-plus" width="32" />
-                    </Link>
-                </button>
+                {thou(
+                    <>
+                        <div className="self-center">Description</div>
+                        <button>
+                            <Link href="/items/new" passHref>
+                                <Icon icon="si-glyph:button-plus" width="32" />
+                            </Link>
+                        </button>
+                    </>
+                )
+                    .or("Description")
+                    .if(role === "MANAGER")}
             </th>
         </tr>
     );
