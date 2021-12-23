@@ -1,5 +1,5 @@
 const { expect, test } = require("@playwright/test");
-const { createItem } = require("../helpers");
+const { createItem } = require("helpers/items");
 
 test("/items/:uuid :: Update item through ", async ({ page }) => {
     const created = await createItem(page);

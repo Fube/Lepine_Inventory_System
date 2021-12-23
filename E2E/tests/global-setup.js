@@ -1,4 +1,6 @@
 const { chromium } = require("@playwright/test");
+const { MANAGER_USERNAME, MANAGER_PASSWORD } = require("config");
+
 module.exports = async (config) => {
     const { baseURL, storageState } = config.projects[0].use;
     const browser = await chromium.launch();
@@ -10,11 +12,8 @@ module.exports = async (config) => {
         page.click("a[href*=login]"),
     ]);
 
-    await page.type('input[name="email"]', process.env.USERNAME ?? "manager");
-    await page.type(
-        'input[name="password"]',
-        process.env.PASSWORD ?? "manager"
-    );
+    await page.type('input[name="email"]', MANAGER_USERNAME);
+    await page.type('input[name="password"]', MANAGER_PASSWORD);
 
     await Promise.all([
         page.waitForNavigation({ waitUntil: "networkidle0" }),

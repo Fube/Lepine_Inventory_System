@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const { loginAs } = require("../../auth/helpers");
+const { loginAs } = require("helpers/auth");
 const nanoid = require("nanoid");
 const alphaOnly = nanoid.customAlphabet("abcdefghijklmnopqrstuvwxyz", 6);
 
