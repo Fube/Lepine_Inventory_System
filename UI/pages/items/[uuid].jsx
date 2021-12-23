@@ -51,7 +51,7 @@ export default function Item({ item }) {
 async function naiveGetServerSideProps(context) {
     const { uuid } = context.query;
     const { data: item } = await axiosBackend(`/items/${uuid}`, {
-        headers: { cookie: context.req.headers.cookie },
+        headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
     return { props: { item } };
 }
