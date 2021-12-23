@@ -1,5 +1,7 @@
 const { test, expect } = require("@playwright/test");
 const { loginAs } = require("../../auth/helpers");
+const nanoid = require("nanoid");
+const alphaOnly = nanoid.customAlphabet("abcdefghijklmnopqrstuvwxyz", 6);
 
 const validUser = {
     email: "foo@bar.com",
@@ -65,7 +67,9 @@ test("/users/new :: Create new user", async ({ page }) => {
 
     // Fill in form
     const { email, password, role } = validUser;
-    await page.type('input[name="email"]', email);
+    const emailWithRandom = alphaOnly() + email;
+
+    await page.type('input[name="email"]', emailWithRandom);
     await page.type('input[name="password"]', password);
     await page.type('input[name="confirmPassword"]', password);
     await page.selectOption('select[name="role"]', role);
@@ -80,14 +84,14 @@ test("/users/new :: Create new user", async ({ page }) => {
     const title = await page.title();
     expect(title).toBe("Users");
 
-    await loginAs(page, validUser);
+    await loginAs(page, { ...validUser, email: emailWithRandom });
 
     // Check that the user is logged in
     const localStorage = await page.evaluate(() => {
         return localStorage;
     });
 
-    expect(localStorage.email).toEqual(validUser.email);
+    expect(localStorage.email).toEqual(emailWithRandom);
 });
 
 test("/users/new :: Try to create with invalid data", async ({ page }) => {
