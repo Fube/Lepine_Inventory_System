@@ -12,7 +12,9 @@ export default function WithClientSideAuth(WrappedComponent) {
         useEffect(() => {
             if (!role) return;
 
-            const mapped = roleRouteMappings.get(router.asPath).includes(role);
+            const mapped = roleRouteMappings
+                .get(router.asPath)
+                .includes(role.toLocaleLowerCase());
             if (!mapped) {
                 router.push("/login");
             }
