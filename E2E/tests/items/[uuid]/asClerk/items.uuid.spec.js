@@ -3,31 +3,50 @@ const {
     READONLY_ITEM_NAME,
     READONLY_ITEM_SKU,
     READONLY_ITEM_DESCRIPTION,
-    dynamicLoad,
+    MANAGER_USERNAME,
+    MANAGER_PASSWORD,
 } = require("config");
-
-const targetItem = {
-    name: "",
-    description: "",
-    sku: "",
-};
+const { createItem, deleteItem } = require("helpers/api/items");
 
 test.describe.parallel("fIvHGIlnwi: Clerk /items tests", () => {
     test.use({
         storageState: "./storage/clerk.json",
     });
 
-    test("hpgBHJdpxb: /items/:uuid :: View as clerk", async ({ page }) => {
-        while (!dynamicLoad.get("READONLY_ITEM_UUID")) {
-            console.log(require("config").dynamicLoad);
-            await page.waitForTimeout(1000);
-        }
-        const READONLY_ITEM_UUID = dynamicLoad.get("READONLY_ITEM_UUID");
+    let uuid = null;
 
+    test.beforeAll(async ({ baseURL }) => {
+        const data = await createItem(
+            baseURL,
+            {
+                email: MANAGER_USERNAME,
+                password: MANAGER_PASSWORD,
+            },
+            {
+                name: READONLY_ITEM_NAME,
+                sku: READONLY_ITEM_SKU,
+                description: READONLY_ITEM_DESCRIPTION,
+            }
+        );
+        uuid = data.uuid;
+    });
+
+    test.afterAll(async ({ baseURL }) => {
+        await deleteItem(
+            baseURL,
+            {
+                email: MANAGER_USERNAME,
+                password: MANAGER_PASSWORD,
+            },
+            uuid
+        );
+    });
+
+    test("hpgBHJdpxb: /items/:uuid :: View as clerk", async ({ page }) => {
         // Go to /items/:uuid
         await Promise.all([
             page.waitForSelector("form"),
-            page.goto(`/items/${READONLY_ITEM_UUID}`),
+            page.goto(`/items/${uuid}`),
         ]);
 
         // Check it is the expected item
