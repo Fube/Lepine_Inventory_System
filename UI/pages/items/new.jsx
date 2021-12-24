@@ -4,23 +4,10 @@ import Nav from "../../components/Nav";
 import ItemBase from "../../components/ItemForm";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import checkEmptyAuth from "../../utils/checkEmptyAuth";
-import roleRouteMappings from "../../config/routeRoleMapping";
-import useAuth from "../../hooks/useAuth";
-import { useEffect } from "react";
-import clientRedirectHelper from "../../utils/clientRedirectHelper";
+import WithClientSideAuth from "../../components/WithClientSideAuth";
 
-export default function CreateItem() {
+function CreateItem() {
     const router = useRouter();
-    const { role } = useAuth();
-
-    useEffect(
-        clientRedirectHelper(
-            roleRouteMappings.get(router.asPath),
-            role.toLocaleLowerCase(),
-            router
-        ),
-        []
-    );
 
     return (
         <>
@@ -48,6 +35,8 @@ export default function CreateItem() {
         </>
     );
 }
+
+export default WithClientSideAuth(CreateItem);
 
 export async function getServerSideProps(ctx) {
     return checkEmptyAuth(axiosBackendAuth, ctx);
