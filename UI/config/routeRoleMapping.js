@@ -1,14 +1,15 @@
-const mappings = new Map();
+/** @type {Map<string, [string]>} */
+const roleRouteMappings = new Map();
 const all = ["manager", "clerk", "salesperson"];
 const managerOnly = ["manager"];
 
 // Item mappings
-mappings.put("/items/new", managerOnly);
-mappings.put("/items", all);
-mappings.put("/items/:uuid", all);
+roleRouteMappings.set("/items/new", managerOnly);
+roleRouteMappings.set("/items", all);
+roleRouteMappings.set("/items/:uuid", all);
 
 // User mappings
-mappings.put("/users/new", managerOnly);
-mappings.put("/users", managerOnly);
+roleRouteMappings.set("/users/new", managerOnly);
+roleRouteMappings.set("/users", managerOnly);
 
-export default mappings;
+export default roleRouteMappings;
