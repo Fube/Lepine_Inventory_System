@@ -3,10 +3,8 @@ const { default: axios } = require("axios");
 const {
     MANAGER_USERNAME,
     MANAGER_PASSWORD,
-    READONLY_ITEM_NAME,
-    READONLY_ITEM_SKU,
-    READONLY_ITEM_DESCRIPTION,
-    dynamicLoad,
+    CLERK_USERNAME,
+    CLERK_PASSWORD,
 } = require("config");
 const { customAlphabet } = require("nanoid");
 
@@ -21,7 +19,13 @@ module.exports = async (config) => {
     await page.context().storageState({ path: "./storage/none.json" });
     await browser.close();
 
-    const clerkLogin = await register(baseURL, "CLERK");
+    let clerkLogin = {
+        email: CLERK_USERNAME,
+        password: CLERK_PASSWORD,
+    };
+    if (!CLERK_USERNAME || !CLERK_PASSWORD) {
+        clerkLogin = await register(baseURL, "CLERK");
+    }
     await loginAndSave(baseURL, clerkLogin, "./storage/clerk.json");
 
     await loginAndSave(
