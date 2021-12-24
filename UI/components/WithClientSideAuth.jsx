@@ -11,13 +11,15 @@ export default function WithClientSideAuth(WrappedComponent) {
         const [loading, setLoading] = useState(true);
 
         useEffect(() => {
+            if (!role) return;
+
             clientRedirectHelper(
                 roleRouteMappings.get(router.asPath),
                 role.toLocaleLowerCase(),
                 router
             )();
             setLoading(false);
-        }, []);
+        }, [role]);
 
         if (loading) {
             return (
