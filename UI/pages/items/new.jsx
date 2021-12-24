@@ -4,22 +4,24 @@ import Nav from "../../components/Nav";
 import ItemBase from "../../components/ItemForm";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import checkEmptyAuth from "../../utils/checkEmptyAuth";
-import getRoleFromJWT from "../../utils/getRoleFromJWT";
-import parseCookies from "../../utils/parseCookies";
 import roleRouteMappings from "../../config/routeRoleMapping";
 import useAuth from "../../hooks/useAuth";
 import { useEffect } from "react";
+import clientRedirectHelper from "../../utils/clientRedirectHelper";
 
 export default function CreateItem() {
     const router = useRouter();
     const { role } = useAuth();
 
-    useEffect(() => {
-        const mapped = roleRouteMappings.get("/items/new").includes(role);
-        if (!mapped) {
-            router.push("/login");
-        }
-    }, []);
+    useEffect(
+        clientRedirectHelper(
+            roleRouteMappings.get(router.asPath),
+            role.toLocaleLowerCase(),
+            router
+        ),
+        []
+    );
+
     return (
         <>
             <Head>
