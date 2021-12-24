@@ -6,6 +6,7 @@ const {
     READONLY_ITEM_NAME,
     READONLY_ITEM_SKU,
     READONLY_ITEM_DESCRIPTION,
+    dynamicLoad,
 } = require("config");
 const { customAlphabet } = require("nanoid");
 
@@ -28,13 +29,6 @@ module.exports = async (config) => {
         { email: MANAGER_USERNAME, password: MANAGER_PASSWORD },
         storageState
     );
-
-    const { uuid } = await createItem(baseURL, {
-        name: READONLY_ITEM_NAME,
-        description: READONLY_ITEM_DESCRIPTION,
-        sku: READONLY_ITEM_SKU,
-    });
-    config.READONLY_ITEM_UUID = uuid;
 };
 
 async function register(baseURL, role) {
@@ -83,24 +77,4 @@ async function loginAndSave(baseURL, { email, password }, storagePath) {
     await page.context().storageState({ path: storagePath });
 
     await browser.close();
-}
-
-async function createItem(baseURL, { name, description, sku }) {
-    const { headers } = await axios.post(`${baseURL}/api/auth/login`, {
-        email: MANAGER_USERNAME,
-        password: MANAGER_PASSWORD,
-    });
-
-    // Register a new clerk
-    const { data } = await axios.post(
-        `${baseURL}/api/items`,
-        { name, description, sku },
-        {
-            headers: {
-                cookie: headers["set-cookie"][0],
-            },
-        }
-    );
-
-    return data;
 }
