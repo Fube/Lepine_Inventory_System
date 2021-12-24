@@ -1,15 +1,13 @@
-import capitalize from "capitalize";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useContext } from "react";
-import { AuthContext } from "../pages/_app";
+import useAuth from "../hooks/useAuth";
 
 export default function Nav() {
-    const { isLoggedIn, role, logout } = useContext(AuthContext);
+    const { isLoggedIn, role, logout } = useAuth();
 
     const router = useRouter();
     const isActive = (path) =>
-        router.pathname.substr(1).startsWith(path) ? "text-blue-400" : "";
+        router.pathname.substring(1).startsWith(path) ? "text-blue-400" : "";
 
     const pages = [];
 

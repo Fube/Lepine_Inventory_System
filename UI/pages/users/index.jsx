@@ -5,8 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Nav from "../../components/Nav";
 import Paginate from "../../components/Pagination";
-import { axiosBackend } from "../../config/axios";
-import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
+import { axiosBackendAuth } from "../../config/axios";
 
 export default function ShowUsers({ users, totalPages, pageNumber }) {
     const router = useRouter();
@@ -99,24 +98,19 @@ function UserTableRow({ uuid, email, role }) {
     );
 }
 
-async function naiveGetServerSideProps(context) {
-    const page = context.query.page || 1;
-    const {
-        data: { content: users, totalPages, number: pageNumber },
-    } = await axiosBackend.get(`/users?page=${page}`, {
-        headers: { cookie: context.req.headers.cookie },
-    });
-    return {
-        props: {
-            users,
-            totalPages,
-            pageNumber,
-        },
-    };
-}
-
 export async function getServerSideProps(context) {
-    return await serverSideRedirectOnUnauth(() =>
-        naiveGetServerSideProps(context)
-    );
+    const page = context.query.page || 1;
+    const res = await axiosBackendAuth.get(`/users?page=${page}`, {
+        headers: { cookie: context?.req?.headers?.cookie ?? "" },
+    });
+
+    return res
+        .refine(({ content: users, totalPages, number: pageNumber }) => ({
+            props: {
+                users,
+                totalPages,
+                pageNumber,
+            },
+        }))
+        .get();
 }

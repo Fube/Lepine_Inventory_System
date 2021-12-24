@@ -7,11 +7,16 @@
     "license": "BSD-3-Clause",
     "devDependencies": {
         "@playwright/test": "^1.17.1",
+        "axios": "^0.24.0",
         "nanoid": "^3.1.30"
     },
     "scripts": {
         "test": "npx playwright test",
         "test-debug": "PWDEBUG=1 npx playwright test",
         "test-debug-windows": "set PWDEBUG=1 && npx playwright test"
-    }
+    },
+    "private": true,
+    "workspaces": [
+        "config"
+    ]
 }

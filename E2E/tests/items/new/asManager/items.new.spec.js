@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const { createItem } = require("../helpers");
+const { createItem } = require("helpers/items");
 
 test("/items/new :: Go to through /items", async ({ page }) => {
     await page.goto("/items");

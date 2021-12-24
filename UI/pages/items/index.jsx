@@ -12,8 +12,8 @@ import {
 import Paginate from "../../components/Pagination";
 import thou from "../../utils/thou";
 import { Icon } from "@iconify/react";
-import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
-import { axiosBackend } from "../../config/axios";
+import { axiosBackendAuth } from "../../config/axios";
+import useAuth from "../../hooks/useAuth";
 
 /**
  *
@@ -21,7 +21,9 @@ import { axiosBackend } from "../../config/axios";
  * @returns
  */
 export default function ShowItems({ items, totalPages, pageNumber }) {
+    const { role } = useAuth();
     const router = useRouter();
+
     const { searchClient } = useContext(AlgoliaContext);
     const [isSearching, setIsSearching] = useState(false);
     const [refresh, setRefresh] = useState(false);
@@ -39,12 +41,18 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
             <th>SKU</th>
             <th>Name</th>
             <th className="flex justify-between">
-                <div className="self-center">Description</div>
-                <button>
-                    <Link href="/items/new">
-                        <Icon icon="si-glyph:button-plus" width="32" />
-                    </Link>
-                </button>
+                {thou(
+                    <>
+                        <div className="self-center">Description</div>
+                        <button>
+                            <Link href="/items/new" passHref>
+                                <Icon icon="si-glyph:button-plus" width="32" />
+                            </Link>
+                        </button>
+                    </>
+                )
+                    .or("Description")
+                    .if(role === "MANAGER")}
             </th>
         </tr>
     );
@@ -69,11 +77,13 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                 <main className="flex justify-center">
                     <div className="text-center">
                         <div className="mt-12">{fallback}</div>
-                        <Link href="/items/new">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
-                                Add One Now!
-                            </button>
-                        </Link>
+                        {role === "MANAGER" && (
+                            <Link href="/items/new" passHref>
+                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
+                                    Add One Now!
+                                </button>
+                            </Link>
+                        )}
                     </div>
                 </main>
             </>
@@ -169,24 +179,20 @@ function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     );
 }
 
-async function naiveGetServerSideProps(context) {
-    const page = context.query.page || 1;
-    const {
-        data: { content: items, totalPages, number: pageNumber },
-    } = await axiosBackend.get(`/items?page=${page}`, {
-        headers: { cookie: context.req.headers.cookie },
-    });
-    return {
-        props: {
-            items,
-            totalPages,
-            pageNumber,
-        },
-    };
-}
-
 export async function getServerSideProps(context) {
-    return await serverSideRedirectOnUnauth(() =>
-        naiveGetServerSideProps(context)
-    );
+    const page = context.query.page || 1;
+
+    const res = await axiosBackendAuth.get(`/items?page=${page}`, {
+        headers: { cookie: context?.req?.headers?.cookie ?? "" },
+    });
+
+    return res
+        .refine(({ content: items, totalPages, number: pageNumber }) => ({
+            props: {
+                items,
+                totalPages,
+                pageNumber,
+            },
+        }))
+        .get();
 }

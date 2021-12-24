@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import Head from "next/head";
-import ItemBase from "../../components/Item";
+import ItemForm from "../../components/ItemForm";
 import Nav from "../../components/Nav";
-import { axiosAPI, axiosBackend } from "../../config/axios";
-import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
+import { axiosAPI, axiosBackendAuth } from "../../config/axios";
+import useAuth from "../../hooks/useAuth";
 
 /**
  *
@@ -11,7 +11,9 @@ import serverSideRedirectOnUnauth from "../../utils/serverSideRedirectOnUnauth";
  * @returns
  */
 export default function Item({ item }) {
+    const { role } = useAuth();
     const router = useRouter();
+
     const handleDelete = async () => {
         await axiosAPI.delete(`/items/${item.uuid}`);
         router.push("/items");
@@ -34,9 +36,9 @@ export default function Item({ item }) {
                 </div>
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
-                        <ItemBase
-                            editable
-                            deletable
+                        <ItemForm
+                            editable={role === "MANAGER"}
+                            deletable={role === "MANAGER"}
                             {...item}
                             handleDelete={handleDelete}
                             handleSubmit={handleSubmit}
@@ -48,14 +50,11 @@ export default function Item({ item }) {
     );
 }
 
-async function naiveGetServerSideProps(context) {
+export async function getServerSideProps(context) {
     const { uuid } = context.query;
-    const { data: item } = await axiosBackend(`/items/${uuid}`, {
-        headers: { cookie: context.req.headers.cookie },
+    const res = await axiosBackendAuth(`/items/${uuid}`, {
+        headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
-    return { props: { item } };
-}
 
-export async function getServerSideProps(ctx) {
-    return serverSideRedirectOnUnauth(() => naiveGetServerSideProps(ctx));
+    return res.refine((item) => ({ props: { item } })).get();
 }

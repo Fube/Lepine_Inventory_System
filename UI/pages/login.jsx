@@ -3,23 +3,19 @@ import { useRouter } from "next/router";
 import Nav from "../components/Nav";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
-import { axiosAPI, axiosBackend } from "../config/axios";
-import { useContext, useEffect } from "react";
-import { AuthContext } from "./_app";
+import { axiosAPI, axiosBackendNoAuth } from "../config/axios";
+import { useEffect } from "react";
+import useAuth from "../hooks/useAuth";
 
 export default function Login() {
-    const { setEmail, setIsLoggedIn, setRole } = useContext(AuthContext);
+    const { setEmail, setIsLoggedIn, setRole, logout } = useAuth();
     const loginSchema = yup.object().shape({
         email: yup.string().required("Email is required"),
         password: yup.string().required("Password is required"),
     });
 
     useEffect(() => {
-        localStorage.removeItem("role");
-        localStorage.removeItem("email");
-        setEmail("");
-        setRole("");
-        setIsLoggedIn(false);
+        logout();
     }, []);
 
     const router = useRouter();
@@ -181,22 +177,23 @@ export default function Login() {
 }
 
 export async function getServerSideProps(context) {
+    const cookie = context?.req?.header?.cookie ?? "";
+
     try {
-        const cookie = context?.req?.header?.cookie ?? "";
-        const res = await axiosBackend.get("/auth/fake/path", {
+        await axiosBackendNoAuth.get("/auth/fake/path", {
             headers: { cookie },
         });
-    } catch (e) {
-        console.log(e);
-        const status = e?.response?.data?.status ?? null;
-        if (status === 401 || status === 403) {
-            return { props: {} };
+    } catch (err) {
+        const status = err?.response?.data?.status ?? null;
+
+        if (status === 404) {
+            return {
+                redirect: {
+                    destination: "/",
+                    permanent: true,
+                },
+            };
         }
     }
-    return {
-        redirect: {
-            destination: "/",
-            permanent: true,
-        },
-    };
+    return { props: {} };
 }

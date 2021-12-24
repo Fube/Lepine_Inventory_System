@@ -3,7 +3,8 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 import Nav from "../../components/Nav";
-import { axiosAPI } from "../../config/axios";
+import { axiosAPI, axiosBackendAuth } from "../../config/axios";
+import checkEmptyAuth from "../../utils/checkEmptyAuth";
 
 // TODO: Fetch this from DB
 const roles = ["Manager", "Clerk", "Salesperson"];
@@ -248,4 +249,8 @@ export default function CreateUser() {
             </div>
         </>
     );
+}
+
+export async function getServerSideProps(ctx) {
+    return checkEmptyAuth(axiosBackendAuth, ctx);
 }
