@@ -8,7 +8,7 @@ const {
 } = require("config");
 const { createItem, deleteItem } = require("helpers/api/items");
 
-test.describe.parallel("fIvHGIlnwi: Clerk /items tests", () => {
+test.describe.parallel("fIvHGIlnwi: Clerk /items/[uuid] tests", () => {
     test.use({
         storageState: "./storage/clerk.json",
     });
