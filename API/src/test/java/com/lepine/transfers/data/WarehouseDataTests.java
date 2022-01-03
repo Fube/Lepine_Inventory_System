@@ -1,5 +1,6 @@
 package com.lepine.transfers.data;
 
+import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
