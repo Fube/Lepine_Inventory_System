@@ -88,4 +88,29 @@ public class WarehouseDataTests {
         assertThat(rootCause).isNotNull();
         assertThat(rootCause.getMessage()).contains("NULL not allowed for column \"zip_code\"");
     }
+
+    @Test
+    @DisplayName("RToZDuhamP: Given warehouse with null city when save, then throw PersistenceException")
+    void save_NullCity() {
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+            .zipCode(VALID_ZIP_CODE)
+            .province(VALID_PROVINCE)
+            .build();
+
+        // Act
+        final PersistenceException persistenceException =
+                assertThrows(PersistenceException.class, () ->  {
+                    warehouseRepo.save(warehouse);
+                    entityManager.flush();
+                });
+
+        // Assert
+        assertThat(persistenceException).isNotNull();
+        final Throwable rootCause = NestedExceptionUtils.getRootCause(persistenceException);
+
+        assertThat(rootCause).isNotNull();
+        assertThat(rootCause.getMessage()).contains("NULL not allowed for column \"city\"");
+    }
 }
