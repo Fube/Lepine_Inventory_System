@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -175,5 +176,42 @@ public class WarehouseDataTests {
         // Case-insensitive regex
         assertThat(rootCause.getMessage()).matches(
                 Pattern.compile(".*unique index.*violation.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL));
+    }
+
+    @Test
+    @DisplayName("iaSUtwfQhu: Given uuid of existing warehouse when deleteByUuid, then return 1")
+    void deleteByUuid_ExistingWarehouse() {
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+            .zipCode(VALID_ZIP_CODE)
+            .city(VALID_CITY)
+            .province(VALID_PROVINCE)
+            .build();
+
+        warehouseRepo.save(warehouse);
+        entityManager.flush();
+
+        // Act
+        final int deleted = warehouseRepo.deleteByUuid(warehouse.getUuid());
+        entityManager.flush();
+
+        // Assert
+        assertThat(deleted).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("gVSHESKmFT: Given uuid of non-existing warehouse when deleteByUuid, then return 0")
+    void deleteByUuid_NonExistingWarehouse() {
+
+        // Arrange
+        final String nonExistingUuid = UUID.randomUUID().toString();
+
+        // Act
+        final int deleted = warehouseRepo.deleteByUuid(nonExistingUuid);
+        entityManager.flush();
+
+        // Assert
+        assertThat(deleted).isEqualTo(0);
     }
 }
