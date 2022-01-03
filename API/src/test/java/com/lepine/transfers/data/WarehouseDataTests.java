@@ -8,9 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles({"test"})
@@ -21,6 +26,9 @@ public class WarehouseDataTests {
         VALID_ZIP_CODE = "A1B2C3",
         VALID_CITY = "City",
         VALID_PROVINCE = "Province";
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     private WarehouseRepo warehouseRepo;
@@ -34,8 +42,8 @@ public class WarehouseDataTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("Given valid warehouse when save then return warehouse")
-    void saveValid() {
+    @DisplayName("Given valid warehouse when save, then return warehouse")
+    void save_Valid() {
 
         // Arrange
         final Warehouse warehouse = Warehouse.builder()
@@ -54,5 +62,30 @@ public class WarehouseDataTests {
         assertThat(save.getCity()).isEqualTo(VALID_CITY);
         assertThat(save.getProvince()).isEqualTo(VALID_PROVINCE);
         assertThat(save.isActive()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Given warehouse with null zip code when save, then throw PersistenceException")
+    void save_NullZipCode() {
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+            .city(VALID_CITY)
+            .province(VALID_PROVINCE)
+            .build();
+
+        // Act
+        final PersistenceException persistenceException =
+                assertThrows(PersistenceException.class, () ->  {
+                    warehouseRepo.save(warehouse);
+                    entityManager.flush();
+                });
+
+        // Assert
+        assertThat(persistenceException).isNotNull();
+        final Throwable rootCause = NestedExceptionUtils.getRootCause(persistenceException);
+
+        assertThat(rootCause).isNotNull();
+        assertThat(rootCause.getMessage()).contains("NULL not allowed for column \"zip_code\"");
     }
 }
