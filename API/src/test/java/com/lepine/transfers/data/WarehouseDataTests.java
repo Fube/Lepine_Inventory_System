@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -175,5 +176,27 @@ public class WarehouseDataTests {
         // Case-insensitive regex
         assertThat(rootCause.getMessage()).matches(
                 Pattern.compile(".*unique index.*violation.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL));
+    }
+
+    @Test
+    @DisplayName("aWhmnLQmoI: Given UUID of existing warehouse when findById, then return warehouse")
+    void findById_ExistingWarehouse() {
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+            .zipCode(VALID_ZIP_CODE)
+            .city(VALID_CITY)
+            .province(VALID_PROVINCE)
+            .build();
+
+        final Warehouse saved = warehouseRepo.save(warehouse);
+        entityManager.flush();
+
+        // Act
+        final Optional<Warehouse> byId = warehouseRepo.findById(saved.getUuid());
+
+        // Assert
+        assertThat(byId).isPresent();
+        assertThat(byId).get().isEqualTo(saved);
     }
 }
