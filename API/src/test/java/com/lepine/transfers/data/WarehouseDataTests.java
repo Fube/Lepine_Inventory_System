@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -137,5 +138,42 @@ public class WarehouseDataTests {
 
         assertThat(rootCause).isNotNull();
         assertThat(rootCause.getMessage()).contains("NULL not allowed for column \"province\"");
+    }
+
+    @Test
+    @DisplayName("GCKjMDwBDQ: Given warehouse with duplicate zip code when save, then throw PersistenceException")
+    void save_DuplicateZipCode() {
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+            .zipCode(VALID_ZIP_CODE)
+            .city(VALID_CITY)
+            .province(VALID_PROVINCE)
+            .build();
+
+        warehouseRepo.save(warehouse);
+        entityManager.flush();
+
+        final Warehouse duplicate = Warehouse.builder()
+            .zipCode(VALID_ZIP_CODE)
+            .city(VALID_CITY)
+            .province(VALID_PROVINCE)
+            .build();
+
+        // Act
+        final PersistenceException persistenceException =
+                assertThrows(PersistenceException.class, () ->  {
+                    warehouseRepo.save(duplicate);
+                    entityManager.flush();
+                });
+
+        // Assert
+        assertThat(persistenceException).isNotNull();
+        final Throwable rootCause = NestedExceptionUtils.getRootCause(persistenceException);
+
+        assertThat(rootCause).isNotNull();
+        // Case-insensitive regex
+        assertThat(rootCause.getMessage()).matches(
+                Pattern.compile(".*unique index.*violation.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL));
     }
 }
