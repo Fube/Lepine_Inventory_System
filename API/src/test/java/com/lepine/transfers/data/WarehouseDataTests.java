@@ -42,7 +42,7 @@ public class WarehouseDataTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("Given valid warehouse when save, then return warehouse")
+    @DisplayName("HmlmnSqPkI: Given valid warehouse when save, then return warehouse")
     void save_Valid() {
 
         // Arrange
@@ -65,7 +65,7 @@ public class WarehouseDataTests {
     }
 
     @Test
-    @DisplayName("Given warehouse with null zip code when save, then throw PersistenceException")
+    @DisplayName("mTgimKuiHy: Given warehouse with null zip code when save, then throw PersistenceException")
     void save_NullZipCode() {
 
         // Arrange
