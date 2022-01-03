@@ -28,5 +28,7 @@ public class Warehouse {
     private String zipCode;
     private String city;
     private String province;
-    private boolean isActive;
+
+    @Builder.Default
+    private boolean isActive = true;
 }
