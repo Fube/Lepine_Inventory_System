@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import javax.transaction.Transactional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -180,6 +181,7 @@ public class WarehouseDataTests {
 
     @Test
     @DisplayName("iaSUtwfQhu: Given uuid of existing warehouse when deleteByUuid, then return 1")
+    @Transactional
     void deleteByUuid_ExistingWarehouse() {
 
         // Arrange
@@ -189,12 +191,11 @@ public class WarehouseDataTests {
             .province(VALID_PROVINCE)
             .build();
 
-        warehouseRepo.save(warehouse);
+        final Warehouse save = warehouseRepo.save(warehouse);
         entityManager.flush();
 
         // Act
-        final int deleted = warehouseRepo.deleteByUuid(warehouse.getUuid());
-        entityManager.flush();
+        final int deleted = warehouseRepo.deleteByUuid(save.getUuid());
 
         // Assert
         assertThat(deleted).isEqualTo(1);
@@ -205,7 +206,7 @@ public class WarehouseDataTests {
     void deleteByUuid_NonExistingWarehouse() {
 
         // Arrange
-        final String nonExistingUuid = UUID.randomUUID().toString();
+        final UUID nonExistingUuid = UUID.randomUUID();
 
         // Act
         final int deleted = warehouseRepo.deleteByUuid(nonExistingUuid);

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 @Repository
 public interface WarehouseRepo extends JpaRepository<Warehouse, UUID> {
+    Integer deleteByUuid(UUID uuid);
 }
