@@ -55,9 +55,9 @@ public class WarehouseServiceImpl implements WarehouseService {
             throw new DuplicateZipCodeException(toUpdate.getZipCode());
         }
 
-        warehouse.setZipCode(toUpdate.getZipCode());
+        final Warehouse updated = warehouseMapper.toEntity(toUpdate);
 
-        final Warehouse save = warehouseRepo.save(warehouse);
+        final Warehouse save = warehouseRepo.save(updated);
         log.info("Warehouse updated");
 
         return save;
