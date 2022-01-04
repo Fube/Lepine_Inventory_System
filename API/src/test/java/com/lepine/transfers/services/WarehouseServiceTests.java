@@ -303,6 +303,8 @@ public class WarehouseServiceTests {
 
         when(warehouseRepo.findByUuid(warehouse.getUuid()))
                 .thenReturn(Optional.of(warehouse));
+        when(warehouseRepo.save(argThat(w -> w.getUuid().equals(warehouse.getUuid()))))
+                .thenReturn(warehouse);
 
         // Act
         final Warehouse updated = warehouseService.update(warehouse.getUuid(), toUpdate);
