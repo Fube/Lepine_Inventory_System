@@ -19,5 +19,5 @@ public class WarehouseUUIDLessDTO {
     private String zipCode;
     private String city;
     private String province;
-    private boolean isActive;
+    private boolean active;
 }

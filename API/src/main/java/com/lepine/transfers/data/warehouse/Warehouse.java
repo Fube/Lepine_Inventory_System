@@ -30,5 +30,5 @@ public class Warehouse {
     private String province;
 
     @Builder.Default
-    private boolean isActive = true;
+    private boolean active = true;
 }
