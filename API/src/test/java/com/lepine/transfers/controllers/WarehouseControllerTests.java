@@ -146,4 +146,93 @@ public class WarehouseControllerTests {
 
         verify(warehouseService, never()).create(any());
     }
+
+    @Test
+    @DisplayName("XFPuMEAYAY: Given blank city when create, then throw ConstraintViolationException")
+    void create_BlankCity_ThrowConstraintViolationException() {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city("")
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.create(given));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_CITY_NOT_BLANK);
+
+        verify(warehouseService, never()).create(any());
+    }
+
+    @Test
+    @DisplayName("gqIiJwAZWW: Given null city when create, then throw ConstraintViolationException")
+    void create_NullCity_ThrowConstraintViolationException() {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(null)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.create(given));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_CITY_NOT_NULL, ERROR_MESSAGE_CITY_NOT_BLANK);
+
+        verify(warehouseService, never()).create(any());
+    }
+
+    @Test
+    @DisplayName("rVNBybBJcv: Given blank province when create, then throw ConstraintViolationException")
+    void create_BlankProvince_ThrowConstraintViolationException() {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province("")
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.create(given));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_PROVINCE_NOT_BLANK);
+
+        verify(warehouseService, never()).create(any());
+    }
+
+    @Test
+    @DisplayName("owUKZjHnXR: Given null province when create, then throw ConstraintViolationException")
+    void create_NullProvince_ThrowConstraintViolationException() {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(null)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.create(given));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_PROVINCE_NOT_NULL, ERROR_MESSAGE_PROVINCE_NOT_BLANK);
+
+        verify(warehouseService, never()).create(any());
+    }
+
 }
