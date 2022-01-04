@@ -39,7 +39,9 @@ public class WarehouseServiceTests {
             ERROR_MESSAGE_CITY_NOT_NULL = "City must not be null",
             ERROR_MESSAGE_CITY_NOT_BLANK = "City must not be blank",
             ERROR_MESSAGE_ZIP_NOT_NULL = "Zipcode must not be null",
-            ERROR_MESSAGE_ZIP_NOT_BLANK = "Zipcode must not be blank";
+            ERROR_MESSAGE_ZIP_NOT_BLANK = "Zipcode must not be blank",
+            ERROR_MESSAGE_PROVINCE_NOT_NULL = "Province must not be null",
+            ERROR_MESSAGE_PROVINCE_NOT_BLANK = "Province must not be blank";
 
 
     @Autowired
@@ -162,6 +164,47 @@ public class WarehouseServiceTests {
 
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
         assertThat(collect).containsExactly(ERROR_MESSAGE_ZIP_NOT_BLANK);
+
+        verify(warehouseRepo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("ivHDXJGayt: Given null province when create, then throw ConstraintViolationException")
+    void create_NullProvinceActiveLessUUIDLessDTO(){
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO toSave = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseService.create(toSave));
+
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_PROVINCE_NOT_NULL, ERROR_MESSAGE_PROVINCE_NOT_BLANK);
+
+        verify(warehouseRepo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("SPxtXyKTxQ: Given blank province when create, then throw ConstraintViolationException")
+    void create_BlankProvinceActiveLessUUIDLessDTO(){
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO toSave = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province("")
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseService.create(toSave));
+
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_PROVINCE_NOT_BLANK);
 
         verify(warehouseRepo, never()).save(any());
     }
