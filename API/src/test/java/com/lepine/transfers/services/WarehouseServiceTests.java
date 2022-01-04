@@ -7,6 +7,7 @@ import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.data.warehouse.WarehouseUUIDLessDTO;
 import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.services.warehouse.WarehouseServiceImpl;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
@@ -45,7 +46,9 @@ public class WarehouseServiceTests {
     private final static String
         VALID_CITY = "City",
         VALID_ZIP = "A1B2C3",
-        VALID_PROVINCE = "Province";
+        VALID_PROVINCE = "Province",
+        ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP = "Zipcode %s already in use",
+        ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND = "Warehouse with uuid %s not found";
     private final static UUID
         VALID_UUID = UUID.randomUUID();
 
@@ -55,8 +58,7 @@ public class WarehouseServiceTests {
             ERROR_MESSAGE_ZIP_NOT_NULL,
             ERROR_MESSAGE_ZIP_NOT_BLANK,
             ERROR_MESSAGE_PROVINCE_NOT_NULL,
-            ERROR_MESSAGE_PROVINCE_NOT_BLANK,
-            ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP = "Zipcode %s already in use";
+            ERROR_MESSAGE_PROVINCE_NOT_BLANK;
 
     @BeforeAll
     void bSetup(){
