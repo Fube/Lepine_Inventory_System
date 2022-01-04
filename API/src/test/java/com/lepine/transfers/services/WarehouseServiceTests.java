@@ -20,6 +20,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,7 +52,8 @@ public class WarehouseServiceTests {
             ERROR_MESSAGE_ZIP_NOT_NULL,
             ERROR_MESSAGE_ZIP_NOT_BLANK,
             ERROR_MESSAGE_PROVINCE_NOT_NULL,
-            ERROR_MESSAGE_PROVINCE_NOT_BLANK;
+            ERROR_MESSAGE_PROVINCE_NOT_BLANK,
+            ERROR_MESSAGE_DUPLICATE_ZIP;
 
     @BeforeAll
     void bSetup(){
@@ -228,6 +230,35 @@ public class WarehouseServiceTests {
 
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
         assertThat(collect).containsExactly(ERROR_MESSAGE_PROVINCE_NOT_BLANK);
+
+        verify(warehouseRepo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("BbxucsXQSf: Given duplicate zipcode when create, then throw DuplicateZipCodeException")
+    void create_DuplicateZipCodeActiveLessUUIDLessDTO(){
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO toSave = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final Warehouse warehouse = Warehouse.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        when(warehouseRepo.findByZipCode(VALID_ZIP))
+                .thenReturn(Optional.of(warehouse));
+
+        // Act & Assert
+        final DuplicateZipCodeException duplicateZipCodeException =
+                assertThrows(DuplicateZipCodeException.class, () -> warehouseService.create(toSave));
+
+        assertThat(duplicateZipCodeException.getMessage()).isEqualTo(ERROR_MESSAGE_DUPLICATE_ZIP);
 
         verify(warehouseRepo, never()).save(any());
     }
