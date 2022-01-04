@@ -296,18 +296,24 @@ public class WarehouseServiceTests {
                 .build();
 
         final WarehouseUUIDLessDTO toUpdate = WarehouseUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
+                .city(VALID_CITY + "2")
+                .zipCode(VALID_ZIP.substring(0, VALID_ZIP.length() - 1) + "2")
+                .province("SomeOtherProvince")
                 .build();
 
         when(warehouseRepo.findByUuid(warehouse.getUuid()))
                 .thenReturn(Optional.of(warehouse));
 
         // Act
-        warehouseService.update(warehouse.getUuid(), toUpdate);
+        final Warehouse updated = warehouseService.update(warehouse.getUuid(), toUpdate);
 
         // Assert
+        assertThat(updated.getUuid()).isEqualTo(warehouse.getUuid());
+        assertThat(updated.getCity()).isEqualTo(toUpdate.getCity());
+        assertThat(updated.getZipCode()).isEqualTo(toUpdate.getZipCode());
+        assertThat(updated.getProvince()).isEqualTo(toUpdate.getProvince());
+        assertThat(updated.isActive()).isEqualTo(warehouse.isActive());
+
         verify(warehouseRepo).findByUuid(warehouse.getUuid());
         verify(warehouseRepo).save(warehouse);
     }
