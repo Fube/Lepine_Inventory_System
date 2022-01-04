@@ -1,5 +1,6 @@
 package com.lepine.transfers.controllers;
 
+import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
@@ -7,7 +8,7 @@ import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
-import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,13 +19,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -146,11 +147,9 @@ public class ItemControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> itemController.getAll(-1, 1));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-        assertEquals("Page number cannot be less than 1",
-                constraintViolations.iterator().next().getMessage());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactly("Page number cannot be less than 1");
+
         verify(itemService, times(0)).findAll(any(PageRequest.class));
     }
 
@@ -197,11 +196,8 @@ public class ItemControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> itemController.getAll(1, -1));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-        assertEquals("Page size cannot be less than 1",
-                constraintViolations.iterator().next().getMessage());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactly("Page size cannot be less than 1");
     }
 
     @Test
@@ -268,15 +264,9 @@ public class ItemControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> itemController.create(itemDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(3, constraintViolations.size());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactlyInAnyOrder("SKU is mandatory", "Name is mandatory", "Description is mandatory");
 
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
         verify(itemService, never()).create(any(Item.class));
     }
 
@@ -296,15 +286,8 @@ public class ItemControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> itemController.create(itemDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(3, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactlyInAnyOrder("SKU is mandatory", "Name is mandatory", "Description is mandatory");
 
         verify(itemService, never()).create(any(Item.class));
     }
@@ -346,15 +329,9 @@ public class ItemControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> itemController.update(uuid, itemDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(3, constraintViolations.size());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactlyInAnyOrder("SKU is mandatory", "Name is mandatory", "Description is mandatory");
 
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
         verify(itemService, never()).update(any(Item.class));
     }
 
@@ -375,15 +352,8 @@ public class ItemControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> itemController.update(uuid, itemDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(3, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.containsAll(List.of("SKU is mandatory", "Name is mandatory", "Description is mandatory")));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactlyInAnyOrder("SKU is mandatory", "Name is mandatory", "Description is mandatory");
 
         verify(itemService, never()).update(any(Item.class));
     }
