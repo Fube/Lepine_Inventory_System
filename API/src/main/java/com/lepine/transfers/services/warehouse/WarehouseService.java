@@ -12,5 +12,5 @@ public interface WarehouseService {
 
     void delete(UUID uuid);
 
-    void update(UUID uuid, @Valid WarehouseUUIDLessDTO toUpdate);
+    Warehouse update(UUID uuid, @Valid WarehouseUUIDLessDTO toUpdate);
 }

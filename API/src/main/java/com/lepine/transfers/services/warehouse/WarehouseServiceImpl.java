@@ -43,7 +43,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public void update(UUID uuid, WarehouseUUIDLessDTO toUpdate) {
+    public Warehouse update(UUID uuid, WarehouseUUIDLessDTO toUpdate) {
         log.info("Updating warehouse with uuid {}", uuid);
 
         final Warehouse warehouse = warehouseRepo.findByUuid(uuid)
@@ -57,7 +57,9 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         warehouse.setZipCode(toUpdate.getZipCode());
 
-        warehouseRepo.save(warehouse);
+        final Warehouse save = warehouseRepo.save(warehouse);
         log.info("Warehouse updated");
+
+        return save;
     }
 }
