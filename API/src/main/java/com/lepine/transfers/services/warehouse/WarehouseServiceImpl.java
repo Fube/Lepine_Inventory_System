@@ -4,12 +4,11 @@ import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseMapper;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
+import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
 
 @Service
 @Slf4j
@@ -22,6 +21,12 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public Warehouse create(WarehouseActiveLessUUIDLessDTO warehouse) {
+
+        if(warehouseRepo.findByZipCode(warehouse.getZipCode()).isPresent()) {
+            log.error("Warehouse with zip code {} already exists", warehouse.getZipCode());
+            throw new DuplicateZipCodeException(warehouse.getZipCode());
+        }
+
         log.info("Creating warehouse with zip {}", warehouse.getZipCode());
         final Warehouse save = warehouseRepo.save(warehouseMapper.toEntity(warehouse));
         log.info("Warehouse created with uuid {}", save.getUuid());

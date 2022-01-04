@@ -55,7 +55,7 @@ public class WarehouseServiceTests {
             ERROR_MESSAGE_ZIP_NOT_BLANK,
             ERROR_MESSAGE_PROVINCE_NOT_NULL,
             ERROR_MESSAGE_PROVINCE_NOT_BLANK,
-            ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP = "Zipcode %s is already in use";
+            ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP = "Zipcode %s already in use";
 
     @BeforeAll
     void bSetup(){
