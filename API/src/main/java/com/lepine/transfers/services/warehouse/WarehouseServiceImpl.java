@@ -14,7 +14,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepo warehouseRepo;
 
     @Override
-    public Warehouse create(Warehouse warehouse) {
+    public Warehouse create(WarehouseActiveLessUUIDLessDTO warehouse) {
         log.info("Creating warehouse with zip {}", warehouse.getZipCode());
         final Warehouse save = warehouseRepo.save(warehouse);
         log.info("Warehouse created with uuid {}", save.getUuid());
