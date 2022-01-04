@@ -1,6 +1,8 @@
 package com.lepine.transfers.services;
 
+import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.services.warehouse.WarehouseServiceImpl;
@@ -19,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {WarehouseServiceImpl.class})
+@SpringBootTest(classes = { MapperConfig.class, WarehouseServiceImpl.class })
 @ActiveProfiles({"test"})
 public class WarehouseServiceTests {
 
@@ -51,6 +53,7 @@ public class WarehouseServiceTests {
             .build();
 
         final Warehouse expected = Warehouse.builder()
+            .uuid(VALID_UUID)
             .city(VALID_CITY)
             .zipCode(VALID_ZIP)
             .province(VALID_PROVINCE)
@@ -68,7 +71,7 @@ public class WarehouseServiceTests {
         assertThat(saved.getCity()).isEqualTo(VALID_CITY);
         assertThat(saved.getZipCode()).isEqualTo(VALID_ZIP);
         assertThat(saved.getProvince()).isEqualTo(VALID_PROVINCE);
-        verify(warehouseRepo, atMostOnce()).save(toSave);
+        verify(warehouseRepo, atMostOnce()).save(expected);
     }
 
     @Test
@@ -86,6 +89,6 @@ public class WarehouseServiceTests {
         final ConstraintDeclarationException constraintDeclarationException =
                 assertThrows(ConstraintDeclarationException.class, () -> warehouseService.create(toSave));
         assertThat(constraintDeclarationException.getMessage()).isEqualTo("The city must not be null");
-        verify(warehouseRepo, never()).save(toSave);
+        verify(warehouseRepo, never()).save(any());
     }
 }
