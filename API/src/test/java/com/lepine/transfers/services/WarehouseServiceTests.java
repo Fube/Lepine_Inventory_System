@@ -1,6 +1,7 @@
 package com.lepine.transfers.services;
 
 import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
@@ -13,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintViolationException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = { MapperConfig.class, WarehouseServiceImpl.class })
+@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, WarehouseServiceImpl.class })
 @ActiveProfiles({"test"})
 public class WarehouseServiceTests {
 
@@ -80,15 +81,15 @@ public class WarehouseServiceTests {
 
         // Arrange
         final WarehouseActiveLessUUIDLessDTO toSave = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
                 .zipCode(VALID_ZIP)
                 .province(VALID_PROVINCE)
                 .build();
 
         // Act & Assert
-        final ConstraintDeclarationException constraintDeclarationException =
-                assertThrows(ConstraintDeclarationException.class, () -> warehouseService.create(toSave));
-        assertThat(constraintDeclarationException.getMessage()).isEqualTo("The city must not be null");
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseService.create(toSave));
+
+        assertThat(constraintViolationException.getMessage()).isEqualTo("City must not be null");
         verify(warehouseRepo, never()).save(any());
     }
 }

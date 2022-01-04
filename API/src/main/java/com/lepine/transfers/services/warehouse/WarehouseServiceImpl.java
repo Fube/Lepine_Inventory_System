@@ -7,10 +7,14 @@ import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepo warehouseRepo;
