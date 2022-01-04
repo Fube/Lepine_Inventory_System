@@ -1,11 +1,24 @@
 package com.lepine.transfers.services.warehouse;
 
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.data.warehouse.WarehouseRepo;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
+@Service
+@Slf4j
+@RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
+
+    private final WarehouseRepo warehouseRepo;
 
     @Override
     public Warehouse create(Warehouse warehouse) {
-        return null;
+        log.info("Creating warehouse with zip {}", warehouse.getZipCode());
+        final Warehouse save = warehouseRepo.save(warehouse);
+        log.info("Warehouse created with uuid {}", save.getUuid());
+
+        return save;
     }
 }
