@@ -11,12 +11,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.validation.ConstraintDeclarationException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.atMostOnce;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {WarehouseServiceImpl.class})
 @ActiveProfiles({"test"})
@@ -62,5 +63,23 @@ public class WarehouseServiceTests {
         assertThat(saved.getProvince()).isEqualTo(VALID_PROVINCE);
         assertThat(saved.isActive()).isTrue();
         verify(warehouseRepo, atMostOnce()).save(toSave);
+    }
+
+    @Test
+    @DisplayName("uuMEUbMZnG: Given null city when create, then throw ConstraintViolationException")
+    void create_NullCityActiveLessUUIDLessDTO(){
+
+        // Arrange
+        final Warehouse toSave = Warehouse.builder()
+            .city(null)
+            .zipCode(VALID_ZIP)
+            .province(VALID_PROVINCE)
+            .build();
+
+        // Act & Assert
+        final ConstraintDeclarationException constraintDeclarationException =
+                assertThrows(ConstraintDeclarationException.class, () -> warehouseService.create(toSave));
+        assertThat(constraintDeclarationException.getMessage()).isEqualTo("The city must not be null");
+        verify(warehouseRepo, never()).save(toSave);
     }
 }
