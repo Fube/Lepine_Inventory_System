@@ -46,7 +46,9 @@ public class WarehouseControllerTests {
             ERROR_MESSAGE_ZIP_NOT_NULL,
             ERROR_MESSAGE_ZIP_NOT_BLANK,
             ERROR_MESSAGE_PROVINCE_NOT_NULL,
-            ERROR_MESSAGE_PROVINCE_NOT_BLANK;
+            ERROR_MESSAGE_PROVINCE_NOT_BLANK,
+            ERROR_MESSAGE_PAGINATION_PAGE_MIN,
+            ERROR_MESSAGE_PAGINATION_SIZE_MIN;
 
     @BeforeAll
     void bSetup(){
@@ -260,4 +262,57 @@ public class WarehouseControllerTests {
         verify(warehouseService, never()).create(any());
     }
 
+    @Test
+    @DisplayName("uvCOaMjFNg: Given page less than 1 when getAll, then throw ConstraintViolationException")
+    void getAll_PageLessThan1_ThrowConstraintViolationException() {
+
+        // Arrange
+        final int pageNumber = 0, pageSize = 10;
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.getAll(pageNumber, pageSize));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_PAGINATION_PAGE_MIN);
+
+        verify(warehouseService, never()).findAll(any());
+    }
+
+    @Test
+    @DisplayName("znLPozjllS: Given page size less than 1 when getAll, then throw ConstraintViolationException")
+    void getAll_PageSizeLessThan1_ThrowConstraintViolationException() {
+
+        // Arrange
+        final int pageNumber = 1, pageSize = 0;
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.getAll(pageNumber, pageSize));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_PAGINATION_SIZE_MIN);
+
+        verify(warehouseService, never()).findAll(any());
+    }
+
+    @Test
+    @DisplayName("ipIXNstdae: Given page and size less than 1 when getAll, then throw ConstraintViolationException")
+    void getAll_PageAndSizeLessThan1_ThrowConstraintViolationException() {
+
+        // Arrange
+        final int pageNumber = 0, pageSize = 0;
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.getAll(pageNumber, pageSize));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_PAGINATION_PAGE_MIN, ERROR_MESSAGE_PAGINATION_SIZE_MIN);
+
+        verify(warehouseService, never()).findAll(any());
+    }
 }
