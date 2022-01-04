@@ -14,11 +14,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -89,7 +92,15 @@ public class WarehouseServiceTests {
         final ConstraintViolationException constraintViolationException =
                 assertThrows(ConstraintViolationException.class, () -> warehouseService.create(toSave));
 
-        assertThat(constraintViolationException.getMessage()).isEqualTo("City must not be null");
+        final Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
+        assertFalse(constraintViolations.isEmpty());
+        assertEquals(1, constraintViolations.size());
+
+        final Set<String> collect = constraintViolations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+
+        assertThat(collect).contains("City must not be null");
         verify(warehouseRepo, never()).save(any());
     }
 }
