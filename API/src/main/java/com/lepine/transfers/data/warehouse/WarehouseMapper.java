@@ -9,6 +9,13 @@ public interface WarehouseMapper {
 
     @Mappings({
             @Mapping(target = "uuid", ignore = true),
+            @Mapping(target = "isActive", ignore = true),
     })
     Warehouse toEntity(WarehouseActiveLessUUIDLessDTO warehouseActiveLessUUIDLessDTO);
+
+    @Mappings({
+            @Mapping(target = "uuid", ignore = true),
+            @Mapping(target = "isActive", source = "active"),
+    })
+    Warehouse toEntity(WarehouseUUIDLessDTO warehouseUUIDLessDTO);
 }
