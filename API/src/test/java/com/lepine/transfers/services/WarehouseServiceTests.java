@@ -96,7 +96,7 @@ public class WarehouseServiceTests {
                 assertThrows(ConstraintViolationException.class, () -> warehouseService.create(toSave));
 
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
-        assertThat(collect).containsExactly(ERROR_MESSAGE_CITY_NOT_NULL);
+        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_CITY_NOT_NULL, ERROR_MESSAGE_CITY_NOT_BLANK);
 
         verify(warehouseRepo, never()).save(any());
     }
