@@ -20,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
@@ -551,5 +554,41 @@ public class WarehouseServiceTests {
 
         verify(warehouseRepo, never()).findByUuid(any());
         verify(warehouseRepo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("iRoKlSuZwS: Given nothing when findAll, then return all warehouses paginated")
+    void findAll_NoArguments_ReturnAllPaginated(){
+
+        // Arrange
+        final Pageable pageable = PageRequest.of(0, 10);
+        final Page<Warehouse> expected = Page.empty(pageable);
+        when(warehouseRepo.findAll(pageable)).thenReturn(expected);
+
+        // Act
+        final Page<Warehouse> result = warehouseService.findAll();
+
+        // Assert
+        assertThat(result).isEqualTo(expected);
+        verify(warehouseRepo).findAll(pageable);
+        verify(warehouseRepo, never()).findAll();
+    }
+
+    @Test
+    @DisplayName("xxuFJXKpgT: Given page request when findAll, then return all warehouses paginated")
+    void findAll_PageRequest_ReturnAllPaginated(){
+
+        // Arrange
+        final PageRequest pageRequest = PageRequest.of(1, 5);
+        final Page<Warehouse> expected = Page.empty(pageRequest);
+        when(warehouseRepo.findAll(pageRequest)).thenReturn(expected);
+
+        // Act
+        final Page<Warehouse> result = warehouseService.findAll(pageRequest);
+
+        // Assert
+        assertThat(result).isEqualTo(expected);
+        verify(warehouseRepo).findAll(pageRequest);
+        verify(warehouseRepo, never()).findAll();
     }
 }
