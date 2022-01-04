@@ -1,6 +1,7 @@
 package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.config.ValidationConfig;
+import com.lepine.transfers.controllers.warehouse.WarehouseController;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.services.warehouse.WarehouseService;
