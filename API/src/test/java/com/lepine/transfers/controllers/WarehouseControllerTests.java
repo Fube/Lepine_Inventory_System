@@ -4,6 +4,7 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.warehouse.WarehouseController;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
+import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -145,6 +147,29 @@ public class WarehouseControllerTests {
         assertThat(collect).containsExactly(ERROR_MESSAGE_ZIP_NOT_NULL, ERROR_MESSAGE_ZIP_NOT_BLANK);
 
         verify(warehouseService, never()).create(any());
+    }
+
+    @Test
+    @DisplayName("uvCOaMjFNg: Given duplicate zipcode when create, then throw DuplicateZipCodeException")
+    void create_DuplicateZipCode_ThrowDuplicateZipCodeException() {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+        given(warehouseService.create(any()))
+                .willThrow(new DuplicateZipCodeException(VALID_ZIP));
+
+        final DuplicateZipCodeException duplicateZipCodeException =
+                assertThrows(DuplicateZipCodeException.class, () -> warehouseController.create(given));
+
+        // Assert
+        assertThat(duplicateZipCodeException.getMessage())
+                .isEqualTo(format(ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP, VALID_ZIP));
+
+        verify(warehouseService, atMostOnce()).create(argThat(w -> w.getZipCode().equals(given.getZipCode())));
     }
 
     @Test
