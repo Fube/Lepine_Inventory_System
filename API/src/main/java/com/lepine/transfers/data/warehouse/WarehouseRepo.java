@@ -10,4 +10,6 @@ public interface WarehouseRepo extends JpaRepository<Warehouse, UUID> {
     Integer deleteByUuid(UUID uuid);
 
     Optional<Warehouse> findByZipCode(String zipCode);
+
+    Optional<Warehouse> findByUuid(UUID uuid);
 }
