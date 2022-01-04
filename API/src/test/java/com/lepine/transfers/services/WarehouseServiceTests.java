@@ -391,4 +391,38 @@ public class WarehouseServiceTests {
         verify(warehouseRepo, never()).findByUuid(any());
         verify(warehouseRepo, never()).save(any());
     }
+
+    @Test
+    @DisplayName("YiEzGmrmGY: Given valid UUID of existing warehouse with duplicate zipcode when update, then throw DuplicateZipCodeException")
+    void update_ExistingWarehouseUUIDLessDTO_DuplicateZip(){
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final WarehouseUUIDLessDTO toUpdate = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        given(warehouseRepo.findByUuid(warehouse.getUuid()))
+                .willReturn(Optional.of(warehouse));
+        given(warehouseRepo.findByZipCode(VALID_ZIP))
+                .willReturn(Optional.of(warehouse));
+
+        // Act & Assert
+        final DuplicateZipCodeException duplicateWarehouseException =
+                assertThrows(DuplicateZipCodeException.class, () -> warehouseService.update(warehouse.getUuid(), toUpdate));
+
+        assertThat(duplicateWarehouseException.getMessage())
+                .isEqualTo(format(ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP, VALID_ZIP));
+
+        verify(warehouseRepo).findByUuid(warehouse.getUuid());
+        verify(warehouseRepo).findByZipCode(VALID_ZIP);
+        verify(warehouseRepo, never()).save(any());
+    }
 }
