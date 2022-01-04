@@ -18,6 +18,9 @@ public class WarehouseUUIDLessDTO {
     @NotBlank(message = "{warehouse.zipcode.not_blank}")
     private String zipCode;
     private String city;
+
+    @NotNull(message = "{warehouse.province.not_null}")
+    @NotBlank(message = "{warehouse.province.not_blank}")
     private String province;
     private boolean active;
 }
