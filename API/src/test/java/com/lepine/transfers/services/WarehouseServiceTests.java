@@ -440,4 +440,60 @@ public class WarehouseServiceTests {
         verify(warehouseRepo).findByZipCode(VALID_ZIP);
         verify(warehouseRepo, never()).save(any());
     }
+
+    @Test
+    @DisplayName("HAOtuUfIso: Given valid UUID of existing warehouse with blank province when update, then throw ConstraintViolationException")
+    void update_ExistingWarehouseUUIDLessDTO_BlankProvince(){
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final WarehouseUUIDLessDTO toUpdate = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province("")
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseService.update(warehouse.getUuid(), toUpdate));
+
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_PROVINCE_NOT_BLANK);
+
+        verify(warehouseRepo, never()).findByUuid(any());
+        verify(warehouseRepo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("QJabOocKHP: Given valid UUID of existing warehouse with null province when update, then throw ConstraintViolationException")
+    void update_ExistingWarehouseUUIDLessDTO_NullProvince(){
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final WarehouseUUIDLessDTO toUpdate = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(null)
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseService.update(warehouse.getUuid(), toUpdate));
+
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_PROVINCE_NOT_NULL, ERROR_MESSAGE_PROVINCE_NOT_BLANK);
+
+        verify(warehouseRepo, never()).findByUuid(any());
+        verify(warehouseRepo, never()).save(any());
+    }
 }
