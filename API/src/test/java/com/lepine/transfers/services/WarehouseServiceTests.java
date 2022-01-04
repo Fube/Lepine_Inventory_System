@@ -412,7 +412,7 @@ public class WarehouseServiceTests {
         given(warehouseRepo.findByUuid(warehouse.getUuid()))
                 .willReturn(Optional.of(warehouse));
         given(warehouseRepo.findByZipCode(VALID_ZIP))
-                .willReturn(Optional.of(warehouse));
+                .willReturn(Optional.of(warehouse.toBuilder().uuid(UUID.randomUUID()).build()));
 
         // Act & Assert
         final DuplicateZipCodeException duplicateWarehouseException =
