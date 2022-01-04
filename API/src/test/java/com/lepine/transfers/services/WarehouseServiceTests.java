@@ -40,17 +40,24 @@ public class WarehouseServiceTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("LHLspyjPmV: Given valid warehouse when create, then return Warehouse")
+    @DisplayName("LHLspyjPmV: Given valid warehouse dto when create, then return Warehouse")
     void create_ValidWarehouseActiveLessUUIDLessDTO(){
 
         // Arrange
-        final Warehouse toSave = Warehouse.builder()
+        final WarehouseActiveLessUUIDLessDTO toSave = WarehouseActiveLessUUIDLessDTO.builder()
             .city(VALID_CITY)
             .zipCode(VALID_ZIP)
             .province(VALID_PROVINCE)
             .build();
 
-        given(warehouseRepo.save(toSave)).willReturn(toSave.toBuilder().uuid(VALID_UUID).build());
+        final Warehouse expected = Warehouse.builder()
+            .city(VALID_CITY)
+            .zipCode(VALID_ZIP)
+            .province(VALID_PROVINCE)
+            .build();
+
+        given(warehouseRepo.save(argThat(n -> n.getZipCode().equals(VALID_ZIP))))
+                .willReturn(expected);
 
         // Act
         final Warehouse saved = warehouseService.create(toSave);
@@ -61,7 +68,6 @@ public class WarehouseServiceTests {
         assertThat(saved.getCity()).isEqualTo(VALID_CITY);
         assertThat(saved.getZipCode()).isEqualTo(VALID_ZIP);
         assertThat(saved.getProvince()).isEqualTo(VALID_PROVINCE);
-        assertThat(saved.isActive()).isTrue();
         verify(warehouseRepo, atMostOnce()).save(toSave);
     }
 
@@ -70,11 +76,11 @@ public class WarehouseServiceTests {
     void create_NullCityActiveLessUUIDLessDTO(){
 
         // Arrange
-        final Warehouse toSave = Warehouse.builder()
-            .city(null)
-            .zipCode(VALID_ZIP)
-            .province(VALID_PROVINCE)
-            .build();
+        final WarehouseActiveLessUUIDLessDTO toSave = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
 
         // Act & Assert
         final ConstraintDeclarationException constraintDeclarationException =
