@@ -301,10 +301,17 @@ public class WarehouseServiceTests {
                 .province("SomeOtherProvince")
                 .build();
 
+        final Warehouse expectedWarehouse = Warehouse.builder()
+                .uuid(warehouse.getUuid())
+                .city(toUpdate.getCity())
+                .zipCode(toUpdate.getZipCode())
+                .province(toUpdate.getProvince())
+                .build();
+
         when(warehouseRepo.findByUuid(warehouse.getUuid()))
                 .thenReturn(Optional.of(warehouse));
         when(warehouseRepo.save(argThat(w -> w.getUuid().equals(warehouse.getUuid()))))
-                .thenReturn(warehouse);
+                .thenReturn(expectedWarehouse);
 
         // Act
         final Warehouse updated = warehouseService.update(warehouse.getUuid(), toUpdate);
@@ -317,7 +324,7 @@ public class WarehouseServiceTests {
         assertThat(updated.isActive()).isEqualTo(warehouse.isActive());
 
         verify(warehouseRepo).findByUuid(warehouse.getUuid());
-        verify(warehouseRepo).save(warehouse);
+        verify(warehouseRepo).save(argThat(w -> w.getUuid().equals(warehouse.getUuid())));
     }
 
     @Test
