@@ -266,4 +266,18 @@ public class WarehouseServiceTests {
         verify(warehouseRepo, never()).save(any());
         verify(warehouseRepo).findByZipCode(VALID_ZIP);
     }
+
+    @Test
+    @DisplayName("NhzdRhdvIW: Given UUID when delete, then try to delete warehouse regardless of its existence")
+    void delete_UUID(){
+
+        // Arrange
+        final UUID uuid = UUID.randomUUID();
+
+        // Act
+        warehouseService.delete(uuid);
+
+        // Assert
+        verify(warehouseRepo).deleteByUuid(uuid);
+    }
 }
