@@ -1,6 +1,7 @@
 package com.lepine.transfers.services.warehouse;
 
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
