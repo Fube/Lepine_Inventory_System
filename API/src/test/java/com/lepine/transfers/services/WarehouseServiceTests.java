@@ -285,7 +285,7 @@ public class WarehouseServiceTests {
     }
 
     @Test
-    @DisplayName("IpgpmsFURI: Given valid WaarehouseUUIDLessDTO when update, then update warehouse")
+    @DisplayName("IpgpmsFURI: Given valid WarehouseUUIDLessDTO when update, then update warehouse")
     void update_ValidWarehouseUUIDLessDTO(){
 
         // Arrange
