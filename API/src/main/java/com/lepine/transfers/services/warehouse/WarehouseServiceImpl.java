@@ -5,6 +5,8 @@ import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -62,5 +64,16 @@ public class WarehouseServiceImpl implements WarehouseService {
         log.info("Warehouse updated");
 
         return save;
+    }
+
+    @Override
+    public Page<Warehouse> findAll() {
+        return findAll(PageRequest.of(0, 10));
+    }
+
+    @Override
+    public Page<Warehouse> findAll(PageRequest pageRequest) {
+        log.info("Finding all warehouses for page {} and size {}", pageRequest.getPageNumber(), pageRequest.getPageSize());
+        return warehouseRepo.findAll(pageRequest);
     }
 }
