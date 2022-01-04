@@ -5,6 +5,7 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
+import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.services.warehouse.WarehouseServiceImpl;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
