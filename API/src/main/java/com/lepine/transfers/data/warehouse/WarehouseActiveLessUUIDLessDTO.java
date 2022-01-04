@@ -14,6 +14,8 @@ import javax.validation.constraints.NotNull;
 @Builder(toBuilder = true)
 public class WarehouseActiveLessUUIDLessDTO {
 
+    @NotNull(message = "Zipcode must not be null")
+    @NotBlank(message = "Zipcode must not be blank")
     private String zipCode;
 
     @NotNull(message = "City must not be null")
