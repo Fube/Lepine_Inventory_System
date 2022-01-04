@@ -13,26 +13,25 @@ import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.exceptions.user.RoleNotFoundException;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.services.user.UserServiceImpl;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -242,17 +241,8 @@ public class UserServiceTests {
         final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        
-        assertTrue(collect.contains(
-                messageSourceHelper.apply("user.not_null")
-        ));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactly(messageSourceHelper.apply("user.not_null"));
 
         verify(userRepo, times(0)).save(any());
     }
@@ -270,15 +260,8 @@ public class UserServiceTests {
         final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        
-        assertTrue(collect.contains(messageSourceHelper.apply("user.email.not_blank")));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactly(messageSourceHelper.apply("user.email.not_blank"));
 
         verify(userRepo, times(0)).save(any());
     }
@@ -297,15 +280,8 @@ public class UserServiceTests {
         final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        
-        assertTrue(collect.contains(messageSourceHelper.apply("user.email.not_blank")));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactly(messageSourceHelper.apply("user.email.not_blank"));
 
         verify(userRepo, times(0)).save(any());
     }
@@ -324,15 +300,8 @@ public class UserServiceTests {
         final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        
-        assertTrue(collect.containsAll(List.of("Email must be a valid email address")));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactly(messageSourceHelper.apply("user.email.not_valid"));
 
         verify(userRepo, times(0)).save(any());
     }
@@ -351,17 +320,8 @@ public class UserServiceTests {
         final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        
-        assertTrue(collect.contains(
-                messageSourceHelper.apply("user.password.not_blank")
-        ));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_blank"));
 
         verify(userRepo, times(0)).save(any());
     }
@@ -381,18 +341,11 @@ public class UserServiceTests {
                 assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(2, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-
-        assertTrue(collect.containsAll(List.of(
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactlyInAnyOrder(
                 messageSourceHelper.apply("user.password.not_blank"),
                 messageSourceHelper.apply("user.password.not_valid")
-        )));
+        );
 
         verify(userRepo, times(0)).save(any());
     }
@@ -411,15 +364,8 @@ public class UserServiceTests {
         final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = cve.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        
-        assertTrue(collect.contains(messageSourceHelper.apply("user.password.not_valid")));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_valid"));
 
         verify(userRepo, times(0)).save(any());
     }
