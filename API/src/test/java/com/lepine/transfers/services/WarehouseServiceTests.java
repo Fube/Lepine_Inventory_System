@@ -35,7 +35,9 @@ public class WarehouseServiceTests {
     private final static UUID
         VALID_UUID = UUID.randomUUID();
 
-    private final static String ERROR_MESSAGE_CITY_NOT_NULL = "City must not be null";
+    private final static String
+            ERROR_MESSAGE_CITY_NOT_NULL = "City must not be null",
+            ERROR_MESSAGE_CITY_NOT_BLANK = "City must not be blank";
 
     @Autowired
     private WarehouseService warehouseService;
@@ -95,6 +97,27 @@ public class WarehouseServiceTests {
 
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
         assertThat(collect).containsExactly(ERROR_MESSAGE_CITY_NOT_NULL);
+
+        verify(warehouseRepo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("kNsjRSVhyX: Given blank city when create, then throw ConstraintViolationException")
+    void create_BlankCityActiveLessUUIDLessDTO(){
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO toSave = WarehouseActiveLessUUIDLessDTO.builder()
+                .city("")
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseService.create(toSave));
+
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_CITY_NOT_BLANK);
 
         verify(warehouseRepo, never()).save(any());
     }
