@@ -38,6 +38,8 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public void delete(UUID uuid) {
-
+        log.info("Deleting warehouse with uuid {}", uuid);
+        warehouseRepo.deleteByUuid(uuid);
+        log.info("Warehouse deleted");
     }
 }
