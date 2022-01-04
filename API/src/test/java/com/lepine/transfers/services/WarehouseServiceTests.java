@@ -12,10 +12,7 @@ import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.services.warehouse.WarehouseServiceImpl;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -72,6 +69,11 @@ public class WarehouseServiceTests {
         ERROR_MESSAGE_ZIP_NOT_BLANK = w.getMessage("warehouse.zipcode.not_blank");
         ERROR_MESSAGE_PROVINCE_NOT_NULL = w.getMessage("warehouse.province.not_null");
         ERROR_MESSAGE_PROVINCE_NOT_BLANK = w.getMessage("warehouse.province.not_blank");
+    }
+
+    @AfterEach
+    void tearDown() {
+        reset(warehouseRepo);
     }
 
     @Autowired
