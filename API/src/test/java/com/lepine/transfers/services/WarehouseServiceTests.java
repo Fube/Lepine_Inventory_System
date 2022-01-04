@@ -335,4 +335,32 @@ public class WarehouseServiceTests {
 
         verify(warehouseRepo, never()).save(any());
     }
+
+    @Test
+    @DisplayName("XNiCkEzPhB: Given valid UUID of existing warehouse with blank zip when update, then throw ConstraintViolationException")
+    void update_ExistingWarehouseUUIDLessDTO_BlankZip(){
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final WarehouseUUIDLessDTO toUpdate = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode("")
+                .province(VALID_PROVINCE)
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseService.update(warehouse.getUuid(), toUpdate));
+
+        assertThat(constraintViolationException.getMessage())
+                .isEqualTo(ERROR_MESSAGE_ZIP_NOT_BLANK);
+
+        verify(warehouseRepo, never()).findByUuid(any());
+        verify(warehouseRepo, never()).save(any());
+    }
 }
