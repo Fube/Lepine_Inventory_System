@@ -35,6 +35,8 @@ public class WarehouseServiceTests {
     private final static UUID
         VALID_UUID = UUID.randomUUID();
 
+    private final static String ERROR_MESSAGE_CITY_NOT_NULL = "City must not be null";
+
     @Autowired
     private WarehouseService warehouseService;
 
@@ -92,7 +94,7 @@ public class WarehouseServiceTests {
                 assertThrows(ConstraintViolationException.class, () -> warehouseService.create(toSave));
 
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
-        assertThat(collect).containsExactly("City must not be null");
+        assertThat(collect).containsExactly(ERROR_MESSAGE_CITY_NOT_NULL);
 
         verify(warehouseRepo, never()).save(any());
     }
