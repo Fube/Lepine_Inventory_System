@@ -264,5 +264,6 @@ public class WarehouseServiceTests {
                 .isEqualTo(format(ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP, VALID_ZIP));
 
         verify(warehouseRepo, never()).save(any());
+        verify(warehouseRepo).findByZipCode(VALID_ZIP);
     }
 }
