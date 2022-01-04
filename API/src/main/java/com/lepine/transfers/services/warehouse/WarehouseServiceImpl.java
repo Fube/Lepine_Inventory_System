@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -32,5 +34,10 @@ public class WarehouseServiceImpl implements WarehouseService {
         log.info("Warehouse created with uuid {}", save.getUuid());
 
         return save;
+    }
+
+    @Override
+    public void delete(UUID uuid) {
+
     }
 }
