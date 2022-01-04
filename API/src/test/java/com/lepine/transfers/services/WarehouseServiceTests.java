@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -54,7 +55,7 @@ public class WarehouseServiceTests {
             ERROR_MESSAGE_ZIP_NOT_BLANK,
             ERROR_MESSAGE_PROVINCE_NOT_NULL,
             ERROR_MESSAGE_PROVINCE_NOT_BLANK,
-            ERROR_MESSAGE_DUPLICATE_ZIP;
+            ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP = "Zipcode %s is already in use";
 
     @BeforeAll
     void bSetup(){
@@ -259,7 +260,8 @@ public class WarehouseServiceTests {
         final DuplicateZipCodeException duplicateZipCodeException =
                 assertThrows(DuplicateZipCodeException.class, () -> warehouseService.create(toSave));
 
-        assertThat(duplicateZipCodeException.getMessage()).isEqualTo(ERROR_MESSAGE_DUPLICATE_ZIP);
+        assertThat(duplicateZipCodeException.getMessage())
+                .isEqualTo(format(ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP, VALID_ZIP));
 
         verify(warehouseRepo, never()).save(any());
     }
