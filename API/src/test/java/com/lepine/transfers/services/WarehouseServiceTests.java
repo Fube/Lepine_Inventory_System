@@ -357,8 +357,8 @@ public class WarehouseServiceTests {
         final ConstraintViolationException constraintViolationException =
                 assertThrows(ConstraintViolationException.class, () -> warehouseService.update(warehouse.getUuid(), toUpdate));
 
-        assertThat(constraintViolationException.getMessage())
-                .isEqualTo(ERROR_MESSAGE_ZIP_NOT_BLANK);
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_ZIP_NOT_BLANK);
 
         verify(warehouseRepo, never()).findByUuid(any());
         verify(warehouseRepo, never()).save(any());
