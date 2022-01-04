@@ -280,4 +280,32 @@ public class WarehouseServiceTests {
         // Assert
         verify(warehouseRepo).deleteByUuid(uuid);
     }
+
+    @Test
+    @DisplayName("IpgpmsFURI: Given valid WaarehouseUUIDLessDTO when update, then update warehouse")
+    void update_ValidWarehouseUUIDLessDTO(){
+
+        // Arrange
+        final Warehouse warehouse = Warehouse.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final WarehouseUUIDLessDTO toUpdate = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        when(warehouseRepo.findByUuid(warehouse.getUuid()))
+                .thenReturn(Optional.of(warehouse));
+
+        // Act
+        warehouseService.update(warehouse.getUuid(), toUpdate);
+
+        // Assert
+        verify(warehouseRepo).findByUuid(warehouse.getUuid());
+        verify(warehouseRepo).save(warehouse);
+    }
 }
