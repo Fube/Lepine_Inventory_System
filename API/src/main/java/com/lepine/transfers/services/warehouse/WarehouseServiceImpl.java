@@ -2,6 +2,7 @@ package com.lepine.transfers.services.warehouse;
 
 import com.lepine.transfers.data.warehouse.*;
 import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public void update(UUID uuid, WarehouseUUIDLessDTO toUpdate) {
         log.info("Updating warehouse with uuid {}", uuid);
-        final Warehouse warehouse = warehouseRepo.findByUuid(uuid).get();
+        final Warehouse warehouse = warehouseRepo.findByUuid(uuid)
+                .orElseThrow(() -> new WarehouseNotFoundException(uuid));
         warehouse.setZipCode(toUpdate.getZipCode());
         warehouseRepo.save(warehouse);
         log.info("Warehouse updated");
