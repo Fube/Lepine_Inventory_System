@@ -317,20 +317,21 @@ public class WarehouseServiceTests {
     void update_NonExistingWarehouseUUIDLessDTO(){
 
         // Arrange
+        final UUID uuid = UUID.randomUUID();
         final WarehouseUUIDLessDTO toUpdate = WarehouseUUIDLessDTO.builder()
                 .city(VALID_CITY)
                 .zipCode(VALID_ZIP)
                 .province(VALID_PROVINCE)
                 .build();
-        given(warehouseRepo.findByUuid(any()))
+        given(warehouseRepo.findByUuid(uuid))
                 .willReturn(Optional.empty());
 
         // Act & Assert
         final WarehouseNotFoundException warehouseNotFoundException =
-                assertThrows(WarehouseNotFoundException.class, () -> warehouseService.update(UUID.randomUUID(), toUpdate));
+                assertThrows(WarehouseNotFoundException.class, () -> warehouseService.update(uuid, toUpdate));
 
         assertThat(warehouseNotFoundException.getMessage())
-                .isEqualTo(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, toUpdate.getUuid()));
+                .isEqualTo(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, uuid));
 
         verify(warehouseRepo, never()).save(any());
     }
