@@ -7,6 +7,7 @@ import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.services.warehouse.WarehouseServiceImpl;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,15 +93,9 @@ public class WarehouseServiceTests {
         final ConstraintViolationException constraintViolationException =
                 assertThrows(ConstraintViolationException.class, () -> warehouseService.create(toSave));
 
-        final Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly("City must not be null");
 
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-
-        assertThat(collect).contains("City must not be null");
         verify(warehouseRepo, never()).save(any());
     }
 }
