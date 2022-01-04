@@ -309,4 +309,27 @@ public class WarehouseServiceTests {
         verify(warehouseRepo).findByUuid(warehouse.getUuid());
         verify(warehouseRepo).save(warehouse);
     }
+
+    @Test
+    @DisplayName("VnvttdRxZP: Given valid UUID of non-existing warehouse when update, then throw WarehouseNotFoundException")
+    void update_NonExistingWarehouseUUIDLessDTO(){
+
+        // Arrange
+        final WarehouseUUIDLessDTO toUpdate = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+        given(warehouseRepo.findByUuid(any()))
+                .willReturn(Optional.empty());
+
+        // Act & Assert
+        final WarehouseNotFoundException warehouseNotFoundException =
+                assertThrows(WarehouseNotFoundException.class, () -> warehouseService.update(UUID.randomUUID(), toUpdate));
+
+        assertThat(warehouseNotFoundException.getMessage())
+                .isEqualTo(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, toUpdate.getUuid()));
+
+        verify(warehouseRepo, never()).save(any());
+    }
 }
