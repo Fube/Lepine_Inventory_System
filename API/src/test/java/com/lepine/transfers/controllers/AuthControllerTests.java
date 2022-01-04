@@ -11,6 +11,7 @@ import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.servlet.http.Cookie;
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.net.HttpCookie;
 import java.util.Locale;
@@ -38,7 +38,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, JWTConfig.class, AuthController.class })
+@SpringBootTest(classes = {MapperConfig.class, ValidationConfig.class, JWTConfig.class, AuthController.class})
 @ActiveProfiles({"test"})
 public class AuthControllerTests {
 
@@ -144,15 +144,10 @@ public class AuthControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> authController.login(userLogin));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = constraintViolationException.getConstraintViolations();
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertThat(collect)
-                .containsExactlyInAnyOrder(
-                        messageSource.getMessage("user.email.not_blank", null, Locale.getDefault()),
-                        messageSource.getMessage("user.password.not_blank", null, Locale.getDefault())
-                );
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(
+                messageSource.getMessage("user.email.not_blank", null, Locale.getDefault()),
+                messageSource.getMessage("user.password.not_blank", null, Locale.getDefault()));
 
         verify(authService, times(0)).login(userLogin);
     }
