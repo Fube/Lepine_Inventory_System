@@ -56,6 +56,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
 
         final Warehouse updated = warehouseMapper.toEntity(toUpdate);
+        updated.setUuid(warehouse.getUuid());
 
         final Warehouse save = warehouseRepo.save(updated);
         log.info("Warehouse updated");
