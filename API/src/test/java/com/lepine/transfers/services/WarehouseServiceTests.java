@@ -8,24 +8,34 @@ import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.services.warehouse.WarehouseServiceImpl;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
+import com.lepine.transfers.utils.MessageSourceUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, WarehouseServiceImpl.class })
+@SpringBootTest(classes = {
+        MapperConfig.class,
+        ValidationConfig.class,
+        WarehouseServiceImpl.class,
+})
 @ActiveProfiles({"test"})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class WarehouseServiceTests {
 
     private final static String
@@ -35,17 +45,30 @@ public class WarehouseServiceTests {
     private final static UUID
         VALID_UUID = UUID.randomUUID();
 
-    private final static String
-            ERROR_MESSAGE_CITY_NOT_NULL = "City must not be null",
-            ERROR_MESSAGE_CITY_NOT_BLANK = "City must not be blank",
-            ERROR_MESSAGE_ZIP_NOT_NULL = "Zipcode must not be null",
-            ERROR_MESSAGE_ZIP_NOT_BLANK = "Zipcode must not be blank",
-            ERROR_MESSAGE_PROVINCE_NOT_NULL = "Province must not be null",
-            ERROR_MESSAGE_PROVINCE_NOT_BLANK = "Province must not be blank";
+    private String
+            ERROR_MESSAGE_CITY_NOT_NULL,
+            ERROR_MESSAGE_CITY_NOT_BLANK,
+            ERROR_MESSAGE_ZIP_NOT_NULL,
+            ERROR_MESSAGE_ZIP_NOT_BLANK,
+            ERROR_MESSAGE_PROVINCE_NOT_NULL,
+            ERROR_MESSAGE_PROVINCE_NOT_BLANK;
 
+    @BeforeAll
+    void bSetup(){
+        final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
+        ERROR_MESSAGE_CITY_NOT_NULL = w.getMessage("warehouse.city.not_null");
+        ERROR_MESSAGE_CITY_NOT_BLANK = w.getMessage("warehouse.city.not_blank");
+        ERROR_MESSAGE_ZIP_NOT_NULL = w.getMessage("warehouse.zipcode.not_null");
+        ERROR_MESSAGE_ZIP_NOT_BLANK = w.getMessage("warehouse.zipcode.not_blank");
+        ERROR_MESSAGE_PROVINCE_NOT_NULL = w.getMessage("warehouse.province.not_null");
+        ERROR_MESSAGE_PROVINCE_NOT_BLANK = w.getMessage("warehouse.province.not_blank");
+    }
 
     @Autowired
     private WarehouseService warehouseService;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
 
     @MockBean
     private WarehouseRepo warehouseRepo;

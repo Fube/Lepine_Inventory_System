@@ -14,15 +14,15 @@ import javax.validation.constraints.NotNull;
 @Builder(toBuilder = true)
 public class WarehouseActiveLessUUIDLessDTO {
 
-    @NotNull(message = "Zipcode must not be null")
-    @NotBlank(message = "Zipcode must not be blank")
+    @NotNull(message = "{warehouse.zipcode.not_null}")
+    @NotBlank(message = "{warehouse.zipcode.not_blank}")
     private String zipCode;
 
-    @NotNull(message = "City must not be null")
-    @NotBlank(message = "City must not be blank")
+    @NotNull(message = "{warehouse.city.not_null}")
+    @NotBlank(message = "{warehouse.city.not_blank}")
     private String city;
 
-    @NotNull(message = "Province must not be null")
-    @NotBlank(message = "Province must not be blank")
+    @NotNull(message = "{warehouse.province.not_null}")
+    @NotBlank(message = "{warehouse.province.not_blank}")
     private String province;
 }
