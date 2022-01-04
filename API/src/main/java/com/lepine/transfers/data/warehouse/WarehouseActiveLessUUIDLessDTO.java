@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -16,6 +17,7 @@ public class WarehouseActiveLessUUIDLessDTO {
     private String zipCode;
 
     @NotNull(message = "City must not be null")
+    @NotBlank(message = "City must not be blank")
     private String city;
 
     private String province;
