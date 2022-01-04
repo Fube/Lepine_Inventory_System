@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -44,9 +45,18 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public void update(UUID uuid, WarehouseUUIDLessDTO toUpdate) {
         log.info("Updating warehouse with uuid {}", uuid);
+
         final Warehouse warehouse = warehouseRepo.findByUuid(uuid)
                 .orElseThrow(() -> new WarehouseNotFoundException(uuid));
+
+        final Optional<Warehouse> existing = warehouseRepo.findByZipCode(toUpdate.getZipCode());
+        if(existing.isPresent() && !existing.get().getUuid().equals(uuid)) {
+            log.error("Warehouse with zip code {} already exists", toUpdate.getZipCode());
+            throw new DuplicateZipCodeException(toUpdate.getZipCode());
+        }
+
         warehouse.setZipCode(toUpdate.getZipCode());
+
         warehouseRepo.save(warehouse);
         log.info("Warehouse updated");
     }
