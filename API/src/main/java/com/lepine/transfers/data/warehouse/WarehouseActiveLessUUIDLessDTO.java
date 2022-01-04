@@ -22,5 +22,7 @@ public class WarehouseActiveLessUUIDLessDTO {
     @NotBlank(message = "City must not be blank")
     private String city;
 
+    @NotNull(message = "Province must not be null")
+    @NotBlank(message = "Province must not be blank")
     private String province;
 }
