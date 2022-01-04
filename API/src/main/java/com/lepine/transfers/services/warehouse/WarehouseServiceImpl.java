@@ -1,9 +1,6 @@
 package com.lepine.transfers.services.warehouse;
 
-import com.lepine.transfers.data.warehouse.Warehouse;
-import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
-import com.lepine.transfers.data.warehouse.WarehouseMapper;
-import com.lepine.transfers.data.warehouse.WarehouseRepo;
+import com.lepine.transfers.data.warehouse.*;
 import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,5 +38,10 @@ public class WarehouseServiceImpl implements WarehouseService {
         log.info("Deleting warehouse with uuid {}", uuid);
         warehouseRepo.deleteByUuid(uuid);
         log.info("Warehouse deleted");
+    }
+
+    @Override
+    public void update(UUID uuid, WarehouseUUIDLessDTO toUpdate) {
+
     }
 }
