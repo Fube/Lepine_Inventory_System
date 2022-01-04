@@ -2,6 +2,7 @@ package com.lepine.transfers.services.warehouse;
 
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
+import com.lepine.transfers.data.warehouse.WarehouseMapper;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepo warehouseRepo;
+    private final WarehouseMapper warehouseMapper;
 
     @Override
     public Warehouse create(WarehouseActiveLessUUIDLessDTO warehouse) {
