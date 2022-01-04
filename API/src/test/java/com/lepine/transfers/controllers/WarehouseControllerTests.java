@@ -120,7 +120,29 @@ public class WarehouseControllerTests {
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
-        assertThat(collect).containsExactly("Zipcode must not be blank");
+        assertThat(collect).containsExactly(ERROR_MESSAGE_ZIP_NOT_BLANK);
+
+        verify(warehouseService, never()).create(any());
+    }
+
+    @Test
+    @DisplayName("TDyevgcMtv: Given null zipcode when create, then throw ConstraintViolationException")
+    void create_NullZipCode_ThrowConstraintViolationException() {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(null)
+                .province(VALID_PROVINCE)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.create(given));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_ZIP_NOT_NULL, ERROR_MESSAGE_ZIP_NOT_BLANK);
 
         verify(warehouseService, never()).create(any());
     }
