@@ -735,6 +735,30 @@ public class WarehouseHttpTests {
     }
 
     @Test
+    @DisplayName("BZwHJAiPOT: Given GET on /warehouses/{uuid} for non-existing warehouse as clerk, then return not found (404, error)")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void getOne_AsClerk_NotFound() throws Exception {
+
+        getOneWarehouse(VALID_UUID, null)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, VALID_UUID)))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
+    @DisplayName("BixPfaFUdE: Given GET on /warehouses/{uuid} for non-existing warehouse as salesperson, then return not found (404, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void getOne_AsSalesperson_NotFound() throws Exception {
+
+        getOneWarehouse(VALID_UUID, null)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, VALID_UUID)))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
     @DisplayName("fZnyMjGmvL: Given PUT on /warehouses/{uuid} with valid dto as manager, then return warehouse (200, warehouse)")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void update_AsManager() throws Exception {
