@@ -14,10 +14,7 @@ import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.utils.MessageSourceUtils;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -281,17 +278,7 @@ public class WarehouseHttpTests {
     }
 
     private ResultActions updateWith(final UUID uuid, final WarehouseUUIDLessDTO given, final Warehouse expected) throws Exception {
-
-        // Arrange
-        final String asString = objectMapper.writeValueAsString(given);
-
-        given(warehouseService.update(uuid, given))
-                .willReturn(expected);
-
-        // Act
-        return mockMvc.perform(put("/warehouses/" + uuid)
-                .contentType("application/json")
-                .content(asString));
+        return updateWith(uuid, given, stubbing -> stubbing.willReturn(expected));
     }
 
     private ResultActions updateWith(final UUID uuid, final WarehouseUUIDLessDTO given, Consumer<BDDMockito.BDDMyOngoingStubbing<Warehouse>> arrangement) throws Exception {
@@ -1065,6 +1052,6 @@ public class WarehouseHttpTests {
                 .andExpect(jsonPath("$.status").value(NOT_FOUND.value()))
                 .andExpect(jsonPath("$.timestamp").exists());
 
-        verify(warehouseService, never()).update(VALID_UUID, given);
+        verify(warehouseService, times(1)).update(VALID_UUID, given);
     }
 }
