@@ -323,7 +323,7 @@ public class WarehouseControllerTests {
     }
 
     @Test
-    @DisplayName("zopZsHMFJb: Give valid page and size when getAll, then return all warehouses paginated and offset by 1")
+    @DisplayName("zopZsHMFJb: Given valid page and size when getAll, then return all warehouses paginated and offset by 1")
     void getAll_ValidPageAndSize_ReturnAllWarehousesPaginated() {
 
         // Arrange
