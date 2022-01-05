@@ -3,6 +3,7 @@ package com.lepine.transfers.controllers.warehouse;
 import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,8 @@ public class WarehouseController {
 
     public Warehouse getByUuid(UUID uuid) {
         log.info("Getting warehouse with uuid {}", uuid);
-        final Warehouse warehouse = warehouseService.findByUuid(uuid).get();
+        final Warehouse warehouse = warehouseService.findByUuid(uuid)
+                .orElseThrow(() -> new WarehouseNotFoundException(uuid));
         log.info("Warehouse found {}", warehouse);
 
         return warehouse;
