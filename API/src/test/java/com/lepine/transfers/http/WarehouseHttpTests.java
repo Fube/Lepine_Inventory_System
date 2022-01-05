@@ -25,7 +25,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Locale;
 import java.util.UUID;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
@@ -34,7 +33,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { WarehouseController.class })
@@ -508,9 +507,9 @@ public class WarehouseHttpTests {
         // Assert
         perform.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(format(ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP, given.getZipCode())))
-                .andExpect(jsonPath("$.status").value(BAD_REQUEST))
+                .andExpect(jsonPath("$.status").value(BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.timestamp").exists());
 
-        verify(warehouseService, never()).create(given);
+        verify(warehouseService, atMostOnce()).create(given);
     }
 }
