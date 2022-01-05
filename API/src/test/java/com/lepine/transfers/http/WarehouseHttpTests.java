@@ -42,8 +42,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { WarehouseController.class })
@@ -70,6 +69,13 @@ public class WarehouseHttpTests {
             .city(VALID_CITY)
             .zipCode(VALID_ZIP)
             .province(VALID_PROVINCE)
+            .build();
+
+    private static final WarehouseUUIDLessDTO VALID_WAREHOUSE_UUID_LESS_DTO = WarehouseUUIDLessDTO.builder()
+            .city(VALID_CITY)
+            .zipCode(VALID_ZIP)
+            .province(VALID_PROVINCE)
+            .active(false)
             .build();
 
     private String
@@ -248,6 +254,20 @@ public class WarehouseHttpTests {
 
         // Act
         return mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+    }
+
+    private ResultActions updateWith(final UUID uuid, final WarehouseUUIDLessDTO given, final Warehouse expected) throws Exception {
+
+        // Arrange
+        final String asString = objectMapper.writeValueAsString(given);
+
+        given(warehouseService.update(uuid, given))
+                .willReturn(expected);
+
+        // Act
+        return mockMvc.perform(put("/warehouses/" + uuid)
                 .contentType("application/json")
                 .content(asString));
     }
@@ -652,5 +672,23 @@ public class WarehouseHttpTests {
     @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void getAll_AsSalesperson_WithSpecificPageAndSize() throws Exception {
         getAllWarehouses(2, 3);
+    }
+
+    @Test
+    @DisplayName("fZnyMjGmvL: Given PUT on /warehouses/{uuid} with valid dto as manager, then return warehouse (200, warehouse)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void update_AsManager() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
+        final Warehouse expected = warehouseMapper.toEntity(given);
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, expected)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
+
+        verify(warehouseService, times(1)).update(VALID_UUID, given);
     }
 }
