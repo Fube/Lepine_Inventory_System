@@ -618,4 +618,22 @@ public class WarehouseServiceTests {
         verify(warehouseRepo, atMostOnce()).findByUuid(expected.getUuid());
         verify(warehouseRepo, never()).findAll();
     }
+
+    @Test
+    @DisplayName("peJbSokGmW: Given valid UUID of non-existing warehouse when findByUuid, then return empty optional")
+    void findByUuid_NonExistingWarehouseUUID_ReturnEmptyOptional(){
+
+        // Arrange
+        when(warehouseRepo.findByUuid(any()))
+                .thenReturn(Optional.empty());
+
+        // Act
+        final Optional<Warehouse> gotten = warehouseService.findByUuid(VALID_UUID);
+
+        // Assert
+        assertThat(gotten).isEmpty();
+
+        verify(warehouseRepo, atMostOnce()).findByUuid(VALID_UUID);
+        verify(warehouseRepo, never()).findAll();
+    }
 }
