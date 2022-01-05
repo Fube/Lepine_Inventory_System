@@ -27,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -597,6 +598,42 @@ public class WarehouseHttpTests {
                 .andExpect(jsonPath("$.content[*].zipCode").exists())
                 .andExpect(jsonPath("$.content[*].province").exists())
                 .andExpect(jsonPath("$.number").value(expected.getNumber() + 1)); // One-indexed
+
+        verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
+    }
+
+    @Test
+    @DisplayName("fOSzmnFBXO: Given GET on /warehouses?page=[int] as manager, then return specific page (200, page)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void getAll_AsManager_WithSpecificPage() throws Exception {
+
+        // Arrange
+        final int page = 2, size = 10;
+        final Warehouse baseWarehouse = Warehouse.builder()
+                .uuid(UUID.randomUUID())
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final List<Warehouse> content = Collections.nCopies(page * size, baseWarehouse);
+        final PageRequest expectedPageRequest = PageRequest.of(page - 1, size);
+        final Page<Warehouse> expected = createPageFor(content, expectedPageRequest);
+        given(warehouseService.findAll(any(PageRequest.class)))
+                .willReturn(expected);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(get("/warehouses?page=" + page));
+
+        // Assert
+        perform.andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.length()").value(size))
+                .andExpect(jsonPath("$.content[*].uuid").exists())
+                .andExpect(jsonPath("$.content[*].city").exists())
+                .andExpect(jsonPath("$.content[*].zipCode").exists())
+                .andExpect(jsonPath("$.content[*].province").exists())
+                .andExpect(jsonPath("$.number").value(page)); // One-indexed
 
         verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
     }
