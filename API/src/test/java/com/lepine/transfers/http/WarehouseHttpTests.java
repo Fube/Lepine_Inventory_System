@@ -512,4 +512,28 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, atMostOnce()).create(given);
     }
+
+    @Test
+    @DisplayName("qmGQTuoAdg: Given POST on /warehouses with duplicate zipcode as clerk, then return forbidden (403, error)")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void create_AsClerk_WithDuplicateZipCode() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).create(given);
+    }
 }
