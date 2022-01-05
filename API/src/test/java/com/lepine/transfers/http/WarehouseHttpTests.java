@@ -703,6 +703,24 @@ public class WarehouseHttpTests {
     }
 
     @Test
+    @DisplayName("FVMdCvSKDl: Given GET on /warehouses/{uuid} for existing warehouse as clerk, then return warehouse (200, warehouse)")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void getOne_AsClerk() throws Exception {
+        getOneWarehouse(VALID_UUID, VALID_WAREHOUSE)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(VALID_WAREHOUSE)));
+    }
+
+    @Test
+    @DisplayName("kLqyRVnXmN: Given GET on /warehouses/{uuid} for existing warehouse as salesperson, then return warehouse (200, warehouse)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void getOne_AsSalesperson() throws Exception {
+        getOneWarehouse(VALID_UUID, VALID_WAREHOUSE)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(VALID_WAREHOUSE)));
+    }
+
+    @Test
     @DisplayName("fZnyMjGmvL: Given PUT on /warehouses/{uuid} with valid dto as manager, then return warehouse (200, warehouse)")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void update_AsManager() throws Exception {
