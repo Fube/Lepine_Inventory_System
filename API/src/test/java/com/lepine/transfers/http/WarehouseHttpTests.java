@@ -760,4 +760,23 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).update(VALID_UUID, given);
     }
+
+    @Test
+    @DisplayName("KZTOVdlDWk: Given PUT on /warehouses/{uuid} with blank zipcode as manager, then return bad request (400, error)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void update_AsManager_WithBlankZipcode() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
+        given.setZipCode("");
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, null)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.zipCode").isArray())
+                .andExpect(jsonPath("$.errors.zipCode[*]", containsInAnyOrder(ERROR_MESSAGE_ZIP_NOT_BLANK)));
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
 }
