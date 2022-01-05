@@ -68,6 +68,11 @@ public class WarehouseHttpTests {
             ERROR_MESSAGE_ZIP_NOT_BLANK,
             ERROR_MESSAGE_PROVINCE_NOT_NULL,
             ERROR_MESSAGE_PROVINCE_NOT_BLANK;
+    private final WarehouseActiveLessUUIDLessDTO VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO = WarehouseActiveLessUUIDLessDTO.builder()
+            .city(VALID_CITY)
+            .zipCode(VALID_ZIP)
+            .province(VALID_PROVINCE)
+            .build();
 
     @BeforeAll
     void bSetup(){
@@ -213,19 +218,12 @@ public class WarehouseHttpTests {
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager() throws Exception {
 
-        // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
-                .build();
-
         // Act & Assert
-        createWith(given)
+        createWith(VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO)
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON));
 
-        verify(warehouseService, atMostOnce()).create(given);
+        verify(warehouseService, atMostOnce()).create(VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO);
     }
 
     @Test
@@ -233,15 +231,8 @@ public class WarehouseHttpTests {
     @WithMockUser(username = "some-clerk", roles = "CLERK")
     void create_AsClerk() throws Exception {
 
-        // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
-                .build();
-
         // Act & Assert
-        createWith(given)
+        createWith(VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO)
                 .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(any());
@@ -252,15 +243,8 @@ public class WarehouseHttpTests {
     @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void create_AsSalesperson() throws Exception {
 
-        // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
-                .build();
-
         // Act & Assert
-        createWith(given)
+        createWith(VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO)
                 .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(any());
