@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.AuthConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
-import com.lepine.transfers.config.controllers.GlobalAdvice;
 import com.lepine.transfers.controllers.warehouse.WarehouseController;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
@@ -14,7 +13,10 @@ import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.utils.MessageSourceUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -1092,4 +1094,16 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).update(VALID_UUID, given);
     }
+
+    @Test
+    @DisplayName("VDRBGOZnsv: Given DELETE on /warehouses/{uuid} of non-existing warehouse as manager, then return ok (200, void)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void delete_AsManager_OfNonExistingWarehouse() throws Exception {
+        // Act & Assert
+        mockMvc.perform(delete("/warehouses/{uuid}", VALID_UUID))
+                .andExpect(status().isOk());
+
+        verify(warehouseService, times(1)).delete(VALID_UUID);
+    }
+
 }
