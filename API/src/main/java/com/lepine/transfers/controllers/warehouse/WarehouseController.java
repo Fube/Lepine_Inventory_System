@@ -1,5 +1,6 @@
 package com.lepine.transfers.controllers.warehouse;
 
+import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.services.warehouse.WarehouseService;
@@ -36,6 +37,6 @@ public class WarehouseController {
         final Page<Warehouse> all = warehouseService.findAll(PageRequest.of(pageNumber, pageSize));
         log.info("Warehouses found {}", all);
 
-        return all;
+        return OneIndexedPageAdapter.of(all);
     }
 }
