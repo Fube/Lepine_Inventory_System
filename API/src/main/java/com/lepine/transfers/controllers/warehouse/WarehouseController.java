@@ -39,11 +39,12 @@ public class WarehouseController {
         return warehouse;
     }
 
+    @GetMapping
     public Page<Warehouse> getAll(
-            @Min(value = 1, message = "{pagination.page.min}") int pageNumber,
-            @Min(value = 1, message = "{pagination.size.min}") int pageSize) {
-        log.info("Getting all warehouses with pageNumber {} and pageSize {}", pageNumber, pageSize);
-        final Page<Warehouse> all = warehouseService.findAll(PageRequest.of(pageNumber, pageSize));
+            @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "{pagination.page.min}") int page,
+            @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "{pagination.size.min}") int size) {
+        log.info("Getting all warehouses with pageNumber {} and pageSize {}", page, size);
+        final Page<Warehouse> all = warehouseService.findAll(PageRequest.of(page, size));
         log.info("Warehouses found {}", all);
 
         return OneIndexedPageAdapter.of(all);
