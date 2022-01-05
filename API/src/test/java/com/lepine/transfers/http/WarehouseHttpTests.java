@@ -8,6 +8,7 @@ import com.lepine.transfers.controllers.warehouse.WarehouseController;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseMapper;
+import com.lepine.transfers.data.warehouse.WarehouseUUIDLessDTO;
 import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.utils.MessageSourceUtils;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,6 +32,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
@@ -200,12 +203,17 @@ public class WarehouseHttpTests {
     }
 
     private ResultActions createWith(final WarehouseActiveLessUUIDLessDTO given) throws Exception {
+        final Warehouse expected = warehouseMapper.toEntity(given);
+        return createWith(given, stubbing -> stubbing.willReturn(expected));
+    }
+
+    private ResultActions createWith(
+            final WarehouseActiveLessUUIDLessDTO given,
+            final Consumer<BDDMockito.BDDMyOngoingStubbing<Warehouse>> arrangement
+    ) throws Exception{
         // Arrange
         final String asString = objectMapper.writeValueAsString(given);
-        final Warehouse expected = warehouseMapper.toEntity(given);
-
-        given(warehouseService.create(given))
-                .willReturn(expected);
+        arrangement.accept(given(warehouseService.create(given)));
 
         // Act
         return mockMvc.perform(post("/warehouses")
@@ -487,23 +495,13 @@ public class WarehouseHttpTests {
     void create_AsManager_WithDuplicateZipCode() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
-                .build();
-        final String asString = objectMapper.writeValueAsString(given);
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO;
+        final Consumer<BDDMockito.BDDMyOngoingStubbing<Warehouse>> action = stubbing ->
+                stubbing.willThrow(new DuplicateZipCodeException(given.getZipCode()));
 
-        given(warehouseService.create(given))
-                .willThrow(new DuplicateZipCodeException(given.getZipCode()));
-
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isBadRequest())
+        // Act & Assert
+        createWith(given, action)
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(format(ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP, given.getZipCode())))
                 .andExpect(jsonPath("$.status").value(BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.timestamp").exists());
