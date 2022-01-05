@@ -1106,4 +1106,25 @@ public class WarehouseHttpTests {
         verify(warehouseService, times(1)).delete(VALID_UUID);
     }
 
+    @Test
+    @DisplayName("GsSQXXWXbC: Given DELETE on /warehouses/{uuid} of (non-)existing warehouse as clerk, then return forbidden (403, error)")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void delete_AsClerk_OfNonExistingWarehouse() throws Exception {
+        // Act & Assert
+        mockMvc.perform(delete("/warehouses/{uuid}", VALID_UUID))
+                .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).delete(VALID_UUID);
+    }
+
+    @Test
+    @DisplayName("HhSsatEbPa: Given DELETE on /warehouses/{uuid} of (non-)existing warehouse as salesperson, then return forbidden (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void delete_AsSalesperson_OfNonExistingWarehouse() throws Exception {
+        // Act & Assert
+        mockMvc.perform(delete("/warehouses/{uuid}", VALID_UUID))
+                .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).delete(VALID_UUID);
+    }
 }
