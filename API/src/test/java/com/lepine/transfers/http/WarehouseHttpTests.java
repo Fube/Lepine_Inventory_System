@@ -1054,4 +1054,25 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, times(1)).update(VALID_UUID, given);
     }
+
+    @Test
+    @DisplayName("FbHwlPpsvh: Given PUT on /warehouses/{uuid} of non-existing warehouse as clerk, then foribdden (403, warehouse)")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void update_AsClerk_OfNonExistingWarehouse() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .city("SomeOtherCity")
+                .build();
+        final Consumer<BDDMockito.BDDMyOngoingStubbing<Warehouse>> arrangement = stubbing -> stubbing
+                .willThrow(new WarehouseNotFoundException(VALID_UUID));
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, arrangement)
+                .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
+
+
 }
