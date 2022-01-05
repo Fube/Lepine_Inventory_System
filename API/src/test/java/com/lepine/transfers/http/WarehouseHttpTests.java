@@ -129,7 +129,7 @@ public class WarehouseHttpTests {
         verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
     }
 
-    private void getAllWarehouses(final int page) throws Exception {
+    private void getAllWarehousesWithPage(final int page) throws Exception {
         // Arrange
         final Warehouse baseWarehouse = Warehouse.builder()
                 .uuid(UUID.randomUUID())
@@ -159,7 +159,6 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
     }
-
 
     @Test
     void contextLoads() {}
@@ -671,7 +670,7 @@ public class WarehouseHttpTests {
     @DisplayName("fOSzmnFBXO: Given GET on /warehouses?page=[int] as manager, then return specific page (200, page)")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void getAll_AsManager_WithSpecificPage() throws Exception {
-        getAllWarehouses(2);
+        getAllWarehousesWithPage(2);
     }
 
     @Test
@@ -756,7 +755,7 @@ public class WarehouseHttpTests {
     @DisplayName("XYNnkITxNv: Given GET on /warehouses?page=[int] as clerk, then return specific page (200, page)")
     @WithMockUser(username = "some-clerk", roles = "CLERK")
     void getAll_AsClerk_WithSpecificPage() throws Exception {
-        getAllWarehouses(2);
+        getAllWarehousesWithPage(2);
     }
 
     @Test
@@ -841,7 +840,7 @@ public class WarehouseHttpTests {
     @DisplayName("pisaONthoM: Given GET on /warehouses?page=[int] as salesperson, then return specific page (200, page)")
     @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void getAll_AsSalesperson_WithSpecificPage() throws Exception {
-        getAllWarehouses(2);
+        getAllWarehousesWithPage(2);
     }
 
     @Test
