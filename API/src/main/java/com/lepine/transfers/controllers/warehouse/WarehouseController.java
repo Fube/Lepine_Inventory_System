@@ -60,7 +60,8 @@ public class WarehouseController {
         return warehouse;
     }
 
-    public void deleteByUuid(UUID uuid) {
+    @DeleteMapping("/{uuid}")
+    public void deleteByUuid(@PathVariable UUID uuid) {
         log.info("Deleting warehouse with uuid {}", uuid);
         warehouseService.delete(uuid);
     }
