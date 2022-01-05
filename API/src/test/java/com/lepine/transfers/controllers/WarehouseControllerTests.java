@@ -343,4 +343,28 @@ public class WarehouseControllerTests {
 
         verify(warehouseService).findAll(pageable);
     }
+
+    @Test
+    @DisplayName("arHsLSCkzs: Given warehouse uuid of existing warehouse when get, then return warehouse")
+    void get_ValidUuid_ReturnWarehouse() {
+
+        // Arrange
+        final Warehouse expected = Warehouse.builder()
+                .uuid(VALID_UUID)
+                .city(VALID_CITY)
+                .province(VALID_PROVINCE)
+                .zipCode(VALID_ZIP)
+                .build();
+
+        when(warehouseService.findByUuid(VALID_UUID))
+                .thenReturn(expected);
+
+        // Act
+        final Warehouse actual = warehouseController.getByUuid(uuid);
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
+
+        verify(warehouseService, atMostOnce()).findByUuid(uuid);
+    }
 }
