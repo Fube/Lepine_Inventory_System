@@ -361,11 +361,11 @@ public class WarehouseControllerTests {
                 .thenReturn(Optional.of(expected));
 
         // Act
-        final Warehouse actual = warehouseController.getByUuid(uuid);
+        final Warehouse actual = warehouseController.getByUuid(expected.getUuid());
 
         // Assert
         assertThat(actual).isEqualTo(expected);
 
-        verify(warehouseService, atMostOnce()).findByUuid(uuid);
+        verify(warehouseService, atMostOnce()).findByUuid(expected.getUuid());
     }
 }

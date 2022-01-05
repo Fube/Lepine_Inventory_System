@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,5 +39,13 @@ public class WarehouseController {
         log.info("Warehouses found {}", all);
 
         return OneIndexedPageAdapter.of(all);
+    }
+
+    public Warehouse getByUuid(UUID uuid) {
+        log.info("Getting warehouse with uuid {}", uuid);
+        final Warehouse warehouse = warehouseService.findByUuid(uuid).get();
+        log.info("Warehouse found {}", warehouse);
+
+        return warehouse;
     }
 }
