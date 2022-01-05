@@ -728,8 +728,9 @@ public class WarehouseHttpTests {
     void update_AsManager_WithBlankCity() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setCity("");
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .city("")
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -747,8 +748,9 @@ public class WarehouseHttpTests {
     void update_AsManager_WithNullCity() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setCity(null);
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .city(null)
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -767,8 +769,10 @@ public class WarehouseHttpTests {
     void update_AsManager_WithBlankZipcode() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setZipCode("");
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO
+                .toBuilder()
+                .zipCode("")
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -786,8 +790,9 @@ public class WarehouseHttpTests {
     void update_AsManager_WithNullZipcode() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setZipCode(null);
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .zipCode(null)
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -806,8 +811,9 @@ public class WarehouseHttpTests {
     void update_AsManager_WithBlankProvince() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setProvince("");
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .province("")
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -825,8 +831,9 @@ public class WarehouseHttpTests {
     void update_AsManager_WithNullProvince() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setProvince(null);
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .province(null)
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -845,8 +852,9 @@ public class WarehouseHttpTests {
     void update_AsClerk_WithNullCity() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setCity(null);
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .city(null)
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -861,8 +869,9 @@ public class WarehouseHttpTests {
     void update_AsClerk_WithNullZipcode() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setZipCode(null);
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .zipCode(null)
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -877,8 +886,9 @@ public class WarehouseHttpTests {
     void update_AsClerk_WithNullProvince() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setProvince(null);
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .province(null)
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -893,8 +903,9 @@ public class WarehouseHttpTests {
     void update_AsSalesperson_WithNullCity() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setCity(null);
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .city(null)
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -909,8 +920,9 @@ public class WarehouseHttpTests {
     void update_AsSalesperson_WithNullZipcode() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setZipCode(null);
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .zipCode(null)
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
@@ -925,8 +937,9 @@ public class WarehouseHttpTests {
     void update_AsSalesperson_WithNullProvince() throws Exception {
 
         // Arrange
-        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
-        given.setProvince(null);
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .province(null)
+                .build();
 
         // Act & Assert
         updateWith(VALID_UUID, given, null)
