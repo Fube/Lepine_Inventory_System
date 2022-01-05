@@ -416,7 +416,7 @@ public class WarehouseControllerTests {
         warehouseController.deleteByUuid(VALID_UUID);
 
         // Assert
-        verify(warehouseService, never()).delete(VALID_UUID);
+        verify(warehouseService, atMostOnce()).delete(VALID_UUID);
     }
 
 }

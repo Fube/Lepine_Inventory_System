@@ -50,4 +50,9 @@ public class WarehouseController {
 
         return warehouse;
     }
+
+    public void deleteByUuid(UUID uuid) {
+        log.info("Deleting warehouse with uuid {}", uuid);
+        warehouseService.delete(uuid);
+    }
 }
