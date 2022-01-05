@@ -431,8 +431,8 @@ public class WarehouseControllerTests {
                 .zipCode(VALID_ZIP)
                 .build();
 
-        when(warehouseService.findByUuid(VALID_UUID))
-                .thenReturn(Optional.empty());
+        when(warehouseService.update(VALID_UUID, warehouse))
+                .thenThrow(new WarehouseNotFoundException(VALID_UUID));
 
         // Act
         final WarehouseNotFoundException warehouseNotFoundException =
@@ -442,6 +442,6 @@ public class WarehouseControllerTests {
         final String message = warehouseNotFoundException.getMessage();
         assertThat(message).isEqualTo(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, VALID_UUID));
 
-        verify(warehouseService, atMostOnce()).findByUuid(VALID_UUID);
+        verify(warehouseService, atMostOnce()).update(VALID_UUID, warehouse);
     }
 }
