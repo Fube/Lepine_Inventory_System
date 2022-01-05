@@ -1,5 +1,6 @@
 package com.lepine.transfers.config.controllers;
 
+import com.lepine.transfers.exceptions.DuplicateResourceException;
 import com.lepine.transfers.exceptions.NotFoundException;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import lombok.Data;
@@ -63,9 +64,9 @@ public class GlobalAdvice {
         return new HTTPConstraintViolationError(e.getBindingResult());
     }
 
-    @ExceptionHandler(DuplicateEmailException.class)
+    @ExceptionHandler(DuplicateResourceException.class)
     @ResponseStatus(value = BAD_REQUEST)
-    public HTTPErrorMessage handleDuplicateEmailException(DuplicateEmailException e) {
+    public HTTPErrorMessage handleDuplicateResourceException(DuplicateResourceException e) {
         return new HTTPErrorMessage(BAD_REQUEST.value(), e.getMessage());
     }
 }
