@@ -9,19 +9,26 @@ import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseMapper;
 import com.lepine.transfers.services.warehouse.WarehouseService;
+import com.lepine.transfers.utils.MessageSourceUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Locale;
 import java.util.UUID;
 
+import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -30,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = { WarehouseController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class WarehouseHttpTests {
 
     private final static String
@@ -40,6 +48,25 @@ public class WarehouseHttpTests {
             ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND = "Warehouse with uuid %s not found";
     private final static UUID
             VALID_UUID = UUID.randomUUID();
+
+    private String
+            ERROR_MESSAGE_CITY_NOT_NULL,
+            ERROR_MESSAGE_CITY_NOT_BLANK,
+            ERROR_MESSAGE_ZIP_NOT_NULL,
+            ERROR_MESSAGE_ZIP_NOT_BLANK,
+            ERROR_MESSAGE_PROVINCE_NOT_NULL,
+            ERROR_MESSAGE_PROVINCE_NOT_BLANK;
+
+    @BeforeAll
+    void bSetup(){
+        final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
+        ERROR_MESSAGE_CITY_NOT_NULL = w.getMessage("warehouse.city.not_null");
+        ERROR_MESSAGE_CITY_NOT_BLANK = w.getMessage("warehouse.city.not_blank");
+        ERROR_MESSAGE_ZIP_NOT_NULL = w.getMessage("warehouse.zipcode.not_null");
+        ERROR_MESSAGE_ZIP_NOT_BLANK = w.getMessage("warehouse.zipcode.not_blank");
+        ERROR_MESSAGE_PROVINCE_NOT_NULL = w.getMessage("warehouse.province.not_null");
+        ERROR_MESSAGE_PROVINCE_NOT_BLANK = w.getMessage("warehouse.province.not_blank");
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -52,6 +79,9 @@ public class WarehouseHttpTests {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
 
     @MockBean
     private WarehouseService warehouseService;
@@ -138,4 +168,31 @@ public class WarehouseHttpTests {
         verify(warehouseService, never()).create(any());
     }
 
+    @Test
+    @DisplayName("koIqErRiKw: GivenPOST on /warehouses with blank city as manager, then return created (400, error)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void create_AsManager_WithInvalidDto() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city("")
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.city").isArray())
+                .andExpect(jsonPath("$.errors.city[*]")
+                        .value(containsInAnyOrder(ERROR_MESSAGE_CITY_NOT_BLANK)));
+
+        verify(warehouseService, never()).create(given);
+    }
 }
