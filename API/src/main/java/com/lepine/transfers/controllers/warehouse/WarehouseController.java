@@ -57,7 +57,7 @@ public class WarehouseController {
         warehouseService.delete(uuid);
     }
 
-    public Warehouse update(UUID uuid, WarehouseUUIDLessDTO warehouseUUIDLessDTO) {
+    public Warehouse update(UUID uuid, @Valid WarehouseUUIDLessDTO warehouseUUIDLessDTO) {
         log.info("Updating warehouse with uuid {}", uuid);
         return warehouseService.update(uuid, warehouseUUIDLessDTO);
     }
