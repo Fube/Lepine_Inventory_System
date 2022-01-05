@@ -129,6 +129,37 @@ public class WarehouseHttpTests {
         verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
     }
 
+    private void getAllWarehouses(final int page) throws Exception {
+        // Arrange
+        final Warehouse baseWarehouse = Warehouse.builder()
+                .uuid(UUID.randomUUID())
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final List<Warehouse> content = Collections.nCopies(page * DEFAULT_SIZE, baseWarehouse);
+        final PageRequest expectedPageRequest = PageRequest.of(page - 1, DEFAULT_SIZE);
+        final Page<Warehouse> expected = createPageFor(content, expectedPageRequest);
+        given(warehouseService.findAll(any(PageRequest.class)))
+                .willReturn(expected);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(get("/warehouses?page=" + page));
+
+        // Assert
+        perform.andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.length()").value(DEFAULT_SIZE))
+                .andExpect(jsonPath("$.content[*].uuid").exists())
+                .andExpect(jsonPath("$.content[*].city").exists())
+                .andExpect(jsonPath("$.content[*].zipCode").exists())
+                .andExpect(jsonPath("$.content[*].province").exists())
+                .andExpect(jsonPath("$.number").value(page)); // One-indexed
+
+        verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
+    }
+
 
     @Test
     void contextLoads() {}
@@ -640,36 +671,7 @@ public class WarehouseHttpTests {
     @DisplayName("fOSzmnFBXO: Given GET on /warehouses?page=[int] as manager, then return specific page (200, page)")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void getAll_AsManager_WithSpecificPage() throws Exception {
-
-        // Arrange
-        final int page = 2, size = 10;
-        final Warehouse baseWarehouse = Warehouse.builder()
-                .uuid(UUID.randomUUID())
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
-                .build();
-
-        final List<Warehouse> content = Collections.nCopies(page * size, baseWarehouse);
-        final PageRequest expectedPageRequest = PageRequest.of(page - 1, size);
-        final Page<Warehouse> expected = createPageFor(content, expectedPageRequest);
-        given(warehouseService.findAll(any(PageRequest.class)))
-                .willReturn(expected);
-
-        // Act
-        final ResultActions perform = mockMvc.perform(get("/warehouses?page=" + page));
-
-        // Assert
-        perform.andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.content.length()").value(size))
-                .andExpect(jsonPath("$.content[*].uuid").exists())
-                .andExpect(jsonPath("$.content[*].city").exists())
-                .andExpect(jsonPath("$.content[*].zipCode").exists())
-                .andExpect(jsonPath("$.content[*].province").exists())
-                .andExpect(jsonPath("$.number").value(page)); // One-indexed
-
-        verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
+        getAllWarehouses(2);
     }
 
     @Test
@@ -754,36 +756,7 @@ public class WarehouseHttpTests {
     @DisplayName("XYNnkITxNv: Given GET on /warehouses?page=[int] as clerk, then return specific page (200, page)")
     @WithMockUser(username = "some-clerk", roles = "CLERK")
     void getAll_AsClerk_WithSpecificPage() throws Exception {
-
-        // Arrange
-        final int page = 2;
-        final Warehouse baseWarehouse = Warehouse.builder()
-                .uuid(UUID.randomUUID())
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
-                .build();
-
-        final List<Warehouse> content = Collections.nCopies(page * DEFAULT_SIZE, baseWarehouse);
-        final PageRequest expectedPageRequest = PageRequest.of(page - 1, DEFAULT_SIZE);
-        final Page<Warehouse> expected = createPageFor(content, expectedPageRequest);
-        given(warehouseService.findAll(any(PageRequest.class)))
-                .willReturn(expected);
-
-        // Act
-        final ResultActions perform = mockMvc.perform(get("/warehouses?page=" + page));
-
-        // Assert
-        perform.andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.content.length()").value(DEFAULT_SIZE))
-                .andExpect(jsonPath("$.content[*].uuid").exists())
-                .andExpect(jsonPath("$.content[*].city").exists())
-                .andExpect(jsonPath("$.content[*].zipCode").exists())
-                .andExpect(jsonPath("$.content[*].province").exists())
-                .andExpect(jsonPath("$.number").value(page)); // One-indexed
-
-        verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
+        getAllWarehouses(2);
     }
 
     @Test
@@ -868,36 +841,7 @@ public class WarehouseHttpTests {
     @DisplayName("pisaONthoM: Given GET on /warehouses?page=[int] as salesperson, then return specific page (200, page)")
     @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void getAll_AsSalesperson_WithSpecificPage() throws Exception {
-
-        // Arrange
-        final int page = 2;
-        final Warehouse baseWarehouse = Warehouse.builder()
-                .uuid(UUID.randomUUID())
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
-                .build();
-
-        final List<Warehouse> content = Collections.nCopies(page * DEFAULT_SIZE, baseWarehouse);
-        final PageRequest expectedPageRequest = PageRequest.of(page - 1, DEFAULT_SIZE);
-        final Page<Warehouse> expected = createPageFor(content, expectedPageRequest);
-        given(warehouseService.findAll(any(PageRequest.class)))
-                .willReturn(expected);
-
-        // Act
-        final ResultActions perform = mockMvc.perform(get("/warehouses?page=" + page));
-
-        // Assert
-        perform.andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.content.length()").value(DEFAULT_SIZE))
-                .andExpect(jsonPath("$.content[*].uuid").exists())
-                .andExpect(jsonPath("$.content[*].city").exists())
-                .andExpect(jsonPath("$.content[*].zipCode").exists())
-                .andExpect(jsonPath("$.content[*].province").exists())
-                .andExpect(jsonPath("$.number").value(page)); // One-indexed
-
-        verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
+        getAllWarehouses(2);
     }
 
     @Test
