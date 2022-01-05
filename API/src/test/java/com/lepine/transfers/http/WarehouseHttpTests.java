@@ -121,7 +121,7 @@ public class WarehouseHttpTests {
     }
 
     @Test
-    @DisplayName("ecFdSbPbFA: Given POST on /warehouses with valid warehouse dto as clerk, then return created (403, error)")
+    @DisplayName("ecFdSbPbFA: Given POST on /warehouses with valid warehouse dto as clerk, then return forbidden (403, error)")
     @WithMockUser(username = "some-clerk", roles = "CLERK")
     void create_AsClerk() throws Exception {
 
@@ -145,7 +145,7 @@ public class WarehouseHttpTests {
     }
 
     @Test
-    @DisplayName("gYhCSDHEzm: Given POST on /warehouses with valid warehouse dto as salesperson, then return created (403, error)")
+    @DisplayName("gYhCSDHEzm: Given POST on /warehouses with valid warehouse dto as salesperson, then return forbidden (403, error)")
     @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void create_AsSalesperson() throws Exception {
 
@@ -169,9 +169,9 @@ public class WarehouseHttpTests {
     }
 
     @Test
-    @DisplayName("koIqErRiKw: GivenPOST on /warehouses with blank city as manager, then return created (400, error)")
+    @DisplayName("koIqErRiKw: GivenPOST on /warehouses with blank city as manager, then return bad request (400, error)")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
-    void create_AsManager_WithInvalidDto() throws Exception {
+    void create_AsManager_WithBlankCity() throws Exception {
 
         // Arrange
         final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
@@ -197,7 +197,7 @@ public class WarehouseHttpTests {
     }
 
     @Test
-    @DisplayName("rFfxEvzkfp: Given POST on /warehouses with blank null city as manager, then return bad request (400, error)")
+    @DisplayName("rFfxEvzkfp: Given POST on /warehouses with null city as manager, then return bad request (400, error)")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_WithNullCity() throws Exception {
 
