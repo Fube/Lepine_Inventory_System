@@ -113,4 +113,29 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).create(any());
     }
+
+    @Test
+    @DisplayName("gYhCSDHEzm: Given POST on /warehouses with valid warehouse dto as salesperson, then return created (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void create_AsSalesperson() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).create(any());
+    }
+
 }
