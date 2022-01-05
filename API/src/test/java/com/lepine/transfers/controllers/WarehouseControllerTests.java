@@ -388,4 +388,35 @@ public class WarehouseControllerTests {
 
         verify(warehouseService, atMostOnce()).findByUuid(VALID_UUID);
     }
+
+    @Test
+    @DisplayName("qXrzvvDGIg: Given warehouse uuid of existing warehouse when delete, then delete warehouse")
+    void delete_ValidUuid_DeleteWarehouse() {
+
+        // Arrange
+        final Warehouse expected = Warehouse.builder()
+                .uuid(VALID_UUID)
+                .city(VALID_CITY)
+                .province(VALID_PROVINCE)
+                .zipCode(VALID_ZIP)
+                .build();
+
+        // Act
+        warehouseController.deleteByUuid(expected.getUuid());
+
+        // Assert
+        verify(warehouseService, atMostOnce()).delete(expected.getUuid());
+    }
+
+    @Test
+    @DisplayName("gwHVqEbnzj: Given warehouse uuid of non-existing warehouse when delete, then do nothing")
+    void delete_InvalidUuid_DoNothing() {
+
+        // Act
+        warehouseController.deleteByUuid(VALID_UUID);
+
+        // Assert
+        verify(warehouseService, never()).delete(VALID_UUID);
+    }
+
 }
