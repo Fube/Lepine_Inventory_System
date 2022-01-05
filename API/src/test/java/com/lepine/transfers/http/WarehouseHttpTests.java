@@ -191,6 +191,20 @@ public class WarehouseHttpTests {
         verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
     }
 
+    private ResultActions createWith(final WarehouseActiveLessUUIDLessDTO given) throws Exception {
+        // Arrange
+        final String asString = objectMapper.writeValueAsString(given);
+        final Warehouse expected = warehouseMapper.toEntity(given);
+
+        given(warehouseService.create(given))
+                .willReturn(expected);
+
+        // Act
+        return mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+    }
+
     @Test
     void contextLoads() {}
 
@@ -205,21 +219,11 @@ public class WarehouseHttpTests {
                 .zipCode(VALID_ZIP)
                 .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        final Warehouse expected = warehouseMapper.toEntity(given);
-
-        given(warehouseService.create(given))
-                .willReturn(expected);
-
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON));
 
         verify(warehouseService, atMostOnce()).create(given);
     }
@@ -235,15 +239,10 @@ public class WarehouseHttpTests {
                 .zipCode(VALID_ZIP)
                 .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(any());
     }
@@ -259,15 +258,10 @@ public class WarehouseHttpTests {
                 .zipCode(VALID_ZIP)
                 .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(any());
     }
