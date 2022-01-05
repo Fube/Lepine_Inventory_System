@@ -518,4 +518,50 @@ public class WarehouseControllerTests {
 
         verify(warehouseService, never()).update(any(), any());
     }
+
+    @Test
+    @DisplayName("RFcrYcwNLS: Given valid uuid of existing warehouse and blank province when update, then throw ConstraintViolationException")
+    void update_ValidUuid_BlankProvince_ThrowConstraintViolationException() {
+
+        // Arrange
+        final WarehouseUUIDLessDTO warehouse = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .province("")
+                .zipCode(VALID_ZIP)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.update(VALID_UUID, warehouse));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_PROVINCE_NOT_BLANK);
+
+        verify(warehouseService, never()).update(any(), any());
+    }
+
+    @Test
+    @DisplayName("sLHpvFfVFd: Given valid uuid of existing warehouse and null province when update, then throw ConstraintViolationException")
+    void update_ValidUuid_NullProvince_ThrowConstraintViolationException() {
+
+        // Arrange
+        final WarehouseUUIDLessDTO warehouse = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .province(null)
+                .zipCode(VALID_ZIP)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.update(VALID_UUID, warehouse));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_PROVINCE_NOT_BLANK, ERROR_MESSAGE_PROVINCE_NOT_NULL);
+
+        verify(warehouseService, never()).update(any(), any());
+    }
+
+
 }
