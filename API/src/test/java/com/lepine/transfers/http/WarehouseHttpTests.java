@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.AuthConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
+import com.lepine.transfers.config.controllers.GlobalAdvice;
 import com.lepine.transfers.controllers.warehouse.WarehouseController;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseMapper;
 import com.lepine.transfers.data.warehouse.WarehouseUUIDLessDTO;
 import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -718,6 +720,18 @@ public class WarehouseHttpTests {
         getOneWarehouse(VALID_UUID, VALID_WAREHOUSE)
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(VALID_WAREHOUSE)));
+    }
+
+    @Test
+    @DisplayName("fdvPakIhYe: Given GET on /warehouses/{uuid} for non-existing warehouse as manager, then return not found (404, error)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void getOne_AsManager_NotFound() throws Exception {
+
+        getOneWarehouse(VALID_UUID, null)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, VALID_UUID)))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
