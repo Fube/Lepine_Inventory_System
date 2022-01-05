@@ -496,4 +496,26 @@ public class WarehouseControllerTests {
 
         verify(warehouseService, never()).update(any(), any());
     }
+
+    @Test
+    @DisplayName("aJpzoJCBCL: Given valid uuid of existing warehouse and null zipcode when update, then throw ConstraintViolationException")
+    void update_ValidUuid_NullZipCode_ThrowConstraintViolationException() {
+
+        // Arrange
+        final WarehouseUUIDLessDTO warehouse = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .province(VALID_PROVINCE)
+                .zipCode(null)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.update(VALID_UUID, warehouse));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_ZIP_NOT_BLANK, ERROR_MESSAGE_ZIP_NOT_NULL);
+
+        verify(warehouseService, never()).update(any(), any());
+    }
 }
