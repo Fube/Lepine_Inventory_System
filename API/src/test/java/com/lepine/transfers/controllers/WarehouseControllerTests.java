@@ -421,31 +421,6 @@ public class WarehouseControllerTests {
     }
 
     @Test
-    @DisplayName("iJCvKRJfVy: Given valid uuid of non-existing warehouse when update, then throw WarehouseNotFoundException")
-    void update_InvalidUuid_ThrowWarehouseNotFoundException() {
-
-        // Arrange
-        final WarehouseUUIDLessDTO warehouse = WarehouseUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .province(VALID_PROVINCE)
-                .zipCode(VALID_ZIP)
-                .build();
-
-        when(warehouseService.update(VALID_UUID, warehouse))
-                .thenThrow(new WarehouseNotFoundException(VALID_UUID));
-
-        // Act
-        final WarehouseNotFoundException warehouseNotFoundException =
-                assertThrows(WarehouseNotFoundException.class, () -> warehouseController.update(VALID_UUID, warehouse));
-
-        // Assert
-        final String message = warehouseNotFoundException.getMessage();
-        assertThat(message).isEqualTo(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, VALID_UUID));
-
-        verify(warehouseService, atMostOnce()).update(VALID_UUID, warehouse);
-    }
-
-    @Test
     @DisplayName("oClxUJUGlb: Given valid uuid of existing warehouse and valid update dto when update, then update warehouse")
     void update_ValidUuid_UpdateWarehouse() {
 
@@ -473,5 +448,30 @@ public class WarehouseControllerTests {
         assertThat(gotten.getZipCode()).isEqualTo(VALID_ZIP);
 
         verify(warehouseService, atMostOnce()).update(VALID_UUID, given);
+    }
+
+    @Test
+    @DisplayName("iJCvKRJfVy: Given valid uuid of non-existing warehouse when update, then throw WarehouseNotFoundException")
+    void update_InvalidUuid_ThrowWarehouseNotFoundException() {
+
+        // Arrange
+        final WarehouseUUIDLessDTO warehouse = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .province(VALID_PROVINCE)
+                .zipCode(VALID_ZIP)
+                .build();
+
+        when(warehouseService.update(VALID_UUID, warehouse))
+                .thenThrow(new WarehouseNotFoundException(VALID_UUID));
+
+        // Act
+        final WarehouseNotFoundException warehouseNotFoundException =
+                assertThrows(WarehouseNotFoundException.class, () -> warehouseController.update(VALID_UUID, warehouse));
+
+        // Assert
+        final String message = warehouseNotFoundException.getMessage();
+        assertThat(message).isEqualTo(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, VALID_UUID));
+
+        verify(warehouseService, atMostOnce()).update(VALID_UUID, warehouse);
     }
 }
