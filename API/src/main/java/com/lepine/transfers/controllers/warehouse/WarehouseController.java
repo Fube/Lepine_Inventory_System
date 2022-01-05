@@ -11,21 +11,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RestController
+@RequestMapping("/warehouses")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
+@CrossOrigin(origins = "${cors.origin}")
 public class WarehouseController {
 
     private final WarehouseService warehouseService;
 
-    public Warehouse create(@Valid WarehouseActiveLessUUIDLessDTO warehouseActiveLessUUIDLessDTO) {
+    @PostMapping
+    @ResponseStatus(value = CREATED)
+    public Warehouse create(@RequestBody @Valid WarehouseActiveLessUUIDLessDTO warehouseActiveLessUUIDLessDTO) {
         log.info("Creating a new warehouse {}", warehouseActiveLessUUIDLessDTO);
         final Warehouse warehouse = warehouseService.create(warehouseActiveLessUUIDLessDTO);
         log.info("Warehouse created {}", warehouse);
