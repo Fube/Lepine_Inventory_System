@@ -50,7 +50,8 @@ public class WarehouseController {
         return OneIndexedPageAdapter.of(all);
     }
 
-    public Warehouse getByUuid(UUID uuid) {
+    @GetMapping("/{uuid}")
+    public Warehouse getByUuid(@PathVariable UUID uuid) {
         log.info("Getting warehouse with uuid {}", uuid);
         final Warehouse warehouse = warehouseService.findByUuid(uuid)
                 .orElseThrow(() -> new WarehouseNotFoundException(uuid));
