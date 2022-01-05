@@ -838,4 +838,20 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).update(VALID_UUID, given);
     }
+
+    @Test
+    @DisplayName("GQIstxKYso: Given PUT on /warehouses/{uuid} with null city as clerk, then return forbidden (403, error)")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void update_AsClerk_WithNullCity() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
+        given.setCity(null);
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, null)
+                .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
 }
