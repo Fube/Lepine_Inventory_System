@@ -721,4 +721,23 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).update(VALID_UUID, given);
     }
+
+    @Test
+    @DisplayName("QLsLrXDuXQ: Given PUT on /warehouses/{uuid} with blank city as manager, then return bad request (400, error)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void update_AsManager_WithBlankCity() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
+        given.setCity("");
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, null)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.city").isArray())
+                .andExpect(jsonPath("$.errors.city[*]", containsInAnyOrder(ERROR_MESSAGE_CITY_NOT_BLANK)));
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
 }
