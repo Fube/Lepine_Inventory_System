@@ -22,6 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.http.HttpMethod.*;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -35,8 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private String DEFAULT_MANAGER_PASSWORD;
 
     private static final Map<HttpMethod, List<String>> whiteListByMethod = Map.of(
-            HttpMethod.POST, List.of("/auth/login"),
-            HttpMethod.HEAD, List.of("/auth/logout")
+            POST, List.of("/auth/login"),
+            HEAD, List.of("/auth/logout")
     );
 
     @Bean
@@ -53,10 +55,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                     .antMatchers("/users/**").hasRole("MANAGER")
-                    .antMatchers(HttpMethod.POST, "/items").hasRole("MANAGER")
-                    .antMatchers(HttpMethod.PUT, "/items/*").hasRole("MANAGER")
-                    .antMatchers(HttpMethod.DELETE, "/items/*").hasRole("MANAGER")
-                    .antMatchers(HttpMethod.POST, "/warehouses").hasRole("MANAGER");
+                    .antMatchers(POST, "/items").hasRole("MANAGER")
+                    .antMatchers(PUT, "/items/*").hasRole("MANAGER")
+                    .antMatchers(DELETE, "/items/*").hasRole("MANAGER")
+                    .antMatchers(POST, "/warehouses").hasRole("MANAGER");
 
 
         for(Map.Entry<HttpMethod, List<String>> entry : whiteListByMethod.entrySet()) {
