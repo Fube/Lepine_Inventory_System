@@ -444,4 +444,34 @@ public class WarehouseControllerTests {
 
         verify(warehouseService, atMostOnce()).update(VALID_UUID, warehouse);
     }
+
+    @Test
+    @DisplayName("oClxUJUGlb: Given valid uuid of existing warehouse and valid update dto when update, then update warehouse")
+    void update_ValidUuid_UpdateWarehouse() {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .province(VALID_PROVINCE)
+                .zipCode(VALID_ZIP)
+                .build();
+        given(warehouseService.update(VALID_UUID, given))
+                .willReturn(Warehouse.builder()
+                        .uuid(VALID_UUID)
+                        .city(VALID_CITY)
+                        .province(VALID_PROVINCE)
+                        .zipCode(VALID_ZIP)
+                        .build());
+
+        // Act
+        final Warehouse gotten = warehouseController.update(VALID_UUID, given);
+
+        // Assert
+        assertThat(gotten.getUuid()).isEqualTo(VALID_UUID);
+        assertThat(gotten.getCity()).isEqualTo(VALID_CITY);
+        assertThat(gotten.getProvince()).isEqualTo(VALID_PROVINCE);
+        assertThat(gotten.getZipCode()).isEqualTo(VALID_ZIP);
+
+        verify(warehouseService, atMostOnce()).update(VALID_UUID, given);
+    }
 }
