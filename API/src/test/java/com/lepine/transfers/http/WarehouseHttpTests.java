@@ -19,20 +19,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.List;
 import java.util.UUID;
 
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -559,5 +565,39 @@ public class WarehouseHttpTests {
         perform.andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(given);
+    }
+
+    @Test
+    @DisplayName("JbKUwBNpKt: Given GET on /warehouses as manager, then return all warehouses paginated (200, page)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void getAll_AsManager() throws Exception {
+
+        // Arrange
+        final List<Warehouse> content = List.of(
+                Warehouse.builder()
+                    .uuid(UUID.randomUUID())
+                    .city(VALID_CITY)
+                    .zipCode(VALID_ZIP)
+                    .province(VALID_PROVINCE)
+                    .build()
+        );
+        final Page<Warehouse> expected = createPageFor(content);
+        given(warehouseService.findAll(any(PageRequest.class)))
+                .willReturn(expected);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(get("/warehouses"));
+
+        // Assert
+        perform.andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.length()").value(content.size()))
+                .andExpect(jsonPath("$.content[*].uuid").exists())
+                .andExpect(jsonPath("$.content[*].city").exists())
+                .andExpect(jsonPath("$.content[*].zipCode").exists())
+                .andExpect(jsonPath("$.content[*].province").exists())
+                .andExpect(jsonPath("$.number").value(expected.getNumber() + 1)); // One-indexed
+
+        verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
     }
 }
