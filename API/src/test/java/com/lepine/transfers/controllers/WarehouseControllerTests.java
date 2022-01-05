@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
@@ -316,5 +319,28 @@ public class WarehouseControllerTests {
         assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_PAGINATION_PAGE_MIN, ERROR_MESSAGE_PAGINATION_SIZE_MIN);
 
         verify(warehouseService, never()).findAll(any());
+    }
+
+    @Test
+    @DisplayName("zopZsHMFJb: Give valid page and size when getAll, then return all warehouses paginated and offset by 1")
+    void getAll_ValidPageAndSize_ReturnAllWarehousesPaginated() {
+
+        // Arrange
+        final int pageNumber = 1, pageSize = 10;
+        final PageRequest pageable = PageRequest.of(pageNumber, pageSize);
+        final Page<Warehouse> expected = Page.empty();
+
+        when(warehouseService.findAll(pageable)).thenReturn(expected);
+
+        // Act
+        final Page<Warehouse> actual = warehouseController.getAll(pageNumber, pageSize);
+
+        // Assert
+        assertThat(actual.getTotalPages()).isEqualTo(expected.getTotalPages());
+        assertThat(actual.getNumber()).isEqualTo(expected.getNumber() + 1);
+        assertThat(actual.getTotalElements()).isEqualTo(expected.getTotalElements());
+        assertThat(actual.getContent()).isEqualTo(expected.getContent());
+
+        verify(warehouseService).findAll(pageable);
     }
 }
