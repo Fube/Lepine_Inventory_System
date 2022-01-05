@@ -308,4 +308,32 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).create(given);
     }
+
+    @Test
+    @DisplayName("LNUOMugqCh: Given POST on /warehouses with null province as manager, then return bad request (400, error)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void create_AsManager_WithNullProvince() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(null)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.province").isArray())
+                .andExpect(jsonPath("$.errors.province[*]")
+                        .value(containsInAnyOrder(ERROR_MESSAGE_PROVINCE_NOT_BLANK, ERROR_MESSAGE_PROVINCE_NOT_NULL)));
+
+        verify(warehouseService, never()).create(given);
+    }
 }
