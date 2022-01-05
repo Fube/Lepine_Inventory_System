@@ -336,4 +336,28 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).create(given);
     }
+
+    @Test
+    @DisplayName("qdXhJmQpYG: Given POST on /warehouses with null city as clerk, then return forbidden (403, error)")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void create_AsClerk_WithNullCity() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(null)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).create(given);
+    }
 }
