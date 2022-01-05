@@ -3,6 +3,7 @@ package com.lepine.transfers.controllers.warehouse;
 import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
+import com.lepine.transfers.data.warehouse.WarehouseUUIDLessDTO;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import lombok.RequiredArgsConstructor;
@@ -54,5 +55,10 @@ public class WarehouseController {
     public void deleteByUuid(UUID uuid) {
         log.info("Deleting warehouse with uuid {}", uuid);
         warehouseService.delete(uuid);
+    }
+
+    public Warehouse update(UUID uuid, WarehouseUUIDLessDTO warehouseUUIDLessDTO) {
+        log.info("Updating warehouse with uuid {}", uuid);
+        return warehouseService.update(uuid, warehouseUUIDLessDTO);
     }
 }
