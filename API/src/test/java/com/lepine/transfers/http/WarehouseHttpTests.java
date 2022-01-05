@@ -691,4 +691,34 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, times(1)).update(VALID_UUID, given);
     }
+
+    @Test
+    @DisplayName("eWMWeZRYcN: Given PUT on /warehouses/{uuid} with valid dto as clerk, then return forbidden (403, error)")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void update_AsClerk() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, null)
+                .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
+
+    @Test
+    @DisplayName("kZylrXkKwd: Given PUT on /warehouses/{uuid} with valid dto as salesperson, then return forbidden (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void update_AsSalesperson() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, null)
+                .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
 }
