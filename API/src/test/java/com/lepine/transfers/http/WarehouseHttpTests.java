@@ -8,6 +8,7 @@ import com.lepine.transfers.controllers.warehouse.WarehouseController;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseMapper;
+import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,9 +29,11 @@ import java.util.Locale;
 import java.util.UUID;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -477,6 +480,36 @@ public class WarehouseHttpTests {
 
         // Assert
         perform.andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).create(given);
+    }
+
+    @Test
+    @DisplayName("UmeoFmclEc: Given POST on /warehouses with duplicate zipcode as manager, then return bad request (400, error)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void create_AsManager_WithDuplicateZipCode() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        given(warehouseService.create(given))
+                .willThrow(new DuplicateZipCodeException(given.getZipCode()));
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(format(ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP, given.getZipCode())))
+                .andExpect(jsonPath("$.status").value(BAD_REQUEST))
+                .andExpect(jsonPath("$.timestamp").exists());
 
         verify(warehouseService, never()).create(given);
     }
