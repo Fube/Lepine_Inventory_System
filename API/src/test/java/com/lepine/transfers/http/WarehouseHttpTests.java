@@ -365,7 +365,7 @@ public class WarehouseHttpTests {
     }
 
     @Test
-    @DisplayName("HXqfxUJWhb: Given POST on /warehouses with null zip code as clerk, then return forbidden (403, error)")
+    @DisplayName("HXqfxUJWhb: Given POST on /warehouses with null zipcode as clerk, then return forbidden (403, error)")
     @WithMockUser(username = "some-clerk", roles = "CLERK")
     void create_AsClerk_WithNullZipCode() throws Exception {
 
@@ -437,7 +437,7 @@ public class WarehouseHttpTests {
     }
 
     @Test
-    @DisplayName("jtzEASMOlT: Given POST on /warehouses with null zip code as salesperson, then return forbidden (403, error)")
+    @DisplayName("jtzEASMOlT: Given POST on /warehouses with null zipcode as salesperson, then return forbidden (403, error)")
     @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void create_AsSalesperson_WithNullZipCode() throws Exception {
 
