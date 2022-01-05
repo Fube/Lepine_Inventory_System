@@ -515,20 +515,11 @@ public class WarehouseHttpTests {
     void create_AsClerk_WithDuplicateZipCode() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
-                .build();
-        final String asString = objectMapper.writeValueAsString(given);
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO;
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(given);
     }
@@ -539,20 +530,11 @@ public class WarehouseHttpTests {
     void create_AsSalesperson_WithDuplicateZipCode() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
-                .build();
-        final String asString = objectMapper.writeValueAsString(given);
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO;
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(given);
     }
