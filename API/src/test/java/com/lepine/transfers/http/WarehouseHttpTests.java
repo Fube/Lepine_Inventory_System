@@ -44,6 +44,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -286,6 +287,19 @@ public class WarehouseHttpTests {
 
         given(warehouseService.update(uuid, given))
                 .willReturn(expected);
+
+        // Act
+        return mockMvc.perform(put("/warehouses/" + uuid)
+                .contentType("application/json")
+                .content(asString));
+    }
+
+    private ResultActions updateWith(final UUID uuid, final WarehouseUUIDLessDTO given, Consumer<BDDMockito.BDDMyOngoingStubbing<Warehouse>> arrangement) throws Exception {
+
+        // Arrange
+        final String asString = objectMapper.writeValueAsString(given);
+
+        arrangement.accept(given(warehouseService.update(uuid, given)));
 
         // Act
         return mockMvc.perform(put("/warehouses/" + uuid)
@@ -785,7 +799,7 @@ public class WarehouseHttpTests {
         final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).update(VALID_UUID, given);
@@ -800,7 +814,7 @@ public class WarehouseHttpTests {
         final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).update(VALID_UUID, given);
@@ -817,7 +831,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.city").isArray())
@@ -837,7 +851,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.city").isArray())
@@ -859,7 +873,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.zipCode").isArray())
@@ -879,7 +893,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.zipCode").isArray())
@@ -900,7 +914,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.province").isArray())
@@ -920,7 +934,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.province").isArray())
@@ -941,7 +955,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).update(VALID_UUID, given);
@@ -958,7 +972,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).update(VALID_UUID, given);
@@ -975,7 +989,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).update(VALID_UUID, given);
@@ -992,7 +1006,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).update(VALID_UUID, given);
@@ -1009,7 +1023,7 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).update(VALID_UUID, given);
@@ -1026,8 +1040,30 @@ public class WarehouseHttpTests {
                 .build();
 
         // Act & Assert
-        updateWith(VALID_UUID, given, null)
+        updateWith(VALID_UUID, given, (Warehouse) null)
                 .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
+
+    @Test
+    @DisplayName("MsUJmbHNye: Given PUT on /warehouses/{uuid} of non-existing warehouse as manager, then return not found (404, error)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void update_AsManager_OfNonExistingWarehouse() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO.toBuilder()
+                .city("SomeOtherCity")
+                .build();
+        final Consumer<BDDMockito.BDDMyOngoingStubbing<Warehouse>> arrangement = stubbing -> stubbing
+                .willThrow(new WarehouseNotFoundException(VALID_UUID));
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, arrangement)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, VALID_UUID)))
+                .andExpect(jsonPath("$.status").value(NOT_FOUND.value()))
+                .andExpect(jsonPath("$.timestamp").exists());
 
         verify(warehouseService, never()).update(VALID_UUID, given);
     }
