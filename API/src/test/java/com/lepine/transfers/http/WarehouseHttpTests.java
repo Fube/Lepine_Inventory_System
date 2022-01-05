@@ -1096,7 +1096,7 @@ public class WarehouseHttpTests {
     }
 
     @Test
-    @DisplayName("VDRBGOZnsv: Given DELETE on /warehouses/{uuid} of non-existing warehouse as manager, then return ok (200, void)")
+    @DisplayName("VDRBGOZnsv: Given DELETE on /warehouses/{uuid} of (non-)existing warehouse as manager, then return ok (200, void)")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void delete_AsManager_OfNonExistingWarehouse() throws Exception {
         // Act & Assert
