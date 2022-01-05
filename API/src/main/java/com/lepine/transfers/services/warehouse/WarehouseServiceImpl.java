@@ -76,4 +76,9 @@ public class WarehouseServiceImpl implements WarehouseService {
         log.info("Finding all warehouses for page {} and size {}", pageRequest.getPageNumber(), pageRequest.getPageSize());
         return warehouseRepo.findAll(pageRequest);
     }
+
+    @Override
+    public Optional<Warehouse> findByUuid(UUID uuid) {
+        return Optional.empty();
+    }
 }

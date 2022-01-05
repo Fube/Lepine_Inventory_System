@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import javax.validation.Valid;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface WarehouseService {
@@ -19,4 +20,6 @@ public interface WarehouseService {
     Page<Warehouse> findAll();
 
     Page<Warehouse> findAll(PageRequest pageRequest);
+
+    Optional<Warehouse> findByUuid(UUID uuid);
 }
