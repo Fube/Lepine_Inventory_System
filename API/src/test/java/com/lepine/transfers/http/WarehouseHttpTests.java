@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -64,6 +65,13 @@ public class WarehouseHttpTests {
     private final static int
             DEFAULT_PAGE = 1,
             DEFAULT_SIZE = 10;
+
+    private static final Warehouse VALID_WAREHOUSE = Warehouse.builder()
+            .city(VALID_CITY)
+            .zipCode(VALID_ZIP)
+            .province(VALID_PROVINCE)
+            .active(true)
+            .build();
 
     private static final WarehouseActiveLessUUIDLessDTO VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO = WarehouseActiveLessUUIDLessDTO.builder()
             .city(VALID_CITY)
@@ -237,6 +245,17 @@ public class WarehouseHttpTests {
                 .andExpect(jsonPath("$.number").value(DEFAULT_PAGE)); // One-indexed
 
         verify(warehouseService, atMostOnce()).findAll(any(PageRequest.class));
+    }
+
+    private ResultActions getOneWarehouse(UUID uuid, Warehouse expected) throws Exception {
+
+        // Arrange
+        final String asString = objectMapper.writeValueAsString(expected);
+        given(warehouseService.findByUuid(uuid))
+                .willReturn(Optional.ofNullable(expected));
+
+        // Act
+        return mockMvc.perform(get("/warehouses/" + uuid));
     }
 
     private ResultActions createWith(final WarehouseActiveLessUUIDLessDTO given) throws Exception {
@@ -672,6 +691,15 @@ public class WarehouseHttpTests {
     @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
     void getAll_AsSalesperson_WithSpecificPageAndSize() throws Exception {
         getAllWarehouses(2, 3);
+    }
+
+    @Test
+    @DisplayName("UpvHCxkskP: Given GET on /warehouses/{uuid} for existing warehouse as manager, then return warehouse (200, warehouse)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void getOne_AsManager() throws Exception {
+        getOneWarehouse(VALID_UUID, VALID_WAREHOUSE)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(VALID_WAREHOUSE)));
     }
 
     @Test
