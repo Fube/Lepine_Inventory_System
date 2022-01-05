@@ -408,4 +408,76 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).create(given);
     }
+
+    @Test
+    @DisplayName("ILYTrmgVxh: Given POST on /warehouses with null city as salesperson, then return forbidden (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void create_AsSalesperson_WithNullCity() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(null)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).create(given);
+    }
+
+    @Test
+    @DisplayName("jtzEASMOlT: Given POST on /warehouses with null zip code as salesperson, then return forbidden (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void create_AsSalesperson_WithNullZipCode() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(null)
+                .province(VALID_PROVINCE)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).create(given);
+    }
+
+    @Test
+    @DisplayName("yZRyqRbzDf: Given POST on /warehouses with null province as salesperson, then return forbidden (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void create_AsSalesperson_WithNullProvince() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(null)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).create(given);
+    }
 }
