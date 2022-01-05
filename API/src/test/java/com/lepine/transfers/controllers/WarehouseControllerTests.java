@@ -536,7 +536,7 @@ public class WarehouseControllerTests {
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
-        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_PROVINCE_NOT_BLANK);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_PROVINCE_NOT_BLANK);
 
         verify(warehouseService, never()).update(any(), any());
     }
@@ -563,5 +563,47 @@ public class WarehouseControllerTests {
         verify(warehouseService, never()).update(any(), any());
     }
 
+    @Test
+    @DisplayName("NGFCHaHAVM: Given valid uuid of existing warehouse and blank city when update, then throw ConstraintViolationException")
+    void update_ValidUuid_BlankCity_ThrowConstraintViolationException() {
 
+        // Arrange
+        final WarehouseUUIDLessDTO warehouse = WarehouseUUIDLessDTO.builder()
+                .city("")
+                .province(VALID_PROVINCE)
+                .zipCode(VALID_ZIP)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.update(VALID_UUID, warehouse));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_CITY_NOT_BLANK);
+
+        verify(warehouseService, never()).update(any(), any());
+    }
+
+    @Test
+    @DisplayName("pJhTWJBHFZ: Given valid uuid of existing warehouse and null city when update, then throw ConstraintViolationException")
+    void update_ValidUuid_NullCity_ThrowConstraintViolationException() {
+
+        // Arrange
+        final WarehouseUUIDLessDTO warehouse = WarehouseUUIDLessDTO.builder()
+                .city(null)
+                .province(VALID_PROVINCE)
+                .zipCode(VALID_ZIP)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> warehouseController.update(VALID_UUID, warehouse));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_CITY_NOT_BLANK, ERROR_MESSAGE_CITY_NOT_NULL);
+
+        verify(warehouseService, never()).update(any(), any());
+    }
 }
