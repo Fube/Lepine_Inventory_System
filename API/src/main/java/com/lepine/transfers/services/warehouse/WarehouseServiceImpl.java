@@ -79,6 +79,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public Optional<Warehouse> findByUuid(UUID uuid) {
-        return Optional.empty();
+        log.info("Finding warehouse with uuid {}", uuid);
+        return warehouseRepo.findByUuid(uuid);
     }
 }
