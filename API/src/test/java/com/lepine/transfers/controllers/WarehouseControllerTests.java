@@ -606,4 +606,28 @@ public class WarehouseControllerTests {
 
         verify(warehouseService, never()).update(any(), any());
     }
+
+    @Test
+    @DisplayName("IcPdHVdKPu: Given valid uuid of existing warehouse and duplicate zip code when update, then throw DuplicateZipCodeException")
+    void update_ValidUuid_DuplicateZipCode_ThrowDuplicateZipCodeException() {
+
+        // Arrange
+        final WarehouseUUIDLessDTO warehouse = WarehouseUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .province(VALID_PROVINCE)
+                .zipCode(VALID_ZIP)
+                .build();
+
+        when(warehouseService.update(VALID_UUID, warehouse))
+                .thenThrow(new DuplicateZipCodeException(VALID_ZIP));
+
+        // Act
+        final DuplicateZipCodeException duplicateZipCodeException =
+                assertThrows(DuplicateZipCodeException.class, () -> warehouseController.update(VALID_UUID, warehouse));
+
+        // Assert
+        assertThat(duplicateZipCodeException.getMessage()).isEqualTo(format(ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP, VALID_ZIP));
+
+        verify(warehouseService, atMostOnce()).update(VALID_UUID, warehouse);
+    }
 }
