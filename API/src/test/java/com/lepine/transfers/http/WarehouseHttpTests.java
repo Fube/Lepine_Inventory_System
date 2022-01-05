@@ -23,11 +23,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.atMostOnce;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { WarehouseController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
@@ -90,5 +88,29 @@ public class WarehouseHttpTests {
                 .andExpect(content().json(objectMapper.writeValueAsString(expected)));
 
         verify(warehouseService, atMostOnce()).create(given);
+    }
+
+    @Test
+    @DisplayName("ecFdSbPbFA: Given POST on /warehouses with valid warehouse dto as clerk, then return created (403, error)")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void create_AsClerk() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).create(any());
     }
 }
