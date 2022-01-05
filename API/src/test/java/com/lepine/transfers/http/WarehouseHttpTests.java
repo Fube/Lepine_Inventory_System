@@ -252,4 +252,33 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).create(given);
     }
+
+    @Test
+    @DisplayName("qdXhJmQpYG: Given POST on /warehouses with null zipcode as manager, then return bad request (400, error)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void create_AsManager_WithNullZipCode() throws Exception {
+
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(null)
+                .province(VALID_PROVINCE)
+                .build();
+        final String asString = objectMapper.writeValueAsString(given);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(post("/warehouses")
+                .contentType("application/json")
+                .content(asString));
+
+        // Assert
+        perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.zipCode").isArray())
+                .andExpect(jsonPath("$.errors.zipCode[*]")
+                        .value(containsInAnyOrder(ERROR_MESSAGE_ZIP_NOT_BLANK, ERROR_MESSAGE_ZIP_NOT_NULL)));
+
+        verify(warehouseService, never()).create(given);
+    }
+
 }
