@@ -55,11 +55,19 @@ public class WarehouseHttpTests {
             VALID_PROVINCE = "Province",
             ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP = "Zipcode %s already in use",
             ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND = "Warehouse with uuid %s not found";
+
     private final static UUID
             VALID_UUID = UUID.randomUUID();
+
     private final static int
             DEFAULT_PAGE = 1,
             DEFAULT_SIZE = 10;
+
+    private static final WarehouseActiveLessUUIDLessDTO VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO = WarehouseActiveLessUUIDLessDTO.builder()
+            .city(VALID_CITY)
+            .zipCode(VALID_ZIP)
+            .province(VALID_PROVINCE)
+            .build();
 
     private String
             ERROR_MESSAGE_CITY_NOT_NULL,
@@ -68,11 +76,6 @@ public class WarehouseHttpTests {
             ERROR_MESSAGE_ZIP_NOT_BLANK,
             ERROR_MESSAGE_PROVINCE_NOT_NULL,
             ERROR_MESSAGE_PROVINCE_NOT_BLANK;
-    private final WarehouseActiveLessUUIDLessDTO VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO = WarehouseActiveLessUUIDLessDTO.builder()
-            .city(VALID_CITY)
-            .zipCode(VALID_ZIP)
-            .province(VALID_PROVINCE)
-            .build();
 
     @BeforeAll
     void bSetup(){
@@ -256,20 +259,13 @@ public class WarehouseHttpTests {
     void create_AsManager_WithBlankCity() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .city("")
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isBadRequest())
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.city").isArray())
                 .andExpect(jsonPath("$.errors.city[*]")
@@ -284,20 +280,13 @@ public class WarehouseHttpTests {
     void create_AsManager_WithNullCity() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .city(null)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isBadRequest())
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.city").isArray())
                 .andExpect(jsonPath("$.errors.city[*]")
@@ -306,27 +295,19 @@ public class WarehouseHttpTests {
         verify(warehouseService, never()).create(given);
     }
 
-
     @Test
     @DisplayName("CqjhRZtJkp: Given POST on /warehouses with blank zipcode as manager, then return bad request (400, error)")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void create_AsManager_WithBlankZipCode() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .zipCode("")
-                .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isBadRequest())
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.zipCode").isArray())
                 .andExpect(jsonPath("$.errors.zipCode[*]")
@@ -341,20 +322,13 @@ public class WarehouseHttpTests {
     void create_AsManager_WithNullZipCode() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .zipCode(null)
-                .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isBadRequest())
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.zipCode").isArray())
                 .andExpect(jsonPath("$.errors.zipCode[*]")
@@ -369,20 +343,13 @@ public class WarehouseHttpTests {
     void create_AsManager_WithBlankProvince() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .province("")
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isBadRequest())
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.province").isArray())
                 .andExpect(jsonPath("$.errors.province[*]")
@@ -397,20 +364,13 @@ public class WarehouseHttpTests {
     void create_AsManager_WithNullProvince() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .province(null)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isBadRequest())
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"))
                 .andExpect(jsonPath("$.errors.province").isArray())
                 .andExpect(jsonPath("$.errors.province[*]")
@@ -425,20 +385,13 @@ public class WarehouseHttpTests {
     void create_AsClerk_WithNullCity() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .city(null)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(given);
     }
@@ -449,20 +402,13 @@ public class WarehouseHttpTests {
     void create_AsClerk_WithNullZipCode() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .zipCode(null)
-                .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(given);
     }
@@ -473,20 +419,13 @@ public class WarehouseHttpTests {
     void create_AsClerk_WithNullProvince() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .province(null)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(given);
     }
@@ -497,20 +436,13 @@ public class WarehouseHttpTests {
     void create_AsSalesperson_WithNullCity() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .city(null)
-                .zipCode(VALID_ZIP)
-                .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(given);
     }
@@ -521,20 +453,13 @@ public class WarehouseHttpTests {
     void create_AsSalesperson_WithNullZipCode() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .zipCode(null)
-                .province(VALID_PROVINCE)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(given);
     }
@@ -545,20 +470,13 @@ public class WarehouseHttpTests {
     void create_AsSalesperson_WithNullProvince() throws Exception {
 
         // Arrange
-        final WarehouseActiveLessUUIDLessDTO given = WarehouseActiveLessUUIDLessDTO.builder()
-                .city(VALID_CITY)
-                .zipCode(VALID_ZIP)
+        final WarehouseActiveLessUUIDLessDTO given = VALID_WAREHOUSE_ACTIVE_LESS_UUID_LESS_DTO.toBuilder()
                 .province(null)
                 .build();
-        final String asString = objectMapper.writeValueAsString(given);
 
-        // Act
-        final ResultActions perform = mockMvc.perform(post("/warehouses")
-                .contentType("application/json")
-                .content(asString));
-
-        // Assert
-        perform.andExpect(status().isForbidden());
+        // Act & Assert
+        createWith(given)
+                .andExpect(status().isForbidden());
 
         verify(warehouseService, never()).create(given);
     }
