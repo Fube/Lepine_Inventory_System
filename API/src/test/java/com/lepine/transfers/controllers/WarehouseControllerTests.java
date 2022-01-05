@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -357,7 +358,7 @@ public class WarehouseControllerTests {
                 .build();
 
         when(warehouseService.findByUuid(VALID_UUID))
-                .thenReturn(expected);
+                .thenReturn(Optional.of(expected));
 
         // Act
         final Warehouse actual = warehouseController.getByUuid(uuid);

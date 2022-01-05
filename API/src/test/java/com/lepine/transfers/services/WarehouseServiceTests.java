@@ -593,4 +593,29 @@ public class WarehouseServiceTests {
         verify(warehouseRepo).findAll(pageRequest);
         verify(warehouseRepo, never()).findAll();
     }
+
+    @Test
+    @DisplayName("SQOcHArIfE: Given valid UUID of existing warehouse when findByUuid, then return warehouse")
+    void findByUuid_ExistingWarehouseUUID_ReturnWarehouse(){
+
+        // Arrange
+        final Warehouse expected = Warehouse.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        when(warehouseRepo.findByUuid(any()))
+                .thenReturn(Optional.of(expected));
+
+        // Act
+        final Optional<Warehouse> gotten = warehouseService.findByUuid(expected.getUuid());
+
+        // Assert
+        assertThat(gotten).isPresent();
+        assertThat(gotten.get()).isEqualTo(expected);
+
+        verify(warehouseRepo, atMostOnce()).findByUuid(expected.getUuid());
+        verify(warehouseRepo, never()).findAll();
+    }
 }
