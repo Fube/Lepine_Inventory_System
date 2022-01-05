@@ -5,6 +5,7 @@ import com.lepine.transfers.controllers.warehouse.WarehouseController;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.exceptions.warehouse.DuplicateZipCodeException;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
@@ -367,5 +368,24 @@ public class WarehouseControllerTests {
         assertThat(actual).isEqualTo(expected);
 
         verify(warehouseService, atMostOnce()).findByUuid(expected.getUuid());
+    }
+
+    @Test
+    @DisplayName("pAaEuqyNLh: Given warehouse uuid of non-existing warehouse when get, then throw WarehouseNotFoundException")
+    void get_InvalidUuid_ThrowWarehouseNotFoundException() {
+
+        // Arrange
+        when(warehouseService.findByUuid(VALID_UUID))
+                .thenReturn(Optional.empty());
+
+        // Act
+        final WarehouseNotFoundException warehouseNotFoundException =
+                assertThrows(WarehouseNotFoundException.class, () -> warehouseController.getByUuid(VALID_UUID));
+
+        // Assert
+        final String message = warehouseNotFoundException.getMessage();
+        assertThat(message).isEqualTo(format(ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND, VALID_UUID));
+
+        verify(warehouseService, atMostOnce()).findByUuid(VALID_UUID);
     }
 }
