@@ -886,4 +886,52 @@ public class WarehouseHttpTests {
 
         verify(warehouseService, never()).update(VALID_UUID, given);
     }
+
+    @Test
+    @DisplayName("rSckYfPWiM: Given PUT on /warehouses/{uuid} with null city as salesperson, then return forbidden (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void update_AsSalesperson_WithNullCity() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
+        given.setCity(null);
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, null)
+                .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
+
+    @Test
+    @DisplayName("HyGSlxUDPc: Given PUT on /warehouses/{uuid} with null zipcode as salesperson, then return forbidden (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void update_AsSalesperson_WithNullZipcode() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
+        given.setZipCode(null);
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, null)
+                .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
+
+    @Test
+    @DisplayName("vczrJGQjGi: Given PUT on /warehouses/{uuid} with null province as salesperson, then return forbidden (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void update_AsSalesperson_WithNullProvince() throws Exception {
+
+        // Arrange
+        final WarehouseUUIDLessDTO given = VALID_WAREHOUSE_UUID_LESS_DTO;
+        given.setProvince(null);
+
+        // Act & Assert
+        updateWith(VALID_UUID, given, null)
+                .andExpect(status().isForbidden());
+
+        verify(warehouseService, never()).update(VALID_UUID, given);
+    }
 }
