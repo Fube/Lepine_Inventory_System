@@ -8,6 +8,7 @@ import {
     GenericErrorStatus,
     GenericForm,
     GenericFormInputErrorCombo,
+    GenericFormToggleErrorCombo,
     GenericSubmitButton,
 } from "./FormikGenericComponents";
 
@@ -17,7 +18,7 @@ import {
  * deletable: boolean,
  * handleDelete: (uuid: string) => void,
  * handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void }
- * & import('@lepine/types').Warehouse } )
+ * & import('../types').Warehouse } )
  */
 export default function WarehouseForm({
     uuid,
@@ -79,7 +80,7 @@ export default function WarehouseForm({
             />
         ),
         active: (
-            <GenericFormInputErrorCombo
+            <GenericFormToggleErrorCombo
                 disabled={!editable}
                 name="active"
                 type="checkbox"

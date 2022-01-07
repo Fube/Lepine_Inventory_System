@@ -32,6 +32,36 @@ export function GenericFormInputErrorCombo(fieldAttributes) {
 
 /**
  *
+ * @param {import("formik").FieldAttributes<any>} param0
+ * @returns
+ */
+export function GenericFormToggleErrorCombo(fieldAttributes) {
+    const [inputProps, { error, touched }, helperProps] = useField(
+        fieldAttributes.name
+    );
+    return (
+        <>
+            <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor={fieldAttributes.name}
+            >
+                {fieldAttributes.placeholder}
+            </label>
+            <Field
+                className={`toggle toggle-accent toggle-lg ${
+                    error && touched ? "border-red-500" : ""
+                }`}
+                {...fieldAttributes}
+            />
+            {error && touched && (
+                <div className="text-red-500 text-xs italic">{error}</div>
+            )}
+        </>
+    );
+}
+
+/**
+ *
  * @param {{ title: string | import("react").Component } & import("react").PropsWithChildren } props
  * @returns
  */

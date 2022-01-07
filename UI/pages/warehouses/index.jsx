@@ -107,12 +107,14 @@ export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
  */
 function WarehouseTableRow({ uuid, zipCode, city, province, active }) {
     return (
-        <tr className="hover">
-            <td>{zipCode}</td>
-            <td>{city}</td>
-            <td>{province}</td>
-            <td>{active ? "Yes" : "No"}</td>
-        </tr>
+        <Link key={uuid} href={`/warehouses/${uuid}`} passHref>
+            <tr className="hover">
+                <td>{zipCode}</td>
+                <td>{city}</td>
+                <td>{province}</td>
+                <td>{active ? "Yes" : "No"}</td>
+            </tr>
+        </Link>
     );
 }
 
