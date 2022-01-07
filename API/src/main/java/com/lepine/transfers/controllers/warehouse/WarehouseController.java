@@ -42,7 +42,7 @@ public class WarehouseController {
     @GetMapping
     public Page<Warehouse> getAll(
             @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "{pagination.page.min}") int page,
-            @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "{pagination.size.min}") int size) {
+            @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "{pagination.size.min}") int size) {
         log.info("Getting all warehouses with pageNumber {} and pageSize {}", page, size);
         final Page<Warehouse> all = warehouseService.findAll(PageRequest.of(page - 1, size));
         log.info("Warehouses found {}", all);
