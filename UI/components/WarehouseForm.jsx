@@ -45,16 +45,18 @@ export default function WarehouseForm({
     handleSubmit = () => {},
     blackList = [],
 }) {
-    const warehouseSchema = yup.object().shape(
-        // Filter out fields in blacklist from rawSchema
-        Object.entries(rawSchema).reduce((acc, [key, value]) => {
+    const filterOut = (toFilter) => {
+        return Object.entries(toFilter).reduce((acc, [key, value]) => {
             if (blackList.includes(key)) return acc;
             return {
                 ...acc,
                 [key]: value,
             };
-        }, {})
-    );
+        }, {});
+    };
+
+    const warehouseSchema = yup.object().shape(filterOut(rawSchema));
+
     const fields = {
         zipCode: (
             <GenericFormInputErrorCombo
@@ -100,34 +102,14 @@ export default function WarehouseForm({
     return (
         <>
             <Formik
-                initialValues={Object.entries(initialValues).reduce(
-                    (acc, [key, value]) => {
-                        if (blackList.includes(key)) return acc;
-                        return {
-                            ...acc,
-                            [key]: value,
-                        };
-                    },
-                    {}
-                )}
+                initialValues={filterOut(initialValues)}
                 validationSchema={warehouseSchema}
                 onSubmit={handleSubmit}
             >
                 {({ setFieldValue }) => (
                     <GenericForm title="Create Warehouse">
                         <GenericErrorStatus />
-                        {Object.values(
-                            Object.entries(fields).reduce(
-                                (acc, [key, value]) => {
-                                    if (blackList.includes(key)) return acc;
-                                    return {
-                                        ...acc,
-                                        [key]: value,
-                                    };
-                                },
-                                {}
-                            )
-                        )}
+                        {Object.values(filterOut(fields))}
                         {editable && (
                             <>
                                 <h3 className="text-center text-4xl text-black">
