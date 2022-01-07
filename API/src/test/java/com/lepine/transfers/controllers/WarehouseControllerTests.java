@@ -17,7 +17,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
@@ -331,9 +330,10 @@ public class WarehouseControllerTests {
         // Arrange
         final int pageNumber = 1, pageSize = 10;
         final PageRequest pageable = PageRequest.of(pageNumber, pageSize);
+        final PageRequest expectedPageRequest = PageRequest.of(pageNumber - 1, pageSize);
         final Page<Warehouse> expected = Page.empty();
 
-        when(warehouseService.findAll(pageable)).thenReturn(expected);
+        when(warehouseService.findAll(expectedPageRequest)).thenReturn(expected);
 
         // Act
         final Page<Warehouse> actual = warehouseController.getAll(pageNumber, pageSize);
@@ -344,7 +344,7 @@ public class WarehouseControllerTests {
         assertThat(actual.getTotalElements()).isEqualTo(expected.getTotalElements());
         assertThat(actual.getContent()).isEqualTo(expected.getContent());
 
-        verify(warehouseService).findAll(pageable);
+        verify(warehouseService).findAll(expectedPageRequest);
     }
 
     @Test
