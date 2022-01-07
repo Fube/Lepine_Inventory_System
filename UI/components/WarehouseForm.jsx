@@ -12,6 +12,19 @@ import {
     GenericSubmitButton,
 } from "./FormikGenericComponents";
 
+const rawSchema = {
+    zipCode: yup
+        .string()
+        .required("Zip Code is required")
+        .matches(
+            /^[a-zA-Z][0-9][a-zA-Z] ?[0-9][a-zA-Z][0-9]$/,
+            "Zip Code must be valid"
+        ),
+    city: yup.string().required("City is required"),
+    province: yup.string().required("Province is required"),
+    active: yup.boolean(),
+};
+
 /**
  * @param {{
  * editable: boolean,
@@ -32,18 +45,6 @@ export default function WarehouseForm({
     handleSubmit = () => {},
     blackList = [],
 }) {
-    const rawSchema = {
-        zipCode: yup
-            .string()
-            .required("Zip Code is required")
-            .matches(
-                /^[a-zA-Z][0-9][a-zA-Z] ?[0-9][a-zA-Z][0-9]$/,
-                "Zip Code must be valid"
-            ),
-        city: yup.string().required("City is required"),
-        province: yup.string().required("Province is required"),
-        active: yup.boolean(),
-    };
     const warehouseSchema = yup.object().shape(
         // Filter out fields in blacklist from rawSchema
         Object.entries(rawSchema).reduce((acc, [key, value]) => {
@@ -89,14 +90,26 @@ export default function WarehouseForm({
         ),
     };
 
+    const initialValues = {
+        zipCode,
+        city,
+        province,
+        active,
+    };
+
     return (
         <>
             <Formik
-                initialValues={{
-                    zipCode,
-                    city,
-                    province,
-                }}
+                initialValues={Object.entries(initialValues).reduce(
+                    (acc, [key, value]) => {
+                        if (blackList.includes(key)) return acc;
+                        return {
+                            ...acc,
+                            [key]: value,
+                        };
+                    },
+                    {}
+                )}
                 validationSchema={warehouseSchema}
                 onSubmit={handleSubmit}
             >
