@@ -7,6 +7,7 @@ import GooglePlacesAutocomplete, {
 } from "react-google-places-autocomplete";
 import * as yup from "yup";
 import {
+    GenericErrorStatus,
     GenericForm,
     GenericFormInputErrorCombo,
     GenericSubmitButton,
@@ -33,12 +34,17 @@ export default function CreateWarehouse() {
         setSubmitting(true);
         try {
             await axiosAPI.post("/warehouses", values);
+            setStatus({
+                isError: false,
+                message: "Warehouse successfully created",
+            });
             router.push("/warehouses");
         } catch (error) {
             console.log(error);
             setStatus({
                 isError: true,
-                message: e?.response?.data?.message ?? "Something went wrong",
+                message:
+                    error?.response?.data?.message ?? "Something went wrong",
             });
         } finally {
             setSubmitting(false);
@@ -67,6 +73,7 @@ export default function CreateWarehouse() {
                         >
                             {({ setFieldValue }) => (
                                 <GenericForm title="Create Warehouse">
+                                    <GenericErrorStatus />
                                     <GenericFormInputErrorCombo
                                         name="zipCode"
                                         type="text"

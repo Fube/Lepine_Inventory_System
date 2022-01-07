@@ -68,3 +68,23 @@ export function GenericSubmitButton() {
         </button>
     );
 }
+
+export function GenericErrorStatus() {
+    const { status } = useFormikContext();
+    if (
+        status === undefined ||
+        status === null ||
+        status.isError === undefined ||
+        status.isError === null
+    )
+        return <></>;
+    return (
+        <div
+            className={`text-${
+                status.isError ? "red" : "green"
+            }-500 text-lg text-center`}
+        >
+            {status.message}
+        </div>
+    );
+}
