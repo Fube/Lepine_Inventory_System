@@ -16,6 +16,7 @@ export default function Nav() {
             pages.push("users");
         }
         pages.push("items");
+        pages.push("warehouses");
     } else {
         pages.push("login");
     }
