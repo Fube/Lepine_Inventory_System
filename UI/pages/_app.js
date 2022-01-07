@@ -4,10 +4,6 @@ import { createContext, useEffect, useState } from "react";
 import { axiosAPI } from "../config/axios";
 import injectYupMethods from "../utils/injectYupMethods";
 
-console.log(
-    `ALGOLIA_APP_ID: ${process.env.NEXT_PUBLIC_ALGOLIA_APP_ID}`,
-    `ALGOLIA_SEARCH_KEY: ${process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY}`
-);
 const searchClient = algoliasearch(
     process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
     process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY
