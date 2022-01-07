@@ -107,7 +107,7 @@ export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
  */
 function WarehouseTableRow({ uuid, zipCode, city, province, active }) {
     return (
-        <tr>
+        <tr className="hover">
             <td>{zipCode}</td>
             <td>{city}</td>
             <td>{province}</td>
