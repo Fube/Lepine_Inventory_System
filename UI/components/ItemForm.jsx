@@ -16,7 +16,7 @@ import {
 
 /**
  *
- * @param {{...Item, editable: boolean, deletable: boolean, handleDelete: (uuid: string) => void, handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => }} arg0
+ * @param {{editable: boolean, deletable: boolean, handleDelete: (uuid: string) => void, handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void } & Item} arg0
  */
 export default function ItemForm({
     uuid,
