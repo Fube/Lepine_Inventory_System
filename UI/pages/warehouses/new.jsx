@@ -13,9 +13,11 @@ import {
     GenericSubmitButton,
 } from "../../components/FormikGenericComponents";
 import Nav from "../../components/Nav";
+import WithClientSideAuth from "../../components/WithClientSideAuth";
 import { axiosAPI } from "../../config/axios";
+import checkEmptyAuth from "../../utils/checkEmptyAuth";
 
-export default function CreateWarehouse() {
+function CreateWarehouse() {
     const router = useRouter();
 
     const warehouseSchema = yup.object().shape({
@@ -150,4 +152,10 @@ function GoogleLocationFormikCombo({ setFieldValue }) {
             />
         </div>
     );
+}
+
+export default WithClientSideAuth(CreateWarehouse);
+
+export async function getServerSideProps(ctx) {
+    return checkEmptyAuth(axiosBackendAuth, ctx);
 }
