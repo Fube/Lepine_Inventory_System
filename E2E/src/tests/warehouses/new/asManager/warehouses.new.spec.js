@@ -71,6 +71,18 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         // Check 'Save' button is there
         const saveButton = await page.$('[type="submit"]');
         expect(saveButton).toBeTruthy();
+    });
+
+    test("RnBjGFFnKQ: /warehouses/new :: Create a new warehouse as manager", async ({
+        page,
+    }) => {
+        // Go to /warehouses/new
+        await Promise.all([
+            page.waitForFunction(
+                () => document.querySelector`title`?.text === "Create Warehouse"
+            ),
+            page.goto("/warehouses/new"),
+        ]);
 
         // Use GMaps alternative to fill form
         const gmapsLocator = page.locator("input:not([name])");
@@ -105,6 +117,7 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         });
 
         // Click save
+        const saveButton = page.locator('[type="submit"]');
         await Promise.all([
             page.waitForFunction(
                 () => document.querySelector`title`.text === "Warehouses"
