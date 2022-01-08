@@ -1,10 +1,10 @@
 const { expect, test } = require("@playwright/test");
+const RandExp = require("randexp");
 const {
     createWarehouse,
     deleteWarehouse,
 } = require("@lepine/e2e-helpers/api/warehouses");
 const {
-    READONLY_WAREHOUSE_ZIP_CODE,
     READONLY_WAREHOUSE_CITY,
     READONLY_WAREHOUSE_PROVINCE,
     MANAGER_USERNAME,
@@ -17,6 +17,7 @@ test.describe.parallel("cLpmyRmcaS: Clerk /warehouses tests", () => {
     });
 
     let uuid = null;
+    let zipCode = new RandExp(/([A-Z][0-9]){3}/).gen();
 
     test.beforeAll(async ({ baseURL }) => {
         const data = await createWarehouse(
@@ -26,7 +27,7 @@ test.describe.parallel("cLpmyRmcaS: Clerk /warehouses tests", () => {
                 password: MANAGER_PASSWORD,
             },
             {
-                zipCode: READONLY_WAREHOUSE_ZIP_CODE,
+                zipCode,
                 city: READONLY_WAREHOUSE_CITY,
                 province: READONLY_WAREHOUSE_PROVINCE,
             }
@@ -87,7 +88,7 @@ test.describe.parallel("cLpmyRmcaS: Clerk /warehouses tests", () => {
             let has = false;
             do {
                 const content = await page.content();
-                if (content.includes(READONLY_WAREHOUSE_ZIP_CODE)) {
+                if (content.includes(zipCode)) {
                     has = true;
                     break;
                 }

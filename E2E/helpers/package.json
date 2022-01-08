@@ -1,4 +1,7 @@
 {
     "name": "@lepine/e2e-helpers",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "devDependencies": {
+        "axios": "^0.24.0"
+    }
 }
