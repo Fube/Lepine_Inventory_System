@@ -1,4 +1,5 @@
 const { expect, test } = require("@playwright/test");
+const { createWarehouse, deleteWarehouse } = require("helpers/api/warehouses");
 
 test.describe.parallel("hNDKKdIIjM: Manager /warehouses tests", () => {
     let uuid = null;
