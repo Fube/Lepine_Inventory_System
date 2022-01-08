@@ -12,33 +12,43 @@ const {
 } = require("@lepine/e2e-config");
 
 test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
-    let uuid = null;
-    let zipCode = new RandExp(/([A-Z][0-9]){3}/).gen();
+    let uuid = null,
+        uuidForDelete = null;
+    const toClean = new Set();
+
+    const zipGen = new RandExp(/([A-Z][0-9]){3}/);
+    const zipCode = zipGen.gen();
+    const zipCodeForDelete = zipGen.gen();
+
+    const baseWarehouse = {
+        zipCode,
+        city: READONLY_WAREHOUSE_CITY,
+        province: READONLY_WAREHOUSE_PROVINCE,
+    };
+    const managerCredentials = {
+        email: MANAGER_USERNAME,
+        password: MANAGER_PASSWORD,
+    };
 
     test.beforeAll(async ({ baseURL }) => {
-        const data = await createWarehouse(
-            baseURL,
-            {
-                email: MANAGER_USERNAME,
-                password: MANAGER_PASSWORD,
-            },
-            {
-                zipCode,
-                city: READONLY_WAREHOUSE_CITY,
-                province: READONLY_WAREHOUSE_PROVINCE,
-            }
-        );
+        const [data, dataForDelete] = await Promise.all([
+            createWarehouse(baseURL, managerCredentials, baseWarehouse),
+            createWarehouse(baseURL, managerCredentials, {
+                ...baseWarehouse,
+                zipCode: zipCodeForDelete,
+            }),
+        ]);
         uuid = data.uuid;
+        uuidForDelete = dataForDelete.uuid;
+        toClean.add(uuid);
+        toClean.add(uuidForDelete);
     });
 
     test.afterAll(async ({ baseURL }) => {
-        await deleteWarehouse(
-            baseURL,
-            {
-                email: MANAGER_USERNAME,
-                password: MANAGER_PASSWORD,
-            },
-            uuid
+        await Promise.all(
+            [...toClean].map((uuid) =>
+                deleteWarehouse(baseURL, managerCredentials, uuid)
+            )
         );
     });
 
@@ -100,5 +110,29 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         // Check delete is enabled
         const deleteBtn = page.locator("* button:last-of-type");
         expect(await deleteBtn.isEnabled()).toBe(true);
+    });
+
+    test("XxidqKpVfB: /warehouses/[uuid] :: Delete warehouse", async ({
+        page,
+    }) => {
+        // Go to /warehouses
+        await Promise.all([
+            page.waitForFunction(
+                () => document.querySelector`title`.text === "Warehouse Details"
+            ),
+            page.goto(`/warehouses/${uuidForDelete}`),
+        ]);
+
+        // Click delete
+        const deleteBtn = page.locator("* button:last-of-type");
+        await Promise.all([
+            page.waitForFunction(
+                () => document.querySelector`title`.text === "Warehouses"
+            ),
+            deleteBtn.click(),
+        ]);
+
+        // Remove from toClean
+        toClean.delete(uuidForDelete);
     });
 });
