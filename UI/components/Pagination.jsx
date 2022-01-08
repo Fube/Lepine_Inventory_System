@@ -1,18 +1,8 @@
 import { useEffect, useState } from "react";
 
 /**
- * @typedef PaginationProps
- * @property {number} startAt
- * @property {number} totalPages
- * @property {number} pageNumber
- * @property {(oldPage: number, newPage: number) => void} onNext
- * @property {(oldPage: number, newPage: number) => void} onPrevious
- * @property {(page: number) => void} onPageChange
- */
-
-/**
  *
- * @param {PaginationProps} param0
+ * @param {import('@lepine/types').PaginationProps} param0
  */
 export default function Paginate({
     startAt = 1,

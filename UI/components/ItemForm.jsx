@@ -7,16 +7,8 @@ import {
 } from "./FormikGenericComponents";
 
 /**
- * @typedef Item
- * @property {string} uuid
- * @property {string} name
- * @property {string} description
- * @property {string} sku
- */
-
-/**
  *
- * @param {{editable: boolean, deletable: boolean, handleDelete: (uuid: string) => void, handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void } & Item} arg0
+ * @param {{editable: boolean, deletable: boolean, handleDelete: (uuid: string) => void, handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void } & import('@lepine/types').Item} arg0
  */
 export default function ItemForm({
     uuid,

@@ -17,7 +17,7 @@ import useAuth from "../../hooks/useAuth";
 
 /**
  *
- * @param {{ items: import("../../components/Item").Item[] }}
+ * @param {{ items: import("@lepine/types").Item[] } & import("@lepine/types").Pagination} param0
  * @returns
  */
 export default function ShowItems({ items, totalPages, pageNumber }) {
@@ -179,6 +179,11 @@ function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     );
 }
 
+/**
+ *
+ * @param {import("next/types").GetServerSidePropsContext} context
+ * @returns
+ */
 export async function getServerSideProps(context) {
     const page = context.query.page || 1;
 

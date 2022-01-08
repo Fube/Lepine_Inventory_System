@@ -49,6 +49,11 @@ export default function WarehouseDetails({ warehouse }) {
     );
 }
 
+/**
+ *
+ * @param {import("next/types").GetServerSidePropsContext} context
+ * @returns
+ */
 export async function getServerSideProps(context) {
     const { uuid } = context.query;
     const res = await axiosBackendAuth(`/warehouses/${uuid}`, {

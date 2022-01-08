@@ -7,7 +7,7 @@ import useAuth from "../../hooks/useAuth";
 
 /**
  *
- * @param {{ item: import("../../components/Item").Item }} param0
+ * @param {{ item: import("@lepine/types").Item }} param0
  * @returns
  */
 export default function Item({ item }) {
@@ -50,6 +50,11 @@ export default function Item({ item }) {
     );
 }
 
+/**
+ *
+ * @param {import("next/types").GetServerSidePropsContext} context
+ * @returns
+ */
 export async function getServerSideProps(context) {
     const { uuid } = context.query;
     const res = await axiosBackendAuth(`/items/${uuid}`, {

@@ -7,6 +7,11 @@ import Nav from "../../components/Nav";
 import Paginate from "../../components/Pagination";
 import { axiosBackendAuth } from "../../config/axios";
 
+/**
+ *
+ * @param {{ users: import("@lepine/types").User[] } & import("@lepine/types").Pagination} param0
+ * @returns
+ */
 export default function ShowUsers({ users, totalPages, pageNumber }) {
     const router = useRouter();
 
@@ -98,6 +103,11 @@ function UserTableRow({ uuid, email, role }) {
     );
 }
 
+/**
+ *
+ * @param {import("next/types").GetServerSidePropsContext} context
+ * @returns
+ */
 export async function getServerSideProps(context) {
     const page = context.query.page || 1;
     const res = await axiosBackendAuth.get(`/users?page=${page}`, {

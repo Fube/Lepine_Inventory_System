@@ -55,6 +55,11 @@ function CreateWarehouse() {
 
 export default WithClientSideAuth(CreateWarehouse);
 
+/**
+ *
+ * @param {import("next/types").GetServerSidePropsContext} context
+ * @returns
+ */
 export async function getServerSideProps(ctx) {
     return checkEmptyAuth(axiosBackendAuth, ctx);
 }
