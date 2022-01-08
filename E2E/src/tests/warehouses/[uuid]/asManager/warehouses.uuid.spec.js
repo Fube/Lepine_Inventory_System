@@ -10,15 +10,21 @@ const {
     MANAGER_USERNAME,
     MANAGER_PASSWORD,
 } = require("@lepine/e2e-config");
+const { clearThenType } = require("@lepine/e2e-helpers/page");
 
 test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
     let uuid = null,
-        uuidForDelete = null;
+        uuidForDelete = null,
+        uuidForUpdate = null;
     const toClean = new Set();
 
     const zipGen = new RandExp(/([A-Z][0-9]){3}/);
     const zipCode = zipGen.gen();
     const zipCodeForDelete = zipGen.gen();
+    const zipCodeForUpdate = zipGen.gen();
+
+    const cityGen = new RandExp(/[a-zA-Z]{1,10}/);
+    const provinceGen = new RandExp(/[a-zA-Z]{1,10}/);
 
     const baseWarehouse = {
         zipCode,
@@ -31,17 +37,24 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
     };
 
     test.beforeAll(async ({ baseURL }) => {
-        const [data, dataForDelete] = await Promise.all([
+        const [data, dataForDelete, dataForUpdate] = await Promise.all([
             createWarehouse(baseURL, managerCredentials, baseWarehouse),
             createWarehouse(baseURL, managerCredentials, {
                 ...baseWarehouse,
                 zipCode: zipCodeForDelete,
             }),
+            createWarehouse(baseURL, managerCredentials, {
+                ...baseWarehouse,
+                zipCode: zipCodeForUpdate,
+            }),
         ]);
+
         uuid = data.uuid;
         uuidForDelete = dataForDelete.uuid;
+        uuidForUpdate = dataForUpdate.uuid;
         toClean.add(uuid);
         toClean.add(uuidForDelete);
+        toClean.add(uuidForUpdate);
     });
 
     test.afterAll(async ({ baseURL }) => {
@@ -134,5 +147,67 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
 
         // Remove from toClean
         toClean.delete(uuidForDelete);
+    });
+
+    test("OxZrIinseB: /warehouses/[uuid] :: Update warehouse", async ({
+        page,
+    }) => {
+        // Go to /warehouses
+        await Promise.all([
+            page.waitForFunction(
+                () => document.querySelector`title`.text === "Warehouse Details"
+            ),
+            page.goto(`/warehouses/${uuidForUpdate}`),
+        ]);
+
+        // Update zipCode
+        const zipCodeInput = page.locator("[name=zipCode]");
+        const updatedZip = zipGen.gen();
+        await clearThenType(page, zipCodeInput, updatedZip);
+
+        // Update city
+        const cityInput = page.locator("[name=city]");
+        const updatedCity = cityGen.gen();
+        await clearThenType(page, cityInput, updatedCity);
+
+        // Update province
+        const provinceInput = page.locator("[name=province]");
+        const updatedProvince = provinceGen.gen();
+        await clearThenType(page, provinceInput, updatedProvince);
+
+        // Update active
+        const activeInput = page.locator("[name=active]");
+        const oldValue = await activeInput.isChecked();
+        await activeInput.click();
+
+        // Check save is enabled
+        const saveBtn = page.locator("button[type=submit]");
+        expect(await saveBtn.isEnabled()).toBe(true);
+
+        // Click save
+        await Promise.all([
+            page.waitForFunction(
+                () => document.querySelector`title`.text === "Warehouses"
+            ),
+            saveBtn.click(),
+        ]);
+
+        // Check it is the expected page
+        const title = await page.title();
+        expect(title).toBe("Warehouses");
+
+        // Go back to warehouse
+        await Promise.all([
+            page.waitForFunction(
+                () => document.querySelector`title`.text === "Warehouse Details"
+            ),
+            page.goto(`/warehouses/${uuidForUpdate}`),
+        ]);
+
+        // Check that the page contains the warehouse we created
+        expect(await zipCodeInput.inputValue()).toEqual(updatedZip);
+        expect(await cityInput.inputValue()).toEqual(updatedCity);
+        expect(await provinceInput.inputValue()).toEqual(updatedProvince);
+        expect(await activeInput.isChecked()).toEqual(!oldValue);
     });
 });

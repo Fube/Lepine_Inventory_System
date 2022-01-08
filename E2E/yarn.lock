@@ -1087,7 +1087,7 @@ pixelmatch@^5.2.1:
   dependencies:
     pngjs "^4.0.1"
 
-playwright-core@=1.17.1:
+playwright-core@=1.17.1, playwright-core@^1.17.1:
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.17.1.tgz#a16e0f89284a0ed8ae6d77e1c905c84b8a2ba022"
   integrity sha512-C3c8RpPiC3qr15fRDN6dx6WnUkPLFmST37gms2aoHPDRvp7EaGDPMMZPpqIm/QWB5J40xDrQCD4YYHz2nBTojQ==
