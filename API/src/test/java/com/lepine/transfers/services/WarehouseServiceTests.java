@@ -13,6 +13,7 @@ import com.lepine.transfers.services.warehouse.WarehouseServiceImpl;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,6 +47,7 @@ public class WarehouseServiceTests {
     private final static String
         VALID_CITY = "City",
         VALID_ZIP = "A1B2C3",
+        VALID_ZIP_WITH_SPACE = "A1B 2C3",
         VALID_PROVINCE = "Province",
         ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP = "Zipcode %s already in use",
         ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND = "Warehouse with uuid %s not found";
@@ -634,6 +636,36 @@ public class WarehouseServiceTests {
         assertThat(gotten).isEmpty();
 
         verify(warehouseRepo, atMostOnce()).findByUuid(VALID_UUID);
+        verify(warehouseRepo, never()).findAll();
+    }
+
+    @Test
+    @DisplayName("KgnLRgsvqK: Given zip code with with space in the middle when create, then persist without space and return warehouse")
+    void create_ZipCodeWithSpaceInTheMiddle_PersistWithoutSpaceAndReturnWarehouse() {
+        // Arrange
+        final WarehouseActiveLessUUIDLessDTO toCreate = WarehouseActiveLessUUIDLessDTO.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP_WITH_SPACE)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final Warehouse expected = Warehouse.builder()
+                .city(VALID_CITY)
+                .zipCode(VALID_ZIP)
+                .province(VALID_PROVINCE)
+                .build();
+
+        final ArgumentMatcher<Warehouse> zipMatcher = w -> w.getZipCode().equals(VALID_ZIP);
+        when(warehouseRepo.save(argThat(zipMatcher)))
+                .thenReturn(expected);
+
+        // Act
+        final Warehouse result = warehouseService.create(toCreate);
+
+        // Assert
+        assertThat(result).isEqualTo(expected);
+
+        verify(warehouseRepo, times(1)).save(argThat(zipMatcher));
         verify(warehouseRepo, never()).findAll();
     }
 }
