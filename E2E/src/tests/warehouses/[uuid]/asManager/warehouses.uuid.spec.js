@@ -210,4 +210,44 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         expect(await provinceInput.inputValue()).toEqual(updatedProvince);
         expect(await activeInput.isChecked()).toEqual(!oldValue);
     });
+
+    test("dcaVQOHILy: /warehouses/[uuid] :: Update warehouse duplicate zipCode", async ({
+        page,
+    }) => {
+        const preZip = zipGen.gen();
+        const preCity = cityGen.gen();
+        const preProvince = provinceGen.gen();
+        const { uuid: preUuid } = await createWarehouse(
+            page,
+            managerCredentials,
+            {
+                zipCode: preZip,
+                city: preCity,
+                province: preProvince,
+            }
+        );
+
+        // Go to /warehouses/[uuid]
+        await Promise.all([
+            page.waitForFunction(
+                () => document.querySelector`title`.text === "Warehouse Details"
+            ),
+            page.goto(`/warehouses/${preUuid}`),
+        ]);
+
+        // Update zipCode
+        const zipCodeInput = page.locator("[name=zipCode]");
+        await zipCodeInput.type(zipCode);
+
+        // Try to save
+        const saveBtn = page.locator("button[type=submit]");
+        await Promise.all([
+            page.waitForResponse(/.*api\/warehouse.*/i),
+            saveBtn.click(),
+        ]);
+
+        // Check for error
+        const error = await page.content();
+        expect(error).toContain(`Zipcode ${zipCode} already in use`);
+    });
 });
