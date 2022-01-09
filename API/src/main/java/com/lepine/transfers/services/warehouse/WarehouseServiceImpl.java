@@ -32,6 +32,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
 
         log.info("Creating warehouse with zip {}", warehouse.getZipCode());
+        warehouse.setZipCode(warehouse.getZipCode().replace(" ", ""));
         final Warehouse save = warehouseRepo.save(warehouseMapper.toEntity(warehouse));
         log.info("Warehouse created with uuid {}", save.getUuid());
 
