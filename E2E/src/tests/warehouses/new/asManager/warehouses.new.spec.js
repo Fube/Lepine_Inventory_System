@@ -1,10 +1,15 @@
 const { expect, test } = require("@playwright/test");
 const RandExp = require("randexp");
-const { deleteWarehouse } = require("@lepine/e2e-helpers/api/warehouses");
+const {
+    deleteWarehouse,
+    createWarehouse,
+} = require("@lepine/e2e-helpers/api/warehouses");
 const {
     READONLY_WAREHOUSE_ZIP_CODE,
     MANAGER_USERNAME,
     MANAGER_PASSWORD,
+    READONLY_WAREHOUSE_CITY,
+    READONLY_WAREHOUSE_PROVINCE,
 } = require("@lepine/e2e-config");
 const { clearThenType } = require("@lepine/e2e-helpers/page");
 
@@ -124,5 +129,64 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
             ),
             saveButton.click(),
         ]);
+    });
+
+    test("IqfotWuott: /warehouses/new :: Create a new warehouse as manager with duplicate zipCode", async ({
+        page,
+        baseURL,
+    }) => {
+        const preZip = zipGen.gen();
+        const { uuid: preUuid } = await createWarehouse(
+            baseURL,
+            managerCredentials,
+            {
+                zipCode: preZip,
+                city: READONLY_WAREHOUSE_CITY,
+                province: READONLY_WAREHOUSE_PROVINCE,
+            }
+        );
+        toClean.add(preUuid);
+
+        // Hook listener for clean up
+        page.addListener("response", async (res) => {
+            if (
+                res.request().method().toLowerCase() == "post" &&
+                res.ok() &&
+                res.url().includes("api/warehouse")
+            ) {
+                const { uuid } = await res.json();
+                toClean.add(uuid);
+            }
+        });
+
+        // Go to /warehouses/new
+        await Promise.all([
+            page.waitForFunction(
+                () => document.querySelector`title`?.text === "Create Warehouse"
+            ),
+            page.goto("/warehouses/new"),
+        ]);
+
+        // Fill out form
+        const zipCodeLocator = page.locator('input[name="zipCode"]');
+        const cityLocator = page.locator('input[name="city"]');
+        const provinceLocator = page.locator('input[name="province"]');
+
+        await zipCodeLocator.type(preZip);
+        await cityLocator.type(READONLY_WAREHOUSE_CITY);
+        await provinceLocator.type(READONLY_WAREHOUSE_PROVINCE);
+
+        // Click save
+        const saveButton = page.locator('[type="submit"]');
+        await Promise.all([
+            page.waitForResponse(/.api\/warehouse.*/i),
+            saveButton.click(),
+        ]);
+
+        // Check error message
+        const errorMessage = page.locator(".text-red-500");
+        expect(await errorMessage.textContent()).toBe(
+            `Zipcode ${preZip} already in use`
+        );
     });
 });
