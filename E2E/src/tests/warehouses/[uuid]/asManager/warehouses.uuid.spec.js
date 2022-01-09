@@ -213,12 +213,13 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
 
     test("dcaVQOHILy: /warehouses/[uuid] :: Update warehouse duplicate zipCode", async ({
         page,
+        baseURL,
     }) => {
         const preZip = zipGen.gen();
         const preCity = cityGen.gen();
         const preProvince = provinceGen.gen();
         const { uuid: preUuid } = await createWarehouse(
-            page,
+            baseURL,
             managerCredentials,
             {
                 zipCode: preZip,
@@ -226,6 +227,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
                 province: preProvince,
             }
         );
+        toClean.add(preUuid);
 
         // Go to /warehouses/[uuid]
         await Promise.all([
@@ -237,7 +239,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
 
         // Update zipCode
         const zipCodeInput = page.locator("[name=zipCode]");
-        await zipCodeInput.type(zipCode);
+        await clearThenType(page, zipCodeInput, zipGen.gen());
 
         // Try to save
         const saveBtn = page.locator("button[type=submit]");
@@ -245,6 +247,10 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
             page.waitForResponse(/.*api\/warehouse.*/i),
             saveBtn.click(),
         ]);
+
+        // Check still on the same page
+        const title = await page.title();
+        expect(title).toBe("Warehouse Details");
 
         // Check for error
         const error = await page.content();
