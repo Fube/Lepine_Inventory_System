@@ -31,6 +31,7 @@ const rawSchema = {
  * deletable: boolean,
  * handleDelete: (uuid: string) => void,
  * handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void }
+ * title: string,
  * & import('../../types').Warehouse } )
  */
 export default function WarehouseForm({
@@ -41,6 +42,7 @@ export default function WarehouseForm({
     active,
     editable,
     deletable,
+    title,
     handleDelete = () => {},
     handleSubmit = () => {},
     blackList = [],
@@ -107,7 +109,7 @@ export default function WarehouseForm({
                 onSubmit={handleSubmit}
             >
                 {({ setFieldValue }) => (
-                    <GenericForm title="Create Warehouse">
+                    <GenericForm title={title}>
                         <GenericErrorStatus />
                         {Object.values(filterOut(fields))}
                         {editable && (

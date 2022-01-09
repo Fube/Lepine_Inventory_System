@@ -51,6 +51,7 @@ export default function WarehouseDetails({ warehouse }) {
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
                         <WarehouseForm
+                            title={"Warehouse Details"}
                             editable={role === "MANAGER"}
                             deletable={role === "MANAGER"}
                             {...warehouse}

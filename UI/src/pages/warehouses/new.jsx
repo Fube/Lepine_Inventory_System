@@ -42,6 +42,7 @@ function CreateWarehouse() {
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
                         <WarehouseForm
+                            title={"Create Warehouse"}
                             handleSubmit={handleSubmit}
                             blackList={["active"]}
                             editable
