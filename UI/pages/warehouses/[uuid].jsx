@@ -17,12 +17,27 @@ export default function WarehouseDetails({ warehouse }) {
         await axiosAPI.delete(`/warehouses/${warehouse.uuid}`);
         router.push("/warehouses");
     };
-    const handleSubmit = async (values, { setSubmitting }) => {
+
+    const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         setSubmitting(true);
-        axiosAPI.put(`/warehouses/${warehouse.uuid}`, values).then(() => {
-            setSubmitting(false);
+        try {
+            await axiosAPI
+                .put(`/warehouses/${warehouse.uuid}`, values)
+                .then(() => {
+                    setSubmitting(false);
+                    router.push("/warehouses");
+                });
             router.push("/warehouses");
-        });
+        } catch (error) {
+            console.log(error);
+            setStatus({
+                isError: true,
+                message:
+                    error?.response?.data?.message ?? "Something went wrong",
+            });
+        } finally {
+            setSubmitting(false);
+        }
     };
     return (
         <>

@@ -239,7 +239,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
 
         // Update zipCode
         const zipCodeInput = page.locator("[name=zipCode]");
-        await clearThenType(page, zipCodeInput, zipGen.gen());
+        await clearThenType(page, zipCodeInput, zipCode);
 
         // Try to save
         const saveBtn = page.locator("button[type=submit]");
