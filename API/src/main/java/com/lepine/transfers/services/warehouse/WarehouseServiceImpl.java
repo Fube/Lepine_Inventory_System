@@ -26,13 +26,13 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public Warehouse create(WarehouseActiveLessUUIDLessDTO warehouse) {
 
+        warehouse.setZipCode(warehouse.getZipCode().replace(" ", ""));
         if(warehouseRepo.findByZipCode(warehouse.getZipCode()).isPresent()) {
             log.error("Warehouse with zip code {} already exists", warehouse.getZipCode());
             throw new DuplicateZipCodeException(warehouse.getZipCode());
         }
 
         log.info("Creating warehouse with zip {}", warehouse.getZipCode());
-        warehouse.setZipCode(warehouse.getZipCode().replace(" ", ""));
         final Warehouse save = warehouseRepo.save(warehouseMapper.toEntity(warehouse));
         log.info("Warehouse created with uuid {}", save.getUuid());
 
@@ -54,6 +54,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         final Warehouse warehouse = warehouseRepo.findByUuid(uuid)
                 .orElseThrow(() -> new WarehouseNotFoundException(uuid));
 
+        toUpdate.setZipCode(toUpdate.getZipCode().replace(" ", ""));
         final Optional<Warehouse> existing = warehouseRepo.findByZipCode(toUpdate.getZipCode());
         if(existing.isPresent() && !existing.get().getUuid().equals(uuid)) {
             log.error("Warehouse with zip code {} already exists", toUpdate.getZipCode());
