@@ -13,21 +13,15 @@ const {
 const { clearThenType } = require("@lepine/e2e-helpers/page");
 
 test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
-    let uuid = null,
-        uuidForDelete = null,
-        uuidForUpdate = null;
+    let uuid = null;
+    let zipCode = null;
     const toClean = new Set();
 
     const zipGen = new RandExp(/([A-Z][0-9]){3}/);
-    const zipCode = zipGen.gen();
-    const zipCodeForDelete = zipGen.gen();
-    const zipCodeForUpdate = zipGen.gen();
-
     const cityGen = new RandExp(/[a-zA-Z]{1,10}/);
     const provinceGen = new RandExp(/[a-zA-Z]{1,10}/);
 
     const baseWarehouse = {
-        zipCode,
         city: READONLY_WAREHOUSE_CITY,
         province: READONLY_WAREHOUSE_PROVINCE,
     };
@@ -36,28 +30,19 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         password: MANAGER_PASSWORD,
     };
 
-    test.beforeAll(async ({ baseURL }) => {
-        const [data, dataForDelete, dataForUpdate] = await Promise.all([
-            createWarehouse(baseURL, managerCredentials, baseWarehouse),
-            createWarehouse(baseURL, managerCredentials, {
-                ...baseWarehouse,
-                zipCode: zipCodeForDelete,
-            }),
-            createWarehouse(baseURL, managerCredentials, {
-                ...baseWarehouse,
-                zipCode: zipCodeForUpdate,
-            }),
-        ]);
-
+    test.beforeEach(async ({ baseURL }) => {
+        const zip = zipGen.gen();
+        const data = await createWarehouse(baseURL, managerCredentials, {
+            ...baseWarehouse,
+            zipCode: zip,
+        });
         uuid = data.uuid;
-        uuidForDelete = dataForDelete.uuid;
-        uuidForUpdate = dataForUpdate.uuid;
+        zipCode = zip;
+
         toClean.add(uuid);
-        toClean.add(uuidForDelete);
-        toClean.add(uuidForUpdate);
     });
 
-    test.afterAll(async ({ baseURL }) => {
+    test.afterEach(async ({ baseURL }) => {
         await Promise.all(
             [...toClean].map((uuid) =>
                 deleteWarehouse(baseURL, managerCredentials, uuid)
@@ -133,7 +118,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
             page.waitForFunction(
                 () => document.querySelector`title`.text === "Warehouse Details"
             ),
-            page.goto(`/warehouses/${uuidForDelete}`),
+            page.goto(`/warehouses/${uuid}`),
         ]);
 
         // Click delete
@@ -144,9 +129,6 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
             ),
             deleteBtn.click(),
         ]);
-
-        // Remove from toClean
-        toClean.delete(uuidForDelete);
     });
 
     test("OxZrIinseB: /warehouses/[uuid] :: Update warehouse", async ({
@@ -157,7 +139,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
             page.waitForFunction(
                 () => document.querySelector`title`.text === "Warehouse Details"
             ),
-            page.goto(`/warehouses/${uuidForUpdate}`),
+            page.goto(`/warehouses/${uuid}`),
         ]);
 
         // Update zipCode
@@ -201,7 +183,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
             page.waitForFunction(
                 () => document.querySelector`title`.text === "Warehouse Details"
             ),
-            page.goto(`/warehouses/${uuidForUpdate}`),
+            page.goto(`/warehouses/${uuid}`),
         ]);
 
         // Check that the page contains the warehouse we created
@@ -211,49 +193,61 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         expect(await activeInput.isChecked()).toEqual(!oldValue);
     });
 
-    test("dcaVQOHILy: /warehouses/[uuid] :: Update warehouse duplicate zipCode", async ({
-        page,
-        baseURL,
-    }) => {
-        const preZip = zipGen.gen();
-        const preCity = cityGen.gen();
-        const preProvince = provinceGen.gen();
-        const { uuid: preUuid } = await createWarehouse(
+    test.describe.parallel("Dual warehouse setup", () => {
+        let preUuid = null;
+        let preZip = null;
+
+        test.beforeEach(async ({ baseURL }) => {
+            preZip = zipGen.gen();
+            const preCity = cityGen.gen();
+            const preProvince = provinceGen.gen();
+            const { uuid } = await createWarehouse(
+                baseURL,
+                managerCredentials,
+                {
+                    zipCode: preZip,
+                    city: preCity,
+                    province: preProvince,
+                }
+            );
+
+            preUuid = uuid;
+
+            toClean.add(uuid);
+        });
+
+        test("dcaVQOHILy: /warehouses/[uuid] :: Update warehouse duplicate zipCode", async ({
+            page,
             baseURL,
-            managerCredentials,
-            {
-                zipCode: preZip,
-                city: preCity,
-                province: preProvince,
-            }
-        );
-        toClean.add(preUuid);
+        }) => {
+            // Go to /warehouses/[uuid]
+            await Promise.all([
+                page.waitForFunction(
+                    () =>
+                        document.querySelector`title`.text ===
+                        "Warehouse Details"
+                ),
+                page.goto(`/warehouses/${preUuid}`),
+            ]);
 
-        // Go to /warehouses/[uuid]
-        await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
-            ),
-            page.goto(`/warehouses/${preUuid}`),
-        ]);
+            // Update zipCode
+            const zipCodeInput = page.locator("[name=zipCode]");
+            await clearThenType(page, zipCodeInput, zipCode);
 
-        // Update zipCode
-        const zipCodeInput = page.locator("[name=zipCode]");
-        await clearThenType(page, zipCodeInput, zipCode);
+            // Try to save
+            const saveBtn = page.locator("button[type=submit]");
+            await Promise.all([
+                page.waitForResponse(/.*api\/warehouse.*/i),
+                saveBtn.click(),
+            ]);
 
-        // Try to save
-        const saveBtn = page.locator("button[type=submit]");
-        await Promise.all([
-            page.waitForResponse(/.*api\/warehouse.*/i),
-            saveBtn.click(),
-        ]);
+            // Check still on the same page
+            const title = await page.title();
+            expect(title).toBe("Warehouse Details");
 
-        // Check still on the same page
-        const title = await page.title();
-        expect(title).toBe("Warehouse Details");
-
-        // Check for error
-        const error = await page.content();
-        expect(error).toContain(`Zipcode ${zipCode} already in use`);
+            // Check for error
+            const error = await page.content();
+            expect(error).toContain(`Zipcode ${zipCode} already in use`);
+        });
     });
 });
