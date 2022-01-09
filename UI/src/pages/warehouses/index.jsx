@@ -109,10 +109,10 @@ function WarehouseTableRow({ uuid, zipCode, city, province, active }) {
     return (
         <Link key={uuid} href={`/warehouses/${uuid}`} passHref>
             <tr className="hover">
-                <td>{zipCode}</td>
-                <td>{city}</td>
-                <td>{province}</td>
-                <td>{active ? "Yes" : "No"}</td>
+                <td className="td-wrap">{zipCode}</td>
+                <td className="td-wrap">{city}</td>
+                <td className="td-wrap">{province}</td>
+                <td className="td-wrap">{active ? "Yes" : "No"}</td>
             </tr>
         </Link>
     );
