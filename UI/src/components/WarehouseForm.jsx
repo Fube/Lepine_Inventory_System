@@ -31,7 +31,7 @@ const rawSchema = {
  * deletable: boolean,
  * handleDelete: (uuid: string) => void,
  * handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void }
- * & import('../types').Warehouse } )
+ * & import('../../types').Warehouse } )
  */
 export default function WarehouseForm({
     uuid,
