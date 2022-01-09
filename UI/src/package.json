@@ -1,5 +1,5 @@
 {
-    "name": "lepine_inventory_system",
+    "name": "@lepine/ui",
     "private": true,
     "version": "1.0.0",
     "scripts": {
