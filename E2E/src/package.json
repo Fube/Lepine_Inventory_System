@@ -1,0 +1,23 @@
+{
+    "name": "E2E",
+    "version": "1.0.0",
+    "description": "E2E tests for LePine transfer system",
+    "main": "index.js",
+    "author": "Fube",
+    "license": "BSD-3-Clause",
+    "devDependencies": {
+        "@lepine/e2e-config": "1.0.0",
+        "@lepine/e2e-helpers": "1.0.0",
+        "@playwright/test": "^1.17.1",
+        "axios": "^0.24.0",
+        "nanoid": "^3.1.30"
+    },
+    "scripts": {
+        "test": "npx playwright test",
+        "test-debug": "PWDEBUG=1 npx playwright test",
+        "test-debug-windows": "set PWDEBUG=1 && npx playwright test"
+    },
+    "dependencies": {
+        "randexp": "^0.5.3"
+    }
+}

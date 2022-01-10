@@ -8,6 +8,7 @@ import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.services.user.UserService;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,13 @@ import org.springframework.test.context.ActiveProfiles;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -101,11 +104,9 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-        assertEquals("Password must be at least 8 characters long, include a number, include a capital letter, include a special character",
-                constraintViolations.iterator().next().getMessage());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactly(
+                "Password must be at least 8 characters long, include a number, include a capital letter, include a special character");
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
@@ -126,11 +127,8 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-        assertEquals("Password must not be blank",
-                constraintViolations.iterator().next().getMessage());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactly("Password must not be blank");
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
@@ -150,17 +148,10 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(2, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.containsAll(List.of(
-                        "Password must be at least 8 characters long, include a number, include a capital letter, include a special character",
-                        "Password must not be blank")));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactlyInAnyOrder(
+                "Password must be at least 8 characters long, include a number, include a capital letter, include a special character",
+                "Password must not be blank");
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
@@ -180,11 +171,8 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-        assertEquals("Email must not be blank",
-                constraintViolations.iterator().next().getMessage());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactly("Email must not be blank");
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
@@ -204,11 +192,8 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-        assertEquals("Email must not be blank",
-                constraintViolations.iterator().next().getMessage());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactly("Email must not be blank");
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
@@ -228,11 +213,8 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-        assertEquals("Email must be a valid email address",
-                constraintViolations.iterator().next().getMessage());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactly("Email must be a valid email address");
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
@@ -252,17 +234,10 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(2, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.containsAll(List.of(
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactlyInAnyOrder(
                         "Email must be a valid email address",
-                        "Password must be at least 8 characters long, include a number, include a capital letter, include a special character")));
+                        "Password must be at least 8 characters long, include a number, include a capital letter, include a special character");
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
@@ -282,18 +257,11 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(3, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.containsAll(List.of(
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactlyInAnyOrder(
                         "Email must not be blank",
                         "Password must not be blank",
-                        "Password must be at least 8 characters long, include a number, include a capital letter, include a special character")));
+                        "Password must be at least 8 characters long, include a number, include a capital letter, include a special character");
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
@@ -313,17 +281,8 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.create(userUUIDLessDTO));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(2, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.containsAll(List.of(
-                        "Email must not be blank",
-                        "Password must not be blank")));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactlyInAnyOrder("Email must not be blank", "Password must not be blank");
 
         verify(userService, times(0)).create(userUUIDLessDTO);
     }
@@ -342,15 +301,8 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.getAll(page, size));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.contains("Page number cannot be less than 1"));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactly("Page number cannot be less than 1");
 
         verify(userService, times(0)).findAll(any());
     }
@@ -369,15 +321,8 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.getAll(page, size));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(1, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.contains("Page size cannot be less than 1"));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactly("Page size cannot be less than 1");
 
         verify(userService, times(0)).findAll(any());
     }
@@ -396,17 +341,9 @@ public class UserControllerTests {
                 assertThrows(ConstraintViolationException.class, () -> userController.getAll(page, size));
 
         // Assert
-        final Set<ConstraintViolation<?>> constraintViolations = exception.getConstraintViolations();
-        assertFalse(constraintViolations.isEmpty());
-        assertEquals(2, constraintViolations.size());
-
-        final Set<String> collect = constraintViolations.stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toSet());
-        assertTrue(
-                collect.containsAll(List.of(
-                        "Page number cannot be less than 1",
-                        "Page size cannot be less than 1")));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
+        assertThat(collect).containsExactlyInAnyOrder(
+                "Page number cannot be less than 1", "Page size cannot be less than 1");
 
         verify(userService, times(0)).findAll(any());
     }

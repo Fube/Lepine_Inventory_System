@@ -314,7 +314,7 @@ sketch
 
 #Ignore h2 db files
 *.db
-**node_modules/*
+**node_modules**
 **/test-results/
 **/tests/coverage-report
 **.local-browsers/

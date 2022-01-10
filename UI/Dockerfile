@@ -15,7 +15,7 @@ COPY --from=deps /app/node_modules ./node_modules
 ARG SERVER_BACKEND_URL
 ENV SERVER_BACKEND_URL $SERVER_BACKEND_URL
 
-RUN yarn build && yarn install --production --ignore-scripts --prefer-offline
+RUN yarn workspace @lepine/ui build && yarn install --production --ignore-scripts --prefer-offline
 
 # Production image, copy all the files and run next
 FROM node:alpine AS runner
@@ -27,8 +27,8 @@ RUN adduser -S nextjs -u 1001
 
 # You only need to copy next.com.lepine.transfers.config.js if you are NOT using the default configuration
 # COPY --from=builder /app/next.com.lepine.transfers.config.js ./
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder /app/src/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/src/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
