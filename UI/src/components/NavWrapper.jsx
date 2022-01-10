@@ -1,16 +1,24 @@
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useAuth from "../hooks/useAuth";
 import Nav from "./Nav";
 
 export default function NavWrapper({ children }) {
-    const { isLoggedIn, role, logout } = useAuth();
+    const [isOpen, setIsOpen] = useState(false);
+    const { isLoggedIn, role } = useAuth();
     const router = useRouter();
+
+    useEffect(() => {
+        setIsOpen(false);
+    }, [router.pathname]);
 
     const isActive = (path) =>
         router.pathname.substring(1).startsWith(path) ? "text-blue-400" : "";
-    const pages = [];
 
+    const toggleIsOpen = () => setIsOpen(!isOpen);
+
+    const pages = [];
     if (isLoggedIn) {
         if (role === "MANAGER") {
             pages.push("users");
@@ -21,7 +29,13 @@ export default function NavWrapper({ children }) {
 
     return (
         <div className="drawer h-screen">
-            <input id="nav-drawer" type="checkbox" className="drawer-toggle" />
+            <input
+                id="nav-drawer"
+                type="checkbox"
+                className="drawer-toggle"
+                checked={isOpen}
+                onChange={toggleIsOpen}
+            />
             <div className="drawer-content">
                 <Nav pages={pages} isActive={isActive} />
                 {children}
