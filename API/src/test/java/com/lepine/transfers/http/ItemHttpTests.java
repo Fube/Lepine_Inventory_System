@@ -521,4 +521,34 @@ public class ItemHttpTests {
         verify(itemService, times(1)).create(any(Item.class));
         verify(itemController, times(1)).create(any(ItemUUIDLessDTO.class));
     }
+
+    @Test
+    @DisplayName("oBYMHzFVov: Given PUT on /items/{uuid} with dupe SKU as Manager, returns 400 BAD REQUEST")
+    @WithMockUser(username = "test-user", roles = {"MANAGER"})
+    void putItem_DupeSKU_AsManager() throws Exception {
+        // Arrange
+        final ItemUUIDLessDTO itemUUIDLessDTO = ItemUUIDLessDTO.builder()
+                .name("Item")
+                .sku("SKU")
+                .description("Description")
+                .build();
+        final Item item = itemMapper.toEntity(itemUUIDLessDTO);
+        given(itemService.update(any(Item.class))).willThrow(new DuplicateSkuException(item.getSku()));
+
+        // Act
+        final ResultActions resultActions = mvc.perform(put("/items/{uuid}", item.getUuid())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(item)));
+
+        // Assert
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", containsString(item.getSku())))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(itemService, times(1)).update(any(Item.class));
+        verify(itemController, times(1)).update(any(UUID.class), any(ItemUUIDLessDTO.class));
+    }
 }
