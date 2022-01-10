@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -33,6 +34,9 @@ class ItemDataTests {
 
     @Autowired
     private ItemRepo itemRepo;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
@@ -147,10 +151,15 @@ class ItemDataTests {
         // Act & Assert
         final Item save = itemRepo.save(item1);
         final PersistenceException persistenceException =
-                assertThrows(PersistenceException.class, () -> itemRepo.save(item2));
+                assertThrows(PersistenceException.class, () -> {
+                    itemRepo.save(item2);
+                    entityManager.flush();
+                });
 
         Throwable exception = Throwables.getRootCause(persistenceException);
         assertThat(exception.getMessage()).contains("Unique");
+
+        entityManager.clear(); // So that count does not throw an exception
         assertEquals(1, itemRepo.count());
     }
 }
