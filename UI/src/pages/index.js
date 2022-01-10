@@ -7,7 +7,7 @@ export default function Home() {
             <Head>
                 <title>Home</title>
             </Head>
-            <Nav />
+
             <h1>Lorem Ipsum Or Something</h1>
         </>
     );

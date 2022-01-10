@@ -4,22 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import useAuth from "../hooks/useAuth";
 
-export default function Nav({ children }) {
+export default function Nav({ pages, isActive }) {
     const { isLoggedIn, role, logout } = useAuth();
-
     const router = useRouter();
-    const isActive = (path) =>
-        router.pathname.substring(1).startsWith(path) ? "text-blue-400" : "";
-
-    const pages = [];
-
-    if (isLoggedIn) {
-        if (role === "MANAGER") {
-            pages.push("users");
-        }
-        pages.push("items");
-        pages.push("warehouses");
-    }
 
     return (
         <>

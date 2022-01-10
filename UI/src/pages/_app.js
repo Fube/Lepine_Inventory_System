@@ -3,6 +3,7 @@ import algoliasearch from "algoliasearch/lite";
 import { createContext, useEffect, useState } from "react";
 import { axiosAPI } from "../config/axios";
 import injectYupMethods from "../utils/injectYupMethods";
+import NavWrapper from "../components/NavWrapper";
 
 const searchClient = algoliasearch(
     process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
@@ -58,30 +59,9 @@ function MyApp({ Component, pageProps }) {
             }}
         >
             <AlgoliaContext.Provider value={{ searchClient }}>
-                <div className="drawer h-screen">
-                    <input
-                        id="nav-drawer"
-                        type="checkbox"
-                        className="drawer-toggle"
-                    />
-                    <div className="drawer-content">
-                        <Component {...pageProps} />
-                    </div>
-                    <div className="drawer-side">
-                        <label
-                            htmlFor="nav-drawer"
-                            className="drawer-overlay"
-                        ></label>
-                        <ul className="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content">
-                            <li>
-                                <a>Menu Item</a>
-                            </li>
-                            <li>
-                                <a>Menu Item</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <NavWrapper>
+                    <Component {...pageProps} />
+                </NavWrapper>
             </AlgoliaContext.Provider>
         </AuthContext.Provider>
     );
