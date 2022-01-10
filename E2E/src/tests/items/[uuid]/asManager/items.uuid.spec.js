@@ -196,7 +196,9 @@ test.describe.parallel("Manager /items/[uuid] tests", () => {
 
             // Check for error
             const error = await page.content();
-            expect(error).toContain(`SKU ${baseItem.sku} already in use`);
+            expect(error).toContain(
+                `Item with SKU ${baseItem.sku} already exists`
+            );
         });
     });
 });
