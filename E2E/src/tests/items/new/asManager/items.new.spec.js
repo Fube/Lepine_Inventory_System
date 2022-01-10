@@ -8,6 +8,7 @@ const { MANAGER_PASSWORD, MANAGER_USERNAME } = require("@lepine/e2e-config");
 const RandExp = require("randexp");
 
 test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
+    const toClean = new Set();
     const skuGen = new RandExp(/[a-zA-Z0-9]{1,6}/);
 
     const baseItem = {
@@ -20,6 +21,14 @@ test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
         email: MANAGER_USERNAME,
         password: MANAGER_PASSWORD,
     };
+
+    test.afterAll(async ({ baseURL }) => {
+        await Promise.all(
+            [...toClean].map((uuid) =>
+                apiDeleteItem(baseURL, managerCredentials, uuid)
+            )
+        );
+    });
 
     test("/items/new :: Go to through /items", async ({ page }) => {
         await page.goto("/items");
@@ -60,13 +69,7 @@ test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
 
     test("/items/new :: Create item from", async ({ page }) => {
         const { uuid } = await createItem(page);
-
-        // Clean up
-        await page.evaluate(
-            async (uuid) =>
-                await fetch(`/api/items/${uuid}`, { method: "DELETE" }),
-            uuid
-        );
+        toClean.add(uuid);
     });
 
     test.describe.parallel("With duplicate SKU setup", () => {
@@ -79,10 +82,7 @@ test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
                 sku,
             });
             uuid = data.uuid;
-        });
-
-        test.afterAll(async ({ baseURL }) => {
-            await apiDeleteItem(baseURL, managerCredentials, uuid);
+            toClean.add(uuid);
         });
 
         test("PVGlvMEslE: /items/new :: Create item with duplicate SKU", async ({
