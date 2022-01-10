@@ -59,7 +59,7 @@ export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
         return (
             <>
                 {header}
-                <Nav />
+
                 <main className="flex justify-center">
                     <div className="text-center">
                         <div className="mt-12">{fallback}</div>
@@ -79,7 +79,7 @@ export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
     return (
         <>
             {header}
-            <Nav />
+
             <div className="overflow-x-auto justify-center flex">
                 <div className="md:w-3/4 lg:w-1/2 w-full">
                     <div className="md:flex justify-around my-4">

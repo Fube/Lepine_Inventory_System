@@ -48,7 +48,6 @@ export default function Login() {
             <Head>
                 <title>Login</title>
             </Head>
-            <Nav />
 
             <main className="flex justify-center">
                 <div className="text-center">

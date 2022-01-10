@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import useAuth from "../hooks/useAuth";
 
 export default function Nav({ pages, isActive }) {
-    const { isLoggedIn, role, logout } = useAuth();
+    const { isLoggedIn, logout } = useAuth();
     const router = useRouter();
 
     return (

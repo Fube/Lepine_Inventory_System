@@ -73,7 +73,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
         return (
             <>
                 {header}
-                <Nav />
+
                 <main className="flex justify-center">
                     <div className="text-center">
                         <div className="mt-12">{fallback}</div>
@@ -98,7 +98,6 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                 indexName="items"
                 refresh={refresh}
             >
-                <Nav />
                 <div className="overflow-x-auto justify-center flex">
                     <div className="md:w-4/5 w-3/4">
                         <div className="md:flex justify-around my-4">

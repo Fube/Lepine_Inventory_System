@@ -45,7 +45,7 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
         return (
             <>
                 {header}
-                <Nav />
+
                 <main className="flex justify-center">
                     <div className="text-center">
                         <div className="mt-12">{fallback}</div>
@@ -63,7 +63,7 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
     return (
         <>
             {header}
-            <Nav />
+
             <div className="overflow-x-auto justify-center flex">
                 <div className="md:w-1/2 w-3/4">
                     <div className="md:flex justify-around my-4">
