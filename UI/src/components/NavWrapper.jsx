@@ -28,22 +28,28 @@ export default function NavWrapper({ children }) {
             </div>
             <div className="drawer-side sm:!hidden">
                 <label htmlFor="nav-drawer" className="drawer-overlay"></label>
-                <ul className="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content">
-                    {pages.map((path, key) => (
-                        <Link key={key} href={`/${path}`}>
-                            <li>
-                                <a
-                                    className={`btn btn-ghost btn-sm rounded-btn !justify-start ${isActive(
-                                        path
-                                    )}`}
-                                >
-                                    {path}
-                                </a>
-                            </li>
-                        </Link>
-                    ))}
-                </ul>
+                <NavSideBar pages={pages} isActive={isActive} />
             </div>
         </div>
+    );
+}
+
+function NavSideBar({ pages, isActive }) {
+    return (
+        <ul className="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content">
+            {pages.map((path, key) => (
+                <Link key={key} href={`/${path}`}>
+                    <li>
+                        <a
+                            className={`btn btn-ghost btn-sm rounded-btn !justify-start ${isActive(
+                                path
+                            )}`}
+                        >
+                            {path}
+                        </a>
+                    </li>
+                </Link>
+            ))}
+        </ul>
     );
 }
