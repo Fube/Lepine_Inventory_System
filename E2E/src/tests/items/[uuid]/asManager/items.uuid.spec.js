@@ -10,7 +10,7 @@ const { createItem, deleteItem } = require("@lepine/e2e-helpers/api/items");
 const { clearThenType } = require("@lepine/e2e-helpers/page");
 const RandExp = require("randexp");
 
-test.describe.parallel("Manager /items/[uuid] tests", () => {
+test.describe.parallel("BrLGZduqdM: Manager /items/[uuid] tests", () => {
     const toClean = new Set();
     const skuGen = new RandExp(/[a-zA-Z0-9]{1,6}/);
 
