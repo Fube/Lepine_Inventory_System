@@ -18,12 +18,27 @@ export default function Item({ item }) {
         await axiosAPI.delete(`/items/${item.uuid}`);
         router.push("/items");
     };
-    const handleSubmit = async (values, { setSubmitting }) => {
+    const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         setSubmitting(true);
-        axiosAPI.put(`/items/${item.uuid}`, values).then(() => {
+        try {
+            await axiosAPI.put(`/items/${item.uuid}`, values).then(() => {
+                setSubmitting(false);
+                router.push("/items");
+            });
+            setStatus({
+                isError: false,
+                message: "Item successfully updated",
+            });
+        } catch (error) {
+            console.log(error);
+            setStatus({
+                isError: true,
+                message:
+                    error?.response?.data?.message ?? "Something went wrong",
+            });
+        } finally {
             setSubmitting(false);
-            router.push("/items");
-        });
+        }
     };
     return (
         <>
