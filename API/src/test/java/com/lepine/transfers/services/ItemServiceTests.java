@@ -285,4 +285,25 @@ public class ItemServiceTests {
         verify(itemRepo, times(1)).findBySkuIgnoreCase(item.getSku());
         verify(itemRepo, never()).save(item);
     }
+
+    @Test
+    @DisplayName("vSdVkauYBE: Given duplicate SKU when update, then throw DuplicateSkuException")
+    void updateDuplicateSku() {
+
+        // Arrange
+        final Item item = Item.builder()
+                .name("name")
+                .sku("SKU")
+                .description("description")
+                .build();
+        given(itemRepo.findBySkuIgnoreCase(item.getSku())).willReturn(Optional.of(item));
+
+        // Act
+        final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.update(item));
+
+        // Assert
+        assertEquals(format(ERROR_FORMAT_DUPLICATE_SKU, item.getSku()), throwable.getMessage());
+        verify(itemRepo, times(1)).findBySkuIgnoreCase(item.getSku());
+        verify(itemRepo, never()).save(item);
+    }
 }
