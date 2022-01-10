@@ -4,6 +4,7 @@ import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.services.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item create(Item item) {
         log.info("creating item");
+
+        log.info("checking for dupe SKU");
+        if(itemRepo.findBySku(item.getSku()).isPresent()) {
+            log.info("dupe SKU found");
+            throw new DuplicateSkuException(item.getSku());
+        }
+
         final Item created = itemRepo.save(item);
         log.info("created item");
 
