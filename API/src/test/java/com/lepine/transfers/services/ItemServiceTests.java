@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -31,6 +32,8 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {MapperConfig.class, ItemServiceImpl.class})
 @ActiveProfiles({"test"})
 public class ItemServiceTests {
+
+    private final static String ERROR_FORMAT_DUPLICATE_SKU = "Item with SKU %s already exists";
 
     @MockBean
     private ItemRepo itemRepo;
@@ -235,5 +238,26 @@ public class ItemServiceTests {
         // Assert
         assertFalse(retrieved.isPresent());
         verify(itemRepo, times(1)).findById(uuid);
+    }
+
+    @Test
+    @DisplayName("psoOxrYKmw: Given duplicate SKU when create, then throw DuplicateSkuException")
+    void createDuplicateSku() {
+
+        // Arrange
+        final Item item = Item.builder()
+                .name("name")
+                .sku("SKU")
+                .description("description")
+                .build();
+        given(itemRepo.findBySku(item.getSku())).willReturn(Optional.of(item));
+
+        // Act
+        final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.create(item));
+
+        // Assert
+        assertEquals(format(ERROR_FORMAT_DUPLICATE_SKU, item.getSku()), throwable.getMessage());
+        verify(itemRepo, times(1)).findBySku(item.getSku());
+        verify(itemRepo, never()).save(item);
     }
 }
