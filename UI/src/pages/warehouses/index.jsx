@@ -24,8 +24,15 @@ export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
         <tr>
             <th>Zip Code</th>
             <th>City</th>
-            <th>Province</th>
-            <th className="flex justify-between">
+            <th className="md:rounded-r-none rounded-r-lg flex justify-between md:table-cell">
+                <div className="self-center">Province</div>
+                <button className="md:hidden">
+                    <Link href="/warehouses/new" passHref>
+                        <Icon icon="si-glyph:button-plus" width="32" />
+                    </Link>
+                </button>
+            </th>
+            <th className="hidden justify-between md:flex">
                 {thou(
                     <>
                         <div className="self-center">Active</div>
@@ -74,7 +81,7 @@ export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
             {header}
             <Nav />
             <div className="overflow-x-auto justify-center flex">
-                <div className="md:w-1/2 w-3/4">
+                <div className="md:w-3/4 lg:w-1/2 w-full">
                     <div className="md:flex justify-around my-4">
                         <h1 className="text-4xl md:mb-0 mb-4">Warehouses</h1>
                     </div>
@@ -111,8 +118,12 @@ function WarehouseTableRow({ uuid, zipCode, city, province, active }) {
             <tr className="hover">
                 <td className="td-wrap">{zipCode}</td>
                 <td className="td-wrap">{city}</td>
-                <td className="td-wrap">{province}</td>
-                <td className="td-wrap">{active ? "Yes" : "No"}</td>
+                <td className="td-wrap md:rounded-r-none rounded-r-lg">
+                    {province}
+                </td>
+                <td className="td-wrap hidden md:table-cell">
+                    {active ? "Yes" : "No"}
+                </td>
             </tr>
         </Link>
     );

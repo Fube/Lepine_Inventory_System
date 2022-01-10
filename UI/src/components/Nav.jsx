@@ -1,3 +1,4 @@
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useAuth from "../hooks/useAuth";
@@ -23,6 +24,12 @@ export default function Nav() {
 
     return (
         <>
+            <Head>
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1"
+                />
+            </Head>
             <div className="navbar mb-2 shadow-lg bg-neutral text-neutral-content">
                 <div className="flex-none px-2 mx-2">
                     <span className="text-lg font-bold">
