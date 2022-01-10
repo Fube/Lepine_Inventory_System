@@ -4,6 +4,7 @@ import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.services.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item create(Item item) {
         log.info("creating item");
+
+        log.info("checking for dupe SKU");
+        if(itemRepo.findBySkuIgnoreCase(item.getSku()).isPresent()) {
+            log.info("dupe SKU found");
+            throw new DuplicateSkuException(item.getSku());
+        }
+
         final Item created = itemRepo.save(item);
         log.info("created item");
 
@@ -54,6 +62,14 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item update(Item item) {
         log.info("updating item");
+
+        log.info("checking for dupe SKU");
+        final Optional<Item> bySkuIgnoreCase = itemRepo.findBySkuIgnoreCase(item.getSku());
+        if(bySkuIgnoreCase.isPresent() && !bySkuIgnoreCase.get().getUuid().equals(item.getUuid())) {
+            log.info("dupe SKU found");
+            throw new DuplicateSkuException(item.getSku());
+        }
+
         final Item updated = itemRepo.save(item);
         log.info("updated item");
 

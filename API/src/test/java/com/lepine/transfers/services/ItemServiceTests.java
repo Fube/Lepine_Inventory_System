@@ -4,6 +4,7 @@ import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.item.ItemServiceImpl;
 import com.lepine.transfers.services.search.SearchService;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -31,6 +33,8 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {MapperConfig.class, ItemServiceImpl.class})
 @ActiveProfiles({"test"})
 public class ItemServiceTests {
+
+    private final static String ERROR_FORMAT_DUPLICATE_SKU = "Item with SKU %s already exists";
 
     @MockBean
     private ItemRepo itemRepo;
@@ -235,5 +239,71 @@ public class ItemServiceTests {
         // Assert
         assertFalse(retrieved.isPresent());
         verify(itemRepo, times(1)).findById(uuid);
+    }
+
+    @Test
+    @DisplayName("psoOxrYKmw: Given duplicate SKU when create, then throw DuplicateSkuException")
+    void createDuplicateSku() {
+
+        // Arrange
+        final Item item = Item.builder()
+                .name("name")
+                .sku("SKU")
+                .description("description")
+                .build();
+        given(itemRepo.findBySkuIgnoreCase(item.getSku())).willReturn(Optional.of(item));
+
+        // Act
+        final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.create(item));
+
+        // Assert
+        assertEquals(format(ERROR_FORMAT_DUPLICATE_SKU, item.getSku()), throwable.getMessage());
+        verify(itemRepo, times(1)).findBySkuIgnoreCase(item.getSku());
+        verify(itemRepo, never()).save(item);
+    }
+
+    @Test
+    @DisplayName("xTyRBjnPWY: Given duplicate SKU with different case when create, then throw DuplicateSkuException")
+    void createDuplicateSkuDifferentCase() {
+
+        // Arrange
+        final String originalSku = "sku";
+        final Item item = Item.builder()
+                .name("name")
+                .sku(originalSku.toUpperCase())
+                .description("description")
+                .build();
+        given(itemRepo.findBySkuIgnoreCase(
+                argThat(n -> n.equalsIgnoreCase(originalSku)
+        ))).willReturn(Optional.of(item));
+
+        // Act
+        final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.create(item));
+
+        // Assert
+        assertEquals(format(ERROR_FORMAT_DUPLICATE_SKU, item.getSku()), throwable.getMessage());
+        verify(itemRepo, times(1)).findBySkuIgnoreCase(item.getSku());
+        verify(itemRepo, never()).save(item);
+    }
+
+    @Test
+    @DisplayName("vSdVkauYBE: Given duplicate SKU when update, then throw DuplicateSkuException")
+    void updateDuplicateSku() {
+
+        // Arrange
+        final Item item = Item.builder()
+                .name("name")
+                .sku("SKU")
+                .description("description")
+                .build();
+        given(itemRepo.findBySkuIgnoreCase(item.getSku())).willReturn(Optional.of(item.toBuilder().uuid(UUID.randomUUID()).build()));
+
+        // Act
+        final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.update(item));
+
+        // Assert
+        assertEquals(format(ERROR_FORMAT_DUPLICATE_SKU, item.getSku()), throwable.getMessage());
+        verify(itemRepo, times(1)).findBySkuIgnoreCase(item.getSku());
+        verify(itemRepo, never()).save(item);
     }
 }

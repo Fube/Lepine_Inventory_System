@@ -40,6 +40,7 @@ test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
             baseWarehouse
         );
         uuid = data.uuid;
+        toClean.add(uuid);
     });
 
     test.afterAll(async ({ baseURL }) => {
@@ -74,7 +75,7 @@ test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
             if (!nextBtn) break;
 
             await Promise.all([
-                page.waitForNavigation({ waitUntil: "networkidle" }),
+                page.waitForResponse(/.*items.*/i),
                 nextBtn.click(),
             ]);
         } while (!warehouse);

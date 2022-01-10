@@ -9,6 +9,27 @@ import WithClientSideAuth from "../../components/WithClientSideAuth";
 function CreateItem() {
     const router = useRouter();
 
+    const handleSubmit = async (values, { setSubmitting, setStatus }) => {
+        setSubmitting(true);
+        try {
+            await axiosAPI.post("/items", values);
+            setStatus({
+                isError: false,
+                message: "Item successfully created",
+            });
+            router.push("/items");
+        } catch (error) {
+            console.log(error);
+            setStatus({
+                isError: true,
+                message:
+                    error?.response?.data?.message ?? "Something went wrong",
+            });
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     return (
         <>
             <Head>
@@ -18,15 +39,7 @@ function CreateItem() {
                 <div className="flex-shrink-0 flex-grow-0"></div>
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
-                        <ItemBase
-                            editable
-                            handleSubmit={async (values, { setSubmitting }) => {
-                                setSubmitting(true);
-                                await axiosAPI.post("/items", values);
-                                setSubmitting(false);
-                                router.push("/items");
-                            }}
-                        />
+                        <ItemBase editable handleSubmit={handleSubmit} />
                     </div>
                 </div>
             </div>
