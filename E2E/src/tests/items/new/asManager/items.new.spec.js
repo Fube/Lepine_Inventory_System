@@ -72,7 +72,7 @@ test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
         toClean.add(uuid);
     });
 
-    test.describe.parallel("With duplicate SKU setup", () => {
+    test.describe.parallel("With duplicate SKU", () => {
         const sku = skuGen.gen();
         let uuid = null;
 

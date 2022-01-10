@@ -7,9 +7,11 @@ const {
     MANAGER_PASSWORD,
 } = require("@lepine/e2e-config");
 const { createItem, deleteItem } = require("@lepine/e2e-helpers/api/items");
+const { clearThenType } = require("@lepine/e2e-helpers/page");
 const RandExp = require("randexp");
 
 test.describe.parallel("Manager /items/[uuid] tests", () => {
+    const toClean = new Set();
     const skuGen = new RandExp(/[a-zA-Z0-9]{1,6}/);
 
     let uuid = null;
@@ -28,6 +30,7 @@ test.describe.parallel("Manager /items/[uuid] tests", () => {
     test.beforeEach(async ({ baseURL, page }) => {
         const data = await createItem(baseURL, managerCredentials, baseItem);
         uuid = data.uuid;
+        toClean.add(uuid);
 
         // Go to item's page
         await Promise.all([
@@ -39,7 +42,11 @@ test.describe.parallel("Manager /items/[uuid] tests", () => {
     });
 
     test.afterEach(async ({ baseURL }) => {
-        await deleteItem(baseURL, managerCredentials, uuid);
+        await Promise.all(
+            [...toClean].map((uuid) =>
+                deleteItem(baseURL, managerCredentials, uuid)
+            )
+        );
     });
 
     test("/items/:uuid :: Delete item through", async ({ page }) => {
@@ -150,5 +157,46 @@ test.describe.parallel("Manager /items/[uuid] tests", () => {
         // Check we have not changed pages
         const title2 = await page.title();
         expect(title2).toBe("Item Details");
+    });
+
+    test.describe.parallel("With duplicate SKU setup", () => {
+        let uuid = null;
+
+        test.beforeAll(async ({ baseURL }) => {
+            const data = await createItem(baseURL, managerCredentials, {
+                ...baseItem,
+                sku: skuGen.gen(),
+            });
+            uuid = data.uuid;
+            toClean.add(uuid);
+        });
+
+        test("GUxNvMRfOP: /items/:uuid :: Update with duplicate SKU", async ({
+            page,
+        }) => {
+            // Change to other item
+            await Promise.all([
+                page.waitForFunction(
+                    () =>
+                        document?.querySelector("title")?.text == "Item Details"
+                ),
+                page.goto(`/items/${uuid}`),
+            ]);
+
+            // Set SKU to the same as the previous item
+            const skuInput = page.locator("input[name=sku]");
+            await clearThenType(page, skuInput, baseItem.sku);
+
+            // Save
+            const saveBtn = page.locator("button[type=submit]");
+            await Promise.all([
+                page.waitForResponse(/.*api\/items.*/i),
+                saveBtn.click(),
+            ]);
+
+            // Check for error
+            const error = await page.content();
+            expect(error).toContain(`SKU ${baseItem.sku} already in use`);
+        });
     });
 });
