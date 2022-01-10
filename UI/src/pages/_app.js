@@ -58,7 +58,30 @@ function MyApp({ Component, pageProps }) {
             }}
         >
             <AlgoliaContext.Provider value={{ searchClient }}>
-                <Component {...pageProps} />
+                <div className="drawer h-screen">
+                    <input
+                        id="nav-drawer"
+                        type="checkbox"
+                        className="drawer-toggle"
+                    />
+                    <div className="drawer-content">
+                        <Component {...pageProps} />
+                    </div>
+                    <div className="drawer-side">
+                        <label
+                            htmlFor="nav-drawer"
+                            className="drawer-overlay"
+                        ></label>
+                        <ul className="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content">
+                            <li>
+                                <a>Menu Item</a>
+                            </li>
+                            <li>
+                                <a>Menu Item</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </AlgoliaContext.Provider>
         </AuthContext.Provider>
     );

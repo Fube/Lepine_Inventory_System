@@ -1,9 +1,10 @@
+import { Icon } from "@iconify/react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useAuth from "../hooks/useAuth";
 
-export default function Nav() {
+export default function Nav({ children }) {
     const { isLoggedIn, role, logout } = useAuth();
 
     const router = useRouter();
@@ -18,8 +19,6 @@ export default function Nav() {
         }
         pages.push("items");
         pages.push("warehouses");
-    } else {
-        pages.push("login");
     }
 
     return (
@@ -36,8 +35,15 @@ export default function Nav() {
                         <Link href="/">Lepine</Link>
                     </span>
                 </div>
-                <div className="flex-1 px-2 mx-2 lg:justify-between">
-                    <div className="items-stretch hidden lg:flex">
+                <div className="flex-1 px-2 mx-2 justify-between drawer">
+                    <label
+                        htmlFor="nav-drawer"
+                        className="sm:hidden flex btn btn-ghost btn-sm rounded-btn self-center"
+                    >
+                        <Icon icon="radix-icons:hamburger-menu" width="32" />
+                        <span className="ml-2">Navigation</span>
+                    </label>
+                    <div className="items-stretch sm:flex hidden">
                         {pages.map((path, key) => (
                             <Link key={key} href={`/${path}`}>
                                 <a
@@ -51,7 +57,7 @@ export default function Nav() {
                         ))}
                     </div>
                     <div>
-                        {isLoggedIn && (
+                        {isLoggedIn ? (
                             <a
                                 className={`btn btn-ghost btn-sm rounded-btn`}
                                 onClick={() =>
@@ -60,6 +66,12 @@ export default function Nav() {
                             >
                                 logout
                             </a>
+                        ) : (
+                            <Link href="/login">
+                                <a className="btn btn-ghost btn-sm rounded-btn self-center">
+                                    login
+                                </a>
+                            </Link>
                         )}
                     </div>
                 </div>
