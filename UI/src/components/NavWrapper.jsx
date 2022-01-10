@@ -36,7 +36,7 @@ export default function NavWrapper({ children }) {
                 checked={isOpen}
                 onChange={toggleIsOpen}
             />
-            <div className="drawer-content">
+            <div className="drawer-content flex flex-col">
                 <Nav pages={pages} isActive={isActive} />
                 {children}
             </div>

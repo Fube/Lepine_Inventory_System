@@ -56,7 +56,7 @@ export default function CreateUser() {
             <Head>
                 <title>Add User</title>
             </Head>
-            <div className="flex flex-col h-screen">
+            <div className="flex flex-col flex-1">
                 <div className="flex-shrink-0 flex-grow-0"></div>
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
