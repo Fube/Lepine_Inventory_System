@@ -14,7 +14,7 @@ export default function NavWrapper({ children }) {
     }, [router.pathname]);
 
     const isActive = (path) =>
-        router.pathname.substring(1).startsWith(path) ? "text-blue-400" : "";
+        router.pathname.substring(1).startsWith(path) ? "!text-blue-400" : "";
 
     const toggleIsOpen = () => setIsOpen(!isOpen);
 
