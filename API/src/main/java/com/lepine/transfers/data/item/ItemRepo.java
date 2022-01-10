@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface ItemRepo extends JpaRepository<Item, UUID> {
     Integer deleteByUuid(UUID uuid);
 
-    Optional<Item> findBySku(String sku);
+    Optional<Item> findBySkuIgnoreCase(String sku);
 }

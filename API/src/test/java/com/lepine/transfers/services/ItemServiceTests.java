@@ -251,14 +251,14 @@ public class ItemServiceTests {
                 .sku("SKU")
                 .description("description")
                 .build();
-        given(itemRepo.findBySku(item.getSku())).willReturn(Optional.of(item));
+        given(itemRepo.findBySkuIgnoreCase(item.getSku())).willReturn(Optional.of(item));
 
         // Act
         final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.create(item));
 
         // Assert
         assertEquals(format(ERROR_FORMAT_DUPLICATE_SKU, item.getSku()), throwable.getMessage());
-        verify(itemRepo, times(1)).findBySku(item.getSku());
+        verify(itemRepo, times(1)).findBySkuIgnoreCase(item.getSku());
         verify(itemRepo, never()).save(item);
     }
 
@@ -273,14 +273,14 @@ public class ItemServiceTests {
                 .sku(originalSku.toUpperCase())
                 .description("description")
                 .build();
-        given(itemRepo.findBySku(originalSku)).willReturn(Optional.of(item));
+        given(itemRepo.findBySkuIgnoreCase(originalSku)).willReturn(Optional.of(item));
 
         // Act
         final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.create(item));
 
         // Assert
         assertEquals(format(ERROR_FORMAT_DUPLICATE_SKU, item.getSku()), throwable.getMessage());
-        verify(itemRepo, times(1)).findBySku(item.getSku());
+        verify(itemRepo, times(1)).findBySkuIgnoreCase(item.getSku());
         verify(itemRepo, never()).save(item);
     }
 }

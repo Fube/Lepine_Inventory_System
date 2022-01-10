@@ -44,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
         log.info("creating item");
 
         log.info("checking for dupe SKU");
-        if(itemRepo.findBySku(item.getSku()).isPresent()) {
+        if(itemRepo.findBySkuIgnoreCase(item.getSku()).isPresent()) {
             log.info("dupe SKU found");
             throw new DuplicateSkuException(item.getSku());
         }
