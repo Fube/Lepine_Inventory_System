@@ -6,6 +6,7 @@ import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
+import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
@@ -436,5 +437,26 @@ public class ItemControllerTests {
         // Assert
         assertEquals(format("Item with uuid %s not found", uuid), exception.getMessage());
         verify(itemService, times(1)).findByUuid(uuid);
+    }
+
+    @Test
+    @DisplayName("TsXoijewqb: Given dupe SKU when create, then throw DuplicateSkuException")
+    void createItemWithDuplicateSkuException() {
+
+        // Arrange
+        final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
+                .name("name")
+                .description("description")
+                .sku("SKU")
+                .build();
+        given(itemService.create(any(Item.class))).willThrow(new DuplicateSkuException("SKU"));
+
+        // Act
+        DuplicateSkuException exception =
+                assertThrows(DuplicateSkuException.class, () -> itemController.create(itemDTO));
+
+        // Assert
+        assertThat(exception.getMessage()).contains("SKU");
+        verify(itemService, times(1)).create(any(Item.class));
     }
 }
