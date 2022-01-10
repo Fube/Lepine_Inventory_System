@@ -4,6 +4,7 @@ import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.item.ItemServiceImpl;
 import com.lepine.transfers.services.search.SearchService;
