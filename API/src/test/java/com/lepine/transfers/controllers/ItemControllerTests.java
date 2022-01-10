@@ -449,7 +449,7 @@ public class ItemControllerTests {
                 .description("description")
                 .sku("SKU")
                 .build();
-        given(itemService.create(any(Item.class))).willThrow(new DuplicateSkuException("SKU"));
+        given(itemService.create(any(Item.class))).willThrow(new DuplicateSkuException(itemDTO.getSku()));
 
         // Act
         DuplicateSkuException exception =
@@ -458,5 +458,26 @@ public class ItemControllerTests {
         // Assert
         assertThat(exception.getMessage()).contains("SKU");
         verify(itemService, times(1)).create(any(Item.class));
+    }
+
+    @Test
+    @DisplayName("fTAlXEQHTq: Given dupe SKU when update, then throw DuplicateSkuException")
+    void updateItemWithDuplicateSkuException() {
+
+        // Arrange
+        final ItemUUIDLessDTO itemDTO = ItemUUIDLessDTO.builder()
+                .name("name")
+                .description("description")
+                .sku("SKU")
+                .build();
+        given(itemService.update(any(Item.class))).willThrow(new DuplicateSkuException(itemDTO.getSku()));
+
+        // Act
+        DuplicateSkuException exception =
+                assertThrows(DuplicateSkuException.class, () -> itemController.update(UUID.randomUUID(), itemDTO));
+
+        // Assert
+        assertThat(exception.getMessage()).contains("SKU");
+        verify(itemService, times(1)).update(any(Item.class));
     }
 }
