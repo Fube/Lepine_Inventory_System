@@ -45,7 +45,9 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         ]);
 
         // Find the button to create a new warehouse
-        const addNewButton = page.locator('[href*="warehouses/new"]');
+        const addNewButton = page.locator(
+            '[href*="warehouses/new"] >> visible=true'
+        );
         await Promise.all([
             page.waitForFunction(
                 () => document.querySelector`title`.text === "Create Warehouse"
