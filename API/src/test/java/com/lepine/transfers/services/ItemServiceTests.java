@@ -296,7 +296,7 @@ public class ItemServiceTests {
                 .sku("SKU")
                 .description("description")
                 .build();
-        given(itemRepo.findBySkuIgnoreCase(item.getSku())).willReturn(Optional.of(item));
+        given(itemRepo.findBySkuIgnoreCase(item.getSku())).willReturn(Optional.of(item.toBuilder().uuid(UUID.randomUUID()).build()));
 
         // Act
         final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.update(item));

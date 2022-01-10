@@ -62,6 +62,14 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item update(Item item) {
         log.info("updating item");
+
+        log.info("checking for dupe SKU");
+        final Optional<Item> bySkuIgnoreCase = itemRepo.findBySkuIgnoreCase(item.getSku());
+        if(bySkuIgnoreCase.isPresent() && !bySkuIgnoreCase.get().getUuid().equals(item.getUuid())) {
+            log.info("dupe SKU found");
+            throw new DuplicateSkuException(item.getSku());
+        }
+
         final Item updated = itemRepo.save(item);
         log.info("updated item");
 
