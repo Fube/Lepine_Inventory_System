@@ -1,7 +1,11 @@
 const { test, expect } = require("@playwright/test");
-const { createItem: apiCreateItem } = require("@lepine/e2e-helpers/api/items");
+const {
+    createItem: apiCreateItem,
+    deleteItem: apiDeleteItem,
+} = require("@lepine/e2e-helpers/api/items");
 const { createItem } = require("@lepine/e2e-helpers/items");
 const { MANAGER_PASSWORD, MANAGER_USERNAME } = require("@lepine/e2e-config");
+const RandExp = require("randexp");
 
 test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
     const skuGen = new RandExp(/[a-zA-Z0-9]{1,6}/);
@@ -70,7 +74,7 @@ test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
         let uuid = null;
 
         test.beforeAll(async ({ baseURL }) => {
-            const data = await apiCreateItem({
+            const data = await apiCreateItem(baseURL, managerCredentials, {
                 ...baseItem,
                 sku,
             });
@@ -78,11 +82,7 @@ test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
         });
 
         test.afterAll(async ({ baseURL }) => {
-            await page.evaluate(
-                async (uuid) =>
-                    await fetch(`/api/items/${uuid}`, { method: "DELETE" }),
-                uuid
-            );
+            await apiDeleteItem(baseURL, managerCredentials, uuid);
         });
 
         test("PVGlvMEslE: /items/new :: Create item with duplicate SKU", async ({
@@ -91,7 +91,7 @@ test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
             // Go to /items/new
             await Promise.all([
                 page.waitForFunction(
-                    () => document.querySelector`title`.text === "Add Item"
+                    () => document?.querySelector("title")?.text === "Add Item"
                 ),
                 page.goto("/items/new"),
             ]);
