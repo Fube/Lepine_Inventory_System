@@ -261,4 +261,26 @@ public class ItemServiceTests {
         verify(itemRepo, times(1)).findBySku(item.getSku());
         verify(itemRepo, never()).save(item);
     }
+
+    @Test
+    @DisplayName("xTyRBjnPWY: Given duplicate SKU with different case when create, then throw DuplicateSkuException")
+    void createDuplicateSkuDifferentCase() {
+
+        // Arrange
+        final String originalSku = "sku";
+        final Item item = Item.builder()
+                .name("name")
+                .sku(originalSku.toUpperCase())
+                .description("description")
+                .build();
+        given(itemRepo.findBySku(originalSku)).willReturn(Optional.of(item));
+
+        // Act
+        final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.create(item));
+
+        // Assert
+        assertEquals(format(ERROR_FORMAT_DUPLICATE_SKU, item.getSku()), throwable.getMessage());
+        verify(itemRepo, times(1)).findBySku(item.getSku());
+        verify(itemRepo, never()).save(item);
+    }
 }
