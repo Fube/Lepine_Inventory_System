@@ -92,7 +92,7 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         ]);
 
         // Use GMaps alternative to fill form
-        const gmapsLocator = page.locator("input:not([name])");
+        const gmapsLocator = page.locator("input[type=text]:not([name])");
         await gmapsLocator.type(READONLY_WAREHOUSE_ZIP_CODE, { delay: 500 }); // To ensure valid zip code
         await Promise.all([
             page.waitForResponse(/.*maps\.googleapis.*/i),

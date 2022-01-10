@@ -40,6 +40,7 @@ test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
             baseWarehouse
         );
         uuid = data.uuid;
+        toClean.add(uuid);
     });
 
     test.afterAll(async ({ baseURL }) => {
