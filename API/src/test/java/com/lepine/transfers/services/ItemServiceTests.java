@@ -273,7 +273,9 @@ public class ItemServiceTests {
                 .sku(originalSku.toUpperCase())
                 .description("description")
                 .build();
-        given(itemRepo.findBySkuIgnoreCase(originalSku)).willReturn(Optional.of(item));
+        given(itemRepo.findBySkuIgnoreCase(
+                argThat(n -> n.equalsIgnoreCase(originalSku)
+        ))).willReturn(Optional.of(item));
 
         // Act
         final Throwable throwable = assertThrows(DuplicateSkuException.class, () -> itemService.create(item));
