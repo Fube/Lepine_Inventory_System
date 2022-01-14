@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
+import java.util.UUID;
+
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
@@ -53,5 +55,12 @@ public class UserController {
         log.info("Got all users, count {}", passwordLessDTOPage.getTotalElements());
 
         return passwordLessDTOPage;
+    }
+    @GetMapping
+    public UserPasswordLessDTO update(@PathVariable UUID uuid, @Valid @RequestBody UserUUIDLessDTO userUUIDLessDTO){
+        log.info("Update user with email {}", userUUIDLessDTO.getEmail());
+        User updated = userService.create(userUUIDLessDTO);
+        log.info("Updated user with UUID {}", updated.getUuid());
+        return userMapper.toPasswordLessDTO(updated);
     }
 }

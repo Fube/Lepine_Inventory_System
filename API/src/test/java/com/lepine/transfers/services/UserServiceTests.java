@@ -369,4 +369,52 @@ public class UserServiceTests {
 
         verify(userRepo, times(0)).save(any());
     }
+    @Test
+    @DisplayName("sfVCiSxtkx: Given UserUUIDLessDTO with invalid password on update, then throw ConstraintViolationException")
+    void update_InvalidPassword(){
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .password(INVALID_PASSWORD)
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_valid"));
+
+        verify(userRepo, times(0)).save(any());
+    }
+    @Test
+    @DisplayName("TQhrxPhekh: Given UserUUIDLessDTO with empty password on update, then throw ConstraintViolationException")
+    void update_EmptyPassword(){
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .password(INVALID_PASSWORD)
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_valid"));
+
+        verify(userRepo, times(0)).save(any());
+    }
+    @Test
+    @DisplayName("eOQLRoUrIH: Given UserUUIDLessDTO with null password on update, then throw ConstraintViolationException")
+    void update_NullPassword(){
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .password(INVALID_PASSWORD)
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
+        assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_valid"));
+
+        verify(userRepo, times(0)).save(any());
+    }
 }
