@@ -26,5 +26,5 @@ public class Stock {
 
     private String Item;
     private String Warehouse;
-    private int Quantity;
+    private Integer Quantity;
 }
