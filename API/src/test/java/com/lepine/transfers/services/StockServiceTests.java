@@ -64,6 +64,8 @@ public class StockServiceTests {
         assertThat(result.getQuantity()).isEqualTo(VALID_STOCK_QUANTITY);
 
         verify(stockRepo, atMostOnce()).save(createStock);
-
     }
+
+
+
 }
