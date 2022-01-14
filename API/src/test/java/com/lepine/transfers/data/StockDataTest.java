@@ -128,4 +128,28 @@ public class StockDataTest {
         assertThat(cause).isNotNull();
         assertThat(cause.getMessage()).isEqualTo("Quantity cannot be null");
     }
+
+    @Test
+    @DisplayName("bqGeGSkOjf: Given stock with negative quantity, when stock is created, then throw exception")
+    void testStockCreationWithNegativeQuantity() {
+
+        // Arrange
+        final Stock stock = Stock.builder()
+                .Item(VALID_ITEM)
+                .Warehouse(VALID_WAREHOUSE)
+                .Quantity(-1)
+                .build();
+
+        // Act
+        final EntityNotFoundException exception =
+                assertThrows(EntityNotFoundException.class, () -> stockRepo.save(stock));
+
+        // Assert
+        assertThat(exception).isNotNull();
+        final Throwable cause = NestedExceptionUtils.getRootCause(exception);
+
+        assertThat(cause).isNotNull();
+        assertThat(cause.getMessage()).isEqualTo("Quantity cannot be negative");
+    }
+
 }
