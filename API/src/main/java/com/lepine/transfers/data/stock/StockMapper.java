@@ -9,7 +9,6 @@ public interface StockMapper {
 
     @Mappings({
             @Mapping(target = "uuid", ignore = true),
-
     })
-    Stock toEntity(StockDto stockDto);
+    Stock toEntity(StockUUIDLessDTO stockUUIDLessDTO);
 }
