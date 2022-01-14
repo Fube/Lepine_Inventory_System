@@ -1,5 +1,7 @@
 package com.lepine.transfers.data.stock;
 
+import com.lepine.transfers.data.item.Item;
+import com.lepine.transfers.data.warehouse.Warehouse;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -24,7 +26,7 @@ public class Stock {
     @Id
     private UUID uuid = UUID.randomUUID();
 
-    private String Item;
-    private String Warehouse;
+    private Item item;
+    private Warehouse warehouse;
     private Integer Quantity;
 }

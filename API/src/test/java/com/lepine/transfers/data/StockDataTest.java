@@ -1,5 +1,6 @@
 package com.lepine.transfers.data;
 
+import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockRepo;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class StockDataTest {
 
-    private final String
+    private final Item
             VALID_ITEM = "Item1",
             VALID_WAREHOUSE = "Warehouse1";
 
