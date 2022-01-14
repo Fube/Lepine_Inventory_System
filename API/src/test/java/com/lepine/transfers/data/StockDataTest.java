@@ -8,9 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.persistence.EntityNotFoundException;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles({"test" })
@@ -35,7 +39,7 @@ public class StockDataTest {
     void contextLoads(){}
 
     @Test
-    @DisplayName("VKKagaZFlZ: Test stock creation")
+    @DisplayName("VKKagaZFlZ: Given valid stock data, when stock is created, then stock is saved")
     void testStockCreation() {
 
         // Arrange
@@ -56,4 +60,26 @@ public class StockDataTest {
         assertThat(create.getQuantity()).isEqualTo(VALID_STOCK_QUANTITY);
     }
 
+    @Test
+    @DisplayName("VkScIOuPoB: Given stock with null sku, when stock is created, then throw exception")
+    void testStockCreationWithNullSku() {
+
+        // Arrange
+        final Stock stock = Stock.builder()
+                .Item(null)
+                .Warehouse(VALID_WAREHOUSE)
+                .Quantity(VALID_STOCK_QUANTITY)
+                .build();
+
+        // Act
+        final EntityNotFoundException exception =
+                assertThrows(EntityNotFoundException.class, () -> stockRepo.save(stock));
+
+        // Assert
+        assertThat(exception).isNotNull();
+        final Throwable cause = NestedExceptionUtils.getRootCause(exception);
+
+        assertThat(cause).isNotNull();
+        assertThat(cause.getMessage()).isEqualTo("Item cannot be null");
+    }
 }
