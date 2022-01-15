@@ -15,11 +15,15 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class StockServiceImpl implements StockService {
 
-    //private final StockRepo stockRepo;
-    //private final StockMapper stockMapper;
+    private final StockRepo stockRepo;
+    private final StockMapper stockMapper;
 
     @Override
-    public Stock create(StockUUIDLessDTO stockUUIDLessDTO) {
+    public Stock create(StockUUIDLessDTO stockUUIDLessDTO){
+
+        // TODO: check if stock exists
         return null;
     }
+
+
 }

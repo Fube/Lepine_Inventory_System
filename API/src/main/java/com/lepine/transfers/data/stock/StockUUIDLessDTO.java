@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class StockUUIDLessDTO {
+
     @NotNull(message = "{stock.item.notnull}")
     @NotBlank(message = "{stock.item.notblank}")
     private Item item;

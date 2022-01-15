@@ -1,8 +1,12 @@
 package com.lepine.transfers.data;
 
+import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.item.Item;
+import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockRepo;
+import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +16,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -22,14 +30,38 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class StockDataTest {
 
-    private final Item
-            VALID_ITEM = "Item1",
-            VALID_WAREHOUSE = "Warehouse1";
+    private static final Integer STOCK_QUANTITY = 10;
 
-    private final int VALID_STOCK_QUANTITY = 10;
+    private static final String VALID_ITEM_NAME = "validItemName";
+    private static final String VALID_ITEM_DESCRIPTION = "validItemDescription";
+    private static final String VALID_ITEM_SKU = "validItemSku";
+    private static final Item VALID_ITEM= Item.builder()
+            .name(VALID_ITEM_NAME)
+            .description(VALID_ITEM_DESCRIPTION)
+            .sku(VALID_ITEM_SKU)
+            .build();
+
+    private static final String VALID_WAREHOUSE_ZIPCODE = "validWarehouseZipcode";
+    private static final String VALID_WAREHOUSE_CITY = "validWarehouseCity";
+    private static final String VALID_WAREHOUSE_PROVINCE = "validWarehouseProvince";
+    private static final Warehouse VALID_WAREHOUSE= Warehouse.builder()
+            .zipCode(VALID_WAREHOUSE_ZIPCODE)
+            .city(VALID_WAREHOUSE_CITY)
+            .province(VALID_WAREHOUSE_PROVINCE)
+            .build();
 
     @Autowired
     private StockRepo stockRepo;
+
+    @Autowired
+    private ItemRepo itemRepo;
+
+    @Autowired
+    private WarehouseRepo warehouseRepo;
+
+    @Autowired
+    private EntityManager entityManager;
+
 
     @BeforeEach
     void setup() {
@@ -45,9 +77,9 @@ public class StockDataTest {
 
         // Arrange
         final Stock stock = Stock.builder()
-                .Item(VALID_ITEM)
-                .Warehouse(VALID_WAREHOUSE)
-                .Quantity(VALID_STOCK_QUANTITY)
+                .item(VALID_ITEM)
+                .warehouse(VALID_WAREHOUSE)
+                .Quantity(STOCK_QUANTITY)
                 .build();
 
         // Act
@@ -58,7 +90,7 @@ public class StockDataTest {
         assertThat(create.getUuid()).isNotNull();
         assertThat(create.getItem()).isEqualTo(VALID_ITEM);
         assertThat(create.getWarehouse()).isEqualTo(VALID_WAREHOUSE);
-        assertThat(create.getQuantity()).isEqualTo(VALID_STOCK_QUANTITY);
+        assertThat(create.getQuantity()).isEqualTo(STOCK_QUANTITY);
     }
 
     @Test
@@ -67,9 +99,9 @@ public class StockDataTest {
 
         // Arrange
         final Stock stock = Stock.builder()
-                .Item(null)
-                .Warehouse(VALID_WAREHOUSE)
-                .Quantity(VALID_STOCK_QUANTITY)
+                .item(null)
+                .warehouse(VALID_WAREHOUSE)
+                .Quantity(STOCK_QUANTITY)
                 .build();
 
         // Act
@@ -90,9 +122,9 @@ public class StockDataTest {
 
         // Arrange
         final Stock stock = Stock.builder()
-                .Item(VALID_ITEM)
-                .Warehouse(null)
-                .Quantity(VALID_STOCK_QUANTITY)
+                .item(VALID_ITEM)
+                .warehouse(null)
+                .Quantity(STOCK_QUANTITY)
                 .build();
 
         // Act
@@ -113,8 +145,8 @@ public class StockDataTest {
 
         // Arrange
         final Stock stock = Stock.builder()
-                .Item(VALID_ITEM)
-                .Warehouse(VALID_WAREHOUSE)
+                .item(VALID_ITEM)
+                .warehouse(VALID_WAREHOUSE)
                 .Quantity(null)
                 .build();
 
@@ -136,8 +168,8 @@ public class StockDataTest {
 
         // Arrange
         final Stock stock = Stock.builder()
-                .Item(VALID_ITEM)
-                .Warehouse(VALID_WAREHOUSE)
+                .item(VALID_ITEM)
+                .warehouse(VALID_WAREHOUSE)
                 .Quantity(-1)
                 .build();
 
