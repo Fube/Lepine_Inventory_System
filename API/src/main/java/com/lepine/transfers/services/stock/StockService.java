@@ -1,6 +1,8 @@
 package com.lepine.transfers.services.stock;
 
 import com.lepine.transfers.data.stock.Stock;
+import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
+import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
