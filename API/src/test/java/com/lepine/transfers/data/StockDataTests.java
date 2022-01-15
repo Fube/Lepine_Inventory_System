@@ -10,12 +10,14 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles({"test"})
@@ -79,5 +81,31 @@ public class StockDataTests {
         assertThat(saved.getItem().getUuid()).isEqualTo(ITEM_UUID);
         assertThat(saved.getWarehouse().getUuid()).isEqualTo(WAREHOUSE_UUID);
         assertThat(saved.getQuantity()).isEqualTo(quantity);
+    }
+
+    @Test
+    @DisplayName("QDlLrANHUy: Given valid stock data with duplicate (item, warehouse), then throw ConstraintViolationException")
+    void save_Duplicate() {
+        // Arrange
+        final int quantity = 10;
+        final Stock stock = Stock.builder()
+            .item(itemRepo.getById(ITEM_UUID))
+            .warehouse(warehouseRepo.getById(WAREHOUSE_UUID))
+            .quantity(quantity)
+            .build();
+        stockRepo.save(stock);
+        entityManager.flush();
+
+        // Act & Assert
+        final Exception exception = assertThrows(Exception.class, () -> {
+            stockRepo.save(stock.toBuilder().uuid(null).build());
+            entityManager.flush();
+        });
+
+        final Throwable rootCause = NestedExceptionUtils.getRootCause(exception);
+        assertThat(rootCause.getMessage()).contains("Unique index");
+
+        // Clean up
+        entityManager.clear(); // Remove dupe from entity manager
     }
 }
