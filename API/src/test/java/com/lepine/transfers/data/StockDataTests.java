@@ -108,4 +108,46 @@ public class StockDataTests {
         // Clean up
         entityManager.clear(); // Remove dupe from entity manager
     }
+
+    @Test
+    @DisplayName("RaRJwjxRxM: Given delete on item, then cascade delete stock")
+    void delete_CascadeItem() {
+        // Arrange
+        final int quantity = 10;
+        final Stock stock = Stock.builder()
+            .item(itemRepo.getById(ITEM_UUID))
+            .warehouse(warehouseRepo.getById(WAREHOUSE_UUID))
+            .quantity(quantity)
+            .build();
+        stockRepo.save(stock);
+        entityManager.flush();
+
+        // Act
+        itemRepo.deleteById(ITEM_UUID);
+        entityManager.flush();
+
+        // Assert
+        assertThat(stockRepo.count()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("cafhkFKJhu: Given delete on warehouse, then cascade delete stock")
+    void delete_CascadeWarehouse() {
+        // Arrange
+        final int quantity = 10;
+        final Stock stock = Stock.builder()
+            .item(itemRepo.getById(ITEM_UUID))
+            .warehouse(warehouseRepo.getById(WAREHOUSE_UUID))
+            .quantity(quantity)
+            .build();
+        stockRepo.save(stock);
+        entityManager.flush();
+
+        // Act
+        warehouseRepo.deleteById(WAREHOUSE_UUID);
+        entityManager.flush();
+
+        // Assert
+        assertThat(stockRepo.count()).isEqualTo(0);
+    }
 }
