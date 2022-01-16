@@ -32,8 +32,7 @@ import static java.lang.String.format;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { StockController.class })
@@ -244,5 +243,15 @@ public class StockHttpTests {
         // Act & Assert
         updateWith(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS)
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("aDUGWbpwfw: Given DELETE on /stocks with valid stock as manager, then return deleted (204, void)")
+    @WithMockUser(username = "some-manager", roles = {"MANAGER"})
+    void delete_AsManager() throws Exception {
+
+        // Act & Assert
+        mockMvc.perform(delete("/stocks/{uuid}", VALID_STOCK_UUID))
+                .andExpect(status().isNoContent());
     }
 }
