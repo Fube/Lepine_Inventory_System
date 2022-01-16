@@ -6,11 +6,12 @@ import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.data.warehouse.Warehouse;
-import com.lepine.transfers.exceptions.item.ItemNotFoundException;
+import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.services.stock.StockService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ public class StockControllerTests {
             VALID_ITEM_UUID = UUID.randomUUID(),
             VALID_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID(),
-            NON_EXISTENT_ITEM_UUID = UUID.randomUUID();
+            NON_EXISTENT_STOCK_UUID = UUID.randomUUID();
 
     private final static String
             VALID_ITEM_NAME = "Item",
@@ -102,15 +103,18 @@ public class StockControllerTests {
     void setUp() {
 
         given(stockService.findByUuid(VALID_STOCK_UUID)).willReturn(Optional.ofNullable(VALID_STOCK));
-        given(stockService.findByUuid(NON_EXISTENT_ITEM_UUID)).willReturn(Optional.empty());
+        given(stockService.findByUuid(NON_EXISTENT_STOCK_UUID)).willReturn(Optional.empty());
 
-        given(stockService.update(NON_EXISTENT_ITEM_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS))
-                .willThrow(new ItemNotFoundException(NON_EXISTENT_ITEM_UUID));
+        given(stockService.update(NON_EXISTENT_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS))
+                .willThrow(new StockNotFoundException(NON_EXISTENT_STOCK_UUID));
 
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
         ERROR_MESSAGE_PAGINATION_PAGE_MIN = w.getMessage("pagination.page.min");
         ERROR_MESSAGE_PAGINATION_SIZE_MIN = w.getMessage("pagination.size.min");
+    }
 
+    @AfterEach
+    void tearDown() {
         reset(stockService);
     }
 
@@ -246,6 +250,25 @@ public class StockControllerTests {
 
         // Assert
         assertThat(result).isEqualTo(expected);
+
+        verify(stockService, times(1)).update(givenUuid, givenDTO);
+    }
+
+    @Test
+    @DisplayName("lywxFvXnDc: Given valid dto for non-existing stock when update, then throw StockNotFoundException")
+    void update_NonExistentStock() {
+
+        // Arrange
+        final StockUuidLessItemLessWarehouseLess givenDTO = VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS;
+        final UUID givenUuid = NON_EXISTENT_STOCK_UUID;
+
+        // Act
+        final StockNotFoundException stockNotFoundException =
+                assertThrows(StockNotFoundException.class, () -> stockController.update(givenUuid, givenDTO));
+
+        // Assert
+        assertThat(stockNotFoundException.getMessage()).isEqualTo(
+                new StockNotFoundException(givenUuid).getMessage());
 
         verify(stockService, times(1)).update(givenUuid, givenDTO);
     }
