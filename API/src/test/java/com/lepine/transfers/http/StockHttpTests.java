@@ -225,4 +225,14 @@ public class StockHttpTests {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(VALID_STOCK)));
     }
+
+    @Test
+    @DisplayName("DHeZZaOljJ: Given PUT on /stocks with valid stock as clerk, then return updated (403, error)")
+    @WithMockUser(username = "some-clerk", roles = {"CLERK"})
+    void update_AsClerk() throws Exception {
+
+        // Act & Assert
+        updateWith(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS)
+                .andExpect(status().isForbidden());
+    }
 }
