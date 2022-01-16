@@ -67,7 +67,7 @@ public class StockServiceTests {
     private StockRepo stockRepo;
 
     @MockBean
-    private SearchService<Stock, UUID> searchService;
+    private SearchService<StockSearchDTO, UUID> searchService;
 
     @Test
     void contextLoads() {}

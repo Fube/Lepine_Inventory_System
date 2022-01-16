@@ -1,8 +1,7 @@
 package com.lepine.transfers.services.stock;
 
-import com.lepine.transfers.data.stock.Stock;
-import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
-import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
+import com.lepine.transfers.data.stock.*;
+import com.lepine.transfers.services.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +15,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class StockServiceImpl implements StockService {
+
+    private final StockRepo stockRepo;
+    private final SearchService<StockSearchDTO, UUID> searchService;
+
     @Override
     public Stock create(StockUuidLessItemUuidWarehouseUuid dto) {
         return null;
