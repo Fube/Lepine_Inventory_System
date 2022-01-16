@@ -54,8 +54,9 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public Optional<Stock> findByUuid(UUID dto) {
-        return Optional.empty();
+    public Optional<Stock> findByUuid(UUID uuid) {
+        log.info("Searching for stock with UUID {}", uuid);
+        return stockRepo.findById(uuid);
     }
 
     @Override
