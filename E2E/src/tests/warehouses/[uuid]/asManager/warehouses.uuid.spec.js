@@ -84,7 +84,9 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         // Click on warehouse
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
+                () =>
+                    document?.querySelector("title")?.text ===
+                    "Warehouse Details"
             ),
             warehouse.click(),
         ]);
@@ -116,7 +118,9 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         // Go to /warehouses
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
+                () =>
+                    document?.querySelector("title")?.text ===
+                    "Warehouse Details"
             ),
             page.goto(`/warehouses/${uuid}`),
         ]);
@@ -125,7 +129,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         const deleteBtn = page.locator("* button:last-of-type");
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
+                () => document?.querySelector("title")?.text === "Warehouses"
             ),
             deleteBtn.click(),
         ]);
@@ -228,7 +232,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
             await Promise.all([
                 page.waitForFunction(
                     () =>
-                        document.querySelector`title`.text ===
+                        document?.querySelector("title")?.text ===
                         "Warehouse Details"
                 ),
                 page.goto(`/warehouses/${preUuid}`),

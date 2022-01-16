@@ -39,7 +39,7 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         // Go to /warehouses
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
+                () => document?.querySelector("title")?.text === "Warehouses"
             ),
             page.goto("/warehouses"),
         ]);
@@ -50,7 +50,9 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         );
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Create Warehouse"
+                () =>
+                    document?.querySelector("title")?.text ===
+                    "Create Warehouse"
             ),
             addNewButton.click(),
         ]);
@@ -86,7 +88,9 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         // Go to /warehouses/new
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`?.text === "Create Warehouse"
+                () =>
+                    document?.querySelector("title")?.text ===
+                    "Create Warehouse"
             ),
             page.goto("/warehouses/new"),
         ]);
@@ -127,7 +131,7 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         const saveButton = page.locator('[type="submit"]');
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
+                () => document?.querySelector("title")?.text === "Warehouses"
             ),
             saveButton.click(),
         ]);
@@ -164,7 +168,9 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         // Go to /warehouses/new
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`?.text === "Create Warehouse"
+                () =>
+                    document?.querySelector("title")?.text ===
+                    "Create Warehouse"
             ),
             page.goto("/warehouses/new"),
         ]);

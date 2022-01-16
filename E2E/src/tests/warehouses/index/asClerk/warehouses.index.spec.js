@@ -58,7 +58,7 @@ test.describe.parallel("cLpmyRmcaS: Clerk /warehouses tests", () => {
         // Click on "Warehouses" button
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
+                () => document?.querySelector("title")?.text === "Warehouses"
             ),
             page.click("a[href*=warehouses]"),
         ]);

@@ -57,7 +57,7 @@ test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
         // Go to /warehouses
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
+                () => document?.querySelector("title")?.text === "Warehouses"
             ),
             page.goto("/warehouses"),
         ]);
@@ -85,7 +85,9 @@ test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
         // Click on warehouse
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
+                () =>
+                    document?.querySelector("title")?.text ===
+                    "Warehouse Details"
             ),
             warehouse.click(),
         ]);
