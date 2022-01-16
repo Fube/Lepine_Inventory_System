@@ -45,4 +45,10 @@ public class StockController {
         log.info("Update stock {}", dto);
         return stockService.update(uuid, dto);
     }
+
+    @DeleteMapping("/{uuid}")
+    public void delete(@PathVariable("uuid") UUID uuid) {
+        log.info("Delete stock {}", uuid);
+        stockService.delete(uuid);
+    }
 }
