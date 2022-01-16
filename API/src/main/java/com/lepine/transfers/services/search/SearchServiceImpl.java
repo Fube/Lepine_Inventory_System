@@ -34,7 +34,7 @@ public class SearchServiceImpl<T, I> implements SearchService<T, I> {
     }
 
     @Override
-    public void updateAllInBatch(List<T> toIndex) {
+    public void partialUpdateAllInBatch(List<T> toIndex) {
         log.info("Updating all {} items in batch", toIndex.size());
         searchIndex.batch(
                 new BatchRequest<>(
