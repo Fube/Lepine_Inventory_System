@@ -14,8 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.validation.ConstraintViolationException;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 
@@ -94,5 +96,18 @@ public class StockControllerTests {
 
         // Assert
         assertThat(result).isEqualTo(VALID_STOCK);
+    }
+
+    @Test
+    @DisplayName("SoDsbTtVZX: Given invalid dto when create, then throw ConstraintViolationException")
+    void create_InvalidDTO() {
+        // Arrange
+        final ConstraintViolationException expected = new ConstraintViolationException("", null);
+        given(stockService.create(VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID))
+                .willThrow(expected);
+
+        // Act & Assert
+        assertThatThrownBy(() -> stockController.create(VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID))
+                .isEqualTo(expected);
     }
 }
