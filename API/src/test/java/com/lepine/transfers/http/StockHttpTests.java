@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -190,6 +191,23 @@ public class StockHttpTests {
         verify(stockService, times(1)).findAll(any(PageRequest.class));
     }
 
+    private void getOneStock() throws Exception {
+        // Arrange
+        final String asString = objectMapper.writeValueAsString(VALID_STOCK);
+        given(stockService.findByUuid(VALID_STOCK_UUID))
+                .willReturn(Optional.ofNullable(VALID_STOCK));
+
+        // Act
+        final ResultActions perform = mockMvc.perform(get("/stocks/" + VALID_STOCK_UUID));
+
+        // Assert
+        perform.andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json(asString));
+
+        verify(stockService, times(1)).findByUuid(VALID_STOCK_UUID);
+    }
+
     @Test
     @DisplayName("ttkHeVrxAm: Given POST on /stocks with valid stock as manager, then return created (201, stock)")
     @WithMockUser(username = "some-manager", roles = {"MANAGER"})
@@ -337,5 +355,12 @@ public class StockHttpTests {
     @WithMockUser(username = "some-salesperson", roles = {"SALESPERSON"})
     void findAll_AsSalesperson() throws Exception {
         getAllStocks();
+    }
+
+    @Test
+    @DisplayName("AURfqvOxKH: Given GET on /stocks/{uuid} of existing stock as manager, then return stock (200, stock)")
+    @WithMockUser(username = "some-manager", roles = {"MANAGER"})
+    void findOne_AsManager() throws Exception {
+        getOneStock();
     }
 }
