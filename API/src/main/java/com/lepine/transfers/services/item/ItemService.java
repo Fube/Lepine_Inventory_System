@@ -4,12 +4,11 @@ import com.lepine.transfers.data.item.Item;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import javax.validation.Valid;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ItemService {
-
-    String UPDATE_EVENT = "ItemUpdated";
 
     Page<Item> findAll();
 

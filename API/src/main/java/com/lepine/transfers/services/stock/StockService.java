@@ -7,11 +7,12 @@ import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import javax.validation.Valid;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface StockService {
-    Stock create(StockUuidLessItemUuidWarehouseUuid dto);
+    Stock create(@Valid StockUuidLessItemUuidWarehouseUuid dto);
 
     Optional<Stock> findByUuid(UUID uuid);
 
