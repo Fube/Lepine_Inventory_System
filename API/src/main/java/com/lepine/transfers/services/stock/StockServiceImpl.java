@@ -40,11 +40,13 @@ public class StockServiceImpl implements StockService {
         log.info("Warehouse exists");
 
         final Stock mapped = stockMapper.toEntity(dto);
+        log.info("Mapped stock {}", mapped);
         final Stock stock = stockRepo.save(mapped);
         log.info("Stock created {}", stock);
 
         log.info("Indexing stock {}", stock);
         final StockSearchDTO searchDTO = stockMapper.toSearchDTO(stock);
+        log.info("Mapped to search DTO {}", searchDTO);
         searchService.index(searchDTO);
         log.info("Stock indexed {}", stock);
 
