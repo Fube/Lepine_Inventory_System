@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,7 +99,15 @@ public class StockServiceTests {
                 s.getItem().getUuid().equals(VALID_ITEM_UUID) &&
                 s.getWarehouse().getUuid().equals(VALID_WAREHOUSE_UUID) &&
                 s.getQuantity() == VALID_QUANTITY;
-        given(stockRepo.save(argThat(stockArgumentMatcher))).willReturn(expected);
+
+        given(stockRepo.save(argThat(stockArgumentMatcher)))
+                .willReturn(expected);
+
+        given(itemService.findByUuid(VALID_ITEM_UUID))
+                .willReturn(Optional.ofNullable(VALID_ITEM));
+
+        given(warehouseService.findByUuid(VALID_WAREHOUSE_UUID))
+                .willReturn(Optional.ofNullable(VALID_WAREHOUSE));
 
         // Act
         final Stock given = stockService.create(stock);
