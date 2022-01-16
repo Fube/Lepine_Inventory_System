@@ -2,12 +2,10 @@ package com.lepine.transfers.services;
 
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;
-import com.lepine.transfers.data.stock.Stock;
-import com.lepine.transfers.data.stock.StockRepo;
-import com.lepine.transfers.data.stock.StockSearchDTO;
-import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
+import com.lepine.transfers.data.stock.*;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
+import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.search.SearchService;
@@ -39,12 +37,14 @@ public class StockServiceTests {
 
     private final static String
             ITEM_NOT_FOUND_ERROR_FORMAT = "Item with uuid %s not found",
-            WAREHOUSE_NOT_FOUND_ERROR_FORMAT = "Warehouse with uuid %s not found";
+            WAREHOUSE_NOT_FOUND_ERROR_FORMAT = "Warehouse with uuid %s not found",
+            STOCK_NOT_FOUND_ERROR_FORMAT = "Stock with uuid %s not found";
 
     private final static int VALID_QUANTITY = 10;
     private final static UUID
             VALID_ITEM_UUID = UUID.randomUUID(),
-            VALID_WAREHOUSE_UUID = UUID.randomUUID();
+            VALID_WAREHOUSE_UUID = UUID.randomUUID(),
+            VALID_STOCK_UUID = UUID.randomUUID();
     private final static String
             VALID_ITEM_NAME = "Item",
             VALID_ITEM_DESCRIPTION = "Description",
@@ -70,6 +70,11 @@ public class StockServiceTests {
     private final static Stock VALID_STOCK = Stock.builder()
             .item(VALID_ITEM)
             .warehouse(VALID_WAREHOUSE)
+            .quantity(VALID_QUANTITY)
+            .build();
+
+    private final static StockUuidLessItemLessWarehouseLess VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS =
+            StockUuidLessItemLessWarehouseLess.builder()
             .quantity(VALID_QUANTITY)
             .build();
 
@@ -169,5 +174,24 @@ public class StockServiceTests {
         assertThatThrownBy(() -> stockService.create(stock))
                 .isInstanceOf(WarehouseNotFoundException.class)
                 .hasMessage(format(WAREHOUSE_NOT_FOUND_ERROR_FORMAT, VALID_WAREHOUSE_UUID));
+    }
+
+    @Test
+    @DisplayName("lXPsKuHBNw: Given non-existent stock when update, then throw StockNotFoundException")
+    void givenNonExistentStock_whenUpdate_thenThrowStockNotFoundException() {
+        // Arrange
+        final StockUuidLessItemUuidWarehouseUuid stock = StockUuidLessItemUuidWarehouseUuid.builder()
+                .itemUuid(VALID_ITEM_UUID)
+                .warehouseUuid(VALID_WAREHOUSE_UUID)
+                .quantity(VALID_QUANTITY)
+                .build();
+
+        given(stockRepo.getById(VALID_STOCK_UUID))
+                .willReturn(null);
+
+        // Act & Assert
+        assertThatThrownBy(() -> stockService.update(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS))
+                .isInstanceOf(StockNotFoundException.class)
+                .hasMessage(format(STOCK_NOT_FOUND_ERROR_FORMAT, VALID_STOCK_UUID));
     }
 }
