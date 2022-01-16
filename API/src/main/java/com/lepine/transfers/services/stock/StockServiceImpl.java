@@ -61,7 +61,11 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public Page<Stock> findAll(PageRequest pageRequest) {
-        return null;
+        log.info("Retrieving for all stocks");
+        final Page<Stock> all = stockRepo.findAll(pageRequest);
+        log.info("Retrieved {} stocks", all.getTotalElements());
+
+        return all;
     }
 
     @Override
