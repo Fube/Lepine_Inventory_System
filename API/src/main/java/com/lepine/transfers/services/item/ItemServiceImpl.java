@@ -10,10 +10,10 @@ import com.lepine.transfers.services.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -22,12 +22,12 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ItemServiceImpl implements ItemService {
+public class ItemServiceImpl implements ItemService, ApplicationEventPublisherAware {
 
     private final ItemRepo itemRepo;
     private final SearchService<ItemSearchDTO, UUID> searchService;
     private final ItemMapper itemMapper;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Page<Item> findAll() {
@@ -110,5 +110,10 @@ public class ItemServiceImpl implements ItemService {
         log.info("retrieved item");
 
         return item;
+    }
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 }
