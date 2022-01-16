@@ -3,6 +3,7 @@ package com.lepine.transfers.services.stock;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
+import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.search.SearchService;
@@ -70,7 +71,22 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public Stock update(UUID uuid, StockUuidLessItemLessWarehouseLess dto) {
-        return null;
+        log.info("Updating stock with UUID {} with update request {}", uuid, dto);
+        // NOTE: Might be able to use mapper here but eeeeeeeeeeeeeeeeeeeeeeeeeeeh it's easier like this for now
+        final Stock stock = findByUuid(uuid).orElseThrow(() -> new StockNotFoundException(uuid));
+        log.info("Found stock {}", stock);
+
+        stock.setQuantity(dto.getQuantity());
+        final Stock updated = stockRepo.save(stock);
+        log.info("Updated stock {}", updated);
+
+        log.info("Indexing stock {}", updated);
+        final StockSearchDTO searchDTO = stockMapper.toSearchDTO(updated);
+        log.info("Mapped to search DTO {}", searchDTO);
+        searchService.index(searchDTO);
+        log.info("Stock indexed {}", updated);
+
+        return updated;
     }
 
     @Override
