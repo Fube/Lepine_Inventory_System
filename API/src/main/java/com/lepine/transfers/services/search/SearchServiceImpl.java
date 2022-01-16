@@ -44,4 +44,16 @@ public class SearchServiceImpl<T, I> implements SearchService<T, I> {
         );
         log.info("Updated {} items in batch", toIndex.size());
     }
+
+    @Override
+    public void deleteAllInBatch(List<T> toDelete) {
+        log.info("Deleting all {} items in batch", toDelete.size());
+        searchIndex.batch(
+                new BatchRequest<>(
+                        toDelete.parallelStream()
+                                .map(n -> new BatchOperation<>(ActionEnum.DELETE_OBJECT, n))
+                                .collect(Collectors.toList()))
+        );
+        log.info("Deleted {} items in batch", toDelete.size());
+    }
 }
