@@ -16,11 +16,11 @@ public class StockSearchDTO {
     private UUID objectID;
     private int quantity;
 
-    private UUID itemUUID;
+    private UUID itemUuid;
     private String name;
     private String sku;
     private String description;
 
-    private UUID warehouseUUID;
+    private UUID warehouseUuid;
     private String zipCode;
 }

@@ -3,6 +3,7 @@ package com.lepine.transfers.services;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockRepo;
+import com.lepine.transfers.data.stock.StockSearchDTO;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.services.search.SearchService;
@@ -95,6 +96,10 @@ public class StockServiceTests {
         // Assert
         assertThat(given).isEqualTo(expected);
         verify(stockRepo, times(1)).save(argThat(stockArgumentMatcher));
-        verify(searchService, times(1)).index(expected);
+        verify(searchService, times(1)).index(argThat(
+                s ->    s.getObjectID().equals(VALID_STOCK.getUuid()) &&
+                        s.getItemUuid().equals(VALID_ITEM_UUID) &&
+                        s.getWarehouseUuid().equals(VALID_WAREHOUSE_UUID)
+        ));
     }
 }
