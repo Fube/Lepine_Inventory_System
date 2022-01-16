@@ -3,6 +3,7 @@ package com.lepine.transfers.services.stock;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
 import com.lepine.transfers.events.item.ItemUpdateEvent;
+import com.lepine.transfers.events.item.ItemUpdateHandler;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
@@ -11,7 +12,6 @@ import com.lepine.transfers.services.search.SearchService;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-public class StockServiceImpl implements StockService {
+public class StockServiceImpl implements StockService, ItemUpdateHandler {
 
     private final StockRepo stockRepo;
     private final StockMapper stockMapper;
@@ -96,7 +96,6 @@ public class StockServiceImpl implements StockService {
         return updated;
     }
 
-    @EventListener(ItemUpdateEvent.class)
     public void onItemUpdate(ItemUpdateEvent event) {
         log.info("Reacting to item update");
         updateSearchIndexFor(event.getItem());
