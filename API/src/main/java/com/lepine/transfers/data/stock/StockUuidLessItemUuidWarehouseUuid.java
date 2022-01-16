@@ -18,5 +18,7 @@ public class StockUuidLessItemUuidWarehouseUuid {
 
     @NotNull(message = "{item.uuid.not_null}")
     private UUID itemUuid;
+
+    @NotNull(message = "{warehouse.uuid.not_null}")
     private UUID warehouseUuid;
 }
