@@ -1,6 +1,5 @@
 package com.lepine.transfers.services.stock;
 
-import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -90,7 +90,10 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID dto) {
-
+        log.info("Deleting stock with UUID {}", dto);
+        final int affected = stockRepo.deleteByUuid(dto);
+        log.info("Deleted {} stocks", affected);
     }
 }
