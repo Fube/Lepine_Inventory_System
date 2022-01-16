@@ -8,6 +8,7 @@ import com.lepine.transfers.data.stock.StockSearchDTO;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.search.SearchService;
 import com.lepine.transfers.services.stock.StockService;
@@ -37,7 +38,8 @@ import static org.mockito.Mockito.verify;
 public class StockServiceTests {
 
     private final static String
-            ITEM_NOT_FOUND_ERROR_FORMAT = "Item with uuid %s not found";
+            ITEM_NOT_FOUND_ERROR_FORMAT = "Item with uuid %s not found",
+            WAREHOUSE_NOT_FOUND_ERROR_FORMAT = "Warehouse with uuid %s not found";
 
     private final static int VALID_QUANTITY = 10;
     private final static UUID
@@ -145,5 +147,27 @@ public class StockServiceTests {
         assertThatThrownBy(() -> stockService.create(stock))
                 .isInstanceOf(ItemNotFoundException.class)
                 .hasMessage(format(ITEM_NOT_FOUND_ERROR_FORMAT, VALID_ITEM_UUID));
+    }
+
+    @Test
+    @DisplayName("NdYraJcddd: Given non-existent warehouse when create, then throw WarehouseNotFoundException")
+    void givenNonExistentWarehouse_whenCreate_thenThrowWarehouseNotFoundException() {
+        // Arrange
+        final StockUuidLessItemUuidWarehouseUuid stock = StockUuidLessItemUuidWarehouseUuid.builder()
+                .itemUuid(VALID_ITEM_UUID)
+                .warehouseUuid(VALID_WAREHOUSE_UUID)
+                .quantity(VALID_QUANTITY)
+                .build();
+
+        given(itemService.findByUuid(VALID_ITEM_UUID))
+                .willReturn(Optional.ofNullable(VALID_ITEM));
+
+        given(warehouseService.findByUuid(VALID_WAREHOUSE_UUID))
+                .willReturn(Optional.empty());
+
+        // Act & Assert
+        assertThatThrownBy(() -> stockService.create(stock))
+                .isInstanceOf(WarehouseNotFoundException.class)
+                .hasMessage(format(WAREHOUSE_NOT_FOUND_ERROR_FORMAT, VALID_WAREHOUSE_UUID));
     }
 }

@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface StockService {
     Stock create(StockUuidLessItemUuidWarehouseUuid dto);
 
-    Optional<Stock> findByUuid(UUID dto);
+    Optional<Stock> findByUuid(UUID uuid);
 
     Page<Stock> findAll(PageRequest pageRequest);
 
