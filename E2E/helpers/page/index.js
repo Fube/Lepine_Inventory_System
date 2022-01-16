@@ -15,12 +15,12 @@ async function clearThenType(page, input, newValue) {
 /**
  *
  * @param {import("playwright-core").Page} page
- * @param {import("playwright-core").Locator} input
- * @param {*} newValue
+ * @param {string} title
  */
-async function waitForTitle(page, title) {
+function waitForTitle(page, title) {
     return page.waitForFunction(
-        () => document?.querySelector("title")?.text === title
+        (title) => document?.querySelector("title")?.text === title,
+        title
     );
 }
 
