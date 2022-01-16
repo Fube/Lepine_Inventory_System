@@ -99,7 +99,8 @@ public class StockServiceTests {
             .build();
 
     private String
-            ITEM_UUID_NULL_ERROR_MESSAGE;
+            ITEM_UUID_NULL_ERROR_MESSAGE,
+            WAREHOUSE_UUID_NULL_ERROR_MESSAGE;
 
     @Autowired
     private StockService stockService;
@@ -123,6 +124,7 @@ public class StockServiceTests {
     void setUp() {
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
         ITEM_UUID_NULL_ERROR_MESSAGE = w.getMessage("item.uuid.not_null");
+        WAREHOUSE_UUID_NULL_ERROR_MESSAGE = w.getMessage("warehouse.uuid.not_null");
     }
 
     @Test
@@ -222,6 +224,23 @@ public class StockServiceTests {
 
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
         assertThat(collect).containsExactlyInAnyOrder(ITEM_UUID_NULL_ERROR_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("NNUJzFFmRz: Given create with null warehouseUuid, then throw ConstraintViolationException")
+    void create_NullWarehouseUuid() {
+
+        // Arrange
+        final StockUuidLessItemUuidWarehouseUuid stock = VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID.toBuilder()
+                .warehouseUuid(null)
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> stockService.create(stock));
+
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(WAREHOUSE_UUID_NULL_ERROR_MESSAGE);
     }
 
     @Test
