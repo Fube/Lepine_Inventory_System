@@ -363,4 +363,18 @@ public class StockHttpTests {
     void findOne_AsManager() throws Exception {
         getOneStock();
     }
+
+    @Test
+    @DisplayName("eOdsrHPxVh: Given GET on /stocks/{uuid} of existing stock as clerk, then return stock (200, stock)")
+    @WithMockUser(username = "some-clerk", roles = {"CLERK"})
+    void findOne_AsClerk() throws Exception {
+        getOneStock();
+    }
+
+    @Test
+    @DisplayName("qPHVxdXWXA: Given GET on /stocks/{uuid} of existing stock as salesperson, then return stock (200, stock)")
+    @WithMockUser(username = "some-salesperson", roles = {"SALESPERSON"})
+    void findOne_AsSalesperson() throws Exception {
+        getOneStock();
+    }
 }
