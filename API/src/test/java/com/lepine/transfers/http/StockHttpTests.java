@@ -235,4 +235,14 @@ public class StockHttpTests {
         updateWith(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS)
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @DisplayName("hQkKDmOfYm: Given PUT on /stocks with valid stock as salesperson, then return updated (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = {"SALESPERSON"})
+    void update_AsSalesperson() throws Exception {
+
+        // Act & Assert
+        updateWith(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS)
+                .andExpect(status().isForbidden());
+    }
 }
