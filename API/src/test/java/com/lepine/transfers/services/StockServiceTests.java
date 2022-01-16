@@ -7,6 +7,7 @@ import com.lepine.transfers.data.stock.StockRepo;
 import com.lepine.transfers.data.stock.StockSearchDTO;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.search.SearchService;
 import com.lepine.transfers.services.stock.StockService;
@@ -23,7 +24,9 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -32,6 +35,9 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest(classes = { MapperConfig.class, StockServiceImpl.class })
 @ActiveProfiles({"test"})
 public class StockServiceTests {
+
+    private final static String
+            ITEM_NOT_FOUND_ERROR_FORMAT = "Item with uuid %s not found";
 
     private final static int VALID_QUANTITY = 10;
     private final static UUID
@@ -120,5 +126,24 @@ public class StockServiceTests {
                         s.getItemUuid().equals(VALID_ITEM_UUID) &&
                         s.getWarehouseUuid().equals(VALID_WAREHOUSE_UUID)
         ));
+    }
+
+    @Test
+    @DisplayName("AayDHWicyB: Given non-existent item when create, then throw ItemNotFoundException")
+    void givenNonExistentItem_whenCreate_thenThrowItemNotFoundException() {
+        // Arrange
+        final StockUuidLessItemUuidWarehouseUuid stock = StockUuidLessItemUuidWarehouseUuid.builder()
+                .itemUuid(VALID_ITEM_UUID)
+                .warehouseUuid(VALID_WAREHOUSE_UUID)
+                .quantity(VALID_QUANTITY)
+                .build();
+
+        given(itemService.findByUuid(VALID_ITEM_UUID))
+                .willReturn(Optional.empty());
+
+        // Act & Assert
+        assertThatThrownBy(() -> stockService.create(stock))
+                .isInstanceOf(ItemNotFoundException.class)
+                .hasMessage(format(ITEM_NOT_FOUND_ERROR_FORMAT, VALID_ITEM_UUID));
     }
 }
