@@ -4,6 +4,7 @@ import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
+import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.services.stock.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,12 @@ public class StockController {
     ){
         log.info("Getting all stocks");
         return OneIndexedPageAdapter.of(stockService.findAll(PageRequest.of(page - 1, size)));
+    }
+
+    @GetMapping("/{uuid}")
+    public Stock get(@PathVariable("uuid") UUID uuid) {
+        log.info("Get stock {}", uuid);
+        return stockService.findByUuid(uuid).orElseThrow(() -> new StockNotFoundException(uuid));
     }
 
     @PutMapping("/{uuid}")
