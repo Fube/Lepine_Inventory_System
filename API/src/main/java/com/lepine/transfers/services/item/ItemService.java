@@ -8,6 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ItemService {
+
+    String UPDATE_EVENT = "ItemUpdated";
+
     Page<Item> findAll();
 
     Page<Item> findAll(PageRequest pageRequest);

@@ -4,10 +4,12 @@ import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.events.item.ItemUpdateEvent;
 import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.services.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepo itemRepo;
     private final SearchService<ItemSearchDTO, UUID> searchService;
     private final ItemMapper itemMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Page<Item> findAll() {
@@ -76,6 +79,9 @@ public class ItemServiceImpl implements ItemService {
         log.info("sending item to search service");
         searchService.index(itemMapper.toSearchDTO(updated));
         log.info("sent item to search service");
+
+        log.info("Publish item update event");
+        applicationEventPublisher.publishEvent(new ItemUpdateEvent(this, updated));
 
         return updated;
     }
