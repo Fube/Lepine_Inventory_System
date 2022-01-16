@@ -6,6 +6,7 @@ import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.stock.StockService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
@@ -23,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -49,7 +51,8 @@ public class StockControllerTests {
     private final static UUID
             VALID_ITEM_UUID = UUID.randomUUID(),
             VALID_WAREHOUSE_UUID = UUID.randomUUID(),
-            VALID_STOCK_UUID = UUID.randomUUID();
+            VALID_STOCK_UUID = UUID.randomUUID(),
+            NON_EXISTENT_ITEM_UUID = UUID.randomUUID();
 
     private final static String
             VALID_ITEM_NAME = "Item",
@@ -97,9 +100,18 @@ public class StockControllerTests {
 
     @BeforeEach
     void setUp() {
+
+        given(stockService.findByUuid(VALID_STOCK_UUID)).willReturn(Optional.ofNullable(VALID_STOCK));
+        given(stockService.findByUuid(NON_EXISTENT_ITEM_UUID)).willReturn(Optional.empty());
+
+        given(stockService.update(NON_EXISTENT_ITEM_UUID, any()))
+                .willThrow(new ItemNotFoundException(NON_EXISTENT_ITEM_UUID));
+
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
         ERROR_MESSAGE_PAGINATION_PAGE_MIN = w.getMessage("pagination.page.min");
         ERROR_MESSAGE_PAGINATION_SIZE_MIN = w.getMessage("pagination.size.min");
+
+        reset(stockService);
     }
 
     @Autowired
@@ -217,5 +229,24 @@ public class StockControllerTests {
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
         Assertions.assertThat(collect)
                 .containsExactlyInAnyOrder(ERROR_MESSAGE_PAGINATION_PAGE_MIN, ERROR_MESSAGE_PAGINATION_SIZE_MIN);
+    }
+
+    @Test
+    @DisplayName("TBJBPpXCrr: Given valid stock when update, then return stock")
+    void update_ValidStock() {
+        // Arrange
+        final Stock expected = VALID_STOCK;
+        final StockUuidLessItemLessWarehouseLess givenDTO = VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS;
+        final UUID givenUuid = VALID_STOCK_UUID;
+        given(stockService.update(givenUuid, givenDTO))
+                .willReturn(expected);
+
+        // Act
+        final Stock result = stockController.update(VALID_STOCK);
+
+        // Assert
+        assertThat(result).isEqualTo(expected);
+
+        verify(stockService, times(1)).update(givenUuid, givenDTO);
     }
 }
