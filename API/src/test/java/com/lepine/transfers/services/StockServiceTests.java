@@ -1,14 +1,17 @@
 package com.lepine.transfers.services;
 
+import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockRepo;
 import com.lepine.transfers.data.stock.StockSearchDTO;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.search.SearchService;
 import com.lepine.transfers.services.stock.StockService;
 import com.lepine.transfers.services.stock.StockServiceImpl;
+import com.lepine.transfers.services.warehouse.WarehouseService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
@@ -25,7 +28,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(classes = { StockServiceImpl.class })
+@SpringBootTest(classes = { MapperConfig.class, StockServiceImpl.class })
 @ActiveProfiles({"test"})
 public class StockServiceTests {
 
@@ -64,11 +67,18 @@ public class StockServiceTests {
     @Autowired
     private StockService stockService;
 
+
     @MockBean
     private StockRepo stockRepo;
 
     @MockBean
     private SearchService<StockSearchDTO, UUID> searchService;
+
+    @MockBean
+    private ItemService itemService;
+
+    @MockBean
+    private WarehouseService warehouseService;
 
     @Test
     void contextLoads() {}
