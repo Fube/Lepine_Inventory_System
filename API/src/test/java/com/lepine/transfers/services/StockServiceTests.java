@@ -81,7 +81,6 @@ public class StockServiceTests {
     @Autowired
     private StockService stockService;
 
-
     @MockBean
     private StockRepo stockRepo;
 
@@ -99,7 +98,7 @@ public class StockServiceTests {
 
     @Test
     @DisplayName("efPRYsFzIE: Given valid stock when create, then return stock")
-    void givenValidStock_whenCreate_thenReturnStock() {
+    void valid_Create() {
         // Arrange
         final StockUuidLessItemUuidWarehouseUuid stock = StockUuidLessItemUuidWarehouseUuid.builder()
                 .itemUuid(VALID_ITEM_UUID)
@@ -137,7 +136,7 @@ public class StockServiceTests {
 
     @Test
     @DisplayName("AayDHWicyB: Given non-existent item when create, then throw ItemNotFoundException")
-    void givenNonExistentItem_whenCreate_thenThrowItemNotFoundException() {
+    void create_NonExistentItem() {
         // Arrange
         final StockUuidLessItemUuidWarehouseUuid stock = StockUuidLessItemUuidWarehouseUuid.builder()
                 .itemUuid(VALID_ITEM_UUID)
@@ -156,7 +155,7 @@ public class StockServiceTests {
 
     @Test
     @DisplayName("NdYraJcddd: Given non-existent warehouse when create, then throw WarehouseNotFoundException")
-    void givenNonExistentWarehouse_whenCreate_thenThrowWarehouseNotFoundException() {
+    void create_NonExistentWarehouse() {
         // Arrange
         final StockUuidLessItemUuidWarehouseUuid stock = StockUuidLessItemUuidWarehouseUuid.builder()
                 .itemUuid(VALID_ITEM_UUID)
@@ -178,7 +177,7 @@ public class StockServiceTests {
 
     @Test
     @DisplayName("lXPsKuHBNw: Given non-existent stock when update, then throw StockNotFoundException")
-    void givenNonExistentStock_whenUpdate_thenThrowStockNotFoundException() {
+    void update_NonExistentStock() {
         // Arrange
         final StockUuidLessItemUuidWarehouseUuid stock = StockUuidLessItemUuidWarehouseUuid.builder()
                 .itemUuid(VALID_ITEM_UUID)
