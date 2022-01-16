@@ -324,4 +324,18 @@ public class StockHttpTests {
     void findAll_AsManager() throws Exception {
         getAllStocks();
     }
+
+    @Test
+    @DisplayName("efWitYzyWH: Given GET on /stocks as clerk, then return all (200, stocks)")
+    @WithMockUser(username = "some-clerk", roles = {"CLERK"})
+    void findAll_AsClerk() throws Exception {
+        getAllStocks();
+    }
+
+    @Test
+    @DisplayName("eXhGyKkpRT: Given GET on /stocks as salesperson, then return all (200, stocks)")
+    @WithMockUser(username = "some-salesperson", roles = {"SALESPERSON"})
+    void findAll_AsSalesperson() throws Exception {
+        getAllStocks();
+    }
 }
