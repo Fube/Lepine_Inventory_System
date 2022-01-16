@@ -56,7 +56,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         // Go to /warehouses
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
+                () => document?.querySelector("title")?.text === "Warehouses"
             ),
             page.goto("/warehouses"),
         ]);
@@ -137,7 +137,9 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         // Go to /warehouses
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
+                () =>
+                    document?.querySelector("title")?.text ===
+                    "Warehouse Details"
             ),
             page.goto(`/warehouses/${uuid}`),
         ]);
@@ -169,7 +171,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         // Click save
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
+                () => document?.querySelector("title")?.text === "Warehouses"
             ),
             saveBtn.click(),
         ]);
@@ -181,7 +183,9 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         // Go back to warehouse
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
+                () =>
+                    document?.querySelector("title")?.text ===
+                    "Warehouse Details"
             ),
             page.goto(`/warehouses/${uuid}`),
         ]);
