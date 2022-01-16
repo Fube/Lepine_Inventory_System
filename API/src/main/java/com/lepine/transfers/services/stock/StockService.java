@@ -1,5 +1,6 @@
 package com.lepine.transfers.services.stock;
 
+import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
@@ -17,6 +18,7 @@ public interface StockService {
     Page<Stock> findAll(PageRequest pageRequest);
 
     Stock update(UUID uuid, StockUuidLessItemLessWarehouseLess dto);
+    void updateSearchIndexFor(Item item);
 
     void delete(UUID dto);
 }

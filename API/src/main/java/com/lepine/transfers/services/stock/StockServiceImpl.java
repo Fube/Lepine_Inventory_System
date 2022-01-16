@@ -1,5 +1,6 @@
 package com.lepine.transfers.services.stock;
 
+import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
@@ -14,8 +15,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -87,6 +90,21 @@ public class StockServiceImpl implements StockService {
         log.info("Stock indexed {}", updated);
 
         return updated;
+    }
+
+    @Override
+    public void updateSearchIndexFor(Item item) {
+        log.info("Updating search index for item with UUID {}", item.getUuid());
+
+        final List<Stock> affected = stockRepo.findByItemUuid(item.getUuid());
+
+        final List<StockSearchDTO> asSearchDTOs =
+                affected.parallelStream()
+                                .map(stockMapper::toSearchDTO)
+                                .collect(Collectors.toList());
+        log.info("Mapped to search DTOs");
+
+        searchService.partialUpdateAllInBatch(asSearchDTOs);
     }
 
     @Override
