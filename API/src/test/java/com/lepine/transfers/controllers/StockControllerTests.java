@@ -42,11 +42,6 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles({"test"})
 public class StockControllerTests {
 
-    private final static String
-            ITEM_NOT_FOUND_ERROR_FORMAT = "Item with uuid %s not found",
-            WAREHOUSE_NOT_FOUND_ERROR_FORMAT = "Warehouse with uuid %s not found",
-            STOCK_NOT_FOUND_ERROR_FORMAT = "Stock with uuid %s not found";
-
     private final static int VALID_QUANTITY = 10;
 
     private final static UUID
