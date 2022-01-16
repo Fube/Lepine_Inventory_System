@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.Min;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RestController
 @RequestMapping("/stocks")
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class StockController {
     private final StockService stockService;
 
     @PostMapping
+    @ResponseStatus(value = CREATED)
     public Stock create(@RequestBody StockUuidLessItemUuidWarehouseUuid dto) {
         log.info("Create stock {}", dto);
         return stockService.create(dto);
