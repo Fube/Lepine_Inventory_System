@@ -10,6 +10,7 @@ import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.stock.StockService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,21 +27,28 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static java.lang.String.format;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { StockController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
 @ActiveProfiles("test")
 public class StockHttpTests {
 
+    private final static String
+            ITEM_NOT_FOUND_ERROR_FORMAT = "Item with uuid %s not found",
+            WAREHOUSE_NOT_FOUND_ERROR_FORMAT = "Warehouse with uuid %s not found",
+            STOCK_NOT_FOUND_ERROR_FORMAT = "Stock with uuid %s not found";
+
     private final static int VALID_QUANTITY = 10;
 
     private final static UUID
             VALID_ITEM_UUID = UUID.randomUUID(),
+            NON_EXISTENT_ITEM_UUID = UUID.randomUUID(),
             VALID_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID(),
             NON_EXISTENT_STOCK_UUID = UUID.randomUUID();
@@ -146,5 +154,23 @@ public class StockHttpTests {
         // Act & Assert
         createWith(VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID)
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("HLndZYAwbH: Given POST on /stocks with non-existent item as manager, then return bad request (404, error)")
+    @WithMockUser(username = "some-manager", roles = {"MANAGER"})
+    void create_NonExistentItem() throws Exception {
+
+        // Arrange
+        final StockUuidLessItemUuidWarehouseUuid given = VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID.toBuilder()
+                .itemUuid(NON_EXISTENT_ITEM_UUID)
+                .build();
+
+        // Act & Assert
+        createWith(given, stubbing -> stubbing.willThrow(new ItemNotFoundException(NON_EXISTENT_ITEM_UUID)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(format(ITEM_NOT_FOUND_ERROR_FORMAT, NON_EXISTENT_ITEM_UUID)))
+                .andExpect(jsonPath("$.status").value(NOT_FOUND.value()))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 }
