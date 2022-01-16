@@ -22,9 +22,10 @@ import java.util.UUID;
 public class StockServiceImpl implements StockService {
 
     private final StockRepo stockRepo;
+    private final StockMapper stockMapper;
+    private final SearchService<StockSearchDTO, UUID> searchService;
     private final ItemService itemService;
     private final WarehouseService warehouseService;
-    private final SearchService<StockSearchDTO, UUID> searchService;
 
     @Override
     public Stock create(StockUuidLessItemUuidWarehouseUuid dto) {
