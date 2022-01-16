@@ -1,6 +1,7 @@
 package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.config.ValidationConfig;
+import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
@@ -12,14 +13,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Collections;
 import java.util.UUID;
 
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest(classes = { ValidationConfig.class, StockController.class })
 @ActiveProfiles({"test"})
@@ -109,5 +116,30 @@ public class StockControllerTests {
         // Act & Assert
         assertThatThrownBy(() -> stockController.create(VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID))
                 .isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("WyaujCIcwR: Given page and size when getAll, then return page")
+    void getAll_PageAndSize() {
+        // Arrange
+        final int
+                page = 1,
+                size = 10;
+        final PageRequest expectedPageRequest = PageRequest.of(page - 1, size);
+        final Page<Stock> expectedPage = createPageFor(Collections.singletonList(VALID_STOCK));
+
+        given(stockService.findAll(expectedPageRequest))
+                .willReturn(expectedPage);
+
+        // Act
+        Page<Stock> result = stockController.getAll(page, size);
+
+        // Assert
+        assertThat(result.getTotalPages()).isEqualTo((int)Math.ceil(expectedPage.getTotalPages() / (double) size));
+        assertThat(result.getTotalElements()).isEqualTo(expectedPage.getTotalElements());
+        assertThat(result.getContent()).isEqualTo(expectedPage.getContent());
+        assertThat(result.getNumber()).isEqualTo(page);
+
+        verify(stockService, times(1)).findAll(expectedPageRequest);
     }
 }
