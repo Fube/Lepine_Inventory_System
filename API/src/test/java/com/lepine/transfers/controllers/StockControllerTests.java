@@ -104,7 +104,7 @@ public class StockControllerTests {
         given(stockService.findByUuid(VALID_STOCK_UUID)).willReturn(Optional.ofNullable(VALID_STOCK));
         given(stockService.findByUuid(NON_EXISTENT_ITEM_UUID)).willReturn(Optional.empty());
 
-        given(stockService.update(NON_EXISTENT_ITEM_UUID, any()))
+        given(stockService.update(NON_EXISTENT_ITEM_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS))
                 .willThrow(new ItemNotFoundException(NON_EXISTENT_ITEM_UUID));
 
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
@@ -242,7 +242,7 @@ public class StockControllerTests {
                 .willReturn(expected);
 
         // Act
-        final Stock result = stockController.update(VALID_STOCK);
+        final Stock result = stockController.update(givenUuid, givenDTO);
 
         // Assert
         assertThat(result).isEqualTo(expected);

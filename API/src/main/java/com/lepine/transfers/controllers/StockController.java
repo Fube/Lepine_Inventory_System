@@ -2,6 +2,7 @@ package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.stock.Stock;
+import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.services.stock.StockService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/stocks")
@@ -36,5 +38,11 @@ public class StockController {
     ){
         log.info("Getting all stocks");
         return OneIndexedPageAdapter.of(stockService.findAll(PageRequest.of(page - 1, size)));
+    }
+
+    @PutMapping("/{uuid}")
+    public Stock update(@PathVariable("uuid") UUID uuid, @RequestBody StockUuidLessItemLessWarehouseLess dto) {
+        log.info("Update stock {}", dto);
+        return stockService.update(uuid, dto);
     }
 }
