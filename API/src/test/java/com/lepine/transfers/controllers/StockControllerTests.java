@@ -1,32 +1,39 @@
 package com.lepine.transfers.controllers;
 
 import com.lepine.transfers.config.ValidationConfig;
-import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.services.stock.StockService;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
+import com.lepine.transfers.utils.MessageSourceUtils;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
+import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = { ValidationConfig.class, StockController.class })
 @ActiveProfiles({"test"})
@@ -38,10 +45,12 @@ public class StockControllerTests {
             STOCK_NOT_FOUND_ERROR_FORMAT = "Stock with uuid %s not found";
 
     private final static int VALID_QUANTITY = 10;
+
     private final static UUID
             VALID_ITEM_UUID = UUID.randomUUID(),
             VALID_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID();
+
     private final static String
             VALID_ITEM_NAME = "Item",
             VALID_ITEM_DESCRIPTION = "Description",
@@ -82,8 +91,22 @@ public class StockControllerTests {
                     .quantity(VALID_QUANTITY)
                     .build();
 
+    private String
+            ERROR_MESSAGE_PAGINATION_PAGE_MIN,
+            ERROR_MESSAGE_PAGINATION_SIZE_MIN;
+
+    @BeforeEach
+    void setUp() {
+        final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
+        ERROR_MESSAGE_PAGINATION_PAGE_MIN = w.getMessage("pagination.page.min");
+        ERROR_MESSAGE_PAGINATION_SIZE_MIN = w.getMessage("pagination.size.min");
+    }
+
     @Autowired
     private StockController stockController;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
 
     @MockBean
     private StockService stockService;
@@ -141,5 +164,58 @@ public class StockControllerTests {
         assertThat(result.getNumber()).isEqualTo(page);
 
         verify(stockService, times(1)).findAll(expectedPageRequest);
+    }
+
+    @Test
+    @DisplayName("SyhWlyNouY: Given page less than 1 when getAll, then throw ConstraintViolationException")
+    void getAll_PageLessThan1_ThrowConstraintViolationException() {
+
+        // Arrange
+        final int pageNumber = 0, pageSize = 10;
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> stockController.getAll(pageNumber, pageSize));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        Assertions.assertThat(collect).containsExactly(ERROR_MESSAGE_PAGINATION_PAGE_MIN);
+
+        verify(stockService, never()).findAll(any());
+    }
+
+    @Test
+    @DisplayName("VKYZkdLAbA: Given page size less than 1 when getAll, then throw ConstraintViolationException")
+    void getAll_PageSizeLessThan1_ThrowConstraintViolationException() {
+
+        // Arrange
+        final int pageNumber = 1, pageSize = 0;
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> stockController.getAll(pageNumber, pageSize));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        Assertions.assertThat(collect).containsExactly(ERROR_MESSAGE_PAGINATION_SIZE_MIN);
+
+        verify(stockService, never()).findAll(any());
+    }
+
+    @Test
+    @DisplayName("RlvpomZxKL: Given page and size less than 1 when getAll, then throw ConstraintViolationException")
+    void getAll_PageAndSizeLessThan1_ThrowConstraintViolationException() {
+
+        // Arrange
+        final int pageNumber = 0, pageSize = 0;
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> stockController.getAll(pageNumber, pageSize));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        Assertions.assertThat(collect)
+                .containsExactlyInAnyOrder(ERROR_MESSAGE_PAGINATION_PAGE_MIN, ERROR_MESSAGE_PAGINATION_SIZE_MIN);
     }
 }
