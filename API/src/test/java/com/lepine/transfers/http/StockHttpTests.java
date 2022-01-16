@@ -246,12 +246,22 @@ public class StockHttpTests {
     }
 
     @Test
-    @DisplayName("aDUGWbpwfw: Given DELETE on /stocks with valid stock as manager, then return deleted (204, void)")
+    @DisplayName("aDUGWbpwfw: Given DELETE on /stocks/{uuid} with valid stock as manager, then return deleted (204, void)")
     @WithMockUser(username = "some-manager", roles = {"MANAGER"})
     void delete_AsManager() throws Exception {
 
         // Act & Assert
         mockMvc.perform(delete("/stocks/{uuid}", VALID_STOCK_UUID))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("ShYQxLDUtl: Given DELETE on /stocks/{uuid} with valid stock as clerk, then return deleted (403, error)")
+    @WithMockUser(username = "some-clerk", roles = {"CLERK"})
+    void delete_AsClerk() throws Exception {
+
+        // Act & Assert
+        mockMvc.perform(delete("/stocks/{uuid}", VALID_STOCK_UUID))
+                .andExpect(status().isForbidden());
     }
 }

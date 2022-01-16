@@ -16,6 +16,7 @@ import javax.validation.constraints.Min;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/stocks")
@@ -50,6 +51,7 @@ public class StockController {
     }
 
     @DeleteMapping("/{uuid}")
+    @ResponseStatus(value = NO_CONTENT)
     public void delete(@PathVariable("uuid") UUID uuid) {
         log.info("Delete stock {}", uuid);
         stockService.delete(uuid);
