@@ -11,6 +11,7 @@ import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.stock.StockService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,7 @@ public class StockHttpTests {
             VALID_ITEM_UUID = UUID.randomUUID(),
             NON_EXISTENT_ITEM_UUID = UUID.randomUUID(),
             VALID_WAREHOUSE_UUID = UUID.randomUUID(),
+            NON_EXISTENT_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID(),
             NON_EXISTENT_STOCK_UUID = UUID.randomUUID();
 
@@ -170,6 +172,24 @@ public class StockHttpTests {
         createWith(given, stubbing -> stubbing.willThrow(new ItemNotFoundException(NON_EXISTENT_ITEM_UUID)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(format(ITEM_NOT_FOUND_ERROR_FORMAT, NON_EXISTENT_ITEM_UUID)))
+                .andExpect(jsonPath("$.status").value(NOT_FOUND.value()))
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
+    @DisplayName("ALyEoCRudY: Given POST on /stocks with non-existent warehouse as manager, then return bad request (404, error)")
+    @WithMockUser(username = "some-manager", roles = {"MANAGER"})
+    void create_NonExistentWarehouse() throws Exception {
+
+        // Arrange
+        final StockUuidLessItemUuidWarehouseUuid given = VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID.toBuilder()
+                .warehouseUuid(NON_EXISTENT_WAREHOUSE_UUID)
+                .build();
+
+        // Act & Assert
+        createWith(given, stubbing -> stubbing.willThrow(new WarehouseNotFoundException(NON_EXISTENT_WAREHOUSE_UUID)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(format(WAREHOUSE_NOT_FOUND_ERROR_FORMAT, NON_EXISTENT_WAREHOUSE_UUID)))
                 .andExpect(jsonPath("$.status").value(NOT_FOUND.value()))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
