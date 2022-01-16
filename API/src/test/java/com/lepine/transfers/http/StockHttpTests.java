@@ -127,4 +127,24 @@ public class StockHttpTests {
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(VALID_STOCK)));
     }
+
+    @Test
+    @DisplayName("KawvOaaxEK: Given POST on /stocks with valid stock as clerk, then return created (403, error)")
+    @WithMockUser(username = "some-clerk", roles = {"CLERK"})
+    void create_AsClerk() throws Exception {
+
+        // Act & Assert
+        createWith(VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("UotbhAcAiZ: Given POST on /stocks with valid stock as salesperson, then return created (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = {"SALESPERSON"})
+    void create_AsSalesperson() throws Exception {
+
+        // Act & Assert
+        createWith(VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID)
+                .andExpect(status().isForbidden());
+    }
 }
