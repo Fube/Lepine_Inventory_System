@@ -33,6 +33,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { StockController.class })
@@ -127,6 +128,26 @@ public class StockHttpTests {
                 .content(asString));
     }
 
+    private ResultActions updateWith(
+            final UUID uuid,
+            final StockUuidLessItemLessWarehouseLess given) throws Exception {
+        return updateWith(uuid, given, stubbing -> stubbing.willReturn(VALID_STOCK));
+    }
+
+    private ResultActions updateWith(
+            final UUID uuid,
+            final StockUuidLessItemLessWarehouseLess given,
+            final Consumer<BDDMockito.BDDMyOngoingStubbing<Stock>> arrangement) throws Exception {
+        // Arrange
+        final String asString = objectMapper.writeValueAsString(given);
+        arrangement.accept(given(stockService.update(uuid, given)));
+
+        // Act
+        return mockMvc.perform(put("/stocks/" + uuid)
+                .contentType(APPLICATION_JSON)
+                .content(asString));
+    }
+
     @Test
     @DisplayName("ttkHeVrxAm: Given POST on /stocks with valid stock as manager, then return created (201, stock)")
     @WithMockUser(username = "some-manager", roles = {"MANAGER"})
@@ -192,5 +213,16 @@ public class StockHttpTests {
                 .andExpect(jsonPath("$.message").value(format(WAREHOUSE_NOT_FOUND_ERROR_FORMAT, NON_EXISTENT_WAREHOUSE_UUID)))
                 .andExpect(jsonPath("$.status").value(NOT_FOUND.value()))
                 .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
+    @DisplayName("bqjbSBYRAN: Given PUT on /stocks with valid stock as manager, then return updated (200, stock)")
+    @WithMockUser(username = "some-manager", roles = {"MANAGER"})
+    void update_AsManager() throws Exception {
+
+        // Act & Assert
+        updateWith(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(VALID_STOCK)));
     }
 }
