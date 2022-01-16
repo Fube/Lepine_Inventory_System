@@ -264,4 +264,14 @@ public class StockHttpTests {
         mockMvc.perform(delete("/stocks/{uuid}", VALID_STOCK_UUID))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @DisplayName("AFKhUQtMhC: Given DELETE on /stocks/{uuid} with valid stock as salesperson, then return deleted (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = {"SALESPERSON"})
+    void delete_AsSalesperson() throws Exception {
+
+        // Act & Assert
+        mockMvc.perform(delete("/stocks/{uuid}", VALID_STOCK_UUID))
+                .andExpect(status().isForbidden());
+    }
 }
