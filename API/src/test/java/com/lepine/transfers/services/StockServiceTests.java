@@ -1,6 +1,7 @@
 package com.lepine.transfers.services;
 
 import com.lepine.transfers.config.MapperConfig;
+import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
 import com.lepine.transfers.data.warehouse.Warehouse;
@@ -12,26 +13,38 @@ import com.lepine.transfers.services.search.SearchService;
 import com.lepine.transfers.services.stock.StockService;
 import com.lepine.transfers.services.stock.StockServiceImpl;
 import com.lepine.transfers.services.warehouse.WarehouseService;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
+import com.lepine.transfers.utils.MessageSourceUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(classes = { MapperConfig.class, StockServiceImpl.class })
+@SpringBootTest(classes = {
+        MapperConfig.class,
+        ValidationConfig.class,
+        StockServiceImpl.class,
+})
 @ActiveProfiles({"test"})
 public class StockServiceTests {
 
@@ -78,8 +91,21 @@ public class StockServiceTests {
             .quantity(VALID_QUANTITY)
             .build();
 
+    private final static StockUuidLessItemUuidWarehouseUuid VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID =
+            StockUuidLessItemUuidWarehouseUuid.builder()
+            .itemUuid(VALID_ITEM_UUID)
+            .warehouseUuid(VALID_WAREHOUSE_UUID)
+            .quantity(VALID_QUANTITY)
+            .build();
+
+    private String
+            ITEM_UUID_NULL_ERROR_MESSAGE;
+
     @Autowired
     private StockService stockService;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
 
     @MockBean
     private StockRepo stockRepo;
@@ -92,6 +118,12 @@ public class StockServiceTests {
 
     @MockBean
     private WarehouseService warehouseService;
+
+    @BeforeEach
+    void setUp() {
+        final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
+        ITEM_UUID_NULL_ERROR_MESSAGE = w.getMessage("item.uuid.not_null");
+    }
 
     @Test
     void contextLoads() {}
@@ -173,6 +205,23 @@ public class StockServiceTests {
         assertThatThrownBy(() -> stockService.create(stock))
                 .isInstanceOf(WarehouseNotFoundException.class)
                 .hasMessage(format(WAREHOUSE_NOT_FOUND_ERROR_FORMAT, VALID_WAREHOUSE_UUID));
+    }
+
+    @Test
+    @DisplayName("HUjjRzdmnD: Given create with null itemUuid, then throw ConstraintViolationException")
+    void create_NullItemUuid() {
+
+        // Arrange
+        final StockUuidLessItemUuidWarehouseUuid stock = VALID_STOCK_UUID_LESS_ITEM_UUID_WAREHOUSE_UUID.toBuilder()
+                .itemUuid(null)
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> stockService.create(stock));
+
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(ITEM_UUID_NULL_ERROR_MESSAGE);
     }
 
     @Test
