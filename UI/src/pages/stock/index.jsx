@@ -7,9 +7,12 @@ import Nav from "../../components/Nav";
 import { axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
+
+
 /**
 *@param {{ stock: import('@lepine/types').Stock[] } & import("@lepine/types").Pagination} param0
 */
+
 export default function ShowStock({ stock, totalPages, pageNumber }) {
     const router = useRouter();
     const { role } = useAuth();
@@ -51,7 +54,7 @@ export default function ShowStock({ stock, totalPages, pageNumber }) {
                         <div className="mt-12">{fallback}</div>
                         <Link href="/stock/new" passHref>
                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
-                                Add One Now!
+                                Add Items Now!
                             </button>
                         </Link>
                     </div>
@@ -96,6 +99,7 @@ export default function ShowStock({ stock, totalPages, pageNumber }) {
  *
  * @param {Stock} param0
  */
+
 function StockTableRow({ uuid, item, warehouse, quantity }) {
     return (
         <tr>
