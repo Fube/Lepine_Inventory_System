@@ -7,13 +7,10 @@ import Nav from "../../components/Nav";
 import { axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
-
-
 /**
 *@param {{ stock: import('@lepine/types').Stock[] } & import("@lepine/types").Pagination} param0
 */
-
-export default function ShowStock({ stock, totalPages, pageNumber }) {
+export default function ShowStock({ stocks, totalPages, pageNumber }) {
     const router = useRouter();
     const { role } = useAuth();
 
@@ -28,9 +25,9 @@ export default function ShowStock({ stock, totalPages, pageNumber }) {
             <th>Item</th>
             <th>Warehouse</th>
             <th>Quantity</th>
-            <th className="flex justify-between">
-                <button>
-                    <Link href="/stock/new" passHref>
+            <th className="md:rounded-r-none rounded-r-lg flex justify-between md:table-cell">
+            <button className="md:hidden">
+                    <Link href="/stocks/new" passHref>
                         <Icon icon="si-glyph:button-plus" width="32" />
                     </Link>
                 </button>
@@ -44,19 +41,21 @@ export default function ShowStock({ stock, totalPages, pageNumber }) {
         </h2>
     );
 
-    if (stock.length <= 0) {
+    if (stocks.length <= 0) {
         return (
             <>
                 {header}
-                <Nav />
+    
                 <main className="flex justify-center">
                     <div className="text-center">
                         <div className="mt-12">{fallback}</div>
-                        <Link href="/stock/new" passHref>
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
-                                Add Items Now!
-                            </button>
-                        </Link>
+                        {role === "MANAGER" && (
+                            <Link href="/stocks/new" passHref>
+                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
+                                    Add One Now!
+                                </button>
+                            </Link>
+                        )}
                     </div>
                 </main>
             </>
@@ -66,7 +65,7 @@ export default function ShowStock({ stock, totalPages, pageNumber }) {
     return (
         <>
             {header}
-            <Nav />
+
             <div className="overflow-x-auto justify-center flex">
             <div className="md:w-1/2 w-3/4">
                     <div className="md:flex justify-around my-4">
@@ -75,15 +74,15 @@ export default function ShowStock({ stock, totalPages, pageNumber }) {
                     <table className="table table-zebra w-full sm:table-fixed">
                         <thead>{head}</thead>
                         <tbody>
-                            {stock.map((user) => (
-                                <stock {...user} key={user.uuid} />
+                            {stocks.map((user) => (
+                                <StockTableRow {...user} key={user.uuid} />
                             ))}
                         </tbody>
                     </table>
                     <div className="flex justify-center mt-4">
                         <Paginate
                             onPageChange={(page) =>
-                                router.push(`/stock?page=${page}`)
+                                router.push(`/stocks?page=${page}`)
                             }
                             totalPages={totalPages}
                             pageNumber={pageNumber}
@@ -99,14 +98,15 @@ export default function ShowStock({ stock, totalPages, pageNumber }) {
  *
  * @param {Stock} param0
  */
-
 function StockTableRow({ uuid, item, warehouse, quantity }) {
     return (
-        <tr>
-            <td>{item}</td>
-            <td>{warehouse}</td>
-            <td>{quantity}</td>
+        <Link key={uuid} href={`/stocks/${uuid}`} passHref> 
+        <tr className="hover">
+            <td className="td-wrap">{item}</td>
+            <td className="td-wrap">{warehouse}</td>
+            <td className="td-wrap">{quantity}</td>
         </tr>
+        </Link>
     );
 }
 
@@ -117,14 +117,14 @@ function StockTableRow({ uuid, item, warehouse, quantity }) {
  */
 export async function getServerSideProps(context) {
     const page = context.query.page || 1;
-    const res = await axiosBackendAuth.get(`/stock?page=${page}`, {
+    const res = await axiosBackendAuth.get(`/stocks?page=${page}`, {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
 
     return res
-        .refine(({ content: stock, totalPages, number: pageNumber }) => ({
+        .refine(({ content: stocks, totalPages, number: pageNumber }) => ({
             props: {
-                stock,
+                stocks,
                 totalPages,
                 pageNumber,
             },

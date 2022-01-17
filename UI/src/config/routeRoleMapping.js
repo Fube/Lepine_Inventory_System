@@ -17,7 +17,7 @@ roleRouteMappings.set("/warehouses", all);
 roleRouteMappings.set("/warehouses/new", managerOnly);
 
 // Stock mappings
-roleRouteMappings.set("/stock", all);
-roleRouteMappings.set("/stock/new", managerOnly);
+roleRouteMappings.set("/stocks", all);
+roleRouteMappings.set("/stocks/new", managerOnly);
 
 export default roleRouteMappings;
