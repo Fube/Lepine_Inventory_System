@@ -94,12 +94,12 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
 
 function UserTableRow({ uuid, email, role }) {
     return (
-        // <Link href={`/users/${uuid}`} passHref>
+         <Link href={`/users/${uuid}`} passHref>
         <tr className="hover">
             <td>{email}</td>
             <td>{capitalize(role.toLowerCase())}</td>
         </tr>
-        // </Link>
+         </Link>
     );
 }
 

@@ -5,6 +5,7 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +16,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/users")
@@ -56,11 +60,34 @@ public class UserController {
 
         return passwordLessDTOPage;
     }
-    @GetMapping
-    public UserPasswordLessDTO update(@PathVariable UUID uuid, @Valid @RequestBody UserUUIDLessDTO userUUIDLessDTO){
-        log.info("Update user with email {}", userUUIDLessDTO.getEmail());
-        User updated = userService.create(userUUIDLessDTO);
-        log.info("Updated user with UUID {}", updated.getUuid());
-        return userMapper.toPasswordLessDTO(updated);
+    @PutMapping("/{uuid}")
+    public User update(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid UserUUIDLessDTO userUUIDLessDTO){
+        log.info("Update user");
+        return userService.update(uuid, userUUIDLessDTO);
+    }
+    @ResponseStatus(NO_CONTENT)
+    @DeleteMapping("/{uuid}")
+    public void delete(@PathVariable  UUID uuid) {
+        log.info("deleting item");
+        userService.delete(uuid);
+        log.info("deleted item");
+    }
+
+    @GetMapping("/{uuid}")
+    public User getByUuid(@PathVariable @NotNull UUID uuid) {
+        log.info("retrieving user by uuid {}", uuid);
+
+        final Optional<User> byUuid = userService.findByUuid(uuid);
+        if(byUuid.isEmpty()) {
+            log.info("user with uuid {} not found", uuid);
+            throw new ItemNotFoundException(uuid);
+        }
+
+        final User user = byUuid.get();
+        log.info("retrieved user by uuid {}", user.getUuid());
+
+        return user;
     }
 }
