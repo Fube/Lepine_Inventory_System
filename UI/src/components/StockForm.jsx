@@ -91,27 +91,9 @@ export default function StockForm({
                 {() => (
                     <GenericForm title={title}>
                         <GenericErrorStatus />
-                        <GenericFormInputErrorCombo
-                            disabled={!editable}
-                            name="item"
-                            type="text"
-                            placeholder="Item"
-                        />
-
-                        <GenericFormInputErrorCombo
-                            disabled={!editable}
-                            name="warehouse"
-                            type="text"
-                            placeholder="Warehouse"
-                        />
-
-                        <GenericFormInputErrorCombo
-                            disabled={!editable}
-                            name="quantity"
-                            type="number"
-                            placeholder="Quantity"
-                        />
                         
+                        {Object.values(filterOut(fields))}
+                       
                         <div className="flex items-center justify-end p-6">
                             {editable && <GenericSubmitButton text="Save" />}
                             {deletable && (

@@ -6,7 +6,7 @@ import WithClientSideAuth from "../../components/WithClientSideAuth";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import checkEmptyAuth from "../../utils/checkEmptyAuth";
 
-export default function CreateStock(){
+ function CreateStock(){
     const router = useRouter();
 
     const handleSubmit = async (values, {setSubmitting, setStatus}) => {
