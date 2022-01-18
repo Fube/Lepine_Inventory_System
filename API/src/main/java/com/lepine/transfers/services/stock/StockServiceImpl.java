@@ -2,6 +2,8 @@ package com.lepine.transfers.services.stock;
 
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
+import com.lepine.transfers.events.item.ItemDeleteEvent;
+import com.lepine.transfers.events.item.ItemDeleteHandler;
 import com.lepine.transfers.events.item.ItemUpdateEvent;
 import com.lepine.transfers.events.item.ItemUpdateHandler;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-public class StockServiceImpl implements StockService, ItemUpdateHandler {
+public class StockServiceImpl implements StockService, ItemUpdateHandler, ItemDeleteHandler {
 
     private final StockRepo stockRepo;
     private final StockMapper stockMapper;
@@ -122,5 +124,25 @@ public class StockServiceImpl implements StockService, ItemUpdateHandler {
         log.info("Deleting stock with UUID {}", dto);
         final int affected = stockRepo.deleteByUuid(dto);
         log.info("Deleted {} stocks", affected);
+    }
+
+    @Override
+    public void onItemDelete(ItemDeleteEvent event) {
+        log.info("Reacting to item delete");
+        deleteSearchIndexFor(event.getUuid());
+    }
+
+    private void deleteSearchIndexFor(UUID uuid) {
+        log.info("Deleting search index for item with UUID {}", uuid);
+
+        final List<Stock> affected = stockRepo.findByItemUuid(uuid);
+
+        final List<StockSearchDTO> asSearchDTOs =
+                affected.parallelStream()
+                                .map(stockMapper::toSearchDTO)
+                                .collect(Collectors.toList());
+        log.info("Mapped to search DTOs");
+
+        searchService.deleteAllInBatch(asSearchDTOs);
     }
 }

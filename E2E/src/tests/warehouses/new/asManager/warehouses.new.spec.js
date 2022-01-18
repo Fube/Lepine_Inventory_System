@@ -11,7 +11,7 @@ const {
     READONLY_WAREHOUSE_CITY,
     READONLY_WAREHOUSE_PROVINCE,
 } = require("@lepine/e2e-config");
-const { clearThenType } = require("@lepine/e2e-helpers/page");
+const { clearThenType, waitForTitle } = require("@lepine/e2e-helpers/page");
 
 test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
     const toClean = new Set();
@@ -38,9 +38,7 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
     }) => {
         // Go to /warehouses
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
-            ),
+            waitForTitle(page, "Warehouses"),
             page.goto("/warehouses"),
         ]);
 
@@ -49,9 +47,7 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
             '[href*="warehouses/new"] >> visible=true'
         );
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Create Warehouse"
-            ),
+            waitForTitle(page, "Create Warehouse"),
             addNewButton.click(),
         ]);
 
@@ -85,9 +81,7 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
     }) => {
         // Go to /warehouses/new
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`?.text === "Create Warehouse"
-            ),
+            waitForTitle(page, "Create Warehouse"),
             page.goto("/warehouses/new"),
         ]);
 
@@ -126,9 +120,7 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
         // Click save
         const saveButton = page.locator('[type="submit"]');
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
-            ),
+            waitForTitle(page, "Warehouses"),
             saveButton.click(),
         ]);
     });
@@ -163,9 +155,7 @@ test.describe.parallel("rJrgbjJUwU: Manager /warehouses/new tests", () => {
 
         // Go to /warehouses/new
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`?.text === "Create Warehouse"
-            ),
+            waitForTitle(page, "Create Warehouse"),
             page.goto("/warehouses/new"),
         ]);
 

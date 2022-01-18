@@ -4,6 +4,7 @@ import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.events.item.ItemDeleteEvent;
 import com.lepine.transfers.events.item.ItemUpdateEvent;
 import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.services.item.ItemServiceImpl;
@@ -189,6 +190,7 @@ public class ItemServiceTests {
         // Assert
         verify(searchService, times(1))
                 .delete(uuid);
+        verify(applicationEventPublisher, times(1)).publishEvent(any(ItemDeleteEvent.class));
     }
 
     @Test
@@ -206,6 +208,7 @@ public class ItemServiceTests {
         // Assert
         verify(searchService, never())
                 .delete(uuid);
+        verify(applicationEventPublisher, times(1)).publishEvent(any(ItemDeleteEvent.class));
     }
 
     @Test

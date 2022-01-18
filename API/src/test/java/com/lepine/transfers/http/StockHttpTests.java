@@ -19,27 +19,39 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static java.lang.String.format;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { StockController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
 @ActiveProfiles("test")
 public class StockHttpTests {
+
+    private final static int
+            DEFAULT_PAGE = 1,
+            DEFAULT_SIZE = 10;
 
     private final static String
             ITEM_NOT_FOUND_ERROR_FORMAT = "Item with uuid %s not found",
@@ -148,6 +160,54 @@ public class StockHttpTests {
                 .content(asString));
     }
 
+    private void getAllStocks() throws Exception {
+        // Arrange
+        final List<Stock> content = Collections.nCopies(DEFAULT_PAGE * DEFAULT_SIZE, VALID_STOCK);
+        final PageRequest expectedPageRequest = PageRequest.of(DEFAULT_PAGE - 1, DEFAULT_SIZE); // One-indexed
+        final Page<Stock> expected = createPageFor(content, expectedPageRequest);
+        given(stockService.findAll(any(PageRequest.class)))
+                .willReturn(expected);
+
+        // Act
+        final ResultActions perform = mockMvc.perform(get("/stocks"));
+
+        // Assert
+        perform.andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.length()").value(DEFAULT_SIZE))
+                .andExpect(jsonPath("$.content[*].uuid").exists())
+                .andExpect(jsonPath("$.content[*].item").exists())
+                .andExpect(jsonPath("$.content[*].item.uuid").exists())
+                .andExpect(jsonPath("$.content[*].item.sku").exists())
+                .andExpect(jsonPath("$.content[*].item.description").exists())
+                .andExpect(jsonPath("$.content[*].item.name").exists())
+                .andExpect(jsonPath("$.content[*].warehouse").exists())
+                .andExpect(jsonPath("$.content[*].warehouse.uuid").exists())
+                .andExpect(jsonPath("$.content[*].warehouse.zipCode").exists())
+                .andExpect(jsonPath("$.content[*].warehouse.city").exists())
+                .andExpect(jsonPath("$.content[*].warehouse.province").exists())
+                .andExpect(jsonPath("$.number").value(DEFAULT_PAGE));
+
+        verify(stockService, times(1)).findAll(any(PageRequest.class));
+    }
+
+    private void getOneStock() throws Exception {
+        // Arrange
+        final String asString = objectMapper.writeValueAsString(VALID_STOCK);
+        given(stockService.findByUuid(VALID_STOCK_UUID))
+                .willReturn(Optional.ofNullable(VALID_STOCK));
+
+        // Act
+        final ResultActions perform = mockMvc.perform(get("/stocks/" + VALID_STOCK_UUID));
+
+        // Assert
+        perform.andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json(asString));
+
+        verify(stockService, times(1)).findByUuid(VALID_STOCK_UUID);
+    }
+
     @Test
     @DisplayName("ttkHeVrxAm: Given POST on /stocks with valid stock as manager, then return created (201, stock)")
     @WithMockUser(username = "some-manager", roles = {"MANAGER"})
@@ -244,5 +304,77 @@ public class StockHttpTests {
         // Act & Assert
         updateWith(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS)
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("aDUGWbpwfw: Given DELETE on /stocks/{uuid} with valid stock as manager, then return deleted (204, void)")
+    @WithMockUser(username = "some-manager", roles = {"MANAGER"})
+    void delete_AsManager() throws Exception {
+
+        // Act & Assert
+        mockMvc.perform(delete("/stocks/{uuid}", VALID_STOCK_UUID))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("ShYQxLDUtl: Given DELETE on /stocks/{uuid} with valid stock as clerk, then return deleted (403, error)")
+    @WithMockUser(username = "some-clerk", roles = {"CLERK"})
+    void delete_AsClerk() throws Exception {
+
+        // Act & Assert
+        mockMvc.perform(delete("/stocks/{uuid}", VALID_STOCK_UUID))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("AFKhUQtMhC: Given DELETE on /stocks/{uuid} with valid stock as salesperson, then return deleted (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = {"SALESPERSON"})
+    void delete_AsSalesperson() throws Exception {
+
+        // Act & Assert
+        mockMvc.perform(delete("/stocks/{uuid}", VALID_STOCK_UUID))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("hJdLSKhZLT: Given GET on /stocks as manager, then return all (200, stocks)")
+    @WithMockUser(username = "some-manager", roles = {"MANAGER"})
+    void findAll_AsManager() throws Exception {
+        getAllStocks();
+    }
+
+    @Test
+    @DisplayName("efWitYzyWH: Given GET on /stocks as clerk, then return all (200, stocks)")
+    @WithMockUser(username = "some-clerk", roles = {"CLERK"})
+    void findAll_AsClerk() throws Exception {
+        getAllStocks();
+    }
+
+    @Test
+    @DisplayName("eXhGyKkpRT: Given GET on /stocks as salesperson, then return all (200, stocks)")
+    @WithMockUser(username = "some-salesperson", roles = {"SALESPERSON"})
+    void findAll_AsSalesperson() throws Exception {
+        getAllStocks();
+    }
+
+    @Test
+    @DisplayName("AURfqvOxKH: Given GET on /stocks/{uuid} of existing stock as manager, then return stock (200, stock)")
+    @WithMockUser(username = "some-manager", roles = {"MANAGER"})
+    void findOne_AsManager() throws Exception {
+        getOneStock();
+    }
+
+    @Test
+    @DisplayName("eOdsrHPxVh: Given GET on /stocks/{uuid} of existing stock as clerk, then return stock (200, stock)")
+    @WithMockUser(username = "some-clerk", roles = {"CLERK"})
+    void findOne_AsClerk() throws Exception {
+        getOneStock();
+    }
+
+    @Test
+    @DisplayName("qPHVxdXWXA: Given GET on /stocks/{uuid} of existing stock as salesperson, then return stock (200, stock)")
+    @WithMockUser(username = "some-salesperson", roles = {"SALESPERSON"})
+    void findOne_AsSalesperson() throws Exception {
+        getOneStock();
     }
 }

@@ -4,6 +4,7 @@ import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;
 import com.lepine.transfers.data.stock.StockUuidLessItemUuidWarehouseUuid;
+import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.services.stock.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import javax.validation.constraints.Min;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/stocks")
@@ -43,6 +45,12 @@ public class StockController {
         return OneIndexedPageAdapter.of(stockService.findAll(PageRequest.of(page - 1, size)));
     }
 
+    @GetMapping("/{uuid}")
+    public Stock get(@PathVariable("uuid") UUID uuid) {
+        log.info("Get stock {}", uuid);
+        return stockService.findByUuid(uuid).orElseThrow(() -> new StockNotFoundException(uuid));
+    }
+
     @PutMapping("/{uuid}")
     public Stock update(@PathVariable("uuid") UUID uuid, @RequestBody StockUuidLessItemLessWarehouseLess dto) {
         log.info("Update stock {}", dto);
@@ -50,6 +58,7 @@ public class StockController {
     }
 
     @DeleteMapping("/{uuid}")
+    @ResponseStatus(value = NO_CONTENT)
     public void delete(@PathVariable("uuid") UUID uuid) {
         log.info("Delete stock {}", uuid);
         stockService.delete(uuid);

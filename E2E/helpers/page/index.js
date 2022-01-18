@@ -12,6 +12,19 @@ async function clearThenType(page, input, newValue) {
     await input.type(newValue);
 }
 
+/**
+ *
+ * @param {import("playwright-core").Page} page
+ * @param {string} title
+ */
+function waitForTitle(page, title) {
+    return page.waitForFunction(
+        (title) => document?.querySelector("title")?.text === title,
+        title
+    );
+}
+
 module.exports = {
     clearThenType,
+    waitForTitle,
 };

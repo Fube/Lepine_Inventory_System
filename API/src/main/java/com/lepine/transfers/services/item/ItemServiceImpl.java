@@ -4,6 +4,7 @@ import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.events.item.ItemDeleteEvent;
 import com.lepine.transfers.events.item.ItemUpdateEvent;
 import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.services.search.SearchService;
@@ -91,6 +92,10 @@ public class ItemServiceImpl implements ItemService, ApplicationEventPublisherAw
     @Transactional
     public void delete(UUID uuid) {
         log.info("deleting item");
+
+        log.info("Publish item delete event");
+        applicationEventPublisher.publishEvent(new ItemDeleteEvent(this, uuid));
+
         final Integer deleted = itemRepo.deleteByUuid(uuid);
         if(deleted <= 0) {
             log.info("item not found");

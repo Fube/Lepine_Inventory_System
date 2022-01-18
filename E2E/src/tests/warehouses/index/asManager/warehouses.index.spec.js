@@ -10,6 +10,7 @@ const {
     MANAGER_USERNAME,
     MANAGER_PASSWORD,
 } = require("@lepine/e2e-config");
+const { waitForTitle } = require("@lepine/e2e-helpers/page");
 
 test.describe.parallel("hNDKKdIIjM: Manager /warehouses tests", () => {
     let uuid = null;
@@ -53,9 +54,7 @@ test.describe.parallel("hNDKKdIIjM: Manager /warehouses tests", () => {
 
         // Click on "Warehouses" button
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
-            ),
+            waitForTitle(page, "Warehouses"),
             page.click("a[href*=warehouses]"),
         ]);
 
