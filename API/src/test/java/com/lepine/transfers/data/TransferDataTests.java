@@ -102,8 +102,6 @@ public class TransferDataTests {
     @Autowired
     private WarehouseRepo warehouseRepo;
 
-    @Test
-    void contextLoads() {}
 
     @BeforeEach
     void setUp() {
@@ -127,6 +125,9 @@ public class TransferDataTests {
         itemRepo.deleteAll();
         warehouseRepo.deleteAll();
     }
+
+    @Test
+    void contextLoads() {}
 
     @Test
     @DisplayName("unLLLtcFVh: Given valid shipment, persist")
@@ -209,6 +210,25 @@ public class TransferDataTests {
         // Arrange
         final Shipment shipment = VALID_SHIPMENT.toBuilder()
                 .transfers(List.of(VALID_TRANSFER.toBuilder().build()))
+                .build();
+
+        final Shipment savedShipment = shipmentRepo.save(shipment);
+        entityManager.flush();
+
+        // Act
+        final Shipment foundShipment = shipmentRepo.findById(savedShipment.getUuid()).get();
+
+        // Assert
+        assertThat(foundShipment.getTransfers()).isEqualTo(savedShipment.getTransfers());
+    }
+
+    @Test
+    @DisplayName("FGBmHRZbAe: Given find on shipment with no transfers, retrieve empty list for transfers")
+    void findOne_ValidNoTransfers() {
+
+        // Arrange
+        final Shipment shipment = VALID_SHIPMENT.toBuilder()
+                .transfers(List.of())
                 .build();
 
         final Shipment savedShipment = shipmentRepo.save(shipment);
