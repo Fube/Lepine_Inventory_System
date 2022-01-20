@@ -157,4 +157,24 @@ public class TransferDataTests {
         assertThat(foundTransfer.getStock().getUuid()).isEqualTo(targetTransfer.getStock().getUuid());
         assertThat(foundTransfer.getQuantity()).isEqualTo(targetTransfer.getQuantity());
     }
+
+    @Test
+    @DisplayName("BBGiUkwvYp: Given delete on shipment, delete all transfers related to it")
+    void delete_ValidCascade() {
+        // Arrange
+        final Shipment shipment = VALID_SHIPMENT.toBuilder()
+                .transfers(List.of(VALID_TRANSFER.toBuilder().build()))
+                .build();
+
+        final Shipment savedShipment = shipmentRepo.save(shipment);
+        entityManager.flush();
+
+        // Act
+        shipmentRepo.delete(savedShipment);
+        entityManager.flush();
+
+        // Assert
+        assertThat(shipmentRepo.count()).isEqualTo(0);
+        assertThat(transferRepo.count()).isEqualTo(0);
+    }
 }
