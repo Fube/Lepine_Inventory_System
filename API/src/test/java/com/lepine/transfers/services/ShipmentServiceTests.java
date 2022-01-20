@@ -10,6 +10,7 @@ import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.services.shipment.ShipmentService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {
 })
@@ -99,6 +101,11 @@ public class ShipmentServiceTests {
     @Test
     void contextLoads() {}
 
+    @AfterEach
+    void cleanUp() {
+        reset(shipmentRepo);
+    }
+
     @Test
     @DisplayName("TzKMznSAph: Given valid DTO when create, then return transfer")
     void valid_Create() {
@@ -111,5 +118,6 @@ public class ShipmentServiceTests {
 
         // Assert
         assertThat(shipment).isEqualTo(VALID_SHIPMENT);
+        verify(shipmentRepo, times(1)).save(VALID_SHIPMENT);
     }
 }
