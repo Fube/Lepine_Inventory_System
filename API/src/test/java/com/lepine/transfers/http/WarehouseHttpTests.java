@@ -252,7 +252,6 @@ public class WarehouseHttpTests {
     private ResultActions getOneWarehouse(UUID uuid, Warehouse expected) throws Exception {
 
         // Arrange
-        final String asString = objectMapper.writeValueAsString(expected);
         given(warehouseService.findByUuid(uuid))
                 .willReturn(Optional.ofNullable(expected));
 

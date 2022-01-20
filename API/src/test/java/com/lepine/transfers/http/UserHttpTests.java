@@ -9,14 +9,16 @@ import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
-import com.lepine.transfers.data.warehouse.Warehouse;
-import com.lepine.transfers.data.warehouse.WarehouseUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.helpers.matchers.UserUUIDLessDTOMatcher;
 import com.lepine.transfers.services.user.UserService;
+import com.lepine.transfers.utils.MessageSourceUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,8 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
+import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
@@ -48,6 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = { UserController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserHttpTests {
 
     private static final String VALID_EMAIL = "valid@gmail.com";
@@ -60,6 +65,8 @@ public class UserHttpTests {
             .uuid(UUID.randomUUID())
             .name(VALID_ROLE_NAME)
             .build();
+    private final static UUID
+            VALID_UUID = UUID.randomUUID();
 
     private static final User VALID_USER = User.builder()
             .uuid(UUID.randomUUID())
@@ -86,7 +93,18 @@ public class UserHttpTests {
         }
         return users;
     }
+    private String
+            ERROR_MESSAGE_PASSWORD_NOT_NULL,
+            ERROR_MESSAGE_PASSWORD_NOT_BLANK,
+            ERROR_MESSAGE_PASSWORD_NOT_VALID;
 
+    @BeforeAll
+    void bSetup(){
+        final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
+        ERROR_MESSAGE_PASSWORD_NOT_NULL = w.getMessage("user.password.not_null");
+        ERROR_MESSAGE_PASSWORD_NOT_BLANK = w.getMessage("user.password.not_blank");
+        ERROR_MESSAGE_PASSWORD_NOT_VALID = w.getMessage("user.password.not_valid");
+    }
     @Autowired
     private MockMvc mvc;
 
@@ -110,9 +128,21 @@ public class UserHttpTests {
         reset(userService);
     }
 
-    @Test
-    void contextLoads(){}
+    private ResultActions updateWith(final UUID uuid, final UserUUIDLessDTO given, final User expected) throws Exception {
+        return updateWith(uuid, given, stubbing -> stubbing.willReturn(expected));
+    }
+    private ResultActions updateWith(final UUID uuid, final UserUUIDLessDTO given, Consumer<BDDMockito.BDDMyOngoingStubbing<User>> arrangement) throws Exception {
 
+        // Arrange
+        final String asString = objectMapper.writeValueAsString(given);
+
+        arrangement.accept(given(userService.update(uuid, given)));
+
+        // Act
+        return mvc.perform(put("/users/" + uuid)
+                .contentType("application/json")
+                .content(asString));
+    }
     @Test
     @DisplayName("qbGyHUhESg: Given POST on /users with valid data as manager, then return 201")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
@@ -604,36 +634,34 @@ public class UserHttpTests {
     }
 
     @Test
-    @DisplayName("IZwUZRjxye: Given Put on /users/{uuid} with valid password, then return 201")
+    @DisplayName("IZwUZRjxye: Given Put on /users/{uuid} with valid password, then return 200")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void update_AsManager() throws Exception {
         // Arrange
         final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO;
         final User expected = userMapper.toEntity(userUUIDLessDTO);
-        final String asString = objectMapper.writeValueAsString(userUUIDLessDTO);
-        //Act & Assert
-        mvc.perform(put("/users/" + VALID_USER.getUuid())
-                .contentType("application/json")
-                .content(asString)).andExpect(status().isOk());
 
-        verify(userController, times(1)).update(VALID_USER.getUuid(), userUUIDLessDTO);
-    }
+        updateWith(VALID_UUID, userUUIDLessDTO, expected)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
+
+        verify(userService, times(1)).update(VALID_UUID, userUUIDLessDTO);
+
+   }
     @Test
     @DisplayName("glqabkOIZD: Given Put on /users/{uuid} with blank password, then return 400")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void update_AsManager_BlankPassword() throws Exception{
         // Arrange
-        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder().password("").build();
-        final String asString = objectMapper.writeValueAsString(userUUIDLessDTO);
-        // Act & Assert
-        mvc.perform(put("/users/" + VALID_USER.getUuid())
-                .contentType("application/json")
-                .content(asString)).andExpect(status().isOk())
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .password("")
+                .build();
+        updateWith(VALID_UUID, userUUIDLessDTO, (User) null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"));
 
-
-        verify(userController, never()).update(VALID_USER.getUuid(), userUUIDLessDTO);
+        verify(userService, never()).update(VALID_UUID, userUUIDLessDTO);
     }
 
     @Test
@@ -642,16 +670,11 @@ public class UserHttpTests {
     void update_AsManager_InvalidPassword() throws Exception {
 
         final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder().password("a").build();
-        final String asString = objectMapper.writeValueAsString(userUUIDLessDTO);
-        // Act & Assert
-        mvc.perform(put("/users/" + VALID_USER.getUuid())
-                        .contentType("application/json")
-                        .content(asString)).andExpect(status().isOk())
+        updateWith(VALID_UUID, userUUIDLessDTO, (User) null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"));
 
-
-        verify(userController, never()).update(VALID_USER.getUuid(), userUUIDLessDTO);
+        verify(userService, never()).update(VALID_UUID, userUUIDLessDTO);
     }
     @Test
     @DisplayName("cxvatXCacZ: Given Put on /users/{uuid} with null password, then return 400")
@@ -659,16 +682,11 @@ public class UserHttpTests {
     void update_AsManager_NullPassword() throws Exception {
 
         final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder().password(null).build();
-        final String asString = objectMapper.writeValueAsString(userUUIDLessDTO);
-        // Act & Assert
-        mvc.perform(put("/users/" + VALID_USER.getUuid())
-                        .contentType("application/json")
-                        .content(asString)).andExpect(status().isOk())
+        updateWith(VALID_UUID, userUUIDLessDTO, (User) null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid request"));
 
-
-        verify(userController, never()).update(VALID_USER.getUuid(), userUUIDLessDTO);
+        verify(userService, never()).update(VALID_UUID, userUUIDLessDTO);
     }
 }
 

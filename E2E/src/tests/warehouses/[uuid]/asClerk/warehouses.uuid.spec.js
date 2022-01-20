@@ -10,6 +10,7 @@ const {
     MANAGER_USERNAME,
     MANAGER_PASSWORD,
 } = require("@lepine/e2e-config");
+const { waitForTitle } = require("@lepine/e2e-helpers/page");
 
 test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
     test.use({
@@ -40,6 +41,7 @@ test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
             baseWarehouse
         );
         uuid = data.uuid;
+        toClean.add(uuid);
     });
 
     test.afterAll(async ({ baseURL }) => {
@@ -55,9 +57,7 @@ test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
     }) => {
         // Go to /warehouses
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
-            ),
+            waitForTitle(page, "Warehouses"),
             page.goto("/warehouses"),
         ]);
 
@@ -74,7 +74,7 @@ test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
             if (!nextBtn) break;
 
             await Promise.all([
-                page.waitForNavigation({ waitUntil: "networkidle" }),
+                page.waitForResponse(/.*items.*/i),
                 nextBtn.click(),
             ]);
         } while (!warehouse);
@@ -83,9 +83,7 @@ test.describe.parallel("WQWEbbEeBW: Clerk /warehouses/[uuid] tests", () => {
 
         // Click on warehouse
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
-            ),
+            waitForTitle(page, "Warehouse Details"),
             warehouse.click(),
         ]);
 

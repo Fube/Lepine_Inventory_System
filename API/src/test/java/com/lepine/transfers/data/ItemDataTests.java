@@ -2,6 +2,7 @@ package com.lepine.transfers.data;
 
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
+import org.assertj.core.util.Throwables;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,11 +11,13 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 
 @DataJpaTest
@@ -30,7 +33,10 @@ class ItemDataTests {
         VALID_ITEM_SKU = "12345678";
 
     @Autowired
-    ItemRepo itemRepo;
+    private ItemRepo itemRepo;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
@@ -123,5 +129,37 @@ class ItemDataTests {
         assertEquals(updatedName, updated.getName());
         assertEquals(updatedDescription, updated.getDescription());
         assertEquals(updatedSKU, updated.getSku());
+    }
+
+    @Test
+    @DisplayName("kzehSYmQDB: Given duplicate SKU when save, then throw ConstraintViolationException")
+    void saveDuplicateSKU() {
+
+        // Arrange
+        final Item item1 = Item.builder()
+                .name(VALID_ITEM_NAME)
+                .description(VALID_ITEM_DESCRIPTION)
+                .sku(VALID_ITEM_SKU)
+                .build();
+
+        final Item item2 = Item.builder()
+                .name("Another-Name")
+                .description("Another-Description")
+                .sku(VALID_ITEM_SKU)
+                .build();
+
+        // Act & Assert
+        final Item save = itemRepo.save(item1);
+        final PersistenceException persistenceException =
+                assertThrows(PersistenceException.class, () -> {
+                    itemRepo.save(item2);
+                    entityManager.flush();
+                });
+
+        Throwable exception = Throwables.getRootCause(persistenceException);
+        assertThat(exception.getMessage()).contains("Unique");
+
+        entityManager.clear(); // So that count does not throw an exception
+        assertEquals(1, itemRepo.count());
     }
 }

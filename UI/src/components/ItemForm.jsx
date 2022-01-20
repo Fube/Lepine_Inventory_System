@@ -4,6 +4,7 @@ import {
     GenericForm,
     GenericFormInputErrorCombo,
     GenericSubmitButton,
+    GenericErrorStatus,
 } from "./FormikGenericComponents";
 
 /**
@@ -39,6 +40,7 @@ export default function ItemForm({
             >
                 {() => (
                     <GenericForm title="Item Details">
+                        <GenericErrorStatus />
                         <GenericFormInputErrorCombo
                             disabled={!editable}
                             name="name"

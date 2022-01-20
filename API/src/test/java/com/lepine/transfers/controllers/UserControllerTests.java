@@ -8,6 +8,8 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.data.warehouse.WarehouseUUIDLessDTO;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +43,8 @@ public class UserControllerTests {
     private static final String VALID_PASSWORD = "S0m3P@ssw0rd";
     private static final String INVALID_PASSWORD = "invalidpassword";
     private static final String VALID_ROLE_NAME = "SOME_ROLE";
-
+    private final static UUID
+            VALID_UUID = UUID.randomUUID();
     private static final UserUUIDLessDTO VALID_USER_DTO = UserUUIDLessDTO.builder()
             .email(VALID_EMAIL)
             .password(VALID_PASSWORD)
@@ -360,63 +363,73 @@ public class UserControllerTests {
         verify(userService, times(0)).findAll(any());
     }
     @Test
-    @DisplayName("pEEIjxtJre: Given user with empty password, then throw ConstrainViolationException")
-    void updateUser_emptyPassword() {
+    @DisplayName("pEEIjxtJre: Given user with valid password, then update user")
+    void updateUser_validPassword() {
 
         // Arrange
         UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
-                .password(INVALID_PASSWORD)
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .role(VALID_ROLE_NAME)
                 .build();
-
+        given(userService.update(VALID_UUID, userUUIDLessDTO))
+                .willReturn(User.builder()
+                        .uuid(VALID_UUID)
+                        .email(VALID_EMAIL)
+                        .password(VALID_PASSWORD)
+                        .role(VALID_ROLE)
+                        .build());
         // Act
-        ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> userController.update(VALID_USER.getUuid(),userUUIDLessDTO));
+        final User updated= userController.update(VALID_UUID,userUUIDLessDTO);
 
         // Assert
-        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
-        assertThat(collect).containsExactly(
-                "Password must be at least 8 characters long, include a number, include a capital letter, include a special character");
+        assertThat(updated.getUuid()).isEqualTo(VALID_UUID);
+        assertThat(updated.getEmail()).isEqualTo(VALID_EMAIL);
+        assertThat(updated.getPassword()).isEqualTo(VALID_PASSWORD);
+        assertThat(updated.getRole()).isEqualTo(VALID_ROLE);
 
-        verify(userService, times(0)).update(VALID_USER.getUuid(),userUUIDLessDTO);
+        verify(userService, atMostOnce()).update(VALID_UUID, userUUIDLessDTO);
     }
     @Test
     @DisplayName("OLKtEHHQMS: Given user with invalid password, then throw ConstrainViolationException")
     void updateUser_invalidPassword() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+        final UserUUIDLessDTO user = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
                 .password(INVALID_PASSWORD)
+                .role(VALID_ROLE_NAME)
                 .build();
 
         // Act
-        ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> userController.update(VALID_USER.getUuid(),userUUIDLessDTO));
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> userController.update(VALID_UUID, user));
 
         // Assert
-        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
-        assertThat(collect).containsExactly(
-                "Password must be at least 8 characters long, include a number, include a capital letter, include a special character");
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly("Password must be at least 8 characters long, include a number, include a capital letter, include a special character");
 
-        verify(userService, times(0)).update(VALID_USER.getUuid(),userUUIDLessDTO);
+        verify(userService, never()).update(any(), any());
     }
     @Test
     @DisplayName("fKzJIgEwqI: Given user with null password, then throw ConstrainViolationException")
     void updateUser_nullPassword() {
 
         // Arrange
-        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
-                .password(INVALID_PASSWORD)
+        final UserUUIDLessDTO user = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password(null)
+                .role(VALID_ROLE_NAME)
                 .build();
 
         // Act
-        ConstraintViolationException exception =
-                assertThrows(ConstraintViolationException.class, () -> userController.update(VALID_USER.getUuid(),userUUIDLessDTO));
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> userController.update(VALID_UUID, user));
 
         // Assert
-        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(exception);
-        assertThat(collect).containsExactly(
-                "Password must be at least 8 characters long, include a number, include a capital letter, include a special character");
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly("Password must not be blank");
 
-        verify(userService, times(0)).update(VALID_USER.getUuid(),userUUIDLessDTO);
+        verify(userService, never()).update(any(), any());
     }
 }

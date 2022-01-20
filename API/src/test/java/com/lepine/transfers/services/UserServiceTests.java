@@ -9,6 +9,8 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.data.warehouse.WarehouseUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.exceptions.user.RoleNotFoundException;
 import com.lepine.transfers.services.user.UserService;
@@ -26,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import java.util.*;
 import java.util.function.Function;
 
@@ -370,50 +373,100 @@ public class UserServiceTests {
         verify(userRepo, times(0)).save(any());
     }
     @Test
-    @DisplayName("sfVCiSxtkx: Given UserUUIDLessDTO with invalid password on update, then throw ConstraintViolationException")
-    void update_InvalidPassword(){
-        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
-                .password(INVALID_PASSWORD)
+    @DisplayName("PUzjTTvnin: Given UserUUIDLessDTO with invalid password on create, then throw ConstraintViolationException")
+    void update_ValidPassword() {
+
+        // Arrange
+        final User user = User.builder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .role(VALID_ROLE)
                 .build();
 
+        final UserUUIDLessDTO toUpdate = VALID_USER_DTO.builder()
+                .password(VALID_PASSWORD + "1")
+                .build();
+
+        final User expectedUser = User.builder()
+                .uuid(user.getUuid())
+                .password(toUpdate.getPassword())
+                .email(toUpdate.getEmail())
+                .role((user.getRole()))
+                .build();
+
+        when(userRepo.save(argThat(w -> w.getUuid().equals(user.getUuid()))))
+                .thenReturn(expectedUser);
+
         // Act
-        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+        final User updated = userService.update(user.getUuid(), toUpdate);
 
         // Assert
-        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
-        assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_valid"));
+        assertThat(updated.getUuid()).isEqualTo(user.getUuid());
 
-        verify(userRepo, times(0)).save(any());
+        verify(userRepo).save(argThat(w -> w.getUuid().equals(user.getUuid())));
     }
     @Test
-    @DisplayName("TQhrxPhekh: Given UserUUIDLessDTO with empty password on update, then throw ConstraintViolationException")
-    void update_EmptyPassword(){
+    @DisplayName("sfVCiSxtkx: Given UserUUIDLessDTO with invalid password on update, then throw ConstraintViolationException")
+    void update_InvalidPassword(){
+
+        final User user = User.builder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .role(VALID_ROLE)
+                .build();
         final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
                 .password(INVALID_PASSWORD)
+                .role(VALID_ROLE_NAME)
                 .build();
 
         // Act
-        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.update(user.getUuid(),userUUIDLessDTO));
 
         // Assert
-        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
-        assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_valid"));
+        assertEquals(format("update.userUUIDLessDTO.password: Password must be at least 8 characters long, include a number, include a capital letter, include a special character"), cve.getMessage());
+
+        verify(userRepo, never()).save(any());
+    }
+    @Test
+    @DisplayName("TQhrxPhekh: Given UserUUIDLessDTO with blank password on update, then throw ConstraintViolationException")
+    void update_EmptyPassword(){
+        final User user = User.builder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .role(VALID_ROLE)
+                .build();
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
+                .password(" ")
+                .role(VALID_ROLE_NAME)
+                .build();
+
+        // Act
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.update(user.getUuid(),userUUIDLessDTO));
+             // Assert
+        assertEquals(format("update.userUUIDLessDTO.password: Password must not be blank, update.userUUIDLessDTO.password: Password must be at least 8 characters long, include a number, include a capital letter, include a special character"), cve.getMessage());
 
         verify(userRepo, times(0)).save(any());
     }
     @Test
     @DisplayName("eOQLRoUrIH: Given UserUUIDLessDTO with null password on update, then throw ConstraintViolationException")
     void update_NullPassword(){
+        final User user = User.builder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .role(VALID_ROLE)
+                .build();
         final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
-                .password(INVALID_PASSWORD)
+                .email(VALID_EMAIL)
+                .password(null)
+                .role(VALID_ROLE_NAME)
                 .build();
 
         // Act
-        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.create(userUUIDLessDTO));
-
+        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.update(user.getUuid(),userUUIDLessDTO));
         // Assert
-        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(cve);
-        assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_valid"));
+        assertEquals(format("update.userUUIDLessDTO.password: Password must not be blank"), cve.getMessage());
 
         verify(userRepo, times(0)).save(any());
     }

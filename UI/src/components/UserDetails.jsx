@@ -21,8 +21,13 @@ export default function UserDetails({
     handleSubmit = () => {},
                                  }) {
     const userSchema = yup.object().shape({
-        email: yup.string().required("Email is required"),
-        password: yup.string().required("Password is required"),
+        email: yup.string().email("Must be a valid email").required("Email is required"),
+        password: yup.string().strongPassword().required("Password is required"),
+        confirmPassword: yup
+            .string()
+            .test("passwords-match", "Passwords must match", function (value) {
+                return this.parent.password === value;
+            }),
     });
 
     return (
@@ -48,13 +53,13 @@ export default function UserDetails({
                         <GenericFormInputErrorCombo
                             disabled={!editable}
                             name="password"
-                            type="text"
+                            type="password"
                             placeholder="Password"
                         />
                         <GenericFormInputErrorCombo
                             disabled={!editable}
-                            name="Confirm password"
-                            type="text"
+                            name="confirmPassword"
+                            type="password"
                             placeholder="Confirm Password"
                         />
 

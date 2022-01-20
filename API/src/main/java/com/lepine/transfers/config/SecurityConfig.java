@@ -55,9 +55,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                     .antMatchers("/users/**").hasRole("MANAGER")
-                    .antMatchers(POST, "/items", "/warehouses").hasRole("MANAGER")
-                    .antMatchers(PUT, "/items/*", "/warehouses/*").hasRole("MANAGER")
-                    .antMatchers(DELETE, "/items/*", "/warehouses/*").hasRole("MANAGER");
+                    .antMatchers(POST, "/items", "/warehouses", "/stocks").hasRole("MANAGER")
+                    .antMatchers(PUT, "/items/*", "/warehouses/*", "/stocks/*").hasRole("MANAGER")
+                    .antMatchers(DELETE, "/items/*", "/warehouses/*", "/stocks/*").hasRole("MANAGER");
 
 
         for(Map.Entry<HttpMethod, List<String>> entry : whiteListByMethod.entrySet()) {
