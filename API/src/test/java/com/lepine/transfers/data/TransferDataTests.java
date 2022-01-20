@@ -201,4 +201,23 @@ public class TransferDataTests {
         assertThat(foundShipment.getOrderNumber()).isEqualTo(savedShipment.getOrderNumber());
         assertThat(foundShipment.getTransfers()).isEqualTo(savedShipment.getTransfers());
     }
+
+    @Test
+    @DisplayName("mPpQQivugk: Given find on shipment, retrieve all transfers related to it")
+    void findOne_ValidFetch() {
+
+        // Arrange
+        final Shipment shipment = VALID_SHIPMENT.toBuilder()
+                .transfers(List.of(VALID_TRANSFER.toBuilder().build()))
+                .build();
+
+        final Shipment savedShipment = shipmentRepo.save(shipment);
+        entityManager.flush();
+
+        // Act
+        final Shipment foundShipment = shipmentRepo.findById(savedShipment.getUuid()).get();
+
+        // Assert
+        assertThat(foundShipment.getTransfers()).isEqualTo(savedShipment.getTransfers());
+    }
 }
