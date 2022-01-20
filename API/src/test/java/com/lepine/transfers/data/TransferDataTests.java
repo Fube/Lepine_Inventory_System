@@ -177,4 +177,28 @@ public class TransferDataTests {
         assertThat(shipmentRepo.count()).isEqualTo(0);
         assertThat(transferRepo.count()).isEqualTo(0);
     }
+
+    @Test
+    @DisplayName("ITIFJpMZQI: Given shipment with no transfers, persist")
+    void save_NoTransfers() {
+
+        // Arrange
+        final Shipment shipment = VALID_SHIPMENT.toBuilder()
+                .transfers(List.of())
+                .build();
+
+        // Act
+        final Shipment savedShipment = shipmentRepo.save(shipment);
+        entityManager.flush();
+
+        // Assert
+        assertThat(savedShipment).isNotNull();
+
+        assertThat(shipmentRepo.count()).isEqualTo(1);
+        final Shipment foundShipment = shipmentRepo.findById(savedShipment.getUuid()).get();
+        assertThat(foundShipment.getStatus()).isEqualTo(savedShipment.getStatus());
+        assertThat(foundShipment.getExpectedDate()).isEqualTo(savedShipment.getExpectedDate());
+        assertThat(foundShipment.getOrderNumber()).isEqualTo(savedShipment.getOrderNumber());
+        assertThat(foundShipment.getTransfers()).isEqualTo(savedShipment.getTransfers());
+    }
 }
