@@ -4,9 +4,12 @@ import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatus;
+import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.Transfer;
+import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.services.shipment.ShipmentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(classes = {
@@ -69,18 +73,21 @@ public class ShipmentServiceTests {
             .quantity(VALID_STOCK_QUANTITY)
             .build();
 
-
-
     private final static UUID
             VALID_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_ITEM_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID(),
             VALID_SHIPMENT_UUID = UUID.randomUUID();
 
-    private final static ShipmentStatusLessUUIDLessDTO shipmentStatusLessUUIDLessDTO = ShipmentStatusLessUUIDLessDTO.builder()
+    private final static TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
+            .stockUuid(VALID_STOCK_UUID)
+            .quantity(VALID_STOCK_QUANTITY)
+            .build();
+
+    private final static ShipmentStatusLessUuidLessDTO VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO = ShipmentStatusLessUuidLessDTO.builder()
             .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
-            .transfers(List.of(VALID_TRANSFER))
+            .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
             .build();
 
     @Autowired
@@ -100,7 +107,7 @@ public class ShipmentServiceTests {
         given(shipmentRepo.save(VALID_SHIPMENT)).willReturn(VALID_SHIPMENT);
 
         // Act
-        Shipment shipment = shipmentService.create(shipmentStatusLessUUIDLessDTO);
+        Shipment shipment = shipmentService.create(VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO);
 
         // Assert
         assertThat(shipment).isEqualTo(VALID_SHIPMENT);
