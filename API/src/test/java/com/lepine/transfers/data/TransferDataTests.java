@@ -27,7 +27,7 @@ import java.util.UUID;
 @DataJpaTest
 @ActiveProfiles({"test"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ShipmentDataTests {
+public class TransferDataTests {
 
     private final static String
         VALID_WAREHOUSE_ZIP_CODE = "A1B2C3",
