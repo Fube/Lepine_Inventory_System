@@ -111,10 +111,6 @@ public class ShipmentDataTests {
         VALID_STOCK_UUID = stockRepo.save(VALID_STOCK.toBuilder().build()).getUuid();
         entityManager.flush();
         VALID_STOCK.setUuid(VALID_STOCK_UUID);
-
-        VALID_TRANSFER_UUID = transferRepo.save(VALID_TRANSFER.toBuilder().build()).getUuid();
-        entityManager.flush();
-        VALID_TRANSFER.setUuid(VALID_TRANSFER_UUID);
     }
 
     @AfterEach
