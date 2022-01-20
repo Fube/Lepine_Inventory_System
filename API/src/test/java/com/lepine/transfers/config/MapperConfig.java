@@ -1,6 +1,7 @@
 package com.lepine.transfers.config;
 
 import com.lepine.transfers.data.item.ItemMapper;
+import com.lepine.transfers.data.stock.StockMapper;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.warehouse.WarehouseMapper;
 import org.mapstruct.factory.Mappers;
@@ -22,5 +23,10 @@ public class MapperConfig {
     @Bean
     public WarehouseMapper getWarehouseMapper() {
         return Mappers.getMapper(WarehouseMapper.class);
+    }
+
+    @Bean
+    public StockMapper getStockMapper() {
+        return Mappers.getMapper(StockMapper.class);
     }
 }

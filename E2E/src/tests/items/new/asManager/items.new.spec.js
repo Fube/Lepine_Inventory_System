@@ -6,6 +6,7 @@ const {
 const { createItem } = require("@lepine/e2e-helpers/items");
 const { MANAGER_PASSWORD, MANAGER_USERNAME } = require("@lepine/e2e-config");
 const RandExp = require("randexp");
+const { waitForTitle } = require("@lepine/e2e-helpers/page");
 
 test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
     const toClean = new Set();
@@ -90,9 +91,7 @@ test.describe.parallel("LGknOhhxOS: Manager /items/new tests", async () => {
         }) => {
             // Go to /items/new
             await Promise.all([
-                page.waitForFunction(
-                    () => document?.querySelector("title")?.text === "Add Item"
-                ),
+                waitForTitle(page, "Add Item"),
                 page.goto("/items/new"),
             ]);
 

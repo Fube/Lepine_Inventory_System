@@ -39,14 +39,4 @@ test("/items :: Go to through nav", async ({ page }) => {
         const plusBtn = await page.$("thead tr th:last-child > button");
         expect(plusBtn).toBeTruthy();
     }
-
-    // Check "Items" in nav is active
-    const navItemsActive = await page.$$(
-        "html > body > div > div  a.btn.btn-ghost.text-blue-400[href]"
-    );
-
-    expect(navItemsActive.length).toBe(1);
-    const active = await navItemsActive[0];
-    expect(await (await active.textContent()).toLowerCase()).toBe("items");
-    expect(await active.getAttribute("href")).toBe("/items");
 });

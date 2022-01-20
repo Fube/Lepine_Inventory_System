@@ -7,7 +7,7 @@ const {
     MANAGER_PASSWORD,
 } = require("@lepine/e2e-config");
 const { createItem, deleteItem } = require("@lepine/e2e-helpers/api/items");
-const { clearThenType } = require("@lepine/e2e-helpers/page");
+const { clearThenType, waitForTitle } = require("@lepine/e2e-helpers/page");
 const RandExp = require("randexp");
 
 test.describe.parallel("BrLGZduqdM: Manager /items/[uuid] tests", () => {
@@ -34,9 +34,7 @@ test.describe.parallel("BrLGZduqdM: Manager /items/[uuid] tests", () => {
 
         // Go to item's page
         await Promise.all([
-            page.waitForFunction(
-                () => document?.querySelector("title")?.text == "Item Details"
-            ),
+            waitForTitle(page, "Item Details"),
             page.goto(`/items/${uuid}`),
         ]);
     });
@@ -176,10 +174,7 @@ test.describe.parallel("BrLGZduqdM: Manager /items/[uuid] tests", () => {
         }) => {
             // Change to other item
             await Promise.all([
-                page.waitForFunction(
-                    () =>
-                        document?.querySelector("title")?.text == "Item Details"
-                ),
+                waitForTitle(page, "Item Details"),
                 page.goto(`/items/${uuid}`),
             ]);
 

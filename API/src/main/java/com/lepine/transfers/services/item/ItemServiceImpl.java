@@ -4,10 +4,14 @@ import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.events.item.ItemDeleteEvent;
+import com.lepine.transfers.events.item.ItemUpdateEvent;
 import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.services.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -19,11 +23,12 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ItemServiceImpl implements ItemService {
+public class ItemServiceImpl implements ItemService, ApplicationEventPublisherAware {
 
     private final ItemRepo itemRepo;
     private final SearchService<ItemSearchDTO, UUID> searchService;
     private final ItemMapper itemMapper;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Page<Item> findAll() {
@@ -77,6 +82,9 @@ public class ItemServiceImpl implements ItemService {
         searchService.index(itemMapper.toSearchDTO(updated));
         log.info("sent item to search service");
 
+        log.info("Publish item update event");
+        applicationEventPublisher.publishEvent(new ItemUpdateEvent(this, updated));
+
         return updated;
     }
 
@@ -84,6 +92,10 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public void delete(UUID uuid) {
         log.info("deleting item");
+
+        log.info("Publish item delete event");
+        applicationEventPublisher.publishEvent(new ItemDeleteEvent(this, uuid));
+
         final Integer deleted = itemRepo.deleteByUuid(uuid);
         if(deleted <= 0) {
             log.info("item not found");
@@ -103,5 +115,10 @@ public class ItemServiceImpl implements ItemService {
         log.info("retrieved item");
 
         return item;
+    }
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 }

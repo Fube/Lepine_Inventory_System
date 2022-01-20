@@ -30,3 +30,10 @@ export type User = {
     email: string;
     role: string;
 };
+
+export type Stock={
+    uuid: string;
+    item: Item;
+    warehouse: Warehouse;
+    quantity: number;
+};

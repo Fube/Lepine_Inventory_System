@@ -4,8 +4,9 @@ import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.events.item.ItemDeleteEvent;
+import com.lepine.transfers.events.item.ItemUpdateEvent;
 import com.lepine.transfers.exceptions.item.DuplicateSkuException;
-import com.lepine.transfers.services.item.ItemService;
 import com.lepine.transfers.services.item.ItemServiceImpl;
 import com.lepine.transfers.services.search.SearchService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,11 +38,14 @@ public class ItemServiceTests {
 
     private final static String ERROR_FORMAT_DUPLICATE_SKU = "Item with SKU %s already exists";
 
+    @Autowired
+    private ItemServiceImpl itemService;
+
     @MockBean
     private ItemRepo itemRepo;
 
-    @Autowired
-    private ItemService itemService;
+    @MockBean
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @MockBean
     private SearchService<ItemSearchDTO, UUID> searchService;
@@ -50,6 +55,8 @@ public class ItemServiceTests {
 
     @BeforeEach
     void setup() {
+        itemService.setApplicationEventPublisher(applicationEventPublisher);
+        reset(itemRepo, applicationEventPublisher, searchService);
         itemRepo.deleteAllInBatch();
     }
 
@@ -150,6 +157,7 @@ public class ItemServiceTests {
                 .sku("SKU")
                 .description("description")
                 .build();
+
         doNothing().when(searchService).index(any(ItemSearchDTO.class));
         given(itemRepo.save(item)).willReturn(item);
 
@@ -160,9 +168,11 @@ public class ItemServiceTests {
         assertEquals(item.getName(), saved.getName());
         assertEquals(item.getSku(), saved.getSku());
         assertEquals(item.getDescription(), saved.getDescription());
+
         verify(itemRepo, times(1)).save(item);
         verify(searchService, times(1))
                 .index(any(ItemSearchDTO.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(ItemUpdateEvent.class));
     }
 
     @Test
@@ -180,6 +190,7 @@ public class ItemServiceTests {
         // Assert
         verify(searchService, times(1))
                 .delete(uuid);
+        verify(applicationEventPublisher, times(1)).publishEvent(any(ItemDeleteEvent.class));
     }
 
     @Test
@@ -197,6 +208,7 @@ public class ItemServiceTests {
         // Assert
         verify(searchService, never())
                 .delete(uuid);
+        verify(applicationEventPublisher, times(1)).publishEvent(any(ItemDeleteEvent.class));
     }
 
     @Test
