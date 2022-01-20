@@ -30,7 +30,8 @@ public class Shipment {
     @Column(name = "status")
     private ShipmentStatus status = ShipmentStatus.PENDING;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "shipment_uuid", referencedColumnName = "uuid", nullable = false)
     private List<Transfer> transfers;
 
     private Date expectedDate;

@@ -1,5 +1,6 @@
 package com.lepine.transfers.data.transfer;
 
+import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.stock.Stock;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;

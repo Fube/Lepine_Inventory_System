@@ -13,6 +13,7 @@ import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -23,6 +24,8 @@ import javax.persistence.EntityManager;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles({"test"})
@@ -62,22 +65,24 @@ public class TransferDataTests {
             .quantity(VALID_STOCK_QUANTITY)
             .build();
 
+    private final static Shipment VALID_SHIPMENT = Shipment.builder()
+            .status(VALID_SHIPMENT_STATUS)
+            .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
+            .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
+            .build();
+
     private final static Transfer VALID_TRANSFER = Transfer.builder()
             .stock(VALID_STOCK)
             .quantity(VALID_STOCK_QUANTITY)
             .build();
 
-    private final static Shipment VALID_SHIPMENT = Shipment.builder()
-            .status(VALID_SHIPMENT_STATUS)
-            .transfers(List.of(VALID_TRANSFER))
-            .build();
 
 
     private UUID
         VALID_WAREHOUSE_UUID,
         VALID_ITEM_UUID,
         VALID_STOCK_UUID,
-        VALID_TRANSFER_UUID;
+        VALID_SHIPMENT_UUID;
 
     @Autowired
     private EntityManager entityManager;
@@ -121,5 +126,35 @@ public class TransferDataTests {
         stockRepo.deleteAll();
         itemRepo.deleteAll();
         warehouseRepo.deleteAll();
+    }
+
+    @Test
+    @DisplayName("unLLLtcFVh: Given valid shipment, persist")
+    void save_Valid() {
+
+        // Arrange
+        final Shipment shipment = VALID_SHIPMENT.toBuilder()
+                .transfers(List.of(VALID_TRANSFER.toBuilder().build()))
+                .build();
+
+        // Act
+        final Shipment savedShipment = shipmentRepo.save(shipment);
+        entityManager.flush();
+
+        // Assert
+        assertThat(savedShipment).isNotNull();
+
+        assertThat(shipmentRepo.count()).isEqualTo(1);
+        final Shipment foundShipment = shipmentRepo.findById(savedShipment.getUuid()).get();
+        assertThat(foundShipment.getStatus()).isEqualTo(savedShipment.getStatus());
+        assertThat(foundShipment.getExpectedDate()).isEqualTo(savedShipment.getExpectedDate());
+        assertThat(foundShipment.getOrderNumber()).isEqualTo(savedShipment.getOrderNumber());
+        assertThat(foundShipment.getTransfers()).isEqualTo(savedShipment.getTransfers());
+
+        assertThat(transferRepo.count()).isEqualTo(shipment.getTransfers().size());
+        final Transfer targetTransfer = shipment.getTransfers().get(0);
+        final Transfer foundTransfer = transferRepo.findAll().get(0);
+        assertThat(foundTransfer.getStock().getUuid()).isEqualTo(targetTransfer.getStock().getUuid());
+        assertThat(foundTransfer.getQuantity()).isEqualTo(targetTransfer.getQuantity());
     }
 }
