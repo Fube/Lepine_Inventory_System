@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @ActiveProfiles({"test"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class TransferDataTests {
+public class ShipmentTransferDataTests {
 
     private final static String
         VALID_WAREHOUSE_ZIP_CODE = "A1B2C3",
