@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,10 +25,15 @@ public class Shipment {
     @Id
     private UUID uuid = UUID.randomUUID();
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private ShipmentStatus status;
+    private ShipmentStatus status = ShipmentStatus.PENDING;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.PERSIST)
     private List<Transfer> transfers;
+
+    private Date expectedDate;
+
+    private String orderNumber;
 }
