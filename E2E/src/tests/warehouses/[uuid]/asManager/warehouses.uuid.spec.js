@@ -10,7 +10,7 @@ const {
     MANAGER_USERNAME,
     MANAGER_PASSWORD,
 } = require("@lepine/e2e-config");
-const { clearThenType } = require("@lepine/e2e-helpers/page");
+const { clearThenType, waitForTitle } = require("@lepine/e2e-helpers/page");
 
 test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
     let uuid = null;
@@ -55,9 +55,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
     }) => {
         // Go to /warehouses
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
-            ),
+            waitForTitle(page, "Warehouses"),
             page.goto("/warehouses"),
         ]);
 
@@ -83,9 +81,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
 
         // Click on warehouse
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
-            ),
+            waitForTitle(page, "Warehouse Details"),
             warehouse.click(),
         ]);
 
@@ -115,18 +111,14 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
     }) => {
         // Go to /warehouses
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
-            ),
+            waitForTitle(page, "Warehouse Details"),
             page.goto(`/warehouses/${uuid}`),
         ]);
 
         // Click delete
         const deleteBtn = page.locator("* button:last-of-type");
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
-            ),
+            waitForTitle(page, "Warehouses"),
             deleteBtn.click(),
         ]);
     });
@@ -136,9 +128,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
     }) => {
         // Go to /warehouses
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
-            ),
+            waitForTitle(page, "Warehouse Details"),
             page.goto(`/warehouses/${uuid}`),
         ]);
 
@@ -167,12 +157,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         expect(await saveBtn.isEnabled()).toBe(true);
 
         // Click save
-        await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
-            ),
-            saveBtn.click(),
-        ]);
+        await Promise.all([waitForTitle(page, "Warehouses"), saveBtn.click()]);
 
         // Check it is the expected page
         const title = await page.title();
@@ -180,9 +165,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
 
         // Go back to warehouse
         await Promise.all([
-            page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouse Details"
-            ),
+            waitForTitle(page, "Warehouse Details"),
             page.goto(`/warehouses/${uuid}`),
         ]);
 
@@ -222,11 +205,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /warehouses/[uuid] tests", () => {
         }) => {
             // Go to /warehouses/[uuid]
             await Promise.all([
-                page.waitForFunction(
-                    () =>
-                        document.querySelector`title`.text ===
-                        "Warehouse Details"
-                ),
+                waitForTitle(page, "Warehouse Details"),
                 page.goto(`/warehouses/${preUuid}`),
             ]);
 
