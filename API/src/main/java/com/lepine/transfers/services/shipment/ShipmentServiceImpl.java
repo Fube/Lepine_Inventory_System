@@ -46,6 +46,17 @@ public class ShipmentServiceImpl implements ShipmentService {
         warehouseService.findByUuid(to)
                 .orElseThrow(() -> new WarehouseNotFoundException(to));
 
+        verifyStockExistence(shipmentStatusLessUUIDLessDTO);
+
+        final Shipment shipment = shipmentMapper.toEntity(shipmentStatusLessUUIDLessDTO);
+        final Shipment saved = shipmentRepo.save(shipment);
+
+        log.info("Shipment with order number {} created as {}", saved.getOrderNumber(), saved.getUuid());
+
+        return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
+    }
+
+    private void verifyStockExistence(ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO) {
         log.info("Checking for existence of all stocks");
 
         final List<TransferUuidLessDTO> uuidLessDTOTransfers = shipmentStatusLessUUIDLessDTO.getTransfers();
@@ -69,13 +80,6 @@ public class ShipmentServiceImpl implements ShipmentService {
                 throw new StockTooLowException(stock.getUuid(), uuidLessDTOTransfer.getQuantity(), stock.getQuantity());
             }
         }
-
-        final Shipment shipment = shipmentMapper.toEntity(shipmentStatusLessUUIDLessDTO);
-        final Shipment saved = shipmentRepo.save(shipment);
-
-        log.info("Shipment with order number {} created as {}", saved.getOrderNumber(), saved.getUuid());
-
-        return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
     }
 
     @Override
