@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class Shipment {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "shipment_uuid", referencedColumnName = "uuid", nullable = false)
     @Builder.Default
-    private List<Transfer> transfers = Collections.emptyList();
+    private List<Transfer> transfers = new ArrayList<>(0);
 
     private LocalDate expectedDate;
     private String orderNumber;
