@@ -127,6 +127,11 @@ public class StockServiceImpl implements StockService, ItemUpdateHandler, ItemDe
     }
 
     @Override
+    public void findByUuidIn(List<UUID> uuids) {
+
+    }
+
+    @Override
     public void onItemDelete(ItemDeleteEvent event) {
         log.info("Reacting to item delete");
         deleteSearchIndexFor(event.getUuid());
