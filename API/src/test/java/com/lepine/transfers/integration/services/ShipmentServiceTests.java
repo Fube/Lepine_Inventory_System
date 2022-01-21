@@ -16,6 +16,7 @@ import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.services.shipment.ShipmentService;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,11 +25,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.validation.ConstraintViolationException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -180,5 +185,21 @@ public class ShipmentServiceTests {
 
         // Assert
         objectMapper.writeValueAsString(shipment);
+    }
+
+    @Test
+    @DisplayName("tVFtvgHnSY: Given DTO with date that is not at least 3 business days from now when create, then throw ConstraintViolationException")
+    void invalid_Create_ExpectedDate_NotAtLeast3BusinessDaysFromNow() {
+
+        // Arrange
+        ShipmentStatusLessUuidLessDTO invalidDTO = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder()
+                .expectedDate(LocalDate.now())
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> shipmentService.create(invalidDTO));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly("Expected date must be at least 3 business days from now");
     }
 }
