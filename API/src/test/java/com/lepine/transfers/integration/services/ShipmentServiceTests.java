@@ -17,6 +17,7 @@ import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
+import com.lepine.transfers.utils.MessageSourceUtils;
 import com.lepine.transfers.utils.date.LocalDateUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,14 +25,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -100,6 +104,8 @@ public class ShipmentServiceTests {
             .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
             .build();
 
+    private String SHIPMENT_EXPECTED_DATE_TOO_EARLY_ERROR_MESSAGE_LOCATOR = "shipment.expected.date.too.early";
+
     @Autowired
     private ShipmentService shipmentService;
 
@@ -120,6 +126,9 @@ public class ShipmentServiceTests {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
 
     @Test
     void contextLoads() {}
@@ -200,6 +209,9 @@ public class ShipmentServiceTests {
         final ConstraintViolationException constraintViolationException =
                 assertThrows(ConstraintViolationException.class, () -> shipmentService.create(invalidDTO));
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
-        assertThat(collect).containsExactly("Expected date must be at least 3 business days from now");
+
+        final String interpolatedMessage = messageSource.getMessage(SHIPMENT_EXPECTED_DATE_TOO_EARLY_ERROR_MESSAGE_LOCATOR, null, Locale.getDefault())
+                .replace("{days}", "3");
+        assertThat(collect).containsExactly(interpolatedMessage);
     }
 }
