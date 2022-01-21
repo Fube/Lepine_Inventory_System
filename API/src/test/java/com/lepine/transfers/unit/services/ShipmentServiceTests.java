@@ -5,9 +5,11 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.services.shipment.ShipmentServiceImpl;
 import com.lepine.transfers.services.stock.StockService;
+import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.date.LocalDateUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -19,13 +21,12 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(classes = {
         ShipmentServiceImpl.class,
@@ -66,6 +67,9 @@ public class ShipmentServiceTests {
     @MockBean
     private StockService stockService;
 
+    @MockBean
+    private WarehouseService warehouseService;
+
     @Test
     void contextLoads() {}
 
@@ -86,5 +90,26 @@ public class ShipmentServiceTests {
         final String interpolatedMessage = messageSource.getMessage(SHIPMENT_EXPECTED_DATE_TOO_EARLY_ERROR_MESSAGE_LOCATOR, null, Locale.getDefault())
                 .replace("{days}", "3");
         assertThat(collect).containsExactly(interpolatedMessage);
+    }
+
+    @Test
+    @DisplayName("msClKIXpFT: Given DTO with 'to' warehouse that does not exist when create, then throw WarehouseNotFoundException")
+    void invalid_Create_ToWarehouse_NotExist() {
+
+        // Arrange
+        final UUID to = UUID.randomUUID();
+        ShipmentStatusLessUuidLessDTO invalidDTO = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder()
+                .to(to)
+                .build();
+
+        given(warehouseService.findByUuid(to)).willReturn(Optional.empty());
+
+        // Act
+        final WarehouseNotFoundException warehouseNotFoundException =
+                catchThrowableOfType(() -> shipmentService.create(invalidDTO), WarehouseNotFoundException.class);
+
+        // Assert
+        assertThat(warehouseNotFoundException.getMessage())
+                .isEqualTo(new WarehouseNotFoundException(to).getMessage());
     }
 }
