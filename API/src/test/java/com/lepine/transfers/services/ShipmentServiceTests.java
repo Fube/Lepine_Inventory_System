@@ -1,5 +1,7 @@
 package com.lepine.transfers.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.shipment.Shipment;
@@ -111,6 +113,9 @@ public class ShipmentServiceTests {
     @Autowired
     private WarehouseRepo warehouseRepo;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     void contextLoads() {}
 
@@ -164,5 +169,16 @@ public class ShipmentServiceTests {
                             .build())
                     .build()
                 );
+    }
+
+    @Test
+    @DisplayName("bGTFRzciVo: Given valid DTO when create, check result is Jackson serializable")
+    void valid_Create_JacksonSerializable() throws JsonProcessingException {
+
+        // Act
+        Shipment shipment = shipmentService.create(VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO);
+
+        // Assert
+        objectMapper.writeValueAsString(shipment);
     }
 }

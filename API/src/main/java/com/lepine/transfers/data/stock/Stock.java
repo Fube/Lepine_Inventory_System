@@ -1,5 +1,6 @@
 package com.lepine.transfers.data.stock;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import lombok.*;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Stock {
 
     @Builder.Default
