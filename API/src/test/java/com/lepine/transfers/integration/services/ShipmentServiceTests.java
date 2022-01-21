@@ -17,6 +17,7 @@ import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
+import com.lepine.transfers.utils.date.LocalDateUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +50,7 @@ public class ShipmentServiceTests {
 
     private final static ShipmentStatus VALID_SHIPMENT_STATUS = ShipmentStatus.PENDING;
 
-    private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDate.now().plusDays(3);
+    private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDateUtils.businessDaysFromNow(3);
 
     private final static int VALID_STOCK_QUANTITY = 10;
 
