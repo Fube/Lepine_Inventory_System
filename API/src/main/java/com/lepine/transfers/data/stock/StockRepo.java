@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public interface StockRepo extends JpaRepository<Stock, UUID> {
     int deleteByUuid(UUID dto);
-
     List<Stock> findByItemUuid(UUID itemUuid);
+    List<Stock> findByUuidIn(List<UUID> uuids);
 }
