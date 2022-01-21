@@ -127,8 +127,12 @@ public class StockServiceImpl implements StockService, ItemUpdateHandler, ItemDe
     }
 
     @Override
-    public void findByUuidIn(List<UUID> uuids) {
+    public List<Stock> findByUuidIn(List<UUID> uuids) {
+        log.info("Searching for stocks with UUIDs {}", uuids);
+        final List<Stock> stocks = stockRepo.findByUuidIn(uuids);
+        log.info("Found {} stocks", stocks.size());
 
+        return stocks;
     }
 
     @Override

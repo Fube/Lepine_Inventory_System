@@ -24,5 +24,5 @@ public interface StockService {
 
     void delete(UUID dto);
 
-    void findByUuidIn(List<UUID> uuids);
+    List<Stock> findByUuidIn(List<UUID> uuids);
 }
