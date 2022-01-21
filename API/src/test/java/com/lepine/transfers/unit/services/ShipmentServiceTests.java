@@ -139,7 +139,7 @@ public class ShipmentServiceTests {
 
         // Arrange
         ShipmentStatusLessUuidLessDTO invalidDTO = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder()
-                .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
+                .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO.toBuilder().quantity(0).build()))
                 .build();
 
         // Act & Assert
