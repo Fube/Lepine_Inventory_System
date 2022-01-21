@@ -256,7 +256,7 @@ public class ShipmentServiceTests {
         final int wantedQuantity = VALID_STOCK.getQuantity() + 1;
         final int givenQuantity = VALID_STOCK.getQuantity();
         final ShipmentStatusLessUuidLessDTO given = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder().transfers(
-                List.of(VALID_TRANSFER_UUID_LESS_DTO.toBuilder().stockUuid(VALID_STOCK_UUID).build()))
+                List.of(VALID_TRANSFER_UUID_LESS_DTO.toBuilder().quantity(wantedQuantity).build()))
                 .build();
 
         // Act
@@ -265,7 +265,7 @@ public class ShipmentServiceTests {
 
         // Assert
         assertThat(stockTooLowException)
-                .hasMessage(new StockTooLowException(VALID_STOCK_UUID, givenQuantity, wantedQuantity).getMessage());
+                .hasMessage(new StockTooLowException(VALID_STOCK_UUID, wantedQuantity, givenQuantity).getMessage());
     }
 
     @Test

@@ -7,6 +7,7 @@ import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
+import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.services.stock.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +54,12 @@ public class ShipmentServiceImpl implements ShipmentService {
                     .findAny();
 
             final Stock stock = any.orElseThrow(() -> new StockNotFoundException(uuidLessDTOTransfer.getStockUuid()));
+
+            if(stock.getQuantity() < uuidLessDTOTransfer.getQuantity()) {
+                log.info("Stock {} has {} quantity, but {} was requested",
+                        stock.getUuid(), stock.getQuantity(), uuidLessDTOTransfer.getQuantity());
+                throw new StockTooLowException(stock.getUuid(), uuidLessDTOTransfer.getQuantity(), stock.getQuantity());
+            }
         }
 
         final Shipment shipment = shipmentMapper.toEntity(shipmentStatusLessUUIDLessDTO);
