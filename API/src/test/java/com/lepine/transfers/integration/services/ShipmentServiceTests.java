@@ -20,6 +20,7 @@ import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
+import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.date.LocalDateUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -264,7 +265,7 @@ public class ShipmentServiceTests {
 
         // Assert
         assertThat(stockTooLowException)
-                .hasMessage(new StockTooLowException(VALID_STOCK, givenQuantity, wantedQuantity).getMessage());
+                .hasMessage(new StockTooLowException(VALID_STOCK_UUID, givenQuantity, wantedQuantity).getMessage());
     }
 
     @Test
