@@ -6,6 +6,7 @@ import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
+import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.services.stock.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,9 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,14 +38,21 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Creating shipment with order number {}", shipmentStatusLessUUIDLessDTO.getOrderNumber());
 
         log.info("Checking for existence of all stocks");
+
         final List<TransferUuidLessDTO> uuidLessDTOTransfers = shipmentStatusLessUUIDLessDTO.getTransfers();
-        final List<Stock> byUuidIn = stockService.findByUuidIn(
-                uuidLessDTOTransfers.parallelStream()
-                        .map(TransferUuidLessDTO::getStockUuid).collect(Collectors.toList()));
+        final List<UUID> uuidLessDTOTransfersMappedToStockUuid = uuidLessDTOTransfers.parallelStream()
+                .map(TransferUuidLessDTO::getStockUuid).collect(Collectors.toList());
+        final Set<Stock> byUuidIn = stockService.findByUuidIn(uuidLessDTOTransfersMappedToStockUuid);
+
         log.info("Found {} stocks", byUuidIn.size());
 
-        if (byUuidIn.size() != uuidLessDTOTransfers.size()) {
-            log.error("Found {} stocks but {} transfers", byUuidIn.size(), uuidLessDTOTransfers.size());
+        // NOTE: This can probably be optimized
+        for (TransferUuidLessDTO uuidLessDTOTransfer : uuidLessDTOTransfers) {
+            final Optional<Stock> any = byUuidIn.parallelStream()
+                    .filter(s -> s.getUuid().equals(uuidLessDTOTransfer.getStockUuid()))
+                    .findAny();
+
+            final Stock stock = any.orElseThrow(() -> new StockNotFoundException(uuidLessDTOTransfer.getStockUuid()));
         }
 
         final Shipment shipment = shipmentMapper.toEntity(shipmentStatusLessUUIDLessDTO);
