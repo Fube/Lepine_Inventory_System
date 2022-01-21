@@ -134,7 +134,7 @@ public class ShipmentServiceTests {
     }
 
     @Test
-    @DisplayName("pagination.size.min: Given DTO with quantity <= 0 when create, then throw ConstraintViolationException")
+    @DisplayName("VGnZujdvFJ: Given DTO with quantity <= 0 when create, then throw ConstraintViolationException")
     void invalid_Create_Quantity_LessThanOrEqualToZero() {
 
         // Arrange
