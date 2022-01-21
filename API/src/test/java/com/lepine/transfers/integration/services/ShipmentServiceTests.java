@@ -248,6 +248,26 @@ public class ShipmentServiceTests {
     }
 
     @Test
+    @DisplayName("vqENeTZanV: Given shipment with transfer quantity exceeding stock quantity when create, then throw StockTooLowException")
+    void transfer_quantity_exceeding_stock_quantity_Create() {
+
+        // Arrange
+        final int wantedQuantity = VALID_STOCK.getQuantity() + 1;
+        final int givenQuantity = VALID_STOCK.getQuantity();
+        final ShipmentStatusLessUuidLessDTO given = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder().transfers(
+                List.of(VALID_TRANSFER_UUID_LESS_DTO.toBuilder().stockUuid(VALID_STOCK_UUID).build()))
+                .build();
+
+        // Act
+        final StockTooLowException stockTooLowException = catchThrowableOfType(
+                () -> shipmentService.create(given), StockTooLowException.class);
+
+        // Assert
+        assertThat(stockTooLowException)
+                .hasMessage(new StockTooLowException(VALID_STOCK, givenQuantity, wantedQuantity).getMessage());
+    }
+
+    @Test
     @DisplayName("OfiSfVWruu: Given PageRequest when get, then return Page of Shipments")
     void valid_findAll() {
 
