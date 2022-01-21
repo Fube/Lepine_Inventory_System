@@ -30,6 +30,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         log.info("Shipment with order number {} created as {}", saved.getOrderNumber(), saved.getUuid());
 
-        return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid()).orElseThrow(() -> new RuntimeException("Shipment not found"));
+        return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
     }
 }
