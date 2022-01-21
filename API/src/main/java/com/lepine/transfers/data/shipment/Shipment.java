@@ -37,6 +37,6 @@ public class Shipment {
     private LocalDate expectedDate;
     private String orderNumber;
 
-    @JoinColumn(name = "user_uuid", referencedColumnName = "uuid", nullable = false)
+    @JoinColumn(name = "created_by", referencedColumnName = "uuid", nullable = false)
     private UUID createdBy;
 }
