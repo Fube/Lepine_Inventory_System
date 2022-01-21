@@ -35,6 +35,8 @@ public class Shipment {
     private List<Transfer> transfers;
 
     private LocalDate expectedDate;
-
     private String orderNumber;
+
+    @JoinColumn(name = "user_uuid", referencedColumnName = "uuid", nullable = false)
+    private UUID createdBy;
 }

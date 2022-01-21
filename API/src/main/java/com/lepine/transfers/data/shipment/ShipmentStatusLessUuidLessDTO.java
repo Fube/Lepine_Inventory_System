@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -23,4 +24,6 @@ public class ShipmentStatusLessUuidLessDTO {
     private LocalDate expectedDate;
 
     private String orderNumber;
+    private UUID createdBy;
+
 }
