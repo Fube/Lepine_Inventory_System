@@ -25,6 +25,7 @@ ext {
 
 dependencies {
     implementation 'org.javatuples:javatuples:1.2'
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:2.12.5"
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'

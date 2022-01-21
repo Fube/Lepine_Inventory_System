@@ -17,7 +17,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class Stock {
 
     @Builder.Default
