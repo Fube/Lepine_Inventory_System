@@ -9,6 +9,5 @@ import javax.validation.Valid;
 
 public interface ShipmentService {
     Shipment create(@Valid ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO);
-
     Page<Shipment> findAll(PageRequest pageRequest);
 }

@@ -219,11 +219,15 @@ public class ShipmentServiceTests {
     @DisplayName("OfiSfVWruu: Given PageRequest when get, then return Page of Shipments")
     void valid_findAll() {
 
+        // Arrange
+        final PageRequest of = PageRequest.of(0, 10);
+        final Shipment saved = shipmentRepo.save(VALID_SHIPMENT.toBuilder().build());
+
         // Act
-        Page<Shipment> shipments = shipmentService.findAll(PageRequest.of(0, 10));
+        Page<Shipment> shipments = shipmentService.findAll(of);
 
         // Assert
         assertThat(shipments.getTotalElements()).isEqualTo(1);
-        assertThat(shipments.getContent().get(0)).isEqualTo(VALID_SHIPMENT);
+        assertThat(shipments.getContent().get(0)).isEqualTo(saved);
     }
 }
