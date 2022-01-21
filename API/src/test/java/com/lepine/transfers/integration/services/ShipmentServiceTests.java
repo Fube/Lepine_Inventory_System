@@ -300,5 +300,4 @@ public class ShipmentServiceTests {
         // Assert
         objectMapper.writeValueAsString(shipments);
     }
-
 }
