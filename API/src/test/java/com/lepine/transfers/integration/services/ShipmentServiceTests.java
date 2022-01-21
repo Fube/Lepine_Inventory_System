@@ -2,8 +2,10 @@ package com.lepine.transfers.integration.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
+import com.lepine.transfers.data.role.RoleRepo;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatus;
@@ -13,6 +15,8 @@ import com.lepine.transfers.data.stock.StockRepo;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
+import com.lepine.transfers.data.user.User;
+import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.services.shipment.ShipmentService;
@@ -91,6 +95,7 @@ public class ShipmentServiceTests {
             VALID_WAREHOUSE_UUID,
             VALID_ITEM_UUID,
             VALID_STOCK_UUID,
+            VALID_USER_UUID,
             VALID_SHIPMENT_UUID;
 
     private final TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
@@ -102,6 +107,11 @@ public class ShipmentServiceTests {
             .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
             .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
+            .build();
+
+    private final User VALID_USER = User.builder()
+            .email("a@b.c")
+            .password("somePassword")
             .build();
 
     private String SHIPMENT_EXPECTED_DATE_TOO_EARLY_ERROR_MESSAGE_LOCATOR = "shipment.expected.date.too.early";
@@ -125,6 +135,12 @@ public class ShipmentServiceTests {
     private WarehouseRepo warehouseRepo;
 
     @Autowired
+    private RoleRepo roleRepo;
+
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -144,6 +160,16 @@ public class ShipmentServiceTests {
         VALID_STOCK.setUuid(VALID_STOCK_UUID);
 
         VALID_TRANSFER_UUID_LESS_DTO.setStockUuid(VALID_STOCK_UUID);
+
+        final Role manager = roleRepo.findByName("MANAGER").get();
+
+        VALID_USER.setRole(manager);
+        VALID_USER_UUID = userRepo.save(VALID_USER).getUuid();
+        VALID_USER.setUuid(VALID_USER_UUID);
+
+        VALID_SHIPMENT.setCreatedBy(VALID_USER_UUID);
+
+        VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.setCreatedBy(VALID_USER_UUID);
     }
 
     @AfterEach
@@ -153,6 +179,7 @@ public class ShipmentServiceTests {
         stockRepo.deleteAllInBatch();
         transferRepo.deleteAllInBatch();
         shipmentRepo.deleteAllInBatch();
+        userRepo.deleteAllInBatch();
     }
 
     @Test
