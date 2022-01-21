@@ -22,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -127,9 +128,9 @@ public class StockServiceImpl implements StockService, ItemUpdateHandler, ItemDe
     }
 
     @Override
-    public List<Stock> findByUuidIn(List<UUID> uuids) {
+    public Set<Stock> findByUuidIn(List<UUID> uuids) {
         log.info("Searching for stocks with UUIDs {}", uuids);
-        final List<Stock> stocks = stockRepo.findByUuidIn(uuids);
+        final Set<Stock> stocks = stockRepo.findDistinctByUuidIn(uuids);
         log.info("Found {} stocks", stocks.size());
 
         return stocks;

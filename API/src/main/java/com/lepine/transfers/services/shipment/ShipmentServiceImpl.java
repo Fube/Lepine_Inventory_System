@@ -4,6 +4,7 @@ import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentMapper;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
+import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.services.stock.StockService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,9 +34,15 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Creating shipment with order number {}", shipmentStatusLessUUIDLessDTO.getOrderNumber());
 
         log.info("Checking for existence of all stocks");
-        stockService.findByUuidIn(
-                shipmentStatusLessUUIDLessDTO.getTransfers().parallelStream()
+        final List<TransferUuidLessDTO> uuidLessDTOTransfers = shipmentStatusLessUUIDLessDTO.getTransfers();
+        final List<Stock> byUuidIn = stockService.findByUuidIn(
+                uuidLessDTOTransfers.parallelStream()
                         .map(TransferUuidLessDTO::getStockUuid).collect(Collectors.toList()));
+        log.info("Found {} stocks", byUuidIn.size());
+
+        if (byUuidIn.size() != uuidLessDTOTransfers.size()) {
+            log.error("Found {} stocks but {} transfers", byUuidIn.size(), uuidLessDTOTransfers.size());
+        }
 
         final Shipment shipment = shipmentMapper.toEntity(shipmentStatusLessUUIDLessDTO);
         final Shipment saved = shipmentRepo.save(shipment);
