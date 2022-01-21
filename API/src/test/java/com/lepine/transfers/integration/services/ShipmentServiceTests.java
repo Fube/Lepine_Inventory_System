@@ -17,7 +17,6 @@ import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
-import com.lepine.transfers.utils.MessageSourceUtils;
 import com.lepine.transfers.utils.date.LocalDateUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
@@ -35,7 +36,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -213,5 +213,17 @@ public class ShipmentServiceTests {
         final String interpolatedMessage = messageSource.getMessage(SHIPMENT_EXPECTED_DATE_TOO_EARLY_ERROR_MESSAGE_LOCATOR, null, Locale.getDefault())
                 .replace("{days}", "3");
         assertThat(collect).containsExactly(interpolatedMessage);
+    }
+
+    @Test
+    @DisplayName("OfiSfVWruu: Given PageRequest when get, then return Page of Shipments")
+    void valid_findAll() {
+
+        // Act
+        Page<Shipment> shipments = shipmentService.findAll(PageRequest.of(0, 10));
+
+        // Assert
+        assertThat(shipments.getTotalElements()).isEqualTo(1);
+        assertThat(shipments.getContent().get(0)).isEqualTo(VALID_SHIPMENT);
     }
 }
