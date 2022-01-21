@@ -45,6 +45,7 @@ public class ShipmentServiceTests {
     private final static String
             VALID_WAREHOUSE_ZIP_CODE = "A1B2C3",
             VALID_WAREHOUSE_CITY = "Some City",
+            VALID_TARGET_WAREHOUSE_ZIP_CODE = "A2B3C4",
             VALID_WAREHOUSE_PROVINCE = "Some Province",
             VALID_ITEM_NAME = "Some Item",
             VALID_ITEM_SKU = "Some SKU",
@@ -61,6 +62,10 @@ public class ShipmentServiceTests {
             .zipCode(VALID_WAREHOUSE_ZIP_CODE)
             .city(VALID_WAREHOUSE_CITY)
             .province(VALID_WAREHOUSE_PROVINCE)
+            .build();
+
+    private final static Warehouse VALID_TARGET_WAREHOUSE = VALID_WAREHOUSE.toBuilder()
+            .zipCode(VALID_TARGET_WAREHOUSE_ZIP_CODE)
             .build();
 
     private final static Item VALID_ITEM = Item.builder()
@@ -88,6 +93,7 @@ public class ShipmentServiceTests {
 
     private UUID
             VALID_WAREHOUSE_UUID,
+            VALID_TARGET_WAREHOUSE_UUID,
             VALID_ITEM_UUID,
             VALID_STOCK_UUID,
             VALID_USER_UUID,
@@ -145,8 +151,10 @@ public class ShipmentServiceTests {
     @BeforeEach
     void setUp() {
         VALID_WAREHOUSE_UUID = warehouseRepo.save(VALID_WAREHOUSE).getUuid();
+        VALID_TARGET_WAREHOUSE_UUID = warehouseRepo.save(VALID_TARGET_WAREHOUSE).getUuid();
         VALID_ITEM_UUID = itemRepo.save(VALID_ITEM).getUuid();
         VALID_WAREHOUSE.setUuid(VALID_WAREHOUSE_UUID);
+        VALID_TARGET_WAREHOUSE.setUuid(VALID_TARGET_WAREHOUSE_UUID);
         VALID_ITEM.setUuid(VALID_ITEM_UUID);
 
         VALID_STOCK_UUID = stockRepo.save(VALID_STOCK).getUuid();
@@ -161,17 +169,19 @@ public class ShipmentServiceTests {
         VALID_USER.setUuid(VALID_USER_UUID);
 
         VALID_SHIPMENT.setCreatedBy(VALID_USER_UUID);
+        VALID_SHIPMENT.setTo(VALID_TARGET_WAREHOUSE_UUID);
 
         VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.setCreatedBy(VALID_USER_UUID);
+        VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.setTo(VALID_WAREHOUSE_UUID);
     }
 
     @AfterEach
     void cleanUp() {
+        shipmentRepo.deleteAllInBatch();
         warehouseRepo.deleteAllInBatch();
         itemRepo.deleteAllInBatch();
         stockRepo.deleteAllInBatch();
         transferRepo.deleteAllInBatch();
-        shipmentRepo.deleteAllInBatch();
         userRepo.deleteAllInBatch();
     }
 
