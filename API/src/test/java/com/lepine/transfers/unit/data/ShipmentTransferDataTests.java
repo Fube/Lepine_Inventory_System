@@ -1,7 +1,9 @@
 package com.lepine.transfers.unit.data;
 
+import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
+import com.lepine.transfers.data.role.RoleRepo;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatus;
@@ -9,6 +11,8 @@ import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockRepo;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
+import com.lepine.transfers.data.user.User;
+import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import org.junit.jupiter.api.AfterEach;
@@ -65,6 +69,11 @@ public class ShipmentTransferDataTests {
             .quantity(VALID_STOCK_QUANTITY)
             .build();
 
+    private final static User VALID_USER = User.builder()
+            .email("a@b.c")
+            .password("somepassword")
+            .build();
+
     private final static Shipment VALID_SHIPMENT = Shipment.builder()
             .status(VALID_SHIPMENT_STATUS)
             .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
@@ -82,7 +91,7 @@ public class ShipmentTransferDataTests {
         VALID_WAREHOUSE_UUID,
         VALID_ITEM_UUID,
         VALID_STOCK_UUID,
-        VALID_SHIPMENT_UUID;
+        VALID_USER_UUID;
 
     @Autowired
     private EntityManager entityManager;
@@ -102,6 +111,12 @@ public class ShipmentTransferDataTests {
     @Autowired
     private WarehouseRepo warehouseRepo;
 
+    @Autowired
+    private RoleRepo roleRepo;
+
+    @Autowired
+    private UserRepo userRepo;
+
 
     @BeforeEach
     void setUp() {
@@ -114,6 +129,15 @@ public class ShipmentTransferDataTests {
         VALID_STOCK_UUID = stockRepo.save(VALID_STOCK.toBuilder().build()).getUuid();
         entityManager.flush();
         VALID_STOCK.setUuid(VALID_STOCK_UUID);
+
+        final Role manager = roleRepo.findByName("MANAGER").get();
+
+        VALID_USER.setRole(manager);
+        VALID_USER_UUID = userRepo.save(VALID_USER).getUuid();
+        entityManager.flush();
+        VALID_USER.setUuid(VALID_USER_UUID);
+
+        VALID_SHIPMENT.setCreatedBy(VALID_USER_UUID);
     }
 
     @AfterEach
