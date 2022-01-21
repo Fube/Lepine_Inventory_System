@@ -38,6 +38,7 @@ public class ShipmentTransferDataTests {
 
     private final static String
         VALID_WAREHOUSE_ZIP_CODE = "A1B2C3",
+        VALID_TARGET_WAREHOUSE_ZIP_CODE = "A2B3C4",
         VALID_WAREHOUSE_CITY = "Some City",
         VALID_WAREHOUSE_PROVINCE = "Some Province",
         VALID_ITEM_NAME = "Some Item",
@@ -56,6 +57,11 @@ public class ShipmentTransferDataTests {
             .city(VALID_WAREHOUSE_CITY)
             .province(VALID_WAREHOUSE_PROVINCE)
             .build();
+
+    private final static Warehouse VALID_TARGET_WAREHOUSE = VALID_WAREHOUSE.toBuilder()
+            .zipCode(VALID_TARGET_WAREHOUSE_ZIP_CODE)
+            .build();
+
 
     private final static Item VALID_ITEM = Item.builder()
             .sku(VALID_ITEM_SKU)
@@ -89,6 +95,7 @@ public class ShipmentTransferDataTests {
 
     private UUID
         VALID_WAREHOUSE_UUID,
+        VALID_TARGET_WAREHOUSE_UUID,
         VALID_ITEM_UUID,
         VALID_STOCK_UUID,
         VALID_USER_UUID;
@@ -121,9 +128,12 @@ public class ShipmentTransferDataTests {
     @BeforeEach
     void setUp() {
         VALID_WAREHOUSE_UUID = warehouseRepo.save(VALID_WAREHOUSE.toBuilder().build()).getUuid();
+        VALID_TARGET_WAREHOUSE_UUID = warehouseRepo.save(VALID_TARGET_WAREHOUSE.toBuilder().build()).getUuid();
+
         VALID_ITEM_UUID = itemRepo.save(VALID_ITEM.toBuilder().build()).getUuid();
         entityManager.flush();
         VALID_WAREHOUSE.setUuid(VALID_WAREHOUSE_UUID);
+        VALID_TARGET_WAREHOUSE.setUuid(VALID_TARGET_WAREHOUSE_UUID);
         VALID_ITEM.setUuid(VALID_ITEM_UUID);
 
         VALID_STOCK_UUID = stockRepo.save(VALID_STOCK.toBuilder().build()).getUuid();
@@ -138,6 +148,7 @@ public class ShipmentTransferDataTests {
         VALID_USER.setUuid(VALID_USER_UUID);
 
         VALID_SHIPMENT.setCreatedBy(VALID_USER_UUID);
+        VALID_SHIPMENT.setTo(VALID_TARGET_WAREHOUSE_UUID);
     }
 
     @AfterEach
