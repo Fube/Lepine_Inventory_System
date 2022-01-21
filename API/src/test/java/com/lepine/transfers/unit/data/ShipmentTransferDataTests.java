@@ -21,7 +21,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +43,7 @@ public class ShipmentTransferDataTests {
 
     private final static ShipmentStatus VALID_SHIPMENT_STATUS = ShipmentStatus.PENDING;
 
-    private final static Date VALID_SHIPMENT_EXPECTED_DATE = new Date();
+    private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDate.now().plusDays(3);
 
     private final static int VALID_STOCK_QUANTITY = 10;
 

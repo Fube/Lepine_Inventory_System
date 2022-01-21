@@ -5,7 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,7 +34,7 @@ public class Shipment {
     @JoinColumn(name = "shipment_uuid", referencedColumnName = "uuid", nullable = false)
     private List<Transfer> transfers;
 
-    private Date expectedDate;
+    private LocalDate expectedDate;
 
     private String orderNumber;
 }

@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -15,6 +15,6 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class ShipmentStatusLessUuidLessDTO {
     private List<TransferUuidLessDTO> transfers;
-    private Date expectedDate;
+    private LocalDate expectedDate;
     private String orderNumber;
 }
