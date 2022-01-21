@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DaysFromNow {
-    String message() default "Date must be %s days from now";
+    String message() default "Date must be at least {days} days from now";
     long days();
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
