@@ -19,6 +19,7 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
+import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.date.LocalDateUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -226,6 +228,24 @@ public class ShipmentServiceTests {
         objectMapper.writeValueAsString(shipment);
     }
 
+    @Test
+    @DisplayName("MUTGjZadGQ: Given shipment with non-existent Stock when create, then throw StockNotFoundException")
+    void non_existent_Stock_Create() {
+
+        // Arrange
+        final UUID nonExistentStockUuid = UUID.randomUUID();
+        final ShipmentStatusLessUuidLessDTO given = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder().transfers(
+                List.of(VALID_TRANSFER_UUID_LESS_DTO.toBuilder().stockUuid(nonExistentStockUuid).build()))
+                .build();
+
+        // Act
+        final StockNotFoundException stockNotFoundException = catchThrowableOfType(
+                () -> shipmentService.create(given), StockNotFoundException.class);
+
+        // Assert
+        assertThat(stockNotFoundException)
+                .hasMessage(new StockNotFoundException(nonExistentStockUuid).getMessage());
+    }
 
     @Test
     @DisplayName("OfiSfVWruu: Given PageRequest when get, then return Page of Shipments")
@@ -259,4 +279,5 @@ public class ShipmentServiceTests {
         // Assert
         objectMapper.writeValueAsString(shipments);
     }
+
 }
