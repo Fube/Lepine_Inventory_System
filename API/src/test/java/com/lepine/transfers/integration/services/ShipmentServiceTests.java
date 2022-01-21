@@ -230,4 +230,19 @@ public class ShipmentServiceTests {
         assertThat(shipments.getTotalElements()).isEqualTo(1);
         assertThat(shipments.getContent().get(0)).isEqualTo(saved);
     }
+
+    @Test
+    @DisplayName("SrmPceFkyg: Given PageRequest when get, check result is Jackson serializable")
+    void valid_findAll_JacksonSerializable() throws JsonProcessingException {
+
+        // Arrange
+        final PageRequest of = PageRequest.of(0, 10);
+        final Shipment saved = shipmentRepo.save(VALID_SHIPMENT.toBuilder().build());
+
+        // Act
+        Page<Shipment> shipments = shipmentService.findAll(of);
+
+        // Assert
+        objectMapper.writeValueAsString(shipments);
+    }
 }
