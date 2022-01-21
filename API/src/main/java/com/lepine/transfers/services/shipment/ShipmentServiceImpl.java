@@ -21,7 +21,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    @SneakyThrows
     public Shipment create(ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO) {
         log.info("Creating shipment with order number {}", shipmentStatusLessUUIDLessDTO.getOrderNumber());
 
