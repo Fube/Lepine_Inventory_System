@@ -1,6 +1,5 @@
 package com.lepine.transfers.services.shipment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentMapper;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
@@ -8,7 +7,6 @@ import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,7 +18,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     private final ShipmentRepo shipmentRepo;
     private final ShipmentMapper shipmentMapper;
-    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional
