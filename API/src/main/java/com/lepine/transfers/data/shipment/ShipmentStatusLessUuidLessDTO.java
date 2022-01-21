@@ -18,7 +18,7 @@ import java.util.List;
 public class ShipmentStatusLessUuidLessDTO {
     private List<TransferUuidLessDTO> transfers;
 
-    @DaysFromNow(days = 3)
+    @DaysFromNow(days = 3, message = "Expected date must be at least {days} business days from now")
     @NotNull
     private LocalDate expectedDate;
 
