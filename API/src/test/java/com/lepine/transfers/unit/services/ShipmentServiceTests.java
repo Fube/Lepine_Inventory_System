@@ -7,6 +7,7 @@ import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.services.shipment.ShipmentServiceImpl;
+import com.lepine.transfers.services.stock.StockService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.date.LocalDateUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -61,6 +62,9 @@ public class ShipmentServiceTests {
 
     @MockBean
     private ShipmentRepo shipmentRepo;
+
+    @MockBean
+    private StockService stockService;
 
     @Test
     void contextLoads() {}
