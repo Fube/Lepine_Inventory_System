@@ -7,6 +7,8 @@ import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -32,5 +34,14 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Shipment with order number {} created as {}", saved.getOrderNumber(), saved.getUuid());
 
         return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
+    }
+
+    @Override
+    public Page<Shipment> findAll(PageRequest pageRequest) {
+        log.info("Finding all shipments for page {}", pageRequest);
+        final Page<Shipment> all = shipmentRepo.findAll(pageRequest);
+        log.info("Found {} shipments for page {}", all.getTotalElements(), pageRequest);
+
+        return all;
     }
 }
