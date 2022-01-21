@@ -255,7 +255,9 @@ public class ShipmentServiceTests {
 
         // Assert
         assertThat(shipments.getTotalElements()).isEqualTo(1);
-        assertThat(shipments.getContent().get(0)).isEqualTo(saved);
+        assertThat(shipments.getContent().get(0))
+                .usingRecursiveComparison()
+                .isEqualTo(saved);
     }
 
     @Test
