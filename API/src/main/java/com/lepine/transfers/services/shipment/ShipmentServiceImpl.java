@@ -8,7 +8,9 @@ import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.stock.StockService;
+import com.lepine.transfers.services.warehouse.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,11 +34,17 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentRepo shipmentRepo;
     private final ShipmentMapper shipmentMapper;
     private final StockService stockService;
+    private final WarehouseService warehouseService;
 
     @Override
     @Transactional
     public Shipment create(ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO) {
         log.info("Creating shipment with order number {}", shipmentStatusLessUUIDLessDTO.getOrderNumber());
+
+        final UUID to = shipmentStatusLessUUIDLessDTO.getTo();
+        log.info("Checking for existence of target warehouse {}", to);
+        warehouseService.findByUuid(to)
+                .orElseThrow(() -> new WarehouseNotFoundException(to));
 
         log.info("Checking for existence of all stocks");
 
