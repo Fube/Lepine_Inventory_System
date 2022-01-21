@@ -42,4 +42,7 @@ public class Shipment {
 
     @JoinColumn(name = "created_by", referencedColumnName = "uuid", nullable = false)
     private UUID createdBy;
+
+    @JoinColumn(name = "to", referencedColumnName = "uuid", nullable = false)
+    private UUID to;
 }

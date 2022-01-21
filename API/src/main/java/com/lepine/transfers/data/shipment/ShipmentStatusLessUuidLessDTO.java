@@ -25,5 +25,5 @@ public class ShipmentStatusLessUuidLessDTO {
 
     private String orderNumber;
     private UUID createdBy;
-
+    private UUID to;
 }
