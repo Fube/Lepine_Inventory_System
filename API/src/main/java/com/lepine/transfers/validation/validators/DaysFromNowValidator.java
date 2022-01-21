@@ -20,7 +20,7 @@ public class DaysFromNowValidator implements ConstraintValidator<DaysFromNow, Lo
     @Override
     public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
         if (value == null) {
-            return false;
+            return true;
         }
 
         // Check if X business days from now
