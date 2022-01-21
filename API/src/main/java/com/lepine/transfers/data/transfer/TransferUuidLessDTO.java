@@ -14,5 +14,5 @@ import java.util.UUID;
 public class TransferUuidLessDTO {
 
     private UUID stockUuid;
-    private int quantity;;
+    private int quantity;
 }
