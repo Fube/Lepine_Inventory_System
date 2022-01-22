@@ -208,6 +208,7 @@ public class ShipmentServiceTests {
                 .ignoringFields("$$_hibernate_interceptor")
                 .isEqualTo(VALID_STOCK.toBuilder()
                     .uuid(VALID_STOCK_UUID)
+                    .quantity(VALID_STOCK_QUANTITY - VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.getTransfers().get(0).getQuantity())
                     .item(VALID_ITEM.toBuilder()
                             .uuid(VALID_ITEM_UUID)
                             .build())
