@@ -12,6 +12,7 @@ import com.lepine.transfers.data.shipment.ShipmentStatus;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockRepo;
+import com.lepine.transfers.data.stock.StockSearchDTO;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
@@ -154,7 +155,7 @@ public class ShipmentServiceTests {
     private ReloadableResourceBundleMessageSource messageSource;
 
     @MockBean
-    private SearchService<Stock, UUID> stockSearchService;
+    private SearchService<StockSearchDTO, UUID> stockSearchService;
 
     @Test
     void contextLoads() {}
