@@ -158,7 +158,7 @@ public class ShipmentHttpTests {
     @Test
     @DisplayName("IaQglpsLWX: Given GET on /shipments as manager, then return page of shipments (200, shipments)")
     @WithUserDetails(value = VALID_MANAGER_EMAIL)
-    void getShipmentsAsManager() throws Exception {
+    void findAll_AsManager() throws Exception {
 
         // Arrange
         final PageRequest expectedPageRequest = PageRequest.of(0, 10, Sort.by("expectedDate").descending());
