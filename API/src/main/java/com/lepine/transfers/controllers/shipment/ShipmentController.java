@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -36,7 +37,11 @@ public class ShipmentController {
 
     @GetMapping
     public Page<Shipment> findAll(@AuthenticationPrincipal User user,
+
+                                  @RequestParam(required = false, defaultValue = "1")
                                   @Min(value = 1, message = "{pagination.page.min}") final int page,
+
+                                  @RequestParam(required = false, defaultValue = "10")
                                   @Min(value = 1, message = "{pagination.size.min}") final int size) {
         final PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by("expectedDate").descending());
 
