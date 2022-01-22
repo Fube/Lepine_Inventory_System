@@ -174,4 +174,31 @@ public class ShipmentControllerTests {
         verify(shipmentService, never()).findAllByUserUuid(any(), any());
         verify(shipmentService, never()).findAll(any());
     }
+
+    @Test
+    @DisplayName("HOnApKfRNF: Given size < 1 when get, then throw ConstraintViolationException")
+    void invalid_SizeLessThan1() {
+
+        // Arrange
+        final int
+                page = 1, // One-indexed
+                size = 0;
+        final User givenUser = User.builder()
+                .uuid(VALID_USER_UUID)
+                .email(VALID_USER_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_MANAGER_ROLE)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException = catchThrowableOfType(
+                () -> shipmentController.findAll(givenUser, page, size), ConstraintViolationException.class);
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly(ERROR_MESSAGE_PAGINATION_SIZE_MIN);
+
+        verify(shipmentService, never()).findAllByUserUuid(any(), any());
+        verify(shipmentService, never()).findAll(any());
+    }
 }
