@@ -5,6 +5,7 @@ import com.lepine.transfers.data.shipment.ShipmentMapper;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
+import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,16 +41,34 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         verifyWarehouseExistence(shipmentStatusLessUUIDLessDTO);
 
-        final List<UUID> uuidLessDTOTransfersMappedToStockUuid = shipmentStatusLessUUIDLessDTO.getTransfers()
-                .parallelStream()
-                .map(TransferUuidLessDTO::getStockUuid).collect(Collectors.toList());
-        final List<TransferUuidLessDTO> uuidLessDTOTransfers = shipmentStatusLessUUIDLessDTO.getTransfers();
 
-        final Set<Stock> byUuidIn = stockService.findByUuidIn(uuidLessDTOTransfersMappedToStockUuid);
+        final List<TransferUuidLessDTO> uuidLessDTOTransfers = shipmentStatusLessUUIDLessDTO.getTransfers();
+        final HashMap<UUID, TransferUuidLessDTO> dtoTransfersByStockUuid = new HashMap<>(uuidLessDTOTransfers.size());
+        uuidLessDTOTransfers.forEach(transferUuidLessDTO ->
+                dtoTransfersByStockUuid.put(transferUuidLessDTO.getStockUuid(), transferUuidLessDTO));
+
+
+        final Set<UUID> dtoStockUuids = dtoTransfersByStockUuid.keySet();
+        final Set<Stock> byUuidIn = stockService.findByUuidIn(dtoStockUuids);
         log.info("Found {} stocks", byUuidIn.size());
 
-        log.info("Checking for existence of all stocks");
-        verifyStockExistence(uuidLessDTOTransfers, byUuidIn);
+        final HashMap<UUID, Stock> stockByUuid = new HashMap<>(byUuidIn.size());
+        byUuidIn.forEach(s -> stockByUuid.put(s.getUuid(), s));
+
+        log.info("Checking for existence of all stocks and their quantities");
+        for (UUID uuid : dtoStockUuids) {
+            final Stock stock = stockByUuid.get(uuid);
+            if(stock == null) {
+                throw new StockNotFoundException(uuid);
+            }
+
+            final int given = stock.getQuantity();
+            final int wanted = dtoTransfersByStockUuid.get(uuid).getQuantity();
+            if(given < wanted) {
+                log.info("Stock {} has {} items, but {} was requested", stock.getUuid(), given, wanted);
+                throw new StockTooLowException(stock.getUuid(), given, wanted);
+            }
+        }
 
         log.info("Mapping Shipment DTO to entity");
         final Shipment shipment = shipmentMapper.toEntity(shipmentStatusLessUUIDLessDTO);
@@ -69,25 +85,6 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Checking for existence of target warehouse {}", to);
         warehouseService.findByUuid(to)
                 .orElseThrow(() -> new WarehouseNotFoundException(to));
-    }
-
-    private void verifyStockExistence(
-            final List<TransferUuidLessDTO> uuidLessDTOTransfers,
-            final Set<Stock> byUuidIn) {
-        // NOTE: This can probably be optimized
-        for (TransferUuidLessDTO uuidLessDTOTransfer : uuidLessDTOTransfers) {
-            final Optional<Stock> any = byUuidIn.parallelStream()
-                    .filter(s -> s.getUuid().equals(uuidLessDTOTransfer.getStockUuid()))
-                    .findAny();
-
-            final Stock stock = any.orElseThrow(() -> new StockNotFoundException(uuidLessDTOTransfer.getStockUuid()));
-
-            if(stock.getQuantity() < uuidLessDTOTransfer.getQuantity()) {
-                log.info("Stock {} has {} quantity, but {} was requested",
-                        stock.getUuid(), stock.getQuantity(), uuidLessDTOTransfer.getQuantity());
-                throw new StockTooLowException(stock.getUuid(), uuidLessDTOTransfer.getQuantity(), stock.getQuantity());
-            }
-        }
     }
 
     @Override

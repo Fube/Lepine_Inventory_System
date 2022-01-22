@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -25,5 +24,5 @@ public interface StockService {
 
     void delete(UUID dto);
 
-    Set<Stock> findByUuidIn(List<UUID> uuids);
+    Set<Stock> findByUuidIn(Set<UUID> uuids);
 }
