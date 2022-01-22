@@ -40,6 +40,8 @@ import java.util.UUID;
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static com.lepine.transfers.utils.PageUtils.createPageFor;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,6 +56,7 @@ public class ShipmentHttpTests {
             VALID_TARGET_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID(),
             VALID_MANAGER_UUID = UUID.randomUUID(),
+            VALID_SALESPERSON_UUID = UUID.randomUUID(),
             VALID_ROLE_UUID = UUID.randomUUID();
 
     private final static int VALID_STOCK_QUANTITY = 10;
@@ -61,17 +64,23 @@ public class ShipmentHttpTests {
     private final static String
             VALID_SHIPMENT_ORDER_NUMBER = "Some Order Number",
             VALID_MANAGER_EMAIL = "a@b.c",
+            VALID_SALESPERSON_EMAIL = "b@c.d",
             VALID_USER_PASSWORD = "noneofyourbusiness",
             VALID_CLERK_ROLE_NAME = "CLERK",
-            VALID_MANAGER_ROLE_NAME = "MANAGER";
+            VALID_MANAGER_ROLE_NAME = "MANAGER",
+            VALID_SALESPERSON_ROLE_NAME = "SALESPERSON";
 
     private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDateUtils.businessDaysFromNow(3);
 
     private final static Role
+            VALID_SALESPERSON_ROLE = Role.builder()
+                .uuid(VALID_SALESPERSON_UUID)
+                .name(VALID_SALESPERSON_ROLE_NAME)
+                .build(),
             VALID_CLERK_ROLE = Role.builder()
-            .uuid(VALID_ROLE_UUID)
-            .name(VALID_CLERK_ROLE_NAME)
-            .build(),
+                .uuid(VALID_ROLE_UUID)
+                .name(VALID_CLERK_ROLE_NAME)
+                .build(),
             VALID_MANAGER_ROLE = Role.builder()
                     .uuid(VALID_ROLE_UUID)
                     .name(VALID_MANAGER_ROLE_NAME)
@@ -149,6 +158,13 @@ public class ShipmentHttpTests {
                 .password(VALID_USER_PASSWORD)
                 .role(VALID_MANAGER_ROLE)
                 .build()));
+
+        given(userRepo.findByEmail(VALID_SALESPERSON_EMAIL)).willReturn(Optional.ofNullable(User.builder()
+                .uuid(VALID_SALESPERSON_UUID)
+                .email(VALID_SALESPERSON_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_SALESPERSON_ROLE)
+                .build()));
     }
 
 
@@ -170,6 +186,27 @@ public class ShipmentHttpTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(shipments)));
+    }
+
+    @Test
+    @DisplayName("bKJKGQYgWu: Given GET on /shipments as salesperson, then return page of shipments created by salesperson (200, shipments)")
+    @WithUserDetails(value = VALID_SALESPERSON_EMAIL)
+    void findAll_AsSalesperson() throws Exception {
+
+        // Arrange
+        final PageRequest expectedPageRequest = PageRequest.of(0, 10, Sort.by("expectedDate").descending());
+        final Page<Shipment> shipments = createPageFor(List.of(VALID_SHIPMENT), expectedPageRequest);
+        given(shipmentService.findAllByUserUuid(VALID_SALESPERSON_UUID, expectedPageRequest))
+                .willReturn(shipments);
+
+        // Act & Assert
+        mockMvc.perform(get("/shipments"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(shipments)));
+
+        verify(shipmentService, times(1))
+                .findAllByUserUuid(VALID_SALESPERSON_UUID, expectedPageRequest);
     }
 
 }
