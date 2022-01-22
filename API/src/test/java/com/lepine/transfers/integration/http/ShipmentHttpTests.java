@@ -40,8 +40,7 @@ import java.util.UUID;
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static com.lepine.transfers.utils.PageUtils.createPageFor;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,6 +56,7 @@ public class ShipmentHttpTests {
             VALID_STOCK_UUID = UUID.randomUUID(),
             VALID_MANAGER_UUID = UUID.randomUUID(),
             VALID_SALESPERSON_UUID = UUID.randomUUID(),
+            VALID_CLERK_UUID = UUID.randomUUID(),
             VALID_ROLE_UUID = UUID.randomUUID();
 
     private final static int VALID_STOCK_QUANTITY = 10;
@@ -65,6 +65,7 @@ public class ShipmentHttpTests {
             VALID_SHIPMENT_ORDER_NUMBER = "Some Order Number",
             VALID_MANAGER_EMAIL = "a@b.c",
             VALID_SALESPERSON_EMAIL = "b@c.d",
+            VALID_CLERK_EMAIL = "c@d.e",
             VALID_USER_PASSWORD = "noneofyourbusiness",
             VALID_CLERK_ROLE_NAME = "CLERK",
             VALID_MANAGER_ROLE_NAME = "MANAGER",
@@ -165,6 +166,13 @@ public class ShipmentHttpTests {
                 .password(VALID_USER_PASSWORD)
                 .role(VALID_SALESPERSON_ROLE)
                 .build()));
+
+        given(userRepo.findByEmail(VALID_CLERK_EMAIL)).willReturn(Optional.ofNullable(User.builder()
+                .uuid(VALID_CLERK_UUID)
+                .email(VALID_CLERK_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_CLERK_ROLE)
+                .build()));
     }
 
 
@@ -211,4 +219,23 @@ public class ShipmentHttpTests {
                 .findAllByUserUuid(VALID_SALESPERSON_UUID, expectedPageRequest);
     }
 
+    @Test
+    @DisplayName("BIyMmmlbaJ: Given GET on /shipments as clerk, then return page of shipments (200, shipments)")
+    @WithUserDetails(value = VALID_CLERK_EMAIL)
+    void findAll_AsClerk() throws Exception {
+
+        // Arrange
+        final PageRequest expectedPageRequest = PageRequest.of(0, 10, Sort.by("expectedDate").descending());
+        final Page<Shipment> shipments = createPageFor(List.of(VALID_SHIPMENT), expectedPageRequest);
+        given(shipmentService.findAll(expectedPageRequest)).willReturn(shipments);
+
+        // Act & Assert
+        mockMvc.perform(get("/shipments"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(objectMapper.writeValueAsString(shipments)));
+
+        verify(shipmentService, times(1)).findAll(expectedPageRequest);
+        verify(shipmentService, never()).findAllByUserUuid(any(), any());
+    }
 }
