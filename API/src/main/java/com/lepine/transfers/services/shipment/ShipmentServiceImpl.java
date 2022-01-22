@@ -111,4 +111,13 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         return all;
     }
+
+    @Override
+    public Page<Shipment> findAllByUserUuid(UUID userUuid, PageRequest pageRequest) {
+        log.info("Finding all shipments for user {} for page {}", userUuid, pageRequest);
+        final Page<Shipment> all = shipmentRepo.findAllByCreatedBy(userUuid, pageRequest);
+        log.info("Found {} shipments for user {} for page {}", all.getTotalElements(), userUuid, pageRequest);
+
+        return all;
+    }
 }

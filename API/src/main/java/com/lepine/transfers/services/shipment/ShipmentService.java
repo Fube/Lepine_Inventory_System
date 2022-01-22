@@ -11,5 +11,5 @@ import java.util.UUID;
 public interface ShipmentService {
     Shipment create(@Valid ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO);
     Page<Shipment> findAll(PageRequest pageRequest);
-    Page<Shipment> findAllByUserUuid(UUID valid_user_uuid, PageRequest pageRequest);
+    Page<Shipment> findAllByUserUuid(UUID userUuid, PageRequest pageRequest);
 }
