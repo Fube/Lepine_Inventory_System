@@ -10,6 +10,8 @@ import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessCreatedByLessUuidLessDTO;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
+import com.lepine.transfers.data.user.User;
+import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import com.lepine.transfers.utils.date.LocalDateUtils;
@@ -22,25 +24,25 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static com.lepine.transfers.utils.PageUtils.createPageFor;
-import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { ShipmentController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
@@ -51,7 +53,7 @@ public class ShipmentHttpTests {
             VALID_SHIPMENT_UUID = UUID.randomUUID(),
             VALID_TARGET_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID(),
-            VALID_USER_UUID = UUID.randomUUID(),
+            VALID_MANAGER_UUID = UUID.randomUUID(),
             VALID_ROLE_UUID = UUID.randomUUID();
 
     private final static int VALID_STOCK_QUANTITY = 10;
@@ -93,7 +95,7 @@ public class ShipmentHttpTests {
                     .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
                     .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
                     .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
-                    .createdBy(VALID_USER_UUID)
+                    .createdBy(VALID_MANAGER_UUID)
                     .to(VALID_TARGET_WAREHOUSE_UUID)
                     .build();
 
@@ -103,7 +105,6 @@ public class ShipmentHttpTests {
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
             .transfers(List.of())
             .build();
-
 
     private String
             ERROR_MESSAGE_PAGINATION_PAGE_MIN,
@@ -124,6 +125,9 @@ public class ShipmentHttpTests {
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
 
+    @Autowired
+    private UserRepo userRepo;
+
     @MockBean
     private ShipmentService shipmentService;
 
@@ -135,6 +139,16 @@ public class ShipmentHttpTests {
         ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY = w.getMessage("shipment.expected.date.too.early");
         ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL = w.getMessage("shipment.order.number.not_null");
         ERROR_MESSAGE_SHIPMENT_TO_NULL = w.getMessage("shipment.to.not_null");
+    }
+
+    @PostConstruct
+    void preSetUp() {
+        given(userRepo.findByEmail(VALID_MANAGER_EMAIL)).willReturn(Optional.ofNullable(User.builder()
+                .uuid(VALID_MANAGER_UUID)
+                .email(VALID_MANAGER_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_MANAGER_ROLE)
+                .build()));
     }
 
 
