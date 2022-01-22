@@ -26,9 +26,9 @@ public class ShipmentStatusLessCreatedByLessUuidLessDTO {
     @NotNull
     private LocalDate expectedDate;
 
-    @NotNull
+    @NotNull(message = "{shipment.order.number.not_null}")
     private String orderNumber;
 
-    @NotNull
+    @NotNull(message = "{shipment.to.not_null}")
     private UUID to;
 }

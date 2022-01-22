@@ -102,6 +102,7 @@ public class ShipmentControllerTests {
     private String
             ERROR_MESSAGE_PAGINATION_PAGE_MIN,
             ERROR_MESSAGE_PAGINATION_SIZE_MIN,
+            ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY,
             ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL,
             ERROR_MESSAGE_SHIPMENT_TO_NULL;
 
@@ -120,7 +121,8 @@ public class ShipmentControllerTests {
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
         ERROR_MESSAGE_PAGINATION_PAGE_MIN = w.getMessage("pagination.page.min");
         ERROR_MESSAGE_PAGINATION_SIZE_MIN = w.getMessage("pagination.size.min");
-        ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL = w.getMessage("shipment.orderNumber.not_null");
+        ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY = w.getMessage("shipment.expected.date.too.early");
+        ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL = w.getMessage("shipment.order.number.not_null");
         ERROR_MESSAGE_SHIPMENT_TO_NULL = w.getMessage("shipment.to.not_null");
     }
 
@@ -330,7 +332,10 @@ public class ShipmentControllerTests {
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
         assertThat(collect)
                 .containsExactlyInAnyOrder(
-                        ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL, ERROR_MESSAGE_SHIPMENT_TO_NULL);
+                        ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY.replace("{days}", "3"),
+                        ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL,
+                        ERROR_MESSAGE_SHIPMENT_TO_NULL
+                );
 
         verify(shipmentService, never()).create(any());
     }
