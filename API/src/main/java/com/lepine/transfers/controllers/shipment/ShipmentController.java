@@ -14,14 +14,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.UUID;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @Slf4j
@@ -58,7 +57,11 @@ public class ShipmentController {
         return shipmentService.findAllByUserUuid(user.getUuid(), pageRequest);
     }
 
+    @PostMapping
+    @ResponseStatus(value = CREATED)
     public Shipment create(@AuthenticationPrincipal User user,
+
+                           @RequestBody
                            @Valid ShipmentStatusLessCreatedByLessUuidLessDTO shipmentStatusLessCreatedByLessUuidLessDTO
     ) {
         log.info("Creating shipment for user {}", user.getUsername());
