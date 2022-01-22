@@ -6,6 +6,7 @@ import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
+import com.lepine.transfers.events.shipment.ShipmentCreatedEvent;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
@@ -13,6 +14,7 @@ import com.lepine.transfers.services.stock.StockService;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentMapper shipmentMapper;
     private final StockService stockService;
     private final WarehouseService warehouseService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
@@ -64,7 +67,12 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment saved = shipmentRepo.save(shipment);
         log.info("Shipment with order number {} created as {}", saved.getOrderNumber(), saved.getUuid());
 
-        return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
+        final Shipment oneByUuidEagerLoad = shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
+
+        log.info("Publishing shipment created event");
+        applicationEventPublisher.publishEvent(new ShipmentCreatedEvent(this, oneByUuidEagerLoad));
+
+        return oneByUuidEagerLoad;
     }
 
     private void verifyStockExistenceAndQuantityAndMutate(HashMap<UUID, TransferUuidLessDTO> dtoTransfersByStockUuid, Set<UUID> dtoStockUuids, HashMap<UUID, Stock> stockByUuid) {
