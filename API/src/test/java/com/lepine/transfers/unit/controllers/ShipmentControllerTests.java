@@ -339,4 +339,28 @@ public class ShipmentControllerTests {
 
         verify(shipmentService, never()).create(any());
     }
+
+    @Test
+    @DisplayName("PfDyAiQiZV: Given create as default login, then throw DefaultLoginNotAllowedException")
+    void invalid_CreateDefaultLogin() {
+
+        // Arrange
+        final User givenUser = User.builder()
+                .uuid(UUID.fromString("00000000-0000-0000-0000-000000000000"))
+                .email(VALID_USER_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_MANAGER_ROLE)
+                .build();
+
+        final ShipmentStatusLessCreatedByLessUuidLessDTO givenDto = VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO;
+
+        // Act
+        final DefaultLoginNotAllowedException defaultLoginNotAllowedException = catchThrowableOfType(
+                () -> shipmentController.create(givenUser, givenDto), DefaultLoginNotAllowedException.class);
+
+        // Assert
+        assertThat(defaultLoginNotAllowedException).isNotNull();
+
+        verify(shipmentService, never()).create(any());
+    }
 }
