@@ -21,7 +21,7 @@ public class ShipmentController {
     private final ShipmentMapper shipmentMapper;
 
     public Page<Shipment> findAll(@AuthenticationPrincipal User user, final int page, final int size) {
-        final PageRequest pageRequest = PageRequest.of(page - 1, size);
+        final PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by("expectedDate").descending());
 
         log.info("Fetching all shipments for user {} with page request {}", user.getUsername(), pageRequest);
 

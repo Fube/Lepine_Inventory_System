@@ -37,10 +37,15 @@ public class ShipmentControllerTests {
         VALID_CLERK_ROLE_NAME = "CLERK",
         VALID_MANAGER_ROLE_NAME = "MANAGER";
 
-    private final static Role VALID_CLERK_ROLE = Role.builder()
-        .uuid(VALID_ROLE_UUID)
-        .name(VALID_CLERK_ROLE_NAME)
-        .build();
+    private final static Role
+            VALID_CLERK_ROLE = Role.builder()
+                .uuid(VALID_ROLE_UUID)
+                .name(VALID_CLERK_ROLE_NAME)
+                .build(),
+            VALID_MANAGER_ROLE = Role.builder()
+                .uuid(VALID_ROLE_UUID)
+                .name(VALID_MANAGER_ROLE_NAME)
+                .build();
 
     @Autowired
     private ShipmentController shipmentController;
@@ -52,7 +57,7 @@ public class ShipmentControllerTests {
     void contextLoads() {}
 
     @Test
-    @DisplayName("UIHcfxYzbs: Given page and size when get, then return page of Shipments")
+    @DisplayName("UIHcfxYzbs: Given page and size when get, then return page of Shipments (findAllByUserUuid)")
     void valid_findAllByUserUuid() {
 
         // Arrange
@@ -84,5 +89,39 @@ public class ShipmentControllerTests {
                                 && pr.getPageSize() == size
                                 && pr.getSort().equals(Sort.by("expectedDate").descending())));
         verify(shipmentService, never()).findAll(any());
+    }
+
+    @Test
+    @DisplayName("sDTUKrHzBh: Given page and size when get, then return page of Shipments (findAll)")
+    void valid_findAll() {
+
+        // Arrange
+        final int
+                page = 1, // One-indexed
+                size = 10;
+        final User givenUser = User.builder()
+                .uuid(VALID_USER_UUID)
+                .email(VALID_USER_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_MANAGER_ROLE)
+                .build();
+        final PageRequest expectedPageRequest = PageRequest.of(page - 1, size, Sort.by("expectedDate").descending());
+        final Page<Shipment> givenShipments = Page.empty();
+
+        given(shipmentService.findAll(expectedPageRequest))
+                .willReturn(givenShipments);
+
+        // Act
+        final Page<Shipment> response = shipmentController.findAll(givenUser, page, size);
+
+        // Assert
+        assertThat(response).isEqualTo(givenShipments);
+
+        verify(shipmentService, times(1))
+                .findAll(
+                        argThat(pr -> pr.getPageNumber() == page - 1
+                                && pr.getPageSize() == size
+                                && pr.getSort().equals(Sort.by("expectedDate").descending())));
+        verify(shipmentService, never()).findAllByUserUuid(any(), any());
     }
 }
