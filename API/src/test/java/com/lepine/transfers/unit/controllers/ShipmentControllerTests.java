@@ -43,6 +43,7 @@ public class ShipmentControllerTests {
 
     private final static UUID
             VALID_SHIPMENT_UUID = UUID.randomUUID(),
+            VALID_TARGET_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID(),
             VALID_USER_UUID = UUID.randomUUID(),
             VALID_ROLE_UUID = UUID.randomUUID();
@@ -78,6 +79,7 @@ public class ShipmentControllerTests {
                     .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
                     .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
                     .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
+                    .to(VALID_TARGET_WAREHOUSE_UUID)
                     .build();
 
     private final static ShipmentStatusLessUuidLessDTO VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO =
@@ -86,6 +88,7 @@ public class ShipmentControllerTests {
                     .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
                     .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
                     .createdBy(VALID_USER_UUID)
+                    .to(VALID_TARGET_WAREHOUSE_UUID)
                     .build();
 
     private final static Shipment VALID_SHIPMENT = Shipment.builder()
