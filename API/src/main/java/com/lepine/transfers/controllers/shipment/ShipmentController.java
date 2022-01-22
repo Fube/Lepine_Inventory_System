@@ -2,6 +2,8 @@ package com.lepine.transfers.controllers.shipment;
 
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentMapper;
+import com.lepine.transfers.data.shipment.ShipmentStatusLessCreatedByLessUuidLessDTO;
+import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 @RestController
@@ -39,5 +42,18 @@ public class ShipmentController {
         log.info("User is not manager, fetching only relevant shipments");
 
         return shipmentService.findAllByUserUuid(user.getUuid(), pageRequest);
+    }
+
+    public Shipment create(@AuthenticationPrincipal User user,
+                           @Valid ShipmentStatusLessCreatedByLessUuidLessDTO shipmentStatusLessCreatedByLessUuidLessDTO
+    ) {
+        log.info("Creating shipment for user {}", user.getUsername());
+
+        log.info("Mapping shipment status less created by less uuid less DTO to shipment");
+        final ShipmentStatusLessUuidLessDTO mapped =
+            shipmentMapper.toDTO(shipmentStatusLessCreatedByLessUuidLessDTO, user);
+        log.info("Mapped shipment status less uuid less DTO to shipment");
+
+        return shipmentService.create(mapped);
     }
 }
