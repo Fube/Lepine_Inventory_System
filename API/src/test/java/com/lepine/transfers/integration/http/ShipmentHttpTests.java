@@ -42,6 +42,7 @@ import static com.lepine.transfers.utils.PageUtils.createPageFor;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -237,5 +238,26 @@ public class ShipmentHttpTests {
 
         verify(shipmentService, times(1)).findAll(expectedPageRequest);
         verify(shipmentService, never()).findAllByUserUuid(any(), any());
+    }
+
+    @Test
+    @DisplayName("IuFRRCKGwG: Given POST /shipments as manager, then create shipment (201, shipment)")
+    @WithUserDetails(value = VALID_MANAGER_EMAIL)
+    void create_AsManager() throws Exception {
+
+        // Arrange
+        final Shipment expectedShipment = VALID_SHIPMENT;
+        final String asString = objectMapper.writeValueAsString(expectedShipment);
+        given(shipmentService.create(any())).willReturn(expectedShipment);
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asString))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(asString));
+
+        verify(shipmentService, times(1)).create(any());
     }
 }
