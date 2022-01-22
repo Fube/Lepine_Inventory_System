@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,8 +20,10 @@ public class ShipmentController {
     private final ShipmentService shipmentService;
     private final ShipmentMapper shipmentMapper;
 
-    public Page<Shipment> findAll(@AuthenticationPrincipal User user, PageRequest pageRequest) {
-        log.info("Fetching all shipments for user {}", user.getUsername());
+    public Page<Shipment> findAll(@AuthenticationPrincipal User user, final int page, final int size) {
+        final PageRequest pageRequest = PageRequest.of(page - 1, size);
+
+        log.info("Fetching all shipments for user {} with page request {}", user.getUsername(), pageRequest);
 
         if(user.getRole().getName().equals("MANAGER")) {
             log.info("User is manager, fetching all shipments");
@@ -28,6 +31,7 @@ public class ShipmentController {
         }
 
         log.info("User is not manager, fetching only relevant shipments");
+
         return shipmentService.findAllByUserUuid(user.getUuid(), pageRequest);
     }
 }

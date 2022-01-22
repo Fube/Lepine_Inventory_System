@@ -18,8 +18,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-import static com.lepine.transfers.utils.PageUtils.createPageFor;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, ShipmentController.class })
 @ActiveProfiles({"test"})
@@ -51,7 +52,7 @@ public class ShipmentControllerTests {
 
     @Test
     @DisplayName("UIHcfxYzbs: Given page and size when get, then return page of Shipments")
-    void valid_findAll() {
+    void valid_findAllByUserUuid() {
 
         // Arrange
         final int
@@ -63,13 +64,22 @@ public class ShipmentControllerTests {
                 .password(VALID_USER_PASSWORD)
                 .role(VALID_CLERK_ROLE)
                 .build();
-        final PageRequest givenPageRequest = PageRequest.of(page, size);
+        final PageRequest expectedPageRequest = PageRequest.of(page - 1, size);
         final Page<Shipment> givenShipments = Page.empty();
 
+        given(shipmentService.findAllByUserUuid(givenUser.getUuid(), expectedPageRequest))
+                .willReturn(givenShipments);
+
         // Act
-        final Page<Shipment> response = shipmentController.findAll(givenUser, givenPageRequest);
+        final Page<Shipment> response = shipmentController.findAll(givenUser, page, size);
 
         // Assert
         assertThat(response).isEqualTo(givenShipments);
+
+        verify(shipmentService, times(1))
+                .findAllByUserUuid(
+                        argThat(n -> n.equals(givenUser.getUuid())),
+                        argThat(pr -> pr.getPageNumber() == page - 1 && pr.getPageSize() == size));
+        verify(shipmentService, never()).findAll(any());
     }
 }
