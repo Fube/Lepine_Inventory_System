@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -24,6 +26,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@RequestMapping("/shipments")
 public class ShipmentController {
 
     private final static UUID DEFAULT_LOGIN_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
@@ -31,6 +34,7 @@ public class ShipmentController {
     private final ShipmentService shipmentService;
     private final ShipmentMapper shipmentMapper;
 
+    @GetMapping
     public Page<Shipment> findAll(@AuthenticationPrincipal User user,
                                   @Min(value = 1, message = "{pagination.page.min}") final int page,
                                   @Min(value = 1, message = "{pagination.size.min}") final int size) {
