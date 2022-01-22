@@ -186,6 +186,8 @@ public class ShipmentHttpTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(shipments)));
+
+        verify(shipmentService, times(1)).findAll(expectedPageRequest);
     }
 
     @Test
