@@ -101,7 +101,9 @@ public class ShipmentControllerTests {
 
     private String
             ERROR_MESSAGE_PAGINATION_PAGE_MIN,
-            ERROR_MESSAGE_PAGINATION_SIZE_MIN;
+            ERROR_MESSAGE_PAGINATION_SIZE_MIN,
+            ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL,
+            ERROR_MESSAGE_SHIPMENT_TO_NULL;
 
     @Autowired
     private ShipmentController shipmentController;
@@ -118,6 +120,8 @@ public class ShipmentControllerTests {
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
         ERROR_MESSAGE_PAGINATION_PAGE_MIN = w.getMessage("pagination.page.min");
         ERROR_MESSAGE_PAGINATION_SIZE_MIN = w.getMessage("pagination.size.min");
+        ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL = w.getMessage("shipment.orderNumber.not_null");
+        ERROR_MESSAGE_SHIPMENT_TO_NULL = w.getMessage("shipment.to.not_null");
     }
 
     @Test
@@ -297,5 +301,37 @@ public class ShipmentControllerTests {
         // Assert
         assertThat(actual).isEqualTo(expected);
         verify(shipmentService, times(1)).create(eq(expectedMappedDto));
+    }
+
+    @Test
+    @DisplayName("ArkEamRoim: Given invalid dto when create, then throw ConstraintViolationException")
+    void invalid_Create() {
+
+        // Arrange
+        final User givenUser = User.builder()
+                .uuid(VALID_USER_UUID)
+                .email(VALID_USER_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_MANAGER_ROLE)
+                .build();
+
+        final ShipmentStatusLessCreatedByLessUuidLessDTO givenDto =
+                VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
+                        .expectedDate(LocalDate.now())
+                        .orderNumber(null)
+                        .to(null)
+                        .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException = catchThrowableOfType(
+                () -> shipmentController.create(givenUser, givenDto), ConstraintViolationException.class);
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect)
+                .containsExactlyInAnyOrder(
+                        ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL, ERROR_MESSAGE_SHIPMENT_TO_NULL);
+
+        verify(shipmentService, never()).create(any());
     }
 }
