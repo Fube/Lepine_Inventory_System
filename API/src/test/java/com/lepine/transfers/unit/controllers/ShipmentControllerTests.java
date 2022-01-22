@@ -9,6 +9,7 @@ import com.lepine.transfers.data.shipment.ShipmentStatusLessCreatedByLessUuidLes
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.user.User;
+import com.lepine.transfers.exceptions.auth.DefaultLoginNotAllowedException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
