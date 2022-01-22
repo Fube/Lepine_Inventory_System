@@ -68,19 +68,19 @@ public class ShipmentControllerTests {
                 .name(VALID_MANAGER_ROLE_NAME)
                 .build();
 
-    private final TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
+    private final static TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
             .stockUuid(VALID_STOCK_UUID)
             .quantity(VALID_STOCK_QUANTITY)
             .build();
 
-    private final ShipmentStatusLessCreatedByLessUuidLessDTO VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO =
+    private final static ShipmentStatusLessCreatedByLessUuidLessDTO VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO =
             ShipmentStatusLessCreatedByLessUuidLessDTO.builder()
                     .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
                     .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
                     .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
                     .build();
 
-    private final ShipmentStatusLessUuidLessDTO VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO =
+    private final static ShipmentStatusLessUuidLessDTO VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO =
             ShipmentStatusLessUuidLessDTO.builder()
                     .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
                     .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
@@ -283,14 +283,16 @@ public class ShipmentControllerTests {
                 .build();
 
         final ShipmentStatusLessCreatedByLessUuidLessDTO givenDto = VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO;
-        final ShipmentStatusLessUuidLessDTO exptedMappedDto = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO;
+        final ShipmentStatusLessUuidLessDTO expectedMappedDto = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO;
         final Shipment expected = VALID_SHIPMENT;
+
+        given(shipmentService.create(expectedMappedDto)).willReturn(expected);
 
         // Act
         final Shipment actual = shipmentController.create(givenUser, givenDto);
 
         // Assert
         assertThat(actual).isEqualTo(expected);
-        verify(shipmentService, times(1)).create(eq(exptedMappedDto));
+        verify(shipmentService, times(1)).create(eq(expectedMappedDto));
     }
 }
