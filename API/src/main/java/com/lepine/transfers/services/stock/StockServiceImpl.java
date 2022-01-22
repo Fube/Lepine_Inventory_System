@@ -2,10 +2,13 @@ package com.lepine.transfers.services.stock;
 
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
+import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.events.item.ItemDeleteEvent;
 import com.lepine.transfers.events.item.ItemDeleteHandler;
 import com.lepine.transfers.events.item.ItemUpdateEvent;
 import com.lepine.transfers.events.item.ItemUpdateHandler;
+import com.lepine.transfers.events.shipment.ShipmentCreateEvent;
+import com.lepine.transfers.events.shipment.ShipmentCreateHandler;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
@@ -30,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-public class StockServiceImpl implements StockService, ItemUpdateHandler, ItemDeleteHandler {
+public class StockServiceImpl implements StockService, ItemUpdateHandler, ItemDeleteHandler, ShipmentCreateHandler {
 
     private final StockRepo stockRepo;
     private final StockMapper stockMapper;
@@ -154,5 +157,18 @@ public class StockServiceImpl implements StockService, ItemUpdateHandler, ItemDe
         log.info("Mapped to search DTOs");
 
         searchService.deleteAllInBatch(asSearchDTOs);
+    }
+
+    @Override
+    public void onShipmentCreate(ShipmentCreateEvent event) {
+        log.info("Reacting to shipment create");
+        final List<StockSearchDTO> affected = event.getShipment()
+                .getTransfers()
+                .parallelStream()
+                .map(transfer -> stockMapper.toSearchDTO(transfer.getStock()))
+                .collect(Collectors.toList());
+        log.info("Found {} affected stocks", affected.size());
+
+        searchService.partialUpdateAllInBatch(affected);
     }
 }
