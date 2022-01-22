@@ -5,6 +5,7 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.shipment.ShipmentController;
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.shipment.Shipment;
+import com.lepine.transfers.data.shipment.ShipmentStatusLessCreatedByLessUuidLessDTO;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.user.User;
