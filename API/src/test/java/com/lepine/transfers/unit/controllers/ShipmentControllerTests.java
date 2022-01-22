@@ -5,10 +5,13 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.shipment.ShipmentController;
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.shipment.Shipment;
+import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
+import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
+import com.lepine.transfers.utils.date.LocalDateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,14 +41,21 @@ import static org.mockito.Mockito.*;
 public class ShipmentControllerTests {
 
     private final static UUID
-        VALID_USER_UUID = UUID.randomUUID(),
-        VALID_ROLE_UUID = UUID.randomUUID();
+            VALID_SHIPMENT_UUID = UUID.randomUUID(),
+            VALID_STOCK_UUID = UUID.randomUUID(),
+            VALID_USER_UUID = UUID.randomUUID(),
+            VALID_ROLE_UUID = UUID.randomUUID();
+
+    private final static int VALID_STOCK_QUANTITY = 10;
 
     private final static String
-        VALID_USER_EMAIL = "a@b.c",
-        VALID_USER_PASSWORD = "noneofyourbusiness",
-        VALID_CLERK_ROLE_NAME = "CLERK",
-        VALID_MANAGER_ROLE_NAME = "MANAGER";
+            VALID_SHIPMENT_ORDER_NUMBER = "Some Order Number",
+            VALID_USER_EMAIL = "a@b.c",
+            VALID_USER_PASSWORD = "noneofyourbusiness",
+            VALID_CLERK_ROLE_NAME = "CLERK",
+            VALID_MANAGER_ROLE_NAME = "MANAGER";
+
+    private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDateUtils.businessDaysFromNow(3);
 
     private final static Role
             VALID_CLERK_ROLE = Role.builder()
@@ -54,6 +66,34 @@ public class ShipmentControllerTests {
                 .uuid(VALID_ROLE_UUID)
                 .name(VALID_MANAGER_ROLE_NAME)
                 .build();
+
+    private final TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
+            .stockUuid(VALID_STOCK_UUID)
+            .quantity(VALID_STOCK_QUANTITY)
+            .build();
+
+    private final ShipmentStatusLessCreatedByLessUuidLessDTO VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO =
+            ShipmentStatusLessCreatedByLessUuidLessDTO.builder()
+                    .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
+                    .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
+                    .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
+                    .build();
+
+    private final ShipmentStatusLessUuidLessDTO VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO =
+            ShipmentStatusLessUuidLessDTO.builder()
+                    .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
+                    .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
+                    .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
+                    .createdBy(VALID_USER_UUID)
+                    .build();
+
+    private final static Shipment VALID_SHIPMENT = Shipment.builder()
+            .uuid(VALID_SHIPMENT_UUID)
+            .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
+            .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
+            .transfers(List.of())
+            .build();
+
 
     private String
             ERROR_MESSAGE_PAGINATION_PAGE_MIN,
@@ -227,5 +267,29 @@ public class ShipmentControllerTests {
 
         verify(shipmentService, never()).findAllByUserUuid(any(), any());
         verify(shipmentService, never()).findAll(any());
+    }
+
+    @Test
+    @DisplayName("vPeYGhUGTx: Given valid dto when create, then return created Shipment")
+    void valid_Create() {
+
+        // Arrange
+        final User givenUser = User.builder()
+                .uuid(VALID_USER_UUID)
+                .email(VALID_USER_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_MANAGER_ROLE)
+                .build();
+
+        final ShipmentStatusLessCreatedByLessUuidLessDTO givenDto = VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO;
+        final ShipmentStatusLessUuidLessDTO exptedMappedDto = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO;
+        final Shipment expected = VALID_SHIPMENT;
+
+        // Act
+        final Shipment actual = shipmentController.create(givenUser, givenDto);
+
+        // Assert
+        assertThat(actual).isEqualTo(expected);
+        verify(shipmentService, times(1)).create(eq(exptedMappedDto));
     }
 }
