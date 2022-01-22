@@ -266,7 +266,7 @@ public class ShipmentServiceTests {
 
         // Assert
         assertThat(stockTooLowException)
-                .hasMessage(new StockTooLowException(VALID_STOCK_UUID, wantedQuantity, givenQuantity).getMessage());
+                .hasMessage(new StockTooLowException(VALID_STOCK_UUID, givenQuantity, wantedQuantity).getMessage());
     }
 
     @Test
