@@ -26,6 +26,9 @@ public class ShipmentStatusLessCreatedByLessUuidLessDTO {
     @NotNull
     private LocalDate expectedDate;
 
+    @NotNull
     private String orderNumber;
+
+    @NotNull
     private UUID to;
 }
