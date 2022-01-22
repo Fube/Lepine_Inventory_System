@@ -47,8 +47,9 @@ public class ShipmentController {
 
         log.info("Fetching all shipments for user {} with page request {}", user.getUsername(), pageRequest);
 
-        if(user.getRole().getName().equals("MANAGER")) {
-            log.info("User is manager, fetching all shipments");
+        final String roleName = user.getRole().getName();
+        if(roleName.equals("MANAGER") || roleName.equals("CLERK")) {
+            log.info("User is {}, fetching all shipments", roleName);
             return shipmentService.findAll(pageRequest);
         }
 
