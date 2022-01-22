@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
@@ -64,7 +65,7 @@ public class ShipmentControllerTests {
                 .password(VALID_USER_PASSWORD)
                 .role(VALID_CLERK_ROLE)
                 .build();
-        final PageRequest expectedPageRequest = PageRequest.of(page - 1, size);
+        final PageRequest expectedPageRequest = PageRequest.of(page - 1, size, Sort.by("expectedDate").descending());
         final Page<Shipment> givenShipments = Page.empty();
 
         given(shipmentService.findAllByUserUuid(givenUser.getUuid(), expectedPageRequest))
@@ -79,7 +80,9 @@ public class ShipmentControllerTests {
         verify(shipmentService, times(1))
                 .findAllByUserUuid(
                         argThat(n -> n.equals(givenUser.getUuid())),
-                        argThat(pr -> pr.getPageNumber() == page - 1 && pr.getPageSize() == size));
+                        argThat(pr -> pr.getPageNumber() == page - 1
+                                && pr.getPageSize() == size
+                                && pr.getSort().equals(Sort.by("expectedDate").descending())));
         verify(shipmentService, never()).findAll(any());
     }
 }
