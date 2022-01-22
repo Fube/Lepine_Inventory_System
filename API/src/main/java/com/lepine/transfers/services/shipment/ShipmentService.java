@@ -6,8 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 public interface ShipmentService {
     Shipment create(@Valid ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO);
     Page<Shipment> findAll(PageRequest pageRequest);
+    Page<Shipment> findAllByUserUuid(UUID valid_user_uuid, PageRequest pageRequest);
 }
