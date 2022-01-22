@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -57,7 +58,7 @@ public class ShipmentHttpTests {
 
     private final static String
             VALID_SHIPMENT_ORDER_NUMBER = "Some Order Number",
-            VALID_USER_EMAIL = "a@b.c",
+            VALID_MANAGER_EMAIL = "a@b.c",
             VALID_USER_PASSWORD = "noneofyourbusiness",
             VALID_CLERK_ROLE_NAME = "CLERK",
             VALID_MANAGER_ROLE_NAME = "MANAGER";
@@ -142,7 +143,7 @@ public class ShipmentHttpTests {
 
     @Test
     @DisplayName("IaQglpsLWX: Given GET on /shipments as manager, then return page of shipments (200, shipments)")
-    @WithMockUser(username = "some-manager", roles = {"MANAGER"})
+    @WithUserDetails(value = VALID_MANAGER_EMAIL)
     void getShipmentsAsManager() throws Exception {
 
         // Arrange
