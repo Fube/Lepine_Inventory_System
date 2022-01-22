@@ -40,6 +40,7 @@ import static org.mockito.BDDMockito.given;
 public class ShipmentServiceTests {
 
     public final static UUID
+            VALID_TARGET_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_SHIPMENT_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID();
 
@@ -53,6 +54,7 @@ public class ShipmentServiceTests {
             .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
             .transfers(List.of())
+            .to(VALID_TARGET_WAREHOUSE_UUID)
             .build();
 
     private final static Shipment VALID_SHIPMENT = Shipment.builder()
@@ -60,6 +62,7 @@ public class ShipmentServiceTests {
             .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
             .transfers(List.of())
+            .to(VALID_TARGET_WAREHOUSE_UUID)
             .build();
 
     private final TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
