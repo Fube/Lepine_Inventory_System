@@ -21,6 +21,7 @@ import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
+import com.lepine.transfers.services.search.SearchService;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.date.LocalDateUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +42,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -148,6 +153,9 @@ public class ShipmentServiceTests {
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
 
+    @MockBean
+    private SearchService<Stock, UUID> stockSearchService;
+
     @Test
     void contextLoads() {}
 
@@ -196,7 +204,6 @@ public class ShipmentServiceTests {
         Shipment shipment = shipmentService.create(VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO);
 
         // Assert
-        System.out.println(shipment.getTransfers().get(0).getStock().getItem().getDescription());
         assertThat(shipment.getUuid()).isNotNull();
         assertThat(shipment.getStatus()).isEqualTo(VALID_SHIPMENT_STATUS);
         assertThat(shipment.getExpectedDate()).isEqualTo(VALID_SHIPMENT_EXPECTED_DATE);
@@ -217,6 +224,11 @@ public class ShipmentServiceTests {
                             .build())
                     .build()
                 );
+
+        assertThat(stockRepo.findById(VALID_STOCK_UUID).get().getQuantity()).isEqualTo(
+                VALID_STOCK_QUANTITY - VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.getTransfers().get(0).getQuantity());
+
+        verify(stockSearchService, times(1)).partialUpdateAllInBatch(any());
     }
 
     @Test
