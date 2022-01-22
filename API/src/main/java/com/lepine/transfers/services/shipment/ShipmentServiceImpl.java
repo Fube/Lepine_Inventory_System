@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -42,31 +41,39 @@ public class ShipmentServiceImpl implements ShipmentService {
     public Shipment create(ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO) {
         log.info("Creating shipment with order number {}", shipmentStatusLessUUIDLessDTO.getOrderNumber());
 
-        final UUID to = shipmentStatusLessUUIDLessDTO.getTo();
-        log.info("Checking for existence of target warehouse {}", to);
-        warehouseService.findByUuid(to)
-                .orElseThrow(() -> new WarehouseNotFoundException(to));
+        verifyWarehouseExistence(shipmentStatusLessUUIDLessDTO);
 
-        verifyStockExistence(shipmentStatusLessUUIDLessDTO);
+        final List<UUID> uuidLessDTOTransfersMappedToStockUuid = shipmentStatusLessUUIDLessDTO.getTransfers()
+                .parallelStream()
+                .map(TransferUuidLessDTO::getStockUuid).collect(Collectors.toList());
+        final List<TransferUuidLessDTO> uuidLessDTOTransfers = shipmentStatusLessUUIDLessDTO.getTransfers();
 
+        final Set<Stock> byUuidIn = stockService.findByUuidIn(uuidLessDTOTransfersMappedToStockUuid);
+        log.info("Found {} stocks", byUuidIn.size());
+
+        log.info("Checking for existence of all stocks");
+        verifyStockExistence(uuidLessDTOTransfers, byUuidIn);
+
+        log.info("Mapping Shipment DTO to entity");
         final Shipment shipment = shipmentMapper.toEntity(shipmentStatusLessUUIDLessDTO);
-        final Shipment saved = shipmentRepo.save(shipment);
+        log.info("Mapped to entity");
 
+        final Shipment saved = shipmentRepo.save(shipment);
         log.info("Shipment with order number {} created as {}", saved.getOrderNumber(), saved.getUuid());
 
         return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
     }
 
-    private void verifyStockExistence(ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO) {
-        log.info("Checking for existence of all stocks");
+    private void verifyWarehouseExistence(ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO) {
+        final UUID to = shipmentStatusLessUUIDLessDTO.getTo();
+        log.info("Checking for existence of target warehouse {}", to);
+        warehouseService.findByUuid(to)
+                .orElseThrow(() -> new WarehouseNotFoundException(to));
+    }
 
-        final List<TransferUuidLessDTO> uuidLessDTOTransfers = shipmentStatusLessUUIDLessDTO.getTransfers();
-        final List<UUID> uuidLessDTOTransfersMappedToStockUuid = uuidLessDTOTransfers.parallelStream()
-                .map(TransferUuidLessDTO::getStockUuid).collect(Collectors.toList());
-        final Set<Stock> byUuidIn = stockService.findByUuidIn(uuidLessDTOTransfersMappedToStockUuid);
-
-        log.info("Found {} stocks", byUuidIn.size());
-
+    private void verifyStockExistence(
+            final List<TransferUuidLessDTO> uuidLessDTOTransfers,
+            final Set<Stock> byUuidIn) {
         // NOTE: This can probably be optimized
         for (TransferUuidLessDTO uuidLessDTOTransfer : uuidLessDTOTransfers) {
             final Optional<Stock> any = byUuidIn.parallelStream()
