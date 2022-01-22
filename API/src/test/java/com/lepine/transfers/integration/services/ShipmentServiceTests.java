@@ -314,4 +314,22 @@ public class ShipmentServiceTests {
         // Assert
         objectMapper.writeValueAsString(shipments);
     }
+
+    @Test
+    @DisplayName("qKQnksVZXM: Given valid user uuid when get by user, then return Page of Shipments for that user")
+    void valid_findAllByUserUuid() {
+
+        // Arrange
+        final PageRequest of = PageRequest.of(0, 10);
+        final Shipment saved = shipmentRepo.save(VALID_SHIPMENT.toBuilder().build());
+
+        // Act
+        Page<Shipment> shipments = shipmentService.findAllByUserUuid(VALID_USER_UUID, of);
+
+        // Assert
+        assertThat(shipments.getTotalElements()).isEqualTo(1);
+        assertThat(shipments.getContent().get(0))
+                .usingRecursiveComparison()
+                .isEqualTo(saved);
+    }
 }
