@@ -5,7 +5,6 @@ import com.lepine.transfers.data.shipment.ShipmentMapper;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
-import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
@@ -21,7 +20,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +54,20 @@ public class ShipmentServiceImpl implements ShipmentService {
         byUuidIn.forEach(s -> stockByUuid.put(s.getUuid(), s));
 
         log.info("Checking for existence of all stocks and their quantities");
+        verifyStockExistenceAndQuantityAndMutate(dtoTransfersByStockUuid, dtoStockUuids, stockByUuid);
+        log.info("All stocks and quantities are valid");
+
+        log.info("Mapping Shipment DTO to entity");
+        final Shipment shipment = shipmentMapper.toEntity(shipmentStatusLessUUIDLessDTO);
+        log.info("Mapped to entity");
+
+        final Shipment saved = shipmentRepo.save(shipment);
+        log.info("Shipment with order number {} created as {}", saved.getOrderNumber(), saved.getUuid());
+
+        return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
+    }
+
+    private void verifyStockExistenceAndQuantityAndMutate(HashMap<UUID, TransferUuidLessDTO> dtoTransfersByStockUuid, Set<UUID> dtoStockUuids, HashMap<UUID, Stock> stockByUuid) {
         for (UUID uuid : dtoStockUuids) {
             final Stock stock = stockByUuid.get(uuid);
             if(stock == null) {
@@ -68,16 +80,12 @@ public class ShipmentServiceImpl implements ShipmentService {
                 log.info("Stock {} has {} items, but {} was requested", stock.getUuid(), given, wanted);
                 throw new StockTooLowException(stock.getUuid(), given, wanted);
             }
+
+            final int newQuantity = given - wanted;
+            log.info("Updating Stock {} quantity from {} to {}", stock.getUuid(), given, newQuantity);
+            stock.setQuantity(newQuantity);
+
         }
-
-        log.info("Mapping Shipment DTO to entity");
-        final Shipment shipment = shipmentMapper.toEntity(shipmentStatusLessUUIDLessDTO);
-        log.info("Mapped to entity");
-
-        final Shipment saved = shipmentRepo.save(shipment);
-        log.info("Shipment with order number {} created as {}", saved.getOrderNumber(), saved.getUuid());
-
-        return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
     }
 
     private void verifyWarehouseExistence(ShipmentStatusLessUuidLessDTO shipmentStatusLessUUIDLessDTO) {
