@@ -169,7 +169,7 @@ public class ShipmentControllerTests {
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
-        assertThat(collect).containsExactly("Page must be greater than or equal to 1");
+        assertThat(collect).containsExactly(ERROR_MESSAGE_PAGINATION_PAGE_MIN);
 
         verify(shipmentService, never()).findAllByUserUuid(any(), any());
         verify(shipmentService, never()).findAll(any());
