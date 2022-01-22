@@ -6,7 +6,7 @@ import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
-import com.lepine.transfers.events.shipment.ShipmentCreatedEvent;
+import com.lepine.transfers.events.shipment.ShipmentCreateEvent;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
@@ -70,7 +70,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment oneByUuidEagerLoad = shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
 
         log.info("Publishing shipment created event");
-        applicationEventPublisher.publishEvent(new ShipmentCreatedEvent(this, oneByUuidEagerLoad));
+        applicationEventPublisher.publishEvent(new ShipmentCreateEvent(this, oneByUuidEagerLoad));
 
         return oneByUuidEagerLoad;
     }
