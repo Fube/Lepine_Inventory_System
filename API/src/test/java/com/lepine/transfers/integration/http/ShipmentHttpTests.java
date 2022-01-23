@@ -274,9 +274,36 @@ public class ShipmentHttpTests {
     }
 
     @Test
-    @DisplayName("IuFRRCKGwG: Given POST /shipments as manager, then create shipment (201, shipment)")
+    @DisplayName("IuFRRCKGwG: Given POST on /shipments as manager, then create shipment (201, shipment)")
     @WithUserDetails(value = VALID_MANAGER_EMAIL)
     void create_AsManager() throws Exception {
+
+        // Arrange
+        final Shipment expectedShipment = VALID_SHIPMENT.toBuilder()
+                .transfers(List.of(VALID_TRANSFER))
+                .build();
+
+        final String expectedAsString = objectMapper.writeValueAsString(expectedShipment);
+        final String givenAsString = objectMapper
+                .writeValueAsString(VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO);
+
+        given(shipmentService.create(any())).willReturn(expectedShipment);
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(givenAsString))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedAsString));
+
+        verify(shipmentService, times(1)).create(any());
+    }
+
+    @Test
+    @DisplayName("mYDtFOFUcM: Given POST on /shipments as clerk, then create shipment (201, shipment)")
+    @WithUserDetails(value = VALID_CLERK_EMAIL)
+    void create_AsClerk() throws Exception {
 
         // Arrange
         final Shipment expectedShipment = VALID_SHIPMENT.toBuilder()
