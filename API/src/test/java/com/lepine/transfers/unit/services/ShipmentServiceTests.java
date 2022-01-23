@@ -53,10 +53,16 @@ public class ShipmentServiceTests {
 
     private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDateUtils.businessDaysFromNow(3);
 
+    private final static TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
+            .stockUuid(VALID_STOCK_UUID)
+            .quantity(VALID_STOCK_QUANTITY)
+            .build();
+
+
     private final static ShipmentStatusLessUuidLessDTO VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO = ShipmentStatusLessUuidLessDTO.builder()
             .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
-            .transfers(List.of())
+            .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
             .to(VALID_TARGET_WAREHOUSE_UUID)
             .build();
 
@@ -66,11 +72,6 @@ public class ShipmentServiceTests {
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
             .transfers(List.of())
             .to(VALID_TARGET_WAREHOUSE_UUID)
-            .build();
-
-    private final TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
-            .stockUuid(VALID_STOCK_UUID)
-            .quantity(VALID_STOCK_QUANTITY)
             .build();
 
     private String
