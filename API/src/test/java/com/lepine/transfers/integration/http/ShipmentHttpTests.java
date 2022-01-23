@@ -303,7 +303,7 @@ public class ShipmentHttpTests {
     @Test
     @DisplayName("mYDtFOFUcM: Given POST on /shipments as salesperson, then create shipment (201, shipment)")
     @WithUserDetails(value = VALID_SALESPERSON_EMAIL)
-    void create_AsClerk() throws Exception {
+    void create_AsSalesperson() throws Exception {
 
         // Arrange
         final Shipment expectedShipment = VALID_SHIPMENT.toBuilder()
@@ -325,5 +325,29 @@ public class ShipmentHttpTests {
                 .andExpect(content().json(expectedAsString));
 
         verify(shipmentService, times(1)).create(any());
+    }
+
+    @Test
+    @DisplayName("btYJfcKwbk: Given POST on /shipments as clerk, then deny access (403, error)")
+    @WithUserDetails(value = VALID_CLERK_EMAIL)
+    void create_AsClerk_DenyAccess() throws Exception {
+
+        // Arrange
+        final Shipment expectedShipment = VALID_SHIPMENT.toBuilder()
+                .transfers(List.of(VALID_TRANSFER))
+                .build();
+
+        final String givenAsString = objectMapper
+                .writeValueAsString(VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO);
+
+        given(shipmentService.create(any())).willReturn(expectedShipment);
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(givenAsString))
+                .andExpect(status().isForbidden());
+
+        verify(shipmentService, never()).create(any());
     }
 }
