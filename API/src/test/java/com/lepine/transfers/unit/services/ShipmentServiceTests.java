@@ -2,10 +2,13 @@ package com.lepine.transfers.unit.services;
 
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
+import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
+import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
+import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.services.shipment.ShipmentServiceImpl;
@@ -72,6 +75,27 @@ public class ShipmentServiceTests {
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
             .transfers(List.of())
             .to(VALID_TARGET_WAREHOUSE_UUID)
+            .build();
+
+    private final static Item VALID_ITEM = Item.builder()
+            .uuid(UUID.randomUUID())
+            .name("Item Name")
+            .description("Item Description")
+            .sku("Item SKU")
+            .build();
+
+    private final static Warehouse VALID_WAREHOUSE = Warehouse.builder()
+            .uuid(VALID_TARGET_WAREHOUSE_UUID)
+            .zipCode("A1B2C3")
+            .city("City")
+            .province("Province")
+            .build();
+
+    private final static Stock VALID_STOCK = Stock.builder()
+            .uuid(VALID_STOCK_UUID)
+            .warehouse(VALID_WAREHOUSE)
+            .item(VALID_ITEM)
+            .quantity(VALID_STOCK_QUANTITY)
             .build();
 
     private String
@@ -176,5 +200,25 @@ public class ShipmentServiceTests {
 
         assertThat(collect).containsExactly(SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE);
         verify(warehouseService, never()).findByUuid(any());
+    }
+
+    @Test
+    @DisplayName("eiTJSLljFY: Given DTO with transfer to same warehouse when create, then throw SameWarehouseException")
+    void invalid_Create_TransferToSameWarehouse() {
+
+        // Arrange
+        ShipmentStatusLessUuidLessDTO invalidDTO = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder()
+                .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
+                .build();
+
+        given(stockService.findByUuidIn(any())).willReturn(Set.of(VALID_STOCK));
+
+        // Act
+        final SameWarehouseException sameWarehouseException =
+                catchThrowableOfType(() -> shipmentService.create(invalidDTO), SameWarehouseException.class);
+
+        // Assert
+        assertThat(sameWarehouseException.getMessage())
+                .isEqualTo(new SameWarehouseException(VALID_STOCK, to).getMessage());
     }
 }
