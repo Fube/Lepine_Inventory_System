@@ -58,7 +58,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/users/**").hasRole("MANAGER")
                     .antMatchers(POST, "/items", "/warehouses", "/stocks").hasRole("MANAGER")
                     .antMatchers(PUT, "/items/*", "/warehouses/*", "/stocks/*").hasRole("MANAGER")
-                    .antMatchers(DELETE, "/items/*", "/warehouses/*", "/stocks/*").hasRole("MANAGER");
+                    .antMatchers(DELETE, "/items/*", "/warehouses/*", "/stocks/*").hasRole("MANAGER")
+                    .antMatchers(POST, "/shipments").hasAnyRole("MANAGER", "SALESPERSON");
 
 
         for(Map.Entry<HttpMethod, List<String>> entry : whiteListByMethod.entrySet()) {
