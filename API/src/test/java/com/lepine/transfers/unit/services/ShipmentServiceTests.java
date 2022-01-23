@@ -9,6 +9,7 @@ import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.services.shipment.ShipmentServiceImpl;
@@ -219,6 +220,6 @@ public class ShipmentServiceTests {
 
         // Assert
         assertThat(sameWarehouseException.getMessage())
-                .isEqualTo(new SameWarehouseException(VALID_STOCK, to).getMessage());
+                .isEqualTo(new SameWarehouseException(VALID_STOCK, VALID_TARGET_WAREHOUSE_UUID).getMessage());
     }
 }
