@@ -30,7 +30,10 @@ import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest(classes = {
         ShipmentServiceImpl.class,
@@ -70,7 +73,9 @@ public class ShipmentServiceTests {
             .quantity(VALID_STOCK_QUANTITY)
             .build();
 
-    private String SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE;
+    private String
+            SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE,
+            SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE;
 
     @Autowired
     private ShipmentService shipmentService;
@@ -91,6 +96,7 @@ public class ShipmentServiceTests {
     void setUp() {
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
         SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE = w.getMessage("transfer.quantity.min");
+        SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE = w.getMessage("shipment.transfers.size.min");
     }
 
     @Test
@@ -151,5 +157,23 @@ public class ShipmentServiceTests {
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
 
         assertThat(collect).containsExactly(SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("EdWjTaarDF: Given DTO with no transfers when create, then throw ConstraintViolationException")
+    void invalid_Create_NoTransfers() {
+
+        // Arrange
+        ShipmentStatusLessUuidLessDTO invalidDTO = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder()
+                .transfers(List.of())
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> shipmentService.create(invalidDTO));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+
+        assertThat(collect).containsExactly(SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE);
+        verify(warehouseService, never()).findByUuid(any());
     }
 }
