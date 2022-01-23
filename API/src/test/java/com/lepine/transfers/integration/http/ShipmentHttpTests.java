@@ -301,8 +301,8 @@ public class ShipmentHttpTests {
     }
 
     @Test
-    @DisplayName("mYDtFOFUcM: Given POST on /shipments as clerk, then create shipment (201, shipment)")
-    @WithUserDetails(value = VALID_CLERK_EMAIL)
+    @DisplayName("mYDtFOFUcM: Given POST on /shipments as salesperson, then create shipment (201, shipment)")
+    @WithUserDetails(value = VALID_SALESPERSON_EMAIL)
     void create_AsClerk() throws Exception {
 
         // Arrange
