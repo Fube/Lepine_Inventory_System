@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public class ShipmentStatusLessUuidLessDTO {
     @Valid
+    @Size(min = 1, message = "{shipment.transfers.size.min}")
     private List<TransferUuidLessDTO> transfers;
 
     @DaysFromNow(days = 3, message = "{shipment.expected.date.too.early}")
