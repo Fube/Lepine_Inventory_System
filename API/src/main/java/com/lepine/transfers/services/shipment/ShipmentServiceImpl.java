@@ -9,6 +9,7 @@ import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.events.shipment.ShipmentCreateEvent;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
+import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.stock.StockService;
 import com.lepine.transfers.services.warehouse.WarehouseService;
@@ -57,7 +58,8 @@ public class ShipmentServiceImpl implements ShipmentService {
         byUuidIn.forEach(s -> stockByUuid.put(s.getUuid(), s));
 
         log.info("Checking for existence of all stocks and their quantities");
-        verifyStockExistenceAndQuantityAndMutate(dtoTransfersByStockUuid, dtoStockUuids, stockByUuid);
+        verifyStockExistenceAndQuantityAndMutate(
+                dtoTransfersByStockUuid, dtoStockUuids, stockByUuid, shipmentStatusLessUUIDLessDTO.getTo());
         log.info("All stocks and quantities are valid");
 
         log.info("Mapping Shipment DTO to entity");
@@ -75,7 +77,12 @@ public class ShipmentServiceImpl implements ShipmentService {
         return oneByUuidEagerLoad;
     }
 
-    private void verifyStockExistenceAndQuantityAndMutate(HashMap<UUID, TransferUuidLessDTO> dtoTransfersByStockUuid, Set<UUID> dtoStockUuids, HashMap<UUID, Stock> stockByUuid) {
+    private void verifyStockExistenceAndQuantityAndMutate(
+            HashMap<UUID, TransferUuidLessDTO> dtoTransfersByStockUuid,
+            Set<UUID> dtoStockUuids,
+            HashMap<UUID, Stock> stockByUuid,
+            UUID to
+    ) {
         for (UUID uuid : dtoStockUuids) {
             final Stock stock = stockByUuid.get(uuid);
             if(stock == null) {
@@ -93,6 +100,10 @@ public class ShipmentServiceImpl implements ShipmentService {
             log.info("Updating Stock {} quantity from {} to {}", stock.getUuid(), given, newQuantity);
             stock.setQuantity(newQuantity);
 
+            if(stock.getWarehouse().getUuid().equals(to)) {
+                log.info("Impossible to ship from warehouse to itself for stock {}", stock.getUuid());
+                throw new SameWarehouseException(stock, to);
+            }
         }
     }
 

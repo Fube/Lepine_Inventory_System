@@ -212,6 +212,7 @@ public class ShipmentServiceTests {
                 .transfers(List.of(VALID_TRANSFER_UUID_LESS_DTO))
                 .build();
 
+        given(warehouseService.findByUuid(VALID_TARGET_WAREHOUSE_UUID)).willReturn(Optional.of(VALID_WAREHOUSE));
         given(stockService.findByUuidIn(any())).willReturn(Set.of(VALID_STOCK));
 
         // Act
