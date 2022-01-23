@@ -6,12 +6,16 @@ import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.shipment.ShipmentController;
 import com.lepine.transfers.data.auth.Role;
+import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessCreatedByLessUuidLessDTO;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
+import com.lepine.transfers.data.stock.Stock;
+import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
+import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import com.lepine.transfers.utils.date.LocalDateUtils;
@@ -53,6 +57,7 @@ public class ShipmentHttpTests {
 
     private final static UUID
             VALID_SHIPMENT_UUID = UUID.randomUUID(),
+            VALID_TRANSFER_UUID = UUID.randomUUID(),
             VALID_TARGET_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID(),
             VALID_MANAGER_UUID = UUID.randomUUID(),
@@ -88,6 +93,27 @@ public class ShipmentHttpTests {
                     .name(VALID_MANAGER_ROLE_NAME)
                     .build();
 
+    private final static Item VALID_ITEM = Item.builder()
+            .uuid(UUID.randomUUID())
+            .name("Item Name")
+            .description("Item Description")
+            .sku("Item SKU")
+            .build();
+
+    private final static Warehouse VALID_WAREHOUSE = Warehouse.builder()
+            .uuid(VALID_TARGET_WAREHOUSE_UUID)
+            .zipCode("A1B2C3")
+            .city("City")
+            .province("Province")
+            .build();
+
+    private final static Stock VALID_STOCK = Stock.builder()
+            .uuid(VALID_STOCK_UUID)
+            .warehouse(VALID_WAREHOUSE)
+            .item(VALID_ITEM)
+            .quantity(VALID_STOCK_QUANTITY)
+            .build();
+
     private final static TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
             .stockUuid(VALID_STOCK_UUID)
             .quantity(VALID_STOCK_QUANTITY)
@@ -115,6 +141,13 @@ public class ShipmentHttpTests {
             .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
             .transfers(List.of())
+            .to(VALID_TARGET_WAREHOUSE_UUID)
+            .build();
+
+    private final static Transfer VALID_TRANSFER = Transfer.builder()
+            .uuid(VALID_TRANSFER_UUID)
+            .stock(VALID_STOCK)
+            .quantity(VALID_STOCK_QUANTITY)
             .build();
 
     private String
@@ -246,17 +279,23 @@ public class ShipmentHttpTests {
     void create_AsManager() throws Exception {
 
         // Arrange
-        final Shipment expectedShipment = VALID_SHIPMENT;
-        final String asString = objectMapper.writeValueAsString(expectedShipment);
+        final Shipment expectedShipment = VALID_SHIPMENT.toBuilder()
+                .transfers(List.of(VALID_TRANSFER))
+                .build();
+
+        final String expectedAsString = objectMapper.writeValueAsString(expectedShipment);
+        final String givenAsString = objectMapper
+                .writeValueAsString(VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO);
+
         given(shipmentService.create(any())).willReturn(expectedShipment);
 
         // Act & Assert
         mockMvc.perform(post("/shipments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asString))
+                .content(givenAsString))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(asString));
+                .andExpect(content().json(expectedAsString));
 
         verify(shipmentService, times(1)).create(any());
     }
