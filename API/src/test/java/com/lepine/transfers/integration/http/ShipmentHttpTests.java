@@ -460,4 +460,30 @@ public class ShipmentHttpTests {
 
         verify(shipmentService, never()).create(any());
     }
+
+    @Test
+    @DisplayName("syKcvTnAnB: Given POST on /shipments with expectedDate < 3 business days as manager, then deny create (401, error)")
+    @WithUserDetails(value = VALID_MANAGER_EMAIL)
+    void create_ExpectedDateLessThan3BusinessDays_DenyCreate() throws Exception {
+
+        // Arrange
+        final String givenAsString = objectMapper
+                .writeValueAsString(
+                        VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
+                                .expectedDate(LocalDate.now().minusDays(2))
+                                .build());
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(givenAsString))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.expectedDate").isArray())
+                .andExpect(jsonPath("$.errors.expectedDate[*]", containsInAnyOrder(
+                        ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY.replace("{days}", "3")
+                )));
+
+        verify(shipmentService, never()).create(any());
+    }
 }
