@@ -434,4 +434,30 @@ public class ShipmentHttpTests {
 
         verify(shipmentService, never()).create(any());
     }
+
+    @Test
+    @DisplayName("NtnpkJyUcQ: Given POST on /shipments with null orderNumber as manager, then deny create (401, error)")
+    @WithUserDetails(value = VALID_MANAGER_EMAIL)
+    void create_NullOrderNumber_DenyCreate() throws Exception {
+
+        // Arrange
+        final String givenAsString = objectMapper
+                .writeValueAsString(
+                        VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
+                                .orderNumber(null)
+                                .build());
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(givenAsString))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.orderNumber").isArray())
+                .andExpect(jsonPath("$.errors.orderNumber[*]", containsInAnyOrder(
+                        ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL
+                )));
+
+        verify(shipmentService, never()).create(any());
+    }
 }
