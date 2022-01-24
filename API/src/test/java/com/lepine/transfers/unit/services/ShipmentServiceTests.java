@@ -101,7 +101,8 @@ public class ShipmentServiceTests {
 
     private String
             SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE,
-            SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE;
+            SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE,
+            ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL;
 
     @Autowired
     private ShipmentService shipmentService;
@@ -123,6 +124,7 @@ public class ShipmentServiceTests {
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
         SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE = w.getMessage("transfer.quantity.min");
         SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE = w.getMessage("shipment.transfers.size.min");
+        ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL = w.getMessage("shipment.transfers.not_null");
     }
 
     @Test
@@ -222,5 +224,23 @@ public class ShipmentServiceTests {
         // Assert
         assertThat(sameWarehouseException.getMessage())
                 .isEqualTo(new SameWarehouseException(VALID_STOCK, VALID_TARGET_WAREHOUSE_UUID).getMessage());
+    }
+
+    @Test
+    @DisplayName("hhIwgajnXJ: Given DTO with null transfers when create, then throw ConstraintViolationException")
+    void invalid_Create_NullTransfers() {
+
+        // Arrange
+        ShipmentStatusLessUuidLessDTO invalidDTO = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder()
+                .transfers(null)
+                .build();
+
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> shipmentService.create(invalidDTO));
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+
+        assertThat(collect).containsExactly(ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL);
+        verify(warehouseService, never()).findByUuid(any());
     }
 }
