@@ -573,7 +573,7 @@ public class ShipmentHttpTests {
                 .content(givenAsString))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(new DefaultLoginNotAllowedException().getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.timestamp").exists());
 
         verify(shipmentService, never()).create(any());

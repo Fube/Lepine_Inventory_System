@@ -2,6 +2,7 @@ package com.lepine.transfers.config.controllers;
 
 import com.lepine.transfers.exceptions.DuplicateResourceException;
 import com.lepine.transfers.exceptions.NotFoundException;
+import com.lepine.transfers.exceptions.auth.DefaultLoginNotAllowedException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import lombok.Data;
@@ -69,6 +70,7 @@ public class GlobalAdvice {
             DuplicateResourceException.class,
             SameWarehouseException.class,
             StockTooLowException.class,
+            DefaultLoginNotAllowedException.class,
     })
     @ResponseStatus(value = BAD_REQUEST)
     public HTTPErrorMessage handleGenericBusinessLogicRuntimeException(RuntimeException e) {
