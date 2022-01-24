@@ -514,7 +514,7 @@ public class ShipmentHttpTests {
                 .andExpect(jsonPath("$.message").value(expectedSameWarehouseException.getMessage()))
                 .andExpect(jsonPath("$.timestamp").exists());
 
-        verify(shipmentService, never()).create(any());
+        verify(shipmentService, times(1)).create(any());
     }
 
 }

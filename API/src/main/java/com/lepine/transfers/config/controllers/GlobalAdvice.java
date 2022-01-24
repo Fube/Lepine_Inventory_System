@@ -2,6 +2,7 @@ package com.lepine.transfers.config.controllers;
 
 import com.lepine.transfers.exceptions.DuplicateResourceException;
 import com.lepine.transfers.exceptions.NotFoundException;
+import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import lombok.Data;
 import lombok.Getter;
@@ -67,6 +68,12 @@ public class GlobalAdvice {
     @ExceptionHandler(DuplicateResourceException.class)
     @ResponseStatus(value = BAD_REQUEST)
     public HTTPErrorMessage handleDuplicateResourceException(DuplicateResourceException e) {
+        return new HTTPErrorMessage(BAD_REQUEST.value(), e.getMessage());
+    }
+
+    @ExceptionHandler(SameWarehouseException.class)
+    @ResponseStatus(value = BAD_REQUEST)
+    public HTTPErrorMessage handleSameWarehouseException(SameWarehouseException e) {
         return new HTTPErrorMessage(BAD_REQUEST.value(), e.getMessage());
     }
 }
