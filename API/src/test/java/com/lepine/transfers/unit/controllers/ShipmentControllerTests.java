@@ -57,7 +57,8 @@ public class ShipmentControllerTests {
             VALID_USER_EMAIL = "a@b.c",
             VALID_USER_PASSWORD = "noneofyourbusiness",
             VALID_CLERK_ROLE_NAME = "CLERK",
-            VALID_MANAGER_ROLE_NAME = "MANAGER";
+            VALID_MANAGER_ROLE_NAME = "MANAGER",
+            VALID_SALESPERSON_ROLE_NAME = "SALESPERSON";
 
     private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDateUtils.businessDaysFromNow(3);
 
@@ -69,6 +70,10 @@ public class ShipmentControllerTests {
             VALID_MANAGER_ROLE = Role.builder()
                 .uuid(VALID_ROLE_UUID)
                 .name(VALID_MANAGER_ROLE_NAME)
+                .build(),
+            VALID_SALESPERSON_ROLE = Role.builder()
+                .uuid(VALID_ROLE_UUID)
+                .name(VALID_SALESPERSON_ROLE_NAME)
                 .build();
 
     private final static TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
@@ -145,7 +150,7 @@ public class ShipmentControllerTests {
                 .uuid(VALID_USER_UUID)
                 .email(VALID_USER_EMAIL)
                 .password(VALID_USER_PASSWORD)
-                .role(VALID_CLERK_ROLE)
+                .role(VALID_SALESPERSON_ROLE)
                 .build();
         final PageRequest expectedPageRequest = PageRequest.of(page - 1, size, Sort.by("expectedDate").descending());
         final Page<Shipment> givenShipments = Page.empty();
