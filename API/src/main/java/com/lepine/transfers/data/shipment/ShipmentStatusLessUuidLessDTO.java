@@ -22,6 +22,7 @@ public class ShipmentStatusLessUuidLessDTO {
 
     @Valid
     @Size(min = 1, message = "{shipment.transfers.size.min}")
+    @NotNull(message = "{shipment.transfers.not_null}")
     private List<TransferUuidLessDTO> transfers;
 
     @DaysFromNow(days = 3, message = "{shipment.expected.date.too.early}")
