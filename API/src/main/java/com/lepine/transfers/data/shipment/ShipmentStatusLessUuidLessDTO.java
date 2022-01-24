@@ -19,6 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class ShipmentStatusLessUuidLessDTO {
+
     @Valid
     @Size(min = 1, message = "{shipment.transfers.size.min}")
     private List<TransferUuidLessDTO> transfers;

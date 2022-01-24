@@ -28,6 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -361,6 +362,35 @@ public class ShipmentControllerTests {
 
         // Assert
         assertThat(defaultLoginNotAllowedException).isNotNull();
+
+        verify(shipmentService, never()).create(any());
+    }
+
+    @Test
+    @DisplayName("JYlFTbbGGp: Given shipment with no transfers when create, then throw ConstraintViolationException")
+    void invalid_CreateNoTransfers() {
+
+        // Arrange
+        final User givenUser = User.builder()
+                .uuid(VALID_USER_UUID)
+                .email(VALID_USER_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_MANAGER_ROLE)
+                .build();
+
+        final ShipmentStatusLessCreatedByLessUuidLessDTO givenDto =
+                VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
+                        .transfers(Collections.emptyList())
+                        .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException = catchThrowableOfType(
+                () -> shipmentController.create(givenUser, givenDto)
+                , ConstraintViolationException.class);
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY);
 
         verify(shipmentService, never()).create(any());
     }
