@@ -37,18 +37,20 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static com.lepine.transfers.utils.PageUtils.createPageFor;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ShipmentController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
@@ -155,7 +157,8 @@ public class ShipmentHttpTests {
             ERROR_MESSAGE_PAGINATION_SIZE_MIN,
             ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY,
             ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL,
-            ERROR_MESSAGE_SHIPMENT_TO_NULL;
+            ERROR_MESSAGE_SHIPMENT_TO_NULL,
+            ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY;
 
     @Autowired
     private MockMvc mockMvc;
@@ -183,6 +186,7 @@ public class ShipmentHttpTests {
         ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY = w.getMessage("shipment.expected.date.too.early");
         ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL = w.getMessage("shipment.order.number.not_null");
         ERROR_MESSAGE_SHIPMENT_TO_NULL = w.getMessage("shipment.to.not_null");
+        ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY = w.getMessage("shipment.transfers.size.min");
     }
 
     @PostConstruct
@@ -347,6 +351,32 @@ public class ShipmentHttpTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(givenAsString))
                 .andExpect(status().isForbidden());
+
+        verify(shipmentService, never()).create(any());
+    }
+
+    @Test
+    @DisplayName("eSVJMMmpye: Given POST on /shipments with no transfers in body as manager, then deny create (401, error)")
+    @WithUserDetails(value = VALID_MANAGER_EMAIL)
+    void create_NoTransfers_DenyCreate() throws Exception {
+
+        // Arrange
+        final String givenAsString = objectMapper
+                .writeValueAsString(
+                        VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
+                                .transfers(Collections.emptyList())
+                                .build());
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(givenAsString))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.transfers").isArray())
+                .andExpect(jsonPath("$.errors.transfers[*]", containsInAnyOrder(
+                        ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY
+                )));
 
         verify(shipmentService, never()).create(any());
     }
