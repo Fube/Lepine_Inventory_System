@@ -16,6 +16,7 @@ import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import com.lepine.transfers.utils.date.LocalDateUtils;
@@ -159,7 +160,8 @@ public class ShipmentHttpTests {
             ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL,
             ERROR_MESSAGE_SHIPMENT_TO_NULL,
             ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY,
-            ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL;
+            ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL,
+            ERROR_MESSAGE_SHIPMENT_TRANSFERS_SELF_TRANSFER;
 
     @Autowired
     private MockMvc mockMvc;
@@ -189,6 +191,7 @@ public class ShipmentHttpTests {
         ERROR_MESSAGE_SHIPMENT_TO_NULL = w.getMessage("shipment.to.not_null");
         ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY = w.getMessage("shipment.transfers.size.min");
         ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL = w.getMessage("shipment.transfers.not_null");
+        ERROR_MESSAGE_SHIPMENT_TRANSFERS_SELF_TRANSFER = w.getMessage("shipment.transfers.self_transfer");
     }
 
     @PostConstruct
@@ -486,4 +489,32 @@ public class ShipmentHttpTests {
 
         verify(shipmentService, never()).create(any());
     }
+
+    @Test
+    @DisplayName("tgiccCFNZV: Given POST /shipments with self-transfer as manager, then deny create (401, error)")
+    @WithUserDetails(value = VALID_MANAGER_EMAIL)
+    void create_SelfTransfer_DenyCreate() throws Exception {
+
+        // Arrange
+        final String givenAsString = objectMapper
+                .writeValueAsString(
+                        VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
+                                .build());
+
+        final SameWarehouseException expectedSameWarehouseException =
+                new SameWarehouseException(VALID_STOCK, VALID_TARGET_WAREHOUSE_UUID);
+        given(shipmentService.create(any()))
+                .willThrow(expectedSameWarehouseException);
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(givenAsString))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(expectedSameWarehouseException.getMessage()))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(shipmentService, never()).create(any());
+    }
+
 }
