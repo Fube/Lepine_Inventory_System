@@ -106,7 +106,8 @@ public class ShipmentControllerTests {
             ERROR_MESSAGE_PAGINATION_SIZE_MIN,
             ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY,
             ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL,
-            ERROR_MESSAGE_SHIPMENT_TO_NULL;
+            ERROR_MESSAGE_SHIPMENT_TO_NULL,
+            ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY;
 
     @Autowired
     private ShipmentController shipmentController;
@@ -126,6 +127,7 @@ public class ShipmentControllerTests {
         ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY = w.getMessage("shipment.expected.date.too.early");
         ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL = w.getMessage("shipment.order.number.not_null");
         ERROR_MESSAGE_SHIPMENT_TO_NULL = w.getMessage("shipment.to.not_null");
+        ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY = w.getMessage("shipment.transfers.size.min");
     }
 
     @Test
