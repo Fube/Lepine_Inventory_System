@@ -158,7 +158,8 @@ public class ShipmentHttpTests {
             ERROR_MESSAGE_SHIPMENT_EXPECTED_DATE_TOO_EARLY,
             ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL,
             ERROR_MESSAGE_SHIPMENT_TO_NULL,
-            ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY;
+            ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY,
+            ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL;
 
     @Autowired
     private MockMvc mockMvc;
@@ -187,6 +188,7 @@ public class ShipmentHttpTests {
         ERROR_MESSAGE_SHIPMENT_ORDER_NUMBER_NULL = w.getMessage("shipment.order.number.not_null");
         ERROR_MESSAGE_SHIPMENT_TO_NULL = w.getMessage("shipment.to.not_null");
         ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY = w.getMessage("shipment.transfers.size.min");
+        ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL = w.getMessage("shipment.transfers.not_null");
     }
 
     @PostConstruct
@@ -376,6 +378,32 @@ public class ShipmentHttpTests {
                 .andExpect(jsonPath("$.errors.transfers").isArray())
                 .andExpect(jsonPath("$.errors.transfers[*]", containsInAnyOrder(
                         ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY
+                )));
+
+        verify(shipmentService, never()).create(any());
+    }
+
+    @Test
+    @DisplayName("YHfbDPDSnZ: Given POST on /shipments with null transfers in body as manager, then deny create (401, error)")
+    @WithUserDetails(value = VALID_MANAGER_EMAIL)
+    void create_NullTransfers_DenyCreate() throws Exception {
+
+        // Arrange
+        final String givenAsString = objectMapper
+                .writeValueAsString(
+                        VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
+                                .transfers(null)
+                                .build());
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(givenAsString))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.transfers").isArray())
+                .andExpect(jsonPath("$.errors.transfers[*]", containsInAnyOrder(
+                        ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL
                 )));
 
         verify(shipmentService, never()).create(any());
