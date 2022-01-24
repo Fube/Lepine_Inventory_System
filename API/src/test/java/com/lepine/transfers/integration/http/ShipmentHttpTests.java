@@ -16,6 +16,7 @@ import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.MessageSourceUtils;
@@ -491,7 +492,7 @@ public class ShipmentHttpTests {
     }
 
     @Test
-    @DisplayName("tgiccCFNZV: Given POST /shipments with self-transfer as manager, then deny create (401, error)")
+    @DisplayName("tgiccCFNZV: Given POST on /shipments with self-transfer as manager, then deny create (401, error)")
     @WithUserDetails(value = VALID_MANAGER_EMAIL)
     void create_SelfTransfer_DenyCreate() throws Exception {
 
@@ -517,4 +518,30 @@ public class ShipmentHttpTests {
         verify(shipmentService, times(1)).create(any());
     }
 
+    @Test
+    @DisplayName("JSFIWUKIcE: Given POST on /shipments when stock too low, then deny create (401, error)")
+    @WithUserDetails(value = VALID_MANAGER_EMAIL)
+    void create_StockTooLow_DenyCreate() throws Exception {
+
+        // Arrange
+        final String givenAsString = objectMapper
+                .writeValueAsString(
+                        VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
+                                .build());
+
+        final StockTooLowException expectedStockTooLowException =
+                new StockTooLowException(VALID_STOCK_UUID, VALID_STOCK_QUANTITY, VALID_STOCK_QUANTITY + 1);
+        given(shipmentService.create(any()))
+                .willThrow(expectedStockTooLowException);
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(givenAsString))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(expectedStockTooLowException.getMessage()))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(shipmentService, times(1)).create(any());
+    }
 }
