@@ -16,6 +16,7 @@ import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.exceptions.auth.DefaultLoginNotAllowedException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import com.lepine.transfers.services.shipment.ShipmentService;
@@ -31,6 +32,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -64,6 +66,7 @@ public class ShipmentHttpTests {
             VALID_TRANSFER_UUID = UUID.randomUUID(),
             VALID_TARGET_WAREHOUSE_UUID = UUID.randomUUID(),
             VALID_STOCK_UUID = UUID.randomUUID(),
+            VALID_DEFAULT_LOGIN_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000"),
             VALID_MANAGER_UUID = UUID.randomUUID(),
             VALID_SALESPERSON_UUID = UUID.randomUUID(),
             VALID_CLERK_UUID = UUID.randomUUID(),
@@ -73,6 +76,7 @@ public class ShipmentHttpTests {
 
     private final static String
             VALID_SHIPMENT_ORDER_NUMBER = "Some Order Number",
+            VALID_DEFAULT_LOGIN_EMAIL = "manager",
             VALID_MANAGER_EMAIL = "a@b.c",
             VALID_SALESPERSON_EMAIL = "b@c.d",
             VALID_CLERK_EMAIL = "c@d.e",
@@ -216,6 +220,13 @@ public class ShipmentHttpTests {
                 .email(VALID_CLERK_EMAIL)
                 .password(VALID_USER_PASSWORD)
                 .role(VALID_CLERK_ROLE)
+                .build()));
+
+        given(userRepo.findByEmail(VALID_DEFAULT_LOGIN_EMAIL)).willReturn(Optional.ofNullable(User.builder()
+                .uuid(VALID_DEFAULT_LOGIN_UUID)
+                .email(VALID_DEFAULT_LOGIN_EMAIL)
+                .password(VALID_USER_PASSWORD)
+                .role(VALID_MANAGER_ROLE)
                 .build()));
     }
 
@@ -544,4 +555,28 @@ public class ShipmentHttpTests {
 
         verify(shipmentService, times(1)).create(any());
     }
+
+    @Test
+    @DisplayName("ABDKaOoniX: Given POST on /shipments with default login, then deny create (400, error)")
+    @WithUserDetails(value = VALID_DEFAULT_LOGIN_EMAIL)
+    void create_DefaultLogin_DenyCreate() throws Exception {
+
+        // Arrange
+        final String givenAsString = objectMapper
+                .writeValueAsString(
+                        VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
+                                .build());
+
+        // Act & Assert
+        mockMvc.perform(post("/shipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(givenAsString))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(new DefaultLoginNotAllowedException().getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        verify(shipmentService, never()).create(any());
+    }
+
 }
