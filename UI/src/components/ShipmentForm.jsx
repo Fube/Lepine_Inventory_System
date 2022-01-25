@@ -1,6 +1,7 @@
 import { Formik, Field, FieldArray } from "formik";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
+import { DateTime } from "luxon-business-days";
 import {
     GenericErrorStatus,
     GenericForm,
@@ -86,12 +87,10 @@ export default function ShipmentForm({
                         <DatePickerField
                             name="expectedDate"
                             placeholder="Expected Date"
-                            minDate={
-                                new Date(
-                                    new Date().getTime() +
-                                        3 * 24 * 60 * 60 * 1000
-                                )
-                            }
+                            minDate={DateTime.local()
+                                .endOf("day")
+                                .plusBusiness({ days: 3 })
+                                .toJSDate()}
                         />
 
                         <div className="flex items-center justify-end p-6">
