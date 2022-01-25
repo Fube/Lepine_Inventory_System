@@ -52,6 +52,14 @@ export default function ShipmentForm({
         orderNumber: yup.string().required("Order Number is required"),
     });
 
+    /**
+     *
+     * @param {Date} date
+     * @returns
+     */
+    const isAcceptableDate = (date) =>
+        DateTime.fromJSDate(date).isBusinessDay();
+
     return (
         <>
             <Formik
@@ -87,10 +95,7 @@ export default function ShipmentForm({
                         <DatePickerField
                             name="expectedDate"
                             placeholder="Expected Date"
-                            minDate={DateTime.local()
-                                .endOf("day")
-                                .plusBusiness({ days: 3 })
-                                .toJSDate()}
+                            filterDate={isAcceptableDate}
                         />
 
                         <div className="flex items-center justify-end p-6">
