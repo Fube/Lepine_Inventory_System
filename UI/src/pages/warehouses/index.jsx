@@ -8,7 +8,7 @@ import { axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
 /**
- * @param {{ warehouses: import('@lepine/types').Warehouse[] } & import("@lepine/types").Pagination} param0
+ * @param {{ warehouses: import('@lepine/ui-types').Warehouse[] } & import("@lepine/ui-types").Pagination} param0
  */
 export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
     const router = useRouter();
