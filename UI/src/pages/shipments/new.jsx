@@ -5,7 +5,12 @@ import WithClientSideAuth from "../../components/WithClientSideAuth";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import checkEmptyAuth from "../../utils/checkEmptyAuth";
 
-function CreateShipment() {
+/**
+ *
+ * @param { activeWarehouses: import('@lepine/ui-types').Warehouse[] } param0
+ * @returns
+ */
+function CreateShipment({ activeWarehouses }) {
     const router = useRouter();
 
     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
@@ -41,15 +46,7 @@ function CreateShipment() {
                         <ShipmentForm
                             title={"Create Shipment"}
                             handleSubmit={handleSubmit}
-                            warehouses={[
-                                // TODO: Load this from back-end
-                                {
-                                    uuid: "00000000-0000-0000-0000-000000000000",
-                                    city: "Laval",
-                                    province: "QC",
-                                    zipCode: "A1B2C3",
-                                },
-                            ]}
+                            warehouses={activeWarehouses}
                             editable
                         />
                     </div>
@@ -67,5 +64,15 @@ export default WithClientSideAuth(CreateShipment);
  * @returns
  */
 export async function getServerSideProps(ctx) {
-    return checkEmptyAuth(axiosBackendAuth, ctx);
+    const res = await axiosBackendAuth.get(`/warehouses?size=100&active=true`, {
+        headers: { cookie: ctx?.req?.headers?.cookie ?? "" },
+    });
+
+    return res
+        .refine(({ content: activeWarehouses }) => ({
+            props: {
+                activeWarehouses,
+            },
+        }))
+        .get();
 }
