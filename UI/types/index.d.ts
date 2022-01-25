@@ -38,7 +38,7 @@ export type Stock = {
     quantity: number;
 };
 
-export interface Shipment {
+export type Shipment = {
     uuid: string;
     status: string;
     transfers: Transfer[];
@@ -46,10 +46,10 @@ export interface Shipment {
     orderNumber: string;
     createdBy: string;
     to: string;
-}
+};
 
-export interface Transfer {
+export type Transfer = {
     uuid: string;
     stock: Stock;
     quantity: number;
-}
+};
