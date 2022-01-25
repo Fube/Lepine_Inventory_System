@@ -1,4 +1,5 @@
 import { Form, Field, useField, useFormikContext } from "formik";
+import DatePicker from "react-datepicker";
 
 /**
  *
@@ -162,3 +163,28 @@ export function GenericFormSelectErrorCombo(fieldAttributes) {
         </>
     );
 }
+
+export const DatePickerField = (fieldAttributes) => {
+    const { setFieldValue } = useFormikContext();
+    const [field] = useField(fieldAttributes);
+    return (
+        <>
+            <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor={fieldAttributes.name}
+            >
+                {fieldAttributes.placeholder}
+            </label>
+            <DatePicker
+                minDate={fieldAttributes.minDate}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                {...field}
+                {...fieldAttributes}
+                selected={(field.value && new Date(field.value)) || null}
+                onChange={(val) => {
+                    setFieldValue(field.name, val);
+                }}
+            />
+        </>
+    );
+};

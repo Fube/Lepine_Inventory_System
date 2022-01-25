@@ -1,4 +1,4 @@
-import { Formik, FieldArray } from "formik";
+import { Formik, Field, FieldArray } from "formik";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
 import {
@@ -7,7 +7,10 @@ import {
     GenericFormInputErrorCombo,
     GenericSubmitButton,
     GenericFormSelectErrorCombo,
+    DatePickerField,
 } from "./FormikGenericComponents";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 /**
  * @param {{
@@ -79,6 +82,18 @@ export default function ShipmentForm({
                             title="Select a warehouse"
                             options={mappedWarehouses}
                         />
+
+                        <DatePickerField
+                            name="expectedDate"
+                            placeholder="Expected Date"
+                            minDate={
+                                new Date(
+                                    new Date().getTime() +
+                                        3 * 24 * 60 * 60 * 1000
+                                )
+                            }
+                        />
+
                         <div className="flex items-center justify-end p-6">
                             {editable && <GenericSubmitButton text="Save" />}
                             {deletable && (
