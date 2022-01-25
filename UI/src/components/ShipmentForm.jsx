@@ -12,6 +12,7 @@ import {
 } from "./FormikGenericComponents";
 
 import "react-datepicker/dist/react-datepicker.css";
+import { Icon } from "@iconify/react";
 
 /**
  * @param {{
@@ -28,7 +29,7 @@ export default function ShipmentForm({
     status = "",
     transfers = [
         {
-            quantity: 0,
+            quantity: 1,
             stock: "",
         },
     ],
@@ -75,7 +76,7 @@ export default function ShipmentForm({
                 onSubmit={handleSubmit}
                 validationSchema={shipmentSchema}
             >
-                {({}) => (
+                {({ values }) => (
                     <GenericForm title={title}>
                         <GenericErrorStatus />
                         <GenericFormInputErrorCombo
@@ -102,17 +103,64 @@ export default function ShipmentForm({
                             filterDate={isAcceptableDate}
                         />
 
-                        <div className="flex items-center justify-end p-6">
-                            {editable && <GenericSubmitButton text="Save" />}
-                            {deletable && (
-                                <button
-                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
-                                    type="button"
-                                    onClick={handleDelete}
-                                >
-                                    Delete
-                                </button>
+                        <div className="divider before:!bg-base-300 after:!bg-base-300 mt-2" />
+                        <span className="block text-gray-700 text-lg font-bold mb-2">
+                            Transfers
+                        </span>
+                        <FieldArray name="transfers">
+                            {({ insert, remove, push }) => (
+                                <>
+                                    {values.transfers.map((transfer, index) => (
+                                        <div key={index} className="mb-6">
+                                            <GenericFormInputErrorCombo
+                                                disabled={!editable}
+                                                name={`transfers[${index}].stock`}
+                                                type="text"
+                                                placeholder="Stock"
+                                            />
+                                            <GenericFormInputErrorCombo
+                                                disabled={!editable}
+                                                name={`transfers.${index}.quantity`}
+                                                type="number"
+                                                placeholder="Quantity"
+                                                min={1}
+                                            />
+                                            {editable && (
+                                                <button
+                                                    type="button"
+                                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2"
+                                                    onClick={() =>
+                                                        remove(index)
+                                                    }
+                                                    disabled={!editable}
+                                                >
+                                                    <Icon icon="gridicons:trash" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                    <div className="flex justify-start mt-4">
+                                        <button
+                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                            type="button"
+                                            onClick={() =>
+                                                push({
+                                                    quantity: 1,
+                                                    stock: "",
+                                                })
+                                            }
+                                        >
+                                            Add transfer
+                                        </button>
+                                    </div>
+                                </>
                             )}
+                        </FieldArray>
+
+                        <div className="divider before:!bg-base-300 after:!bg-base-300 mt-2 mb-0" />
+
+                        <div className="flex items-center justify-center p-6 pt-2">
+                            {editable && <GenericSubmitButton text="Save" />}
                         </div>
                     </GenericForm>
                 )}
