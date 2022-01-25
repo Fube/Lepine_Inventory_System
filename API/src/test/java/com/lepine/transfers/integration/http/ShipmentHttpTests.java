@@ -21,7 +21,7 @@ import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.MessageSourceUtils;
-import com.lepine.transfers.utils.date.LocalDateUtils;
+import com.lepine.transfers.utils.date.ZonedDateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +53,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ShipmentController.class })
@@ -85,7 +84,7 @@ public class ShipmentHttpTests {
             VALID_MANAGER_ROLE_NAME = "MANAGER",
             VALID_SALESPERSON_ROLE_NAME = "SALESPERSON";
 
-    private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDateUtils.businessDaysFromNow(3);
+    private final static ZonedDateTime VALID_SHIPMENT_EXPECTED_DATE = ZonedDateUtils.businessDaysFromNow(4);
 
     private final static Role
             VALID_SALESPERSON_ROLE = Role.builder()
@@ -485,7 +484,7 @@ public class ShipmentHttpTests {
         final String givenAsString = objectMapper
                 .writeValueAsString(
                         VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
-                                .expectedDate(LocalDate.now().minusDays(2))
+                                .expectedDate(ZonedDateTime.now().minusDays(2))
                                 .build());
 
         // Act & Assert

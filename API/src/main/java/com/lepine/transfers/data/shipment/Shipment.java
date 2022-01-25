@@ -5,9 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +36,7 @@ public class Shipment {
     @Builder.Default
     private List<Transfer> transfers = new ArrayList<>(0);
 
-    private LocalDate expectedDate;
+    private ZonedDateTime expectedDate;
     private String orderNumber;
 
     @JoinColumn(name = "created_by", referencedColumnName = "uuid", nullable = false)

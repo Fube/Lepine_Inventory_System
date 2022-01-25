@@ -13,7 +13,7 @@ import com.lepine.transfers.exceptions.auth.DefaultLoginNotAllowedException;
 import com.lepine.transfers.services.shipment.ShipmentService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
-import com.lepine.transfers.utils.date.LocalDateUtils;
+import com.lepine.transfers.utils.date.ZonedDateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +60,7 @@ public class ShipmentControllerTests {
             VALID_MANAGER_ROLE_NAME = "MANAGER",
             VALID_SALESPERSON_ROLE_NAME = "SALESPERSON";
 
-    private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDateUtils.businessDaysFromNow(3);
+    private final static ZonedDateTime VALID_SHIPMENT_EXPECTED_DATE = ZonedDateUtils.businessDaysFromNow(4);
 
     private final static Role
             VALID_CLERK_ROLE = Role.builder()
@@ -328,7 +328,7 @@ public class ShipmentControllerTests {
 
         final ShipmentStatusLessCreatedByLessUuidLessDTO givenDto =
                 VALID_SHIPMENT_STATUS_LESS_CREATED_BY_LESS_UUID_LESS_DTO.toBuilder()
-                        .expectedDate(LocalDate.now())
+                        .expectedDate(ZonedDateTime.now())
                         .orderNumber(null)
                         .to(null)
                         .build();

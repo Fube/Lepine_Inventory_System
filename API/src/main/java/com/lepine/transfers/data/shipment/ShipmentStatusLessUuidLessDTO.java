@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +27,7 @@ public class ShipmentStatusLessUuidLessDTO {
 
     @DaysFromNow(days = 3, message = "{shipment.expected.date.too.early}")
     @NotNull
-    private LocalDate expectedDate;
+    private ZonedDateTime expectedDate;
 
     @NotNull(message = "{shipment.order.number.not_null}")
     private String orderNumber;

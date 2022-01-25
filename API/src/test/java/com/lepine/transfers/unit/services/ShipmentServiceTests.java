@@ -17,7 +17,7 @@ import com.lepine.transfers.services.stock.StockService;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
-import com.lepine.transfers.utils.date.LocalDateUtils;
+import com.lepine.transfers.utils.date.ZonedDateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 import javax.validation.ConstraintViolationException;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
@@ -55,7 +55,7 @@ public class ShipmentServiceTests {
     private final static String VALID_SHIPMENT_ORDER_NUMBER = "Some Order Number";
     private final static String SHIPMENT_EXPECTED_DATE_TOO_EARLY_ERROR_MESSAGE_LOCATOR = "shipment.expected.date.too.early";
 
-    private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDateUtils.businessDaysFromNow(3);
+    private final static ZonedDateTime VALID_SHIPMENT_EXPECTED_DATE = ZonedDateUtils.businessDaysFromNow(4);
 
     private final static TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
             .stockUuid(VALID_STOCK_UUID)
@@ -136,7 +136,7 @@ public class ShipmentServiceTests {
 
         // Arrange
         ShipmentStatusLessUuidLessDTO invalidDTO = VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.toBuilder()
-                .expectedDate(LocalDate.now())
+                .expectedDate(ZonedDateTime.now())
                 .build();
 
         // Act & Assert

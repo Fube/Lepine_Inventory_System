@@ -24,7 +24,7 @@ import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.services.search.SearchService;
 import com.lepine.transfers.services.shipment.ShipmentService;
-import com.lepine.transfers.utils.date.LocalDateUtils;
+import com.lepine.transfers.utils.date.ZonedDateUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +37,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,7 +63,7 @@ public class ShipmentServiceTests {
 
     private final static ShipmentStatus VALID_SHIPMENT_STATUS = ShipmentStatus.PENDING;
 
-    private final static LocalDate VALID_SHIPMENT_EXPECTED_DATE = LocalDateUtils.businessDaysFromNow(3);
+    private final static ZonedDateTime VALID_SHIPMENT_EXPECTED_DATE = ZonedDateUtils.businessDaysFromNow(4);
 
     private final static int VALID_STOCK_QUANTITY = 10;
 

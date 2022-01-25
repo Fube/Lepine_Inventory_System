@@ -1,8 +1,8 @@
 package com.lepine.transfers.utils.date;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
-public class LocalDateUtils {
+public class ZonedDateUtils {
 
     // Copied from https://stackoverflow.com/questions/33942544/how-to-skip-weekends-while-adding-days-to-localdate-in-java-8/33943576
     /**
@@ -35,13 +35,13 @@ public class LocalDateUtils {
         return result;
     }
 
-    public static LocalDate addBusinessDays(LocalDate date, long businessDays) {
+    public static ZonedDateTime addBusinessDays(ZonedDateTime date, long businessDays) {
         int dayOfWeek = date.getDayOfWeek().getValue();
         long allDays = getAllDays(dayOfWeek, businessDays);
         return date.plusDays(allDays);
     }
 
-    public static LocalDate businessDaysFromNow(long businessDays) {
-        return addBusinessDays(LocalDate.now(), businessDays);
+    public static ZonedDateTime businessDaysFromNow(long businessDays) {
+        return addBusinessDays(ZonedDateTime.now(), businessDays);
     }
 }
