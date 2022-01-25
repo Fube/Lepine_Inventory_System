@@ -30,9 +30,9 @@ const rawSchema = {
  * editable: boolean,
  * deletable: boolean,
  * handleDelete: (uuid: string) => void,
- * handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void }
- * title: string,
- * & import('../../types').Warehouse } )
+ * handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void
+ * title: string, }
+ * & import('@lepine/ui-types').Warehouse } )
  */
 export default function WarehouseForm({
     uuid,
