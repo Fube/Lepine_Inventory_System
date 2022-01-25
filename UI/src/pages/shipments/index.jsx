@@ -1,12 +1,17 @@
 import Head from "next/head";
 import Link from "next/link";
+import { Icon } from "@iconify/react";
 import Paginate from "../../components/Pagination";
 import { axiosBackendAuth } from "../../config/axios";
+import useAuth from "../../hooks/useAuth";
+import thou from "../../utils/thou";
 
 /**
  * @param {{ shipments: import('@lepine/ui-types').Shipment[] } & import("@lepine/ui-types").Pagination} param0
  */
 export default function ShowShipments({ shipments, totalPages, pageNumber }) {
+    const { role } = useAuth();
+
     const header = (
         <Head>
             <title>Shipments</title>
@@ -22,7 +27,20 @@ export default function ShowShipments({ shipments, totalPages, pageNumber }) {
     const head = (
         <tr>
             <th>Order Number</th>
-            <th>Shipment Date</th>
+            <th className="flex justify-between">
+                {thou(
+                    <>
+                        <div className="self-center">Shipment Date</div>
+                        <button>
+                            <Link href="/shipments/new" passHref>
+                                <Icon icon="si-glyph:button-plus" width="32" />
+                            </Link>
+                        </button>
+                    </>
+                )
+                    .or("Shipment Date")
+                    .if(role === "MANAGER" || role === "SALESPERSON")}
+            </th>
         </tr>
     );
 
@@ -30,7 +48,19 @@ export default function ShowShipments({ shipments, totalPages, pageNumber }) {
         return (
             <>
                 {header}
-                <div className="flex justify-center">{fallback}</div>
+                <main className="flex justify-center">
+                    <div className="text-center">
+                        <div className="mt-12">{fallback}</div>
+                        {role === "MANAGER" ||
+                            (role === "SALESPERSON" && (
+                                <Link href="/shipments/new" passHref>
+                                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
+                                        Add One Now!
+                                    </button>
+                                </Link>
+                            ))}
+                    </div>
+                </main>
             </>
         );
     }

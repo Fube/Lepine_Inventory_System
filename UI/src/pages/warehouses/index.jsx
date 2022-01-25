@@ -26,11 +26,15 @@ export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
             <th>City</th>
             <th className="md:rounded-r-none rounded-r-lg flex justify-between md:table-cell">
                 <div className="self-center">Province</div>
-                <button className="md:hidden">
-                    <Link href="/warehouses/new" passHref>
-                        <Icon icon="si-glyph:button-plus" width="32" />
-                    </Link>
-                </button>
+                {role === "MANAGER" ? (
+                    <button className="md:hidden">
+                        <Link href="/warehouses/new" passHref>
+                            <Icon icon="si-glyph:button-plus" width="32" />
+                        </Link>
+                    </button>
+                ) : (
+                    ""
+                )}
             </th>
             <th className="hidden justify-between md:flex">
                 {thou(
