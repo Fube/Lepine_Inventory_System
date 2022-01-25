@@ -118,3 +118,47 @@ export function GenericErrorStatus() {
         </div>
     );
 }
+
+/**
+ *
+ * @param {import("formik").FieldAttributes<any> & {
+ *    title: string;
+ *    options: {value: *, text: *}[];
+ * }} param0
+ * @returns
+ */
+export function GenericFormSelectErrorCombo(fieldAttributes) {
+    const [inputProps, { error, touched }, helperProps] = useField(
+        fieldAttributes.name
+    );
+    return (
+        <>
+            <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor={fieldAttributes.name}
+            >
+                {fieldAttributes.placeholder}
+            </label>
+            <Field
+                className={
+                    "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" +
+                    (error && touched ? " border-red-500" : "")
+                }
+                component="select"
+                {...fieldAttributes}
+            >
+                <option value="" disabled>
+                    {fieldAttributes.title}
+                </option>
+                {fieldAttributes.options.map(({ key, value }) => (
+                    <option key={value} value={value}>
+                        {key}
+                    </option>
+                ))}
+            </Field>
+            {error && touched && (
+                <div className="text-red-500 text-xs italic">{error}</div>
+            )}
+        </>
+    );
+}

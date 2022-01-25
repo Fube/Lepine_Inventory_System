@@ -41,7 +41,15 @@ function CreateShipment() {
                         <ShipmentForm
                             title={"Create Shipment"}
                             handleSubmit={handleSubmit}
-                            blackList={["active"]}
+                            warehouses={[
+                                // TODO: Load this from back-end
+                                {
+                                    uuid: "00000000-0000-0000-0000-000000000000",
+                                    city: "Laval",
+                                    province: "QC",
+                                    zipCode: "A1B2C3",
+                                },
+                            ]}
                             editable
                         />
                     </div>
