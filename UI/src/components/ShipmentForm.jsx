@@ -95,6 +95,10 @@ export default function ShipmentForm({
                         <DatePickerField
                             name="expectedDate"
                             placeholder="Expected Date"
+                            minDate={DateTime.local()
+                                .endOf("day")
+                                .plusBusiness({ days: 4 })
+                                .toJSDate()}
                             filterDate={isAcceptableDate}
                         />
 
