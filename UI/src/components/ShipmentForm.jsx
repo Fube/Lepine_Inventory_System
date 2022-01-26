@@ -1,4 +1,4 @@
-import { Formik, Field, FieldArray } from "formik";
+import { Formik, FieldArray } from "formik";
 import { useEffect, useState, useContext } from "react";
 import * as yup from "yup";
 import { DateTime } from "luxon-business-days";
@@ -14,7 +14,7 @@ import {
 import "react-datepicker/dist/react-datepicker.css";
 import { Icon } from "@iconify/react";
 import { connectHits, InstantSearch } from "react-instantsearch-core";
-import { Hits, SearchBox, Configure } from "react-instantsearch-dom";
+import { SearchBox, Configure } from "react-instantsearch-dom";
 import { AlgoliaContext } from "../pages/_app";
 import thou from "../utils/thou";
 
@@ -92,7 +92,7 @@ export default function ShipmentForm({
                         .number()
                         .min(1, "Quantity must be greater than or equal to 1")
                         .required("Quantity is required"),
-                    stock: yup.string().required("Stock is required"),
+                    stockUuid: yup.string().required("Stock is required"),
                 })
             )
             .min(1, "At least one transfer is required"),
@@ -185,12 +185,12 @@ export default function ShipmentForm({
                                                             searchClient={
                                                                 searchClient
                                                             }
-                                                            selectName={`transfers[${index}].stock`}
+                                                            selectName={`transfers[${index}].stockUuid`}
                                                             hitAsDummy={(
                                                                 hit
                                                             ) => {
                                                                 setFieldValue(
-                                                                    `transfers[${index}].stock`,
+                                                                    `transfers[${index}].stockUuid`,
                                                                     hit.objectID
                                                                 );
                                                                 return (
@@ -298,7 +298,7 @@ function AlgoliaStockOptionHit({
                         <div className="text-sm leading-5">
                             {sku} - {description}
                         </div>
-                        <div className="text-sm leading-5 flex justify-around">
+                        <div className="text-sm leading-5 flex gap-6">
                             <div className="flex">
                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium leading-4 bg-green-100 text-green-800">
                                     <Icon
