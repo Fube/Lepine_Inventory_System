@@ -278,7 +278,8 @@ public class WarehouseControllerTests {
 
         // Act
         final ConstraintViolationException constraintViolationException =
-                assertThrows(ConstraintViolationException.class, () -> warehouseController.getAll(pageNumber, pageSize));
+                assertThrows(ConstraintViolationException.class,
+                        () -> warehouseController.getAll(pageNumber, pageSize, Optional.empty()));
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
@@ -296,7 +297,8 @@ public class WarehouseControllerTests {
 
         // Act
         final ConstraintViolationException constraintViolationException =
-                assertThrows(ConstraintViolationException.class, () -> warehouseController.getAll(pageNumber, pageSize));
+                assertThrows(ConstraintViolationException.class,
+                        () -> warehouseController.getAll(pageNumber, pageSize, Optional.empty()));
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
@@ -314,7 +316,8 @@ public class WarehouseControllerTests {
 
         // Act
         final ConstraintViolationException constraintViolationException =
-                assertThrows(ConstraintViolationException.class, () -> warehouseController.getAll(pageNumber, pageSize));
+                assertThrows(ConstraintViolationException.class,
+                        () -> warehouseController.getAll(pageNumber, pageSize, Optional.empty()));
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
@@ -336,7 +339,7 @@ public class WarehouseControllerTests {
         when(warehouseService.findAll(expectedPageRequest)).thenReturn(expected);
 
         // Act
-        final Page<Warehouse> actual = warehouseController.getAll(pageNumber, pageSize);
+        final Page<Warehouse> actual = warehouseController.getAll(pageNumber, pageSize, Optional.empty());
 
         // Assert
         assertThat(actual.getTotalPages()).isEqualTo(expected.getTotalPages());
