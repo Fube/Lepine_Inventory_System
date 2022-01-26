@@ -57,6 +57,23 @@ export default function ShipmentForm({
 
     const shipmentSchema = yup.object().shape({
         orderNumber: yup.string().required("Order Number is required"),
+        expectedDate: yup
+            .date()
+            .businessDay()
+            .required("Expected Date is required"),
+        to: yup.string().required("To is required"),
+        transfers: yup
+            .array()
+            .of(
+                yup.object().shape({
+                    quantity: yup
+                        .number()
+                        .min(1, "Quantity must be greater than or equal to 1")
+                        .required("Quantity is required"),
+                    stock: yup.string().required("Stock is required"),
+                })
+            )
+            .min(1, "At least one transfer is required"),
     });
 
     /**
