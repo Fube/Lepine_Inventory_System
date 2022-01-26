@@ -213,6 +213,18 @@ export default function ShipmentForm({
                                                                     ])
                                                                 );
                                                             }}
+                                                            onReset={(
+                                                                lastHit
+                                                            ) => {
+                                                                selectedStockUuids.delete(
+                                                                    lastHit.objectID
+                                                                );
+                                                                setSelectedStockUuids(
+                                                                    [
+                                                                        ...selectedStockUuids,
+                                                                    ]
+                                                                );
+                                                            }}
                                                         />
 
                                                         <GenericFormInputErrorCombo
@@ -286,7 +298,7 @@ function AlgoliaStockOptionHit({
                         <div className="text-sm leading-5">
                             {sku} - {description}
                         </div>
-                        <div className="text-sm leading-5 flex justify-between">
+                        <div className="text-sm leading-5 flex justify-around">
                             <div className="flex">
                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium leading-4 bg-green-100 text-green-800">
                                     <Icon
@@ -345,18 +357,26 @@ function AlgoliaSearchAsDropDown({
     hitAsDummy,
     searchClient,
     onSelect = () => {},
+    onReset = () => {},
     filter = "",
 }) {
     const [showHits, setShowHits] = useState(false);
     const [dummySearch, setDummySearch] = useState(null);
+    const [lastHit, setLastHit] = useState(null);
 
     const handleSelect = (hit) => {
         setShowHits(false);
         setDummySearch(hitAsDummy(hit));
+        setLastHit(hit);
         onSelect(hit);
     };
 
-    return thou(<div onClick={() => setDummySearch(null)}>{dummySearch}</div>)
+    const handleDummyClick = () => {
+        onReset(lastHit);
+        setDummySearch(null);
+    };
+
+    return thou(<div onClick={handleDummyClick}>{dummySearch}</div>)
         .or(
             <InstantSearch searchClient={searchClient} indexName={indexName}>
                 <Configure filters={filter} />
