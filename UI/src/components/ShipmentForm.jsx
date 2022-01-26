@@ -219,7 +219,7 @@ function AlgoliaStockOptionHit({
     hit: { objectID: uuid, description, name, sku, zipCode, quantity },
 }) {
     return (
-        <li value={uuid} className="border-2 hover:bg-blue-300 mb-2">
+        <li value={uuid} className="border-2 hover:bg-blue-300 mb-2 p-2">
             <div className="flex items-center">
                 <div className="ml-2">
                     <div className="text-sm leading-5 font-medium text-base-300">
@@ -229,14 +229,26 @@ function AlgoliaStockOptionHit({
                         <div className="text-sm leading-5">
                             {sku} - {description}
                         </div>
-                        <div className="text-sm leading-5 flex">
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium leading-4 bg-green-100 text-green-800">
-                                <Icon
-                                    icon="ic:baseline-warehouse"
-                                    height={24}
-                                />
-                            </span>
-                            <span className="self-center">{zipCode}</span>
+                        <div className="text-sm leading-5 flex justify-between">
+                            <div className="flex">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium leading-4 bg-green-100 text-green-800">
+                                    <Icon
+                                        icon="ic:baseline-warehouse"
+                                        height={24}
+                                    />
+                                </span>
+                                <span className="self-center">{zipCode}</span>
+                            </div>
+
+                            <div className="flex">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium leading-4 bg-green-100 text-green-800">
+                                    <Icon
+                                        icon="ic:baseline-plus-minus-alt"
+                                        height={24}
+                                    />
+                                </span>
+                                <span className="self-center">{quantity}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
