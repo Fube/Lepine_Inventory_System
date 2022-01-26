@@ -1,5 +1,5 @@
 import { Formik, Field, FieldArray } from "formik";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import * as yup from "yup";
 import { DateTime } from "luxon-business-days";
 import {
@@ -13,6 +13,10 @@ import {
 
 import "react-datepicker/dist/react-datepicker.css";
 import { Icon } from "@iconify/react";
+import { connectHits, InstantSearch } from "react-instantsearch-core";
+import { Hits, SearchBox } from "react-instantsearch-dom";
+import { AlgoliaContext } from "../pages/_app";
+import thou from "../utils/thou";
 
 /**
  * @param {{
@@ -44,6 +48,8 @@ export default function ShipmentForm({
     handleDelete = () => {},
     handleSubmit = () => {},
 }) {
+    const { searchClient } = useContext(AlgoliaContext);
+
     const mappedWarehouses = warehouses.map((warehouse) => ({
         key: `${warehouse.city}, ${warehouse.province} - ${warehouse.zipCode}`,
         value: warehouse.uuid,
@@ -112,12 +118,28 @@ export default function ShipmentForm({
                                 <>
                                     {values.transfers.map((transfer, index) => (
                                         <div key={index} className="mb-6">
-                                            <GenericFormInputErrorCombo
-                                                disabled={!editable}
-                                                name={`transfers[${index}].stock`}
-                                                type="text"
-                                                placeholder="Stock"
+                                            <AlgoliaSearchAsDropDown
+                                                hitComponent={
+                                                    AlgoliaStockOptionHit
+                                                }
+                                                indexName="stocks"
+                                                searchClient={searchClient}
+                                                selectName={`transfers[${index}].stock`}
+                                                hitAsDummy={(hit) => (
+                                                    <span className="text-black">
+                                                        {hit.sku} - {hit.name}
+                                                    </span>
+                                                )}
+                                                onSelect={(hit) =>
+                                                    console.log(hit)
+                                                }
                                             />
+                                            {/* <GenericFormInputErrorCombo
+                                                        disabled={!editable}
+                                                        name={`transfers[${index}].stock`}
+                                                        type="text"
+                                                        placeholder="Stock"
+                                                    /> */}
                                             <GenericFormInputErrorCombo
                                                 disabled={!editable}
                                                 name={`transfers.${index}.quantity`}
@@ -168,3 +190,98 @@ export default function ShipmentForm({
         </>
     );
 }
+
+function AlgoliaStockOptionHit({
+    hit: { objectID: uuid, description, name, sku, zipCode, quantity },
+}) {
+    return (
+        <li value={uuid} className="border-2 hover:bg-blue-300 mb-2">
+            <div className="flex items-center">
+                <div className="ml-2">
+                    <div className="text-sm leading-5 font-medium text-base-300">
+                        {name}
+                    </div>
+                    <div className="text-base-200">
+                        <div className="text-sm leading-5">
+                            {sku} - {description}
+                        </div>
+                        <div className="text-sm leading-5 flex">
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium leading-4 bg-green-100 text-green-800">
+                                <Icon
+                                    icon="ic:baseline-warehouse"
+                                    height={24}
+                                />
+                            </span>
+                            <span className="self-center">{zipCode}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+    );
+}
+
+function AlgoliaSelectHitsInternal({
+    hits,
+    hitComponent: HitComponent,
+    fallbackComponent = <>Nothing found</>,
+    selectName,
+    onSelect = () => {},
+}) {
+    if (!hits || hits.length <= 0) {
+        return fallbackComponent;
+    }
+
+    const mapped = hits.map((hit) => (
+        <span key={hit.objectID} onClick={() => onSelect(hit)}>
+            <HitComponent hit={hit} />
+        </span>
+    ));
+
+    return (
+        <ul className="text-black" autoFocus={true} name={selectName}>
+            {mapped}
+        </ul>
+    );
+}
+
+function AlgoliaSearchAsDropDown({
+    selectName,
+    indexName,
+    hitComponent,
+    hitAsDummy,
+    searchClient,
+    onSelect = () => {},
+}) {
+    const [showHits, setShowHits] = useState(false);
+    const [dummySearch, setDummySearch] = useState(null);
+
+    const handleSelect = (hit) => {
+        setShowHits(false);
+        setDummySearch(hitAsDummy(hit));
+        onSelect(hit);
+    };
+
+    return thou(<div onClick={() => setDummySearch(null)}>{dummySearch}</div>)
+        .or(
+            <InstantSearch searchClient={searchClient} indexName={indexName}>
+                <SearchBox
+                    className="text-black"
+                    onChange={(e) =>
+                        setShowHits(e?.currentTarget?.value?.length > 0)
+                    }
+                    autoFocus={true}
+                />
+                {showHits && (
+                    <AlgoliaSelectHits
+                        hitComponent={hitComponent}
+                        selectName={selectName}
+                        onSelect={handleSelect}
+                    />
+                )}
+            </InstantSearch>
+        )
+        .if(dummySearch !== null);
+}
+
+const AlgoliaSelectHits = connectHits(AlgoliaSelectHitsInternal);
