@@ -14,24 +14,26 @@ function CreateShipment({ activeWarehouses }) {
     const router = useRouter();
 
     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
-        setSubmitting(true);
-        try {
-            await axiosAPI.post("/shipments", values);
-            setStatus({
-                isError: false,
-                message: "Shipment successfully created",
-            });
-            router.push("/shipments");
-        } catch (error) {
-            console.log(error);
-            setStatus({
-                isError: true,
-                message:
-                    error?.response?.data?.message ?? "Something went wrong",
-            });
-        } finally {
-            setSubmitting(false);
-        }
+        // setSubmitting(true);
+        // try {
+        //     await axiosAPI.post("/shipments", values);
+        //     setStatus({
+        //         isError: false,
+        //         message: "Shipment successfully created",
+        //     });
+        //     router.push("/shipments");
+        // } catch (error) {
+        //     console.log(error);
+        //     setStatus({
+        //         isError: true,
+        //         message:
+        //             error?.response?.data?.message ?? "Something went wrong",
+        //     });
+        // } finally {
+        //     setSubmitting(false);
+        // }
+        console.log(values);
+        setSubmitting(false);
     };
 
     return (

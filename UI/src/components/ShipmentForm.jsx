@@ -82,7 +82,7 @@ export default function ShipmentForm({
                 onSubmit={handleSubmit}
                 validationSchema={shipmentSchema}
             >
-                {({ values }) => (
+                {({ values, setFieldValue }) => (
                     <GenericForm title={title}>
                         <GenericErrorStatus />
                         <GenericFormInputErrorCombo
@@ -114,7 +114,7 @@ export default function ShipmentForm({
                             Transfers
                         </span>
                         <FieldArray name="transfers">
-                            {({ insert, remove, push }) => (
+                            {({ remove, push }) => (
                                 <>
                                     {values.transfers.map((transfer, index) => (
                                         <div key={index} className="mb-6">
@@ -125,11 +125,18 @@ export default function ShipmentForm({
                                                 indexName="stocks"
                                                 searchClient={searchClient}
                                                 selectName={`transfers[${index}].stock`}
-                                                hitAsDummy={(hit) => (
-                                                    <span className="text-black">
-                                                        {hit.sku} - {hit.name}
-                                                    </span>
-                                                )}
+                                                hitAsDummy={(hit) => {
+                                                    setFieldValue(
+                                                        `transfers[${index}].stock`,
+                                                        hit.objectID
+                                                    );
+                                                    return (
+                                                        <span className="text-black">
+                                                            {hit.sku} -{" "}
+                                                            {hit.name}
+                                                        </span>
+                                                    );
+                                                }}
                                                 onSelect={(hit) =>
                                                     console.log(hit)
                                                 }
