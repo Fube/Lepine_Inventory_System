@@ -14,7 +14,7 @@ import {
 import "react-datepicker/dist/react-datepicker.css";
 import { Icon } from "@iconify/react";
 import { connectHits, InstantSearch } from "react-instantsearch-core";
-import { Hits, SearchBox } from "react-instantsearch-dom";
+import { Hits, SearchBox, Configure } from "react-instantsearch-dom";
 import { AlgoliaContext } from "../pages/_app";
 import thou from "../utils/thou";
 
@@ -49,6 +49,7 @@ export default function ShipmentForm({
     handleSubmit = () => {},
 }) {
     const { searchClient } = useContext(AlgoliaContext);
+    const [algoliaFilter, setAlgoliaFilter] = useState("quantity > 0");
 
     const mappedWarehouses = warehouses.map((warehouse) => ({
         key: `${warehouse.city}, ${warehouse.province} - ${warehouse.zipCode}`,
@@ -114,6 +115,13 @@ export default function ShipmentForm({
                             placeholder="To"
                             title="Select a warehouse"
                             options={mappedWarehouses}
+                            onChange={(e) => {
+                                const warehouseUuid = e.target.value;
+                                setFieldValue("to", warehouseUuid);
+                                setAlgoliaFilter(
+                                    `quantity > 0 AND NOT warehouseUuid:'${warehouseUuid}'`
+                                );
+                            }}
                         />
 
                         <DatePickerField
@@ -136,6 +144,7 @@ export default function ShipmentForm({
                                     {values.transfers.map((transfer, index) => (
                                         <div key={index} className="mb-6">
                                             <AlgoliaSearchAsDropDown
+                                                filter={algoliaFilter}
                                                 hitComponent={
                                                     AlgoliaStockOptionHit
                                                 }
@@ -158,12 +167,7 @@ export default function ShipmentForm({
                                                     console.log(hit)
                                                 }
                                             />
-                                            {/* <GenericFormInputErrorCombo
-                                                        disabled={!editable}
-                                                        name={`transfers[${index}].stock`}
-                                                        type="text"
-                                                        placeholder="Stock"
-                                                    /> */}
+
                                             <GenericFormInputErrorCombo
                                                 disabled={!editable}
                                                 name={`transfers.${index}.quantity`}
@@ -288,6 +292,7 @@ function AlgoliaSearchAsDropDown({
     hitAsDummy,
     searchClient,
     onSelect = () => {},
+    filter = "",
 }) {
     const [showHits, setShowHits] = useState(false);
     const [dummySearch, setDummySearch] = useState(null);
@@ -298,9 +303,14 @@ function AlgoliaSearchAsDropDown({
         onSelect(hit);
     };
 
+    useEffect(() => {
+        console.log(filter);
+    }, [filter]);
+
     return thou(<div onClick={() => setDummySearch(null)}>{dummySearch}</div>)
         .or(
             <InstantSearch searchClient={searchClient} indexName={indexName}>
+                <Configure filters={filter} />
                 <SearchBox
                     className="text-black"
                     onChange={(e) =>
