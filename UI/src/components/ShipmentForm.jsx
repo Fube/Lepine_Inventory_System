@@ -50,6 +50,27 @@ export default function ShipmentForm({
 }) {
     const { searchClient } = useContext(AlgoliaContext);
     const [algoliaFilter, setAlgoliaFilter] = useState("quantity > 0");
+    const [selectedStockUuids, setSelectedStockUuids] = useState(new Set());
+    const [selectedWarehouseUuid, setSelectedWarehouseUuid] = useState("");
+
+    useEffect(() => {
+        if (!selectedStockUuids || !selectedWarehouseUuid) return;
+
+        let baseQuery = `quantity > 0`;
+
+        if (selectedWarehouseUuid.length > 0) {
+            baseQuery += ` AND NOT warehouseUuid:"${selectedWarehouseUuid}"`;
+        }
+
+        if (selectedStockUuids.size > 0) {
+            for (const stockUuid of selectedStockUuids) {
+                baseQuery += ` AND NOT objectID:"${stockUuid}"`;
+            }
+        }
+
+        console.log(baseQuery);
+        setAlgoliaFilter(baseQuery);
+    }, [selectedStockUuids, selectedWarehouseUuid]);
 
     const mappedWarehouses = warehouses.map((warehouse) => ({
         key: `${warehouse.city}, ${warehouse.province} - ${warehouse.zipCode}`,
@@ -117,13 +138,14 @@ export default function ShipmentForm({
                             options={mappedWarehouses}
                             onChange={(e) => {
                                 const warehouseUuid = e.target.value;
+
+                                // Send to end of event loop
                                 setTimeout(
                                     () => setFieldValue("to", warehouseUuid),
                                     0
                                 );
-                                setAlgoliaFilter(
-                                    `quantity > 0 AND NOT warehouseUuid:'${warehouseUuid}'`
-                                );
+
+                                setSelectedWarehouseUuid(warehouseUuid);
                             }}
                         />
 
@@ -181,6 +203,14 @@ export default function ShipmentForm({
                                                                             hit.name
                                                                         }
                                                                     </span>
+                                                                );
+                                                            }}
+                                                            onSelect={(hit) => {
+                                                                setSelectedStockUuids(
+                                                                    new Set([
+                                                                        ...selectedStockUuids,
+                                                                        hit.objectID,
+                                                                    ])
                                                                 );
                                                             }}
                                                         />
