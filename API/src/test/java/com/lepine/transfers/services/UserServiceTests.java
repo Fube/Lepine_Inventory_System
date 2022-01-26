@@ -9,8 +9,6 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
-import com.lepine.transfers.data.warehouse.Warehouse;
-import com.lepine.transfers.data.warehouse.WarehouseUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.exceptions.user.RoleNotFoundException;
 import com.lepine.transfers.services.user.UserService;
@@ -373,7 +371,7 @@ public class UserServiceTests {
         verify(userRepo, times(0)).save(any());
     }
     @Test
-    @DisplayName("PUzjTTvnin: Given UserUUIDLessDTO with invalid password on create, then throw ConstraintViolationException")
+    @DisplayName("PUzjTTvnin: Given UserUUIDLessDTO with valid password on update")
     void update_ValidPassword() {
 
         // Arrange
@@ -385,6 +383,8 @@ public class UserServiceTests {
 
         final UserUUIDLessDTO toUpdate = VALID_USER_DTO.builder()
                 .password(VALID_PASSWORD + "1")
+                .email(user.getEmail())
+                .role(VALID_ROLE_NAME)
                 .build();
 
         final User expectedUser = User.builder()
@@ -393,17 +393,26 @@ public class UserServiceTests {
                 .email(toUpdate.getEmail())
                 .role((user.getRole()))
                 .build();
-
+        given(roleRepo.findByName(VALID_ROLE_NAME))
+                .willReturn(Optional.of(VALID_ROLE));
+        when(userRepo.findById(user.getUuid()))
+                .thenReturn(Optional.of(user));
         when(userRepo.save(argThat(w -> w.getUuid().equals(user.getUuid()))))
                 .thenReturn(expectedUser);
 
         // Act
+
         final User updated = userService.update(user.getUuid(), toUpdate);
 
         // Assert
         assertThat(updated.getUuid()).isEqualTo(user.getUuid());
+        assertThat(updated.getEmail()).isEqualTo(toUpdate.getEmail());
+        assertThat(updated.getPassword()).isEqualTo(toUpdate.getPassword());
+        assertThat(updated.getRole().getName()).isEqualTo(toUpdate.getRole());
 
+        verify(userRepo).findById(user.getUuid());
         verify(userRepo).save(argThat(w -> w.getUuid().equals(user.getUuid())));
+
     }
     @Test
     @DisplayName("sfVCiSxtkx: Given UserUUIDLessDTO with invalid password on update, then throw ConstraintViolationException")
@@ -436,18 +445,22 @@ public class UserServiceTests {
                 .password(VALID_PASSWORD)
                 .role(VALID_ROLE)
                 .build();
-        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+        final UserUUIDLessDTO toUpdate = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password(" ")
                 .role(VALID_ROLE_NAME)
                 .build();
 
-        // Act
-        final ConstraintViolationException cve = assertThrows(ConstraintViolationException.class, () -> userService.update(user.getUuid(),userUUIDLessDTO));
-             // Assert
-        assertEquals(format("update.userUUIDLessDTO.password: Password must not be blank, update.userUUIDLessDTO.password: Password must be at least 8 characters long, include a number, include a capital letter, include a special character"), cve.getMessage());
+        // Act & Assert
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> userService.update(user.getUuid(), toUpdate));
 
-        verify(userRepo, times(0)).save(any());
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly("Password must not be blank",
+                "Password must be at least 8 characters long, include a number, include a capital letter, include a special character");
+
+        verify(userRepo, never()).findById(any());
+        verify(userRepo, never()).save(any());
     }
     @Test
     @DisplayName("eOQLRoUrIH: Given UserUUIDLessDTO with null password on update, then throw ConstraintViolationException")

@@ -93,13 +93,10 @@ public class UserServiceImpl implements UserService, AuthService {
     @Override
     @Transactional
     public void delete(UUID uuid) {
-        log.info("deleting user");
         final Integer deleted = userRepo.deleteByUuid(uuid);
         if(deleted <= 0) {
-            log.info("user not found");
             return;
         }
-        log.info("deleted item");
     }
 
     @Override

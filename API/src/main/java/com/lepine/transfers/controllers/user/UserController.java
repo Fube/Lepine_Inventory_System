@@ -5,7 +5,7 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
-import com.lepine.transfers.exceptions.item.ItemNotFoundException;
+import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,9 +70,7 @@ public class UserController {
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{uuid}")
     public void delete(@PathVariable  UUID uuid) {
-        log.info("deleting item");
         userService.delete(uuid);
-        log.info("deleted item");
     }
 
     @GetMapping("/{uuid}")
@@ -82,7 +80,7 @@ public class UserController {
         final Optional<User> byUuid = userService.findByUuid(uuid);
         if(byUuid.isEmpty()) {
             log.info("user with uuid {} not found", uuid);
-            throw new ItemNotFoundException(uuid);
+            throw new UserNotFoundException(uuid);
         }
 
         final User user = byUuid.get();

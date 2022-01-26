@@ -12,7 +12,7 @@ const {
 } = require("@lepine/e2e-config");
 const { clearThenType } = require("@lepine/e2e-helpers/page");
 
-test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
+test.describe.parallel("pITVJXIolA: Manager /users/[uuid] tests", () => {
     let uuid = null;
     let email = null;
     const toClean = new Set();
@@ -47,10 +47,10 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
         );
     });
 
-    test("TJbFoGiWQI: /users/[uuid] :: Go to through /users as manager", async ({
+    test("gLZKUGBwCV: /users/[uuid] :: Go to through /users as manager", async ({
                                                                                               page,
                                                                                           }) => {
-        // Go to /warehouses
+        // Go to /users
         await Promise.all([
             page.waitForFunction(
                 () => document.querySelector`title`.text === "Users"
@@ -58,7 +58,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
             page.goto("/users"),
         ]);
 
-        // Find warehouse
+        // Find user
         let user = null;
         do {
             user = await page.$(`tr[href*="${uuid}"]`);
@@ -78,7 +78,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
 
         expect(user).toBeTruthy();
 
-        // Click on warehouse
+        // Click on user
         await Promise.all([
             page.waitForFunction(
                 () => document.querySelector`title`.text === "User Details"
@@ -90,7 +90,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
         const title = await page.title();
         expect(title).toBe("User Details");
 
-        // Check that the page contains the warehouse we created
+        // Check that the page contains the user we created
         const content = await page.content();
         expect(content).toContain(READONLY_USER_EMAIL);
         expect(content).toContain(READONLY_USER_PASSWORD);
@@ -106,7 +106,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
         expect(await deleteBtn.isEnabled()).toBe(true);
     });
 
-    test("vUkFglQMbZ: /users/[uuid] :: Delete user", async ({
+    test("fbGZTlhGss: /users/[uuid] :: Delete user", async ({
                                                                           page,
                                                                       }) => {
         // Go to /users
@@ -127,10 +127,10 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
         ]);
     });
 
-    test("OmuplAvGPg: /users/[uuid] :: Update user", async ({
+    test("ubhsJptWED: /users/[uuid] :: Update user", async ({
                                                                           page,
                                                                       }) => {
-        // Go to /warehouses
+        // Go to /users
         await Promise.all([
             page.waitForFunction(
                 () => document.querySelector`title`.text === "User Details"
@@ -145,7 +145,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
 
         // Update password
         const passwordInput = page.locator("[name=password]");
-        const updatedCity = passwordGen.gen();
+        const updatedPassword = passwordGen.gen();
         await clearThenType(page, passwordInput, updatedPassword);
 
 
@@ -156,7 +156,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
         // Click save
         await Promise.all([
             page.waitForFunction(
-                () => document.querySelector`title`.text === "Warehouses"
+                () => document.querySelector`title`.text === "Users"
             ),
             saveBtn.click(),
         ]);
@@ -173,7 +173,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
             page.goto(`/users/${uuid}`),
         ]);
 
-        // Check that the page contains the warehouse we created
+        // Check that the page contains the user we created
         expect(await emailInput.inputValue()).toEqual(updatedEmail);
         expect(await passwordInput.inputValue()).toEqual(updatedPassword);
 
@@ -200,7 +200,7 @@ test.describe.parallel("RgtXQeVKVM: Manager /users/[uuid] tests", () => {
             toClean.add(uuid);
         });
 
-        test("fzkrekYTsB: /users/[uuid] :: Update user duplicate email", async ({
+        test("DyzFhNCFzN: /users/[uuid] :: Update user duplicate email", async ({
                                                                                                 page,
                                                                                                 baseURL,
                                                                                             }) => {
