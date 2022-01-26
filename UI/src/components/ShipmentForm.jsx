@@ -117,7 +117,10 @@ export default function ShipmentForm({
                             options={mappedWarehouses}
                             onChange={(e) => {
                                 const warehouseUuid = e.target.value;
-                                setFieldValue("to", warehouseUuid);
+                                setTimeout(
+                                    () => setFieldValue("to", warehouseUuid),
+                                    0
+                                );
                                 setAlgoliaFilter(
                                     `quantity > 0 AND NOT warehouseUuid:'${warehouseUuid}'`
                                 );
@@ -133,81 +136,101 @@ export default function ShipmentForm({
                                 .toJSDate()}
                             filterDate={isAcceptableDate}
                         />
+                        {values.to && values.to.length > 0 && (
+                            <>
+                                <div className="divider before:!bg-base-300 after:!bg-base-300 mt-2" />
+                                <span className="block text-gray-700 text-lg font-bold mb-2">
+                                    Transfers
+                                </span>
 
-                        <div className="divider before:!bg-base-300 after:!bg-base-300 mt-2" />
-                        <span className="block text-gray-700 text-lg font-bold mb-2">
-                            Transfers
-                        </span>
-                        <FieldArray name="transfers">
-                            {({ remove, push }) => (
-                                <>
-                                    {values.transfers.map((transfer, index) => (
-                                        <div key={index} className="mb-6">
-                                            <AlgoliaSearchAsDropDown
-                                                filter={algoliaFilter}
-                                                hitComponent={
-                                                    AlgoliaStockOptionHit
-                                                }
-                                                indexName="stocks"
-                                                searchClient={searchClient}
-                                                selectName={`transfers[${index}].stock`}
-                                                hitAsDummy={(hit) => {
-                                                    setFieldValue(
-                                                        `transfers[${index}].stock`,
-                                                        hit.objectID
-                                                    );
-                                                    return (
-                                                        <span className="text-black">
-                                                            {hit.sku} -{" "}
-                                                            {hit.name}
-                                                        </span>
-                                                    );
-                                                }}
-                                                onSelect={(hit) =>
-                                                    console.log(hit)
-                                                }
-                                            />
+                                <FieldArray name="transfers">
+                                    {({ remove, push }) => (
+                                        <>
+                                            {values.transfers.map(
+                                                (transfer, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="mb-6"
+                                                    >
+                                                        <AlgoliaSearchAsDropDown
+                                                            filter={
+                                                                algoliaFilter
+                                                            }
+                                                            hitComponent={
+                                                                AlgoliaStockOptionHit
+                                                            }
+                                                            indexName="stocks"
+                                                            searchClient={
+                                                                searchClient
+                                                            }
+                                                            selectName={`transfers[${index}].stock`}
+                                                            hitAsDummy={(
+                                                                hit
+                                                            ) => {
+                                                                setFieldValue(
+                                                                    `transfers[${index}].stock`,
+                                                                    hit.objectID
+                                                                );
+                                                                return (
+                                                                    <span className="text-black">
+                                                                        {
+                                                                            hit.sku
+                                                                        }{" "}
+                                                                        -{" "}
+                                                                        {
+                                                                            hit.name
+                                                                        }
+                                                                    </span>
+                                                                );
+                                                            }}
+                                                        />
 
-                                            <GenericFormInputErrorCombo
-                                                disabled={!editable}
-                                                name={`transfers.${index}.quantity`}
-                                                type="number"
-                                                placeholder="Quantity"
-                                                min={1}
-                                            />
-                                            {editable && (
-                                                <button
-                                                    type="button"
-                                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2"
-                                                    onClick={() =>
-                                                        remove(index)
-                                                    }
-                                                    disabled={!editable}
-                                                >
-                                                    <Icon icon="gridicons:trash" />
-                                                </button>
+                                                        <GenericFormInputErrorCombo
+                                                            disabled={!editable}
+                                                            name={`transfers.${index}.quantity`}
+                                                            type="number"
+                                                            placeholder="Quantity"
+                                                            min={1}
+                                                        />
+                                                        {editable && (
+                                                            <button
+                                                                type="button"
+                                                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2"
+                                                                onClick={() =>
+                                                                    remove(
+                                                                        index
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    !editable
+                                                                }
+                                                            >
+                                                                <Icon icon="gridicons:trash" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                )
                                             )}
-                                        </div>
-                                    ))}
-                                    <div className="flex justify-start mt-4">
-                                        <button
-                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                                            type="button"
-                                            onClick={() =>
-                                                push({
-                                                    quantity: 1,
-                                                    stock: "",
-                                                })
-                                            }
-                                        >
-                                            Add transfer
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-                        </FieldArray>
-
-                        <div className="divider before:!bg-base-300 after:!bg-base-300 mt-2 mb-0" />
+                                            <div className="flex justify-start mt-4">
+                                                <button
+                                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                                    type="button"
+                                                    onClick={() =>
+                                                        push({
+                                                            quantity: 1,
+                                                            stock: "",
+                                                        })
+                                                    }
+                                                >
+                                                    Add transfer
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </FieldArray>
+                                <div className="divider before:!bg-base-300 after:!bg-base-300 mt-2 mb-0" />
+                            </>
+                        )}
 
                         <div className="flex items-center justify-center p-6 pt-2">
                             {editable && <GenericSubmitButton text="Save" />}
@@ -264,7 +287,7 @@ function AlgoliaStockOptionHit({
 function AlgoliaSelectHitsInternal({
     hits,
     hitComponent: HitComponent,
-    fallbackComponent = <>Nothing found</>,
+    fallbackComponent = <span className="text-red-500">Nothing found</span>,
     selectName,
     onSelect = () => {},
 }) {
@@ -302,10 +325,6 @@ function AlgoliaSearchAsDropDown({
         setDummySearch(hitAsDummy(hit));
         onSelect(hit);
     };
-
-    useEffect(() => {
-        console.log(filter);
-    }, [filter]);
 
     return thou(<div onClick={() => setDummySearch(null)}>{dummySearch}</div>)
         .or(
