@@ -113,12 +113,12 @@ function ShipmentTableRow({
     expectedDate,
 }) {
     return (
-        <Link key={uuid} href={`/shipments/${uuid}`} passHref>
-            <tr className="hover">
-                <td>{orderNumber}</td>
-                <td>{new Date(expectedDate).toDateString()}</td>
-            </tr>
-        </Link>
+        // <Link key={uuid} href={`/shipments/${uuid}`} passHref>
+        <tr className="hover">
+            <td>{orderNumber}</td>
+            <td>{new Date(expectedDate).toDateString()}</td>
+        </tr>
+        // </Link>
     );
 }
 
