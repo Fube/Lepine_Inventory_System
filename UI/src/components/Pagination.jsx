@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 /**
  *
- * @param {import('@lepine/types').PaginationProps} param0
+ * @param {import('@lepine/ui-types').PaginationProps} param0
  */
 export default function Paginate({
     startAt = 1,

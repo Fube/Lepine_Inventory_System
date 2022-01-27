@@ -8,7 +8,7 @@ import { axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
 /**
- * @param {{ warehouses: import('@lepine/types').Warehouse[] } & import("@lepine/types").Pagination} param0
+ * @param {{ warehouses: import('@lepine/ui-types').Warehouse[] } & import("@lepine/ui-types").Pagination} param0
  */
 export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
     const router = useRouter();
@@ -26,11 +26,15 @@ export default function ShowWarehouses({ warehouses, totalPages, pageNumber }) {
             <th>City</th>
             <th className="md:rounded-r-none rounded-r-lg flex justify-between md:table-cell">
                 <div className="self-center">Province</div>
-                <button className="md:hidden">
-                    <Link href="/warehouses/new" passHref>
-                        <Icon icon="si-glyph:button-plus" width="32" />
-                    </Link>
-                </button>
+                {role === "MANAGER" ? (
+                    <button className="md:hidden">
+                        <Link href="/warehouses/new" passHref>
+                            <Icon icon="si-glyph:button-plus" width="32" />
+                        </Link>
+                    </button>
+                ) : (
+                    ""
+                )}
             </th>
             <th className="hidden justify-between md:flex">
                 {thou(

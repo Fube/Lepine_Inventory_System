@@ -10,7 +10,7 @@ import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
-import com.lepine.transfers.helpers.matchers.UserUUIDLessDTOMatcher;
+import com.lepine.transfers.utils.matchers.UserUUIDLessDTOMatcher;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,22 +37,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.function.Consumer;
 
+import java.util.function.Consumer;
+import static com.lepine.transfers.utils.PageUtils.createPageFor;
 import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
+
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { UserController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
 @ActiveProfiles("test")
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+
 public class UserHttpTests {
 
     private static final String VALID_EMAIL = "valid@gmail.com";
@@ -65,8 +71,10 @@ public class UserHttpTests {
             .uuid(UUID.randomUUID())
             .name(VALID_ROLE_NAME)
             .build();
+
     private final static UUID
             VALID_UUID = UUID.randomUUID();
+
 
     private static final User VALID_USER = User.builder()
             .uuid(UUID.randomUUID())
@@ -93,6 +101,7 @@ public class UserHttpTests {
         }
         return users;
     }
+
     private String
             ERROR_MESSAGE_PASSWORD_NOT_NULL,
             ERROR_MESSAGE_PASSWORD_NOT_BLANK,
@@ -105,6 +114,7 @@ public class UserHttpTests {
         ERROR_MESSAGE_PASSWORD_NOT_BLANK = w.getMessage("user.password.not_blank");
         ERROR_MESSAGE_PASSWORD_NOT_VALID = w.getMessage("user.password.not_valid");
     }
+
     @Autowired
     private MockMvc mvc;
 
@@ -128,6 +138,7 @@ public class UserHttpTests {
         reset(userService);
     }
 
+
     private ResultActions updateWith(final UUID uuid, final UserUUIDLessDTO given, final User expected) throws Exception {
         return updateWith(uuid, given, stubbing -> stubbing.willReturn(expected));
     }
@@ -143,6 +154,10 @@ public class UserHttpTests {
                 .contentType("application/json")
                 .content(asString));
     }
+
+    @Test
+    void contextLoads(){}
+
     @Test
     @DisplayName("qbGyHUhESg: Given POST on /users with valid data as manager, then return 201")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
@@ -633,6 +648,7 @@ public class UserHttpTests {
         verify(userService, times(1)).create(argThat(userUUIDLessDTOMatcher));
     }
 
+
     @Test
     @DisplayName("IZwUZRjxye: Given Put on /users/{uuid} with valid password, then return 200")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
@@ -689,4 +705,5 @@ public class UserHttpTests {
         verify(userService, never()).update(VALID_UUID, userUUIDLessDTO);
     }
 }
+
 

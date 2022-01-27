@@ -8,6 +8,8 @@ import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.warehouse.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -42,9 +45,28 @@ public class WarehouseController {
     @GetMapping
     public Page<Warehouse> getAll(
             @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "{pagination.page.min}") int page,
-            @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "{pagination.size.min}") int size) {
+            @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "{pagination.size.min}") int size,
+            @RequestParam("active") Optional<Boolean> active
+    ) {
         log.info("Getting all warehouses with pageNumber {} and pageSize {}", page, size);
-        final Page<Warehouse> all = warehouseService.findAll(PageRequest.of(page - 1, size));
+
+        Page<Warehouse> all = null;
+        final PageRequest pageRequest = PageRequest.of(page - 1, size);
+
+        if(active.isPresent()) {
+            final Boolean isActive = active.get();
+            log.info("Active filter present, setting it to {}", isActive);
+            all = warehouseService.findAll(
+                    Example.of(Warehouse.builder()
+                            .uuid(null)
+                            .active(isActive)
+                            .build(),
+                            ExampleMatcher.matching().withIgnoreCase().withIgnoreNullValues()),
+                    pageRequest
+            );
+        } else {
+            all = warehouseService.findAll(pageRequest);
+        }
         log.info("Warehouses found {}", all);
 
         return OneIndexedPageAdapter.of(all);

@@ -3,6 +3,8 @@ package com.lepine.transfers.services.warehouse;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseActiveLessUUIDLessDTO;
 import com.lepine.transfers.data.warehouse.WarehouseUUIDLessDTO;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -20,6 +22,8 @@ public interface WarehouseService {
     Page<Warehouse> findAll();
 
     Page<Warehouse> findAll(PageRequest pageRequest);
+
+    Page<Warehouse> findAll(Example<Warehouse> example, PageRequest pageRequest);
 
     Optional<Warehouse> findByUuid(UUID uuid);
 }

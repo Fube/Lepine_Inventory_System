@@ -6,7 +6,7 @@ import useAuth from "../../hooks/useAuth";
 import StockForm from "../../components/StockForm";
 /**
  *
- * @param {{ stock: import("@lepine/types").Stock }} param0
+ * @param {{ stock: import("@lepine/ui-types").Stock }} param0
  * @returns
  */
 export default function StockDetails({ stock }) {
@@ -21,12 +21,10 @@ export default function StockDetails({ stock }) {
     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         setSubmitting(true);
         try {
-            await axiosAPI
-                .put(`/stocks/${stock.uuid}`, values)
-                .then(() => {
-                    setSubmitting(false);
-                    router.push("/stocks");
-                });
+            await axiosAPI.put(`/stocks/${stock.uuid}`, values).then(() => {
+                setSubmitting(false);
+                router.push("/stocks");
+            });
             router.push("/stocks");
         } catch (error) {
             console.log(error);
@@ -40,7 +38,7 @@ export default function StockDetails({ stock }) {
         }
     };
 
-return (
+    return (
         <>
             <Head>
                 <title>Stock Details</title>
@@ -69,7 +67,7 @@ return (
  * @param {import("next/types").GetServerSidePropsContext} context
  * @returns
  */
- export async function getServerSideProps(context) {
+export async function getServerSideProps(context) {
     const { uuid } = context.query;
     const res = await axiosBackendAuth(`/stockss/${uuid}`, {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },

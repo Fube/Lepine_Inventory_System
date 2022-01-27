@@ -1,4 +1,4 @@
-package com.lepine.transfers.helpers;
+package com.lepine.transfers.utils;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
-public class PageHelpers {
+public class PageUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> Page<T> createPageFor(List<T> items, PageRequest pageRequest) {

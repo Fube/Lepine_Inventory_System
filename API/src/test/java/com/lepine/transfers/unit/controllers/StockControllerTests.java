@@ -30,7 +30,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
+
+import static com.lepine.transfers.utils.PageUtils.createPageFor;
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;

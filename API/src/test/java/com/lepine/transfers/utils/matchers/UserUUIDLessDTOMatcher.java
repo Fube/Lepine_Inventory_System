@@ -1,4 +1,4 @@
-package com.lepine.transfers.helpers.matchers;
+package com.lepine.transfers.utils.matchers;
 
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import org.mockito.ArgumentMatcher;

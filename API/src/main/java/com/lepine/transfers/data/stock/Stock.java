@@ -1,5 +1,6 @@
 package com.lepine.transfers.data.stock;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.warehouse.Warehouse;
 import lombok.*;

@@ -17,7 +17,7 @@ import useAuth from "../../hooks/useAuth";
 
 /**
  *
- * @param {{ items: import("@lepine/types").Item[] } & import("@lepine/types").Pagination} param0
+ * @param {{ items: import("@lepine/ui-types").Item[] } & import("@lepine/ui-types").Pagination} param0
  * @returns
  */
 export default function ShowItems({ items, totalPages, pageNumber }) {

@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,6 +38,7 @@ public class UserControllerTests {
     private static final String INVALID_EMAIL = "oogabooga";
     private static final String VALID_PASSWORD = "S0m3P@ssw0rd";
     private static final String INVALID_PASSWORD = "invalidpassword";
+
     private static final String VALID_ROLE_NAME = "SOME_ROLE";
     private final static UUID
             VALID_UUID = UUID.randomUUID();
@@ -54,6 +57,7 @@ public class UserControllerTests {
             .password(VALID_PASSWORD)
             .role(VALID_ROLE)
             .build();
+
     private static List<User> generateUsers(int num) {
         return IntStream.range(0, num)
                 .mapToObj(i -> User.builder()
@@ -64,7 +68,6 @@ public class UserControllerTests {
                 )
                 .collect(Collectors.toList());
     }
-
 
     @Autowired
     private UserController userController;
@@ -426,4 +429,5 @@ public class UserControllerTests {
 
         verify(userService, never()).update(any(), any());
     }
+
 }

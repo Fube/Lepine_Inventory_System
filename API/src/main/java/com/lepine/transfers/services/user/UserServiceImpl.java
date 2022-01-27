@@ -150,6 +150,7 @@ public class UserServiceImpl implements UserService, AuthService {
             } else {
                 final UserDetails userDetails = (UserDetails) rawPrincipal;
                 principal = User.builder()
+                        .uuid(UUID.fromString("00000000-0000-0000-0000-000000000000"))
                         .email(userDetails.getUsername())
                         .password(userDetails.getPassword())
                         .role(Role.builder()

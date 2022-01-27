@@ -31,9 +31,25 @@ export type User = {
     role: string;
 };
 
-export type Stock={
+export type Stock = {
     uuid: string;
     item: Item;
     warehouse: Warehouse;
+    quantity: number;
+};
+
+export type Shipment = {
+    uuid: string;
+    status: string;
+    transfers: Transfer[];
+    expectedDate: string;
+    orderNumber: string;
+    createdBy: string;
+    to: string;
+};
+
+export type Transfer = {
+    uuid: string;
+    stock: Stock;
     quantity: number;
 };

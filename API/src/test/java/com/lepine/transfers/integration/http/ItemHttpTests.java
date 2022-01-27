@@ -10,7 +10,7 @@ import com.lepine.transfers.data.item.ItemMapper;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
-import com.lepine.transfers.helpers.matchers.ItemMatcher;
+import com.lepine.transfers.utils.matchers.ItemMatcher;
 import com.lepine.transfers.services.item.ItemService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,8 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.*;
 
-import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
+
+import static com.lepine.transfers.utils.PageUtils.createPageFor;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
