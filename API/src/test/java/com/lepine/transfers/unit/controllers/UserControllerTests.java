@@ -1,4 +1,4 @@
-package com.lepine.transfers.controllers;
+package com.lepine.transfers.unit.controllers;
 
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;

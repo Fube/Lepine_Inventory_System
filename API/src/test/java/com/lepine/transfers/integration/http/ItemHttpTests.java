@@ -1,4 +1,4 @@
-package com.lepine.transfers.http;
+package com.lepine.transfers.integration.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.AuthConfig;
@@ -27,7 +27,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
 
 import java.util.*;
 

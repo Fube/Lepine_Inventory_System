@@ -1,4 +1,4 @@
-package com.lepine.transfers.http;
+package com.lepine.transfers.integration.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.JWTConfig;

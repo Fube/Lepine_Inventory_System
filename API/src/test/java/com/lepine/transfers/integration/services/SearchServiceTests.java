@@ -1,4 +1,4 @@
-package com.lepine.transfers.services;
+package com.lepine.transfers.integration.services;
 
 import com.algolia.search.SearchClient;
 import com.algolia.search.SearchIndex;

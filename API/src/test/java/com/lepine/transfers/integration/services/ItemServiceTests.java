@@ -1,4 +1,4 @@
-package com.lepine.transfers.services;
+package com.lepine.transfers.integration.services;
 
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;

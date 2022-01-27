@@ -1,6 +1,7 @@
-package com.lepine.transfers.controllers;
+package com.lepine.transfers.unit.controllers;
 
 import com.lepine.transfers.config.ValidationConfig;
+import com.lepine.transfers.controllers.StockController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockUuidLessItemLessWarehouseLess;

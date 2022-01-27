@@ -1,4 +1,4 @@
-package com.lepine.transfers.data;
+package com.lepine.transfers.unit.data;
 
 import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
