@@ -6,7 +6,7 @@ import useAuth from "../../hooks/useAuth";
 import WarehouseForm from "../../components/WarehouseForm";
 /**
  *
- * @param {{ warehouse: import("@lepine/types").Warehouse }} param0
+ * @param {{ warehouse: import("@lepine/ui-types").Warehouse }} param0
  * @returns
  */
 export default function WarehouseDetails({ warehouse }) {

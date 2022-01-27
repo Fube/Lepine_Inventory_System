@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -57,7 +58,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/users/**").hasRole("MANAGER")
                     .antMatchers(POST, "/items", "/warehouses", "/stocks").hasRole("MANAGER")
                     .antMatchers(PUT, "/items/*", "/warehouses/*", "/stocks/*").hasRole("MANAGER")
-                    .antMatchers(DELETE, "/items/*", "/warehouses/*", "/stocks/*").hasRole("MANAGER");
+                    .antMatchers(DELETE, "/items/*", "/warehouses/*", "/stocks/*").hasRole("MANAGER")
+                    .antMatchers(POST, "/shipments").hasAnyRole("MANAGER", "SALESPERSON");
 
 
         for(Map.Entry<HttpMethod, List<String>> entry : whiteListByMethod.entrySet()) {
@@ -78,9 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-        final DaoAuthenticationConfigurer dao = new DaoAuthenticationConfigurer<>(username ->
-                userRepo.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User with email " + username + "not found")));
+        final DaoAuthenticationConfigurer dao = new DaoAuthenticationConfigurer<>(getUserDetailsService());
 
         dao.passwordEncoder(passwordEncoder());
 
@@ -93,8 +93,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.apply(dao);
     }
 
+    @Bean
+    public UserDetailsService getUserDetailsService() {
+        return username ->
+                userRepo.findByEmail(username)
+                        .orElseThrow(() -> new UsernameNotFoundException("User with email " + username + "not found"));
+    }
+
     @Override @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
 }

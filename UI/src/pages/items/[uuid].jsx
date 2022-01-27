@@ -7,7 +7,7 @@ import useAuth from "../../hooks/useAuth";
 
 /**
  *
- * @param {{ item: import("@lepine/types").Item }} param0
+ * @param {{ item: import("@lepine/ui-types").Item }} param0
  * @returns
  */
 export default function Item({ item }) {
