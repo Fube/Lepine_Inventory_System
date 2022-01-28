@@ -267,15 +267,15 @@ public class ShipmentServiceTests {
         );
         final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
 
-        given(shipmentRepo.save(expected)).willReturn(expected);
+        given(shipmentRepo.save(any())).willAnswer(invocation -> invocation.getArgument(0)); // Return as is
         given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT));
 
         // Act
         final Shipment updatedShipment = shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch);
 
         // Assert
-        assertThat(updatedShipment).isEqualTo(expected);
-        verify(shipmentRepo, times(1)).save(expected);
+        assertThat(updatedShipment).usingRecursiveComparison().isEqualTo(expected);
+        verify(shipmentRepo, times(1)).save(refEq(expected));
         verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
     }
 }
