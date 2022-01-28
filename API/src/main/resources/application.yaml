@@ -59,13 +59,13 @@ spring:
             on-profile:
                 - dev
     flyway:
-        url: jdbc:h2:./h2db:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+        url: jdbc:h2:file:./lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
         baseline-on-migrate: true
         user: sa
         password:
 
     datasource:
-        url: jdbc:h2:./h2db:lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+        url: jdbc:h2:file:./lepine;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
         driver-class-name: org.h2.Driver
         username: sa
         password:

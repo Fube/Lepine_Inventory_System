@@ -2,15 +2,20 @@ package com.lepine.transfers.services.user;
 
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.auth.UserLogin;
+
 import com.lepine.transfers.data.role.RoleRepo;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
+
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.exceptions.user.RoleNotFoundException;
+import com.lepine.transfers.exceptions.user.UserNotFoundException;
+import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
+
 import com.lepine.transfers.utils.auth.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -83,6 +89,48 @@ public class UserServiceImpl implements UserService, AuthService {
 
         return got;
     }
+
+    @Override
+    @Transactional
+    public void delete(UUID uuid) {
+        final Integer deleted = userRepo.deleteByUuid(uuid);
+        if(deleted <= 0) {
+            return;
+        }
+    }
+
+    @Override
+    public User update(UUID uuid,UserUUIDLessDTO userUUIDLessDTO) {
+        log.info("updating user");
+        Optional<User> byId = userRepo.findById(uuid);
+        if(byId.isEmpty()){
+            log.info("user with {} doesn't exist",uuid);
+            throw new UserNotFoundException(uuid);
+        }
+        log.info("Looking for a role {}",userUUIDLessDTO.getRole());
+        Optional<Role> byName = roleRepo.findByName(userUUIDLessDTO.getRole());
+        if(byName.isEmpty()){
+            log.info("Role not found");
+            throw new RoleNotFoundException(userUUIDLessDTO.getRole());
+        }
+        final User mapped = userMapper.toEntity(userUUIDLessDTO);
+        mapped.setUuid(uuid);
+        mapped.setRole(byName.get());
+        final User updated = userRepo.save(mapped);
+        log.info("updated user");
+
+        return updated;
+    }
+
+
+    @Override
+    public Optional<User> findByUuid(UUID uuid) {
+        log.info("retrieving user");
+        final Optional<User> user = userRepo.findById(uuid);
+        log.info("retrieved user");
+
+        return user;    }
+
 
     @Override
     public Pair<User, String> login(UserLogin userLogin) {

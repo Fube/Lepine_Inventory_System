@@ -7,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface UserService {
 
@@ -15,4 +17,10 @@ public interface UserService {
     Page<User> findAll();
 
     Page<User> findAll(PageRequest pageRequest);
+
+    void delete(UUID uuid);
+
+    User update(UUID uuid,@Valid UserUUIDLessDTO userUUIDLessDTO);
+
+    Optional<User> findByUuid(UUID uuid);
 }

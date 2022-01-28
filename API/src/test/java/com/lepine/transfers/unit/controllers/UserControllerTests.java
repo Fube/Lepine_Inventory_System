@@ -3,6 +3,7 @@ package com.lepine.transfers.unit.controllers;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.user.UserController;
+import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.data.user.UserMapper;
 import com.lepine.transfers.data.user.UserPasswordLessDTO;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
@@ -38,9 +38,21 @@ public class UserControllerTests {
     private static final String INVALID_EMAIL = "oogabooga";
     private static final String VALID_PASSWORD = "S0m3P@ssw0rd";
     private static final String INVALID_PASSWORD = "invalidpassword";
-    private static final String VALID_ROLE = "SOME_ROLE";
 
+    private static final String VALID_ROLE_NAME = "SOME_ROLE";
+    private final static UUID
+            VALID_UUID = UUID.randomUUID();
     private static final UserUUIDLessDTO VALID_USER_DTO = UserUUIDLessDTO.builder()
+            .email(VALID_EMAIL)
+            .password(VALID_PASSWORD)
+            .role(VALID_ROLE_NAME)
+            .build();
+    private static final Role VALID_ROLE = Role.builder()
+            .uuid(UUID.randomUUID())
+            .name(VALID_ROLE_NAME)
+            .build();
+    private static final User VALID_USER = User.builder()
+            .uuid(UUID.randomUUID())
             .email(VALID_EMAIL)
             .password(VALID_PASSWORD)
             .role(VALID_ROLE)
@@ -119,7 +131,7 @@ public class UserControllerTests {
         UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
                 .email(VALID_EMAIL)
                 .password(null)
-                .role(VALID_ROLE)
+                .role(VALID_ROLE_NAME)
                 .build();
 
         // Act
@@ -347,4 +359,75 @@ public class UserControllerTests {
 
         verify(userService, times(0)).findAll(any());
     }
+    @Test
+    @DisplayName("pEEIjxtJre: Given user with valid password, then update user")
+    void updateUser_validPassword() {
+
+        // Arrange
+        UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .role(VALID_ROLE_NAME)
+                .build();
+        given(userService.update(VALID_UUID, userUUIDLessDTO))
+                .willReturn(User.builder()
+                        .uuid(VALID_UUID)
+                        .email(VALID_EMAIL)
+                        .password(VALID_PASSWORD)
+                        .role(VALID_ROLE)
+                        .build());
+        // Act
+        final User updated= userController.update(VALID_UUID,userUUIDLessDTO);
+
+        // Assert
+        assertThat(updated.getUuid()).isEqualTo(VALID_UUID);
+        assertThat(updated.getEmail()).isEqualTo(VALID_EMAIL);
+        assertThat(updated.getPassword()).isEqualTo(VALID_PASSWORD);
+        assertThat(updated.getRole()).isEqualTo(VALID_ROLE);
+
+        verify(userService, atMostOnce()).update(VALID_UUID, userUUIDLessDTO);
+    }
+    @Test
+    @DisplayName("OLKtEHHQMS: Given user with invalid password, then throw ConstrainViolationException")
+    void updateUser_invalidPassword() {
+
+        // Arrange
+        final UserUUIDLessDTO user = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password(INVALID_PASSWORD)
+                .role(VALID_ROLE_NAME)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> userController.update(VALID_UUID, user));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly("Password must be at least 8 characters long, include a number, include a capital letter, include a special character");
+
+        verify(userService, never()).update(any(), any());
+    }
+    @Test
+    @DisplayName("fKzJIgEwqI: Given user with null password, then throw ConstrainViolationException")
+    void updateUser_nullPassword() {
+
+        // Arrange
+        final UserUUIDLessDTO user = UserUUIDLessDTO.builder()
+                .email(VALID_EMAIL)
+                .password(null)
+                .role(VALID_ROLE_NAME)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                assertThrows(ConstraintViolationException.class, () -> userController.update(VALID_UUID, user));
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactly("Password must not be blank");
+
+        verify(userService, never()).update(any(), any());
+    }
+
 }
