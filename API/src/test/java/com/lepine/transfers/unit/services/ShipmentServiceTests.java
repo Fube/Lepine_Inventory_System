@@ -372,7 +372,9 @@ public class ShipmentServiceTests {
         );
         final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
 
-        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT));
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT.toBuilder()
+                .status(ShipmentStatus.ACCEPTED)
+                .build()));
 
         // Act & Assert
         final ShipmentNotPendingException shipmentNotPendingException =
