@@ -164,7 +164,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             throw new ConstraintViolationException(violations);
         }
 
-        final Shipment updated = shipmentMapper.toEntity(backDTO, shipment);
+        final Shipment updated = shipmentMapper.toEntity(backDTO, shipment.toBuilder().build());
 
         return shipmentRepo.save(updated);
     }
