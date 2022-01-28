@@ -40,9 +40,7 @@ import java.util.UUID;
 
 import java.util.function.Consumer;
 import static com.lepine.transfers.utils.PageUtils.createPageFor;
-import static com.lepine.transfers.helpers.PageHelpers.createPageFor;
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
-
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
