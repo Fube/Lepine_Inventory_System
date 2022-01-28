@@ -1,6 +1,7 @@
 package com.lepine.transfers.unit.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.config.JacksonConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.item.Item;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -45,6 +47,8 @@ import static org.mockito.Mockito.*;
         ShipmentServiceImpl.class,
         MapperConfig.class,
         ValidationConfig.class,
+        JacksonAutoConfiguration.class,
+        JacksonConfig.class,
 })
 public class ShipmentServiceTests {
 
@@ -261,7 +265,7 @@ public class ShipmentServiceTests {
                 "path", "/status",
                 "op", "replace"
         );
-        final JsonPatch jsonPatch = objectMapper.convertValue(patchAsMap, JsonPatch.class);
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
 
         given(shipmentRepo.save(expected)).willReturn(expected);
 
