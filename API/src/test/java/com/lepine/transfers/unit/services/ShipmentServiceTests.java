@@ -278,4 +278,29 @@ public class ShipmentServiceTests {
         verify(shipmentRepo, times(1)).save(refEq(expected));
         verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
     }
+
+    @Test
+    @DisplayName("RVIhyPdeLK: Given non-existing entity when update, then throw ShipmentNotFoundException")
+    void invalid_Update_NonExistingEntity() {
+
+        // Arrange
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/status",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.empty());
+
+        // Act & Assert
+        final ShipmentNotFoundException shipmentNotFoundException =
+                catchThrowableOfType(
+                        () -> shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch), ShipmentNotFoundException.class);
+
+        assertThat(shipmentNotFoundException.getMessage())
+                .isEqualTo(new ShipmentNotFoundException(VALID_SHIPMENT_UUID).getMessage());
+        verify(shipmentRepo, never()).save(any());
+        verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
+    }
 }
