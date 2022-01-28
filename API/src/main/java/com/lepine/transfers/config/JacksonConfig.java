@@ -2,6 +2,7 @@ package com.lepine.transfers.config;
 
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr353.JSR353Module;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +14,8 @@ public class JacksonConfig {
     public Jackson2ObjectMapperBuilderCustomizer getJsonCustomizer() {
         return builder -> builder.modules(
                 new Hibernate5Module(),
-                new JavaTimeModule()
+                new JavaTimeModule(),
+                new JSR353Module()
         );
     }
 }
