@@ -14,10 +14,14 @@ public interface ShipmentMapper {
     })
     Shipment toEntity(ShipmentStatusLessUuidLessDTO stockDTO);
 
+    Shipment toEntity(ShipmentPatchDTO shipmentPatchDTO);
+
     @Mappings({
             @Mapping(target = "createdBy", source = "user.uuid")
     })
-    ShipmentStatusLessUuidLessDTO toDTO(
+    ShipmentStatusLessUuidLessDTO toStatusLessUuidLessDTO(
             ShipmentStatusLessCreatedByLessUuidLessDTO shipmentStatusLessCreatedByLessUuidLessDTO,
             User user);
+
+    ShipmentPatchDTO toPatchDTO(Shipment shipment);
 }

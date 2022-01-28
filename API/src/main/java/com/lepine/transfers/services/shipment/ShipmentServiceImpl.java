@@ -1,10 +1,7 @@
 package com.lepine.transfers.services.shipment;
 
 import com.algolia.search.com.fasterxml.jackson.databind.ObjectMapper;
-import com.lepine.transfers.data.shipment.Shipment;
-import com.lepine.transfers.data.shipment.ShipmentMapper;
-import com.lepine.transfers.data.shipment.ShipmentRepo;
-import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
+import com.lepine.transfers.data.shipment.*;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.events.shipment.ShipmentCreateEvent;
@@ -141,7 +138,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Applying patch {} to shipment {}", jsonPatch, uuid);
         final Shipment shipment = shipmentRepo.findById(uuid).get();
 
-        final ShipmentPatchDTO shipmentPatchDTO = shipmentMapper.toPatchDTO(jsonPatch);
+        final ShipmentPatchDTO shipmentPatchDTO = shipmentMapper.toPatchDTO(shipment);
         JsonStructure target = objectMapper.convertValue(shipmentPatchDTO, JsonStructure.class);
         JsonStructure patched = jsonPatch.apply(target);
 

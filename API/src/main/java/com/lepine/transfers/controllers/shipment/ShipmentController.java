@@ -74,7 +74,7 @@ public class ShipmentController {
 
         log.info("Mapping shipment status less created by less uuid less DTO to shipment");
         final ShipmentStatusLessUuidLessDTO mapped =
-            shipmentMapper.toDTO(shipmentStatusLessCreatedByLessUuidLessDTO, user);
+            shipmentMapper.toStatusLessUuidLessDTO(shipmentStatusLessCreatedByLessUuidLessDTO, user);
         log.info("Mapped shipment status less uuid less DTO to shipment");
 
         return shipmentService.create(mapped);
