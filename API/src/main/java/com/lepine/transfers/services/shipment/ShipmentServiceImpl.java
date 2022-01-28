@@ -1,6 +1,6 @@
 package com.lepine.transfers.services.shipment;
 
-import com.algolia.search.com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.data.shipment.*;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
