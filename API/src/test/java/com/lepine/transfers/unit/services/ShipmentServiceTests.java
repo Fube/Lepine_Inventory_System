@@ -1,10 +1,12 @@
 package com.lepine.transfers.unit.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
+import com.lepine.transfers.data.shipment.ShipmentStatus;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
@@ -26,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
+import javax.json.JsonPatch;
 import javax.validation.ConstraintViolationException;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -36,8 +39,7 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {
         ShipmentServiceImpl.class,
@@ -109,6 +111,9 @@ public class ShipmentServiceTests {
 
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private ShipmentRepo shipmentRepo;
@@ -242,5 +247,29 @@ public class ShipmentServiceTests {
 
         assertThat(collect).containsExactly(ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL);
         verify(warehouseService, never()).findByUuid(any());
+    }
+
+    @Test
+    @DisplayName("bsfviHubzM: Given JsonPatch when update, then update and return updated entity")
+    void valid_Update_JsonPatch() {
+
+        // Arrange
+        final Shipment expected = VALID_SHIPMENT.toBuilder().status(ShipmentStatus.ACCEPTED).build();
+
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/status",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(patchAsMap, JsonPatch.class);
+
+        given(shipmentRepo.save(expected)).willReturn(expected);
+
+        // Act
+        final Shipment updatedShipment = shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch);
+
+        // Assert
+        assertThat(updatedShipment).isEqualTo(expected);
+        verify(shipmentRepo, times(1)).save(expected);
     }
 }
