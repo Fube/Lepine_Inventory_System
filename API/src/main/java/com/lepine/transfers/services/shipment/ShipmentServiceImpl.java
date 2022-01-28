@@ -6,6 +6,7 @@ import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.events.shipment.ShipmentCreateEvent;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotFoundException;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotPendingException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
@@ -146,6 +147,11 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Applying patch {} to shipment {}", jsonPatch, uuid);
         final Shipment shipment = shipmentRepo.findById(uuid)
                 .orElseThrow(() -> new ShipmentNotFoundException(uuid));
+
+        if(shipment.getStatus() != ShipmentStatus.PENDING) {
+            log.info("Shipment {} is not pending, cannot be updated", uuid);
+            throw new ShipmentNotPendingException(uuid);
+        }
 
         final ShipmentPatchDTO shipmentPatchDTO = shipmentMapper.toPatchDTO(shipment);
         JsonStructure target = objectMapper.convertValue(shipmentPatchDTO, JsonStructure.class);
