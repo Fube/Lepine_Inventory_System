@@ -1,5 +1,6 @@
 package com.lepine.transfers.services.shipment;
 
+import com.algolia.search.com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentMapper;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
@@ -21,6 +22,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.json.JsonPatch;
+import javax.json.JsonStructure;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -35,6 +38,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final StockService stockService;
     private final WarehouseService warehouseService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -130,5 +134,19 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Found {} shipments for user {} for page {}", all.getTotalElements(), userUuid, pageRequest);
 
         return all;
+    }
+
+    @Override
+    public Shipment update(UUID uuid, JsonPatch jsonPatch) {
+        log.info("Applying patch {} to shipment {}", jsonPatch, uuid);
+        final Shipment shipment = shipmentRepo.findById(uuid).get();
+
+        final ShipmentPatchDTO shipmentPatchDTO = shipmentMapper.toPatchDTO(jsonPatch);
+        JsonStructure target = objectMapper.convertValue(shipmentPatchDTO, JsonStructure.class);
+        JsonStructure patched = jsonPatch.apply(target);
+
+        final Shipment updated = shipmentMapper.toEntity(shipmentPatchDTO);
+
+        return shipmentRepo.save(updated);
     }
 }
