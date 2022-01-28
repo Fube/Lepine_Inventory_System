@@ -358,4 +358,29 @@ public class ShipmentServiceTests {
         verify(shipmentRepo, never()).save(any());
         verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
     }
+
+    @Test
+    @DisplayName("AqfTQwkxYA: Given non-pending shipment when update, then throw ShipmentNotPendingException")
+    void invalid_Update_NonPendingShipment() {
+
+        // Arrange
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/status",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT));
+
+        // Act & Assert
+        final ShipmentNotPendingException shipmentNotPendingException =
+                catchThrowableOfType(
+                        () -> shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch), ShipmentNotPendingException.class);
+
+        assertThat(shipmentNotPendingException)
+                .hasMessage(new ShipmentNotPendingException(VALID_SHIPMENT_UUID).getMessage());
+        verify(shipmentRepo, never()).save(any());
+        verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
+    }
 }
