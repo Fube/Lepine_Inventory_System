@@ -1,5 +1,6 @@
 package com.lepine.transfers.data.shipment;
 
+import com.lepine.transfers.validation.InEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class ShipmentPatchDTO {
 
     @NotNull(message = "{shipment.patch.status.not_null}")
     @NotBlank(message = "{shipment.patch.status.not_blank}")
-    private ShipmentStatus status;
+    @InEnum(value = ShipmentStatus.class, message = "{shipment.patch.status.in_enum}")
+    private String status;
 }

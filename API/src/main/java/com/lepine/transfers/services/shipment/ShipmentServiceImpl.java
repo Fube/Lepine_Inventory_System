@@ -23,7 +23,13 @@ import org.springframework.validation.annotation.Validated;
 import javax.json.JsonPatch;
 import javax.json.JsonStructure;
 import javax.transaction.Transactional;
-import java.util.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +43,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final WarehouseService warehouseService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ObjectMapper objectMapper;
+    private final Validator validator;
 
     @Override
     @Transactional
@@ -144,8 +151,14 @@ public class ShipmentServiceImpl implements ShipmentService {
         JsonStructure target = objectMapper.convertValue(shipmentPatchDTO, JsonStructure.class);
         JsonStructure patched = jsonPatch.apply(target);
 
-        final Shipment updated = shipmentMapper
-                .toEntity(objectMapper.convertValue(patched, ShipmentPatchDTO.class), shipment);
+        final ShipmentPatchDTO backDTO = objectMapper.convertValue(patched, ShipmentPatchDTO.class);
+
+        Set<ConstraintViolation<ShipmentPatchDTO>> violations = validator.validate(backDTO);
+        if(!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        final Shipment updated = shipmentMapper.toEntity(backDTO, shipment);
 
         return shipmentRepo.save(updated);
     }

@@ -110,6 +110,7 @@ public class ShipmentServiceTests {
     private String
             SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE,
             SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE,
+            SHIPMENT_PATCH_DTO_STATUS_INVALID_MESSAGE,
             ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL;
 
     @Autowired
@@ -135,6 +136,7 @@ public class ShipmentServiceTests {
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
         SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE = w.getMessage("transfer.quantity.min");
         SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE = w.getMessage("shipment.transfers.size.min");
+        SHIPMENT_PATCH_DTO_STATUS_INVALID_MESSAGE = w.getMessage("shipment.patch.status.in_enum");
         ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL = w.getMessage("shipment.transfers.not_null");
     }
 
@@ -326,6 +328,33 @@ public class ShipmentServiceTests {
 
         assertThat(jsonException)
                 .hasMessageContaining("contains no value for name 'invalid'");
+        verify(shipmentRepo, never()).save(any());
+        verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
+    }
+
+    @Test
+    @DisplayName("vtKrSaYebx: Given JsonPatch with invalid value when update, then throw ConstraintViolationException")
+    void invalid_Update_InvalidValue() {
+
+        // Arrange
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", "invalid",
+                "path", "/status",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT));
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                catchThrowableOfType(() -> shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch), ConstraintViolationException.class);
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+
+        assertThat(collect).containsExactlyInAnyOrder(SHIPMENT_PATCH_DTO_STATUS_INVALID_MESSAGE);
+
         verify(shipmentRepo, never()).save(any());
         verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
     }
