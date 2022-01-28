@@ -12,6 +12,7 @@ import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.events.shipment.ShipmentUpdateEvent;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotFoundException;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotPendingException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
@@ -287,8 +288,7 @@ public class ShipmentServiceTests {
         verify(shipmentRepo, times(1)).save(refEq(expected));
         verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
         verify(applicationEventPublisher, times(1)).publishEvent(
-                refEq(new ShipmentUpdatedEvent(shipmentService, VALID_SHIPMENT, expected)));
-        );
+                refEq(new ShipmentUpdateEvent(shipmentService, VALID_SHIPMENT, expected)));
     }
 
     @Test
