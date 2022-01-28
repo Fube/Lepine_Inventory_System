@@ -5,6 +5,7 @@ import com.lepine.transfers.data.shipment.*;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.events.shipment.ShipmentCreateEvent;
+import com.lepine.transfers.events.shipment.ShipmentUpdateEvent;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotFoundException;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotPendingException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
@@ -166,6 +167,14 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         final Shipment updated = shipmentMapper.toEntity(backDTO, shipment.toBuilder().build());
 
-        return shipmentRepo.save(updated);
+        final Shipment saved = shipmentRepo.save(updated);
+
+        log.info("Updated shipment");
+
+        log.info("Publishing update event for shipment {}", uuid);
+        applicationEventPublisher.publishEvent(new ShipmentUpdateEvent(this, shipment, saved));
+
+        return saved;
+
     }
 }

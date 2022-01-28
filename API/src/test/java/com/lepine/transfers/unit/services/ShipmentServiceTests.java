@@ -1,6 +1,7 @@
 package com.lepine.transfers.unit.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.config.ApplicationEventPublisherConfig;
 import com.lepine.transfers.config.JacksonConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
@@ -12,7 +13,6 @@ import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.warehouse.Warehouse;
-import com.lepine.transfers.events.shipment.ShipmentUpdateEvent;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotFoundException;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotPendingException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
@@ -54,6 +54,7 @@ import static org.mockito.Mockito.*;
         ValidationConfig.class,
         JacksonAutoConfiguration.class,
         JacksonConfig.class,
+        ApplicationEventPublisherConfig.class,
 })
 public class ShipmentServiceTests {
 
@@ -134,7 +135,7 @@ public class ShipmentServiceTests {
     @MockBean
     private WarehouseService warehouseService;
 
-    @MockBean
+    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
     @BeforeEach
@@ -287,8 +288,7 @@ public class ShipmentServiceTests {
         assertThat(updatedShipment).usingRecursiveComparison().isEqualTo(expected);
         verify(shipmentRepo, times(1)).save(refEq(expected));
         verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
-        verify(applicationEventPublisher, times(1)).publishEvent(
-                refEq(new ShipmentUpdateEvent(shipmentService, VALID_SHIPMENT, expected)));
+        verify(applicationEventPublisher, times(1)).publishEvent(any());
     }
 
     @Test
