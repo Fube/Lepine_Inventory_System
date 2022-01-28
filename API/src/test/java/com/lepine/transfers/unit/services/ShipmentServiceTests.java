@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 import javax.json.JsonException;
@@ -131,6 +132,9 @@ public class ShipmentServiceTests {
 
     @MockBean
     private WarehouseService warehouseService;
+
+    @MockBean
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @BeforeEach
     void setUp() {
@@ -282,6 +286,9 @@ public class ShipmentServiceTests {
         assertThat(updatedShipment).usingRecursiveComparison().isEqualTo(expected);
         verify(shipmentRepo, times(1)).save(refEq(expected));
         verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
+        verify(applicationEventPublisher, times(1)).publishEvent(
+                refEq(new ShipmentUpdatedEvent(shipmentService, VALID_SHIPMENT, expected)));
+        );
     }
 
     @Test
