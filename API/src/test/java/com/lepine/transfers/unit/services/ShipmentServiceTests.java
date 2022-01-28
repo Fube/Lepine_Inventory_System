@@ -31,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
+import javax.json.JsonException;
 import javax.json.JsonPatch;
 import javax.validation.ConstraintViolationException;
 import java.time.ZonedDateTime;
@@ -301,6 +302,30 @@ public class ShipmentServiceTests {
 
         assertThat(shipmentNotFoundException.getMessage())
                 .isEqualTo(new ShipmentNotFoundException(VALID_SHIPMENT_UUID).getMessage());
+        verify(shipmentRepo, never()).save(any());
+        verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
+    }
+
+    @Test
+    @DisplayName("gQZVHDBSPg: Given JsonPatch with invalid path when update, then throw JsonException")
+    void invalid_Update_InvalidPath() {
+
+        // Arrange
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/invalid",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT));
+
+        // Act & Assert
+        final JsonException jsonException =
+                catchThrowableOfType(() -> shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch), JsonException.class);
+
+        assertThat(jsonException)
+                .hasMessageContaining("contains no value for name 'invalid'");
         verify(shipmentRepo, never()).save(any());
         verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
     }
