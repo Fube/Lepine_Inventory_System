@@ -142,7 +142,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         JsonStructure target = objectMapper.convertValue(shipmentPatchDTO, JsonStructure.class);
         JsonStructure patched = jsonPatch.apply(target);
 
-        final Shipment updated = shipmentMapper.toEntity(shipmentPatchDTO);
+        final Shipment updated = shipmentMapper.toEntity(objectMapper.convertValue(patched, ShipmentPatchDTO.class));
 
         return shipmentRepo.save(updated);
     }
