@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -39,7 +40,7 @@ public class NotifierTests {
             .email(VALID_USER_EMAIL)
             .build();
 
-    @Autowired
+    @SpyBean
     private Notifier notifier;
 
     @Autowired
@@ -83,6 +84,7 @@ public class NotifierTests {
         applicationEventPublisher.publishEvent(expectedUpdateShipmentEvent);
 
         // Assert
+        verify(notifier, times(1)).onShipmentUpdate(expectedUpdateShipmentEvent);
         verify(userService, times(1)).findByUuid(VALID_USER_UUID);
         verify(mailerService, times(1))
                 .sendHTML(VALID_USER_EMAIL, expectedSubject, expectedBody);
@@ -110,6 +112,7 @@ public class NotifierTests {
         applicationEventPublisher.publishEvent(expectedUpdateShipmentEvent);
 
         // Assert
+        verify(notifier, times(1)).onShipmentUpdate(expectedUpdateShipmentEvent);
         verify(userService, never()).findByUuid(any());
         verify(mailerService, never()).sendHTML(any(), any(), any());
     }
@@ -138,6 +141,7 @@ public class NotifierTests {
         applicationEventPublisher.publishEvent(expectedUpdateShipmentEvent);
 
         // Assert
+        verify(notifier, times(1)).onShipmentUpdate(expectedUpdateShipmentEvent);
         verify(userService, times(1)).findByUuid(VALID_USER_UUID);
         verify(mailerService, never()).sendHTML(any(), any(), any());
     }
