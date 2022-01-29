@@ -5,5 +5,5 @@ import org.springframework.context.event.EventListener;
 public interface ShipmentUpdateHandler {
 
     @EventListener(ShipmentUpdateEvent.class)
-    void onShipmentCreate(ShipmentUpdateEvent event);
+    void onShipmentUpdate(ShipmentUpdateEvent event);
 }

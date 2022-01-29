@@ -24,7 +24,7 @@ public class Notifier implements ShipmentUpdateHandler {
     private final MailerService mailerService;
 
     @Override
-    public void onShipmentCreate(ShipmentUpdateEvent event) {
+    public void onShipmentUpdate(ShipmentUpdateEvent event) {
 
         log.info("Reacting to shipment update event");
 
