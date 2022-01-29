@@ -81,7 +81,14 @@ public class ShipmentController {
         return shipmentService.create(mapped);
     }
 
-    public Shipment update(UUID uuid, JsonPatch jsonPatch) {
+    @PatchMapping(
+            path = "/{uuid}",
+            consumes = "application/json-patch+json",
+            produces = "application/json"
+    )
+    public Shipment update(
+            @PathVariable UUID uuid,
+            @RequestBody JsonPatch jsonPatch) {
         log.info("Updating shipment with uuid {}", uuid);
         return shipmentService.update(uuid, jsonPatch);
     }
