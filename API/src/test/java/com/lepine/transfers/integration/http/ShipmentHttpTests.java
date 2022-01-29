@@ -8,6 +8,7 @@ import com.lepine.transfers.controllers.shipment.ShipmentController;
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.shipment.Shipment;
+import com.lepine.transfers.data.shipment.ShipmentStatus;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessCreatedByLessUuidLessDTO;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
@@ -41,24 +42,22 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.annotation.PostConstruct;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static com.lepine.transfers.utils.PageUtils.createPageFor;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = { ShipmentController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class })
 @ActiveProfiles("test")
 public class ShipmentHttpTests {
+
+    final static String JSON_PATCH = "application/json-patch+json";
 
     private final static UUID
             VALID_SHIPMENT_UUID = UUID.randomUUID(),
@@ -578,4 +577,36 @@ public class ShipmentHttpTests {
         verify(shipmentService, never()).create(any());
     }
 
+    @Test
+    @DisplayName("SJprQfZCVn: Given PATCH on /shipments/{uuid} with valid JsonPatch, then update (200, success)")
+    @WithUserDetails(value = VALID_MANAGER_EMAIL)
+    void update_ValidJsonPatch_Success() throws Exception {
+
+        // Arrange
+
+        final Shipment expectedShipment = VALID_SHIPMENT.toBuilder()
+                .status(ShipmentStatus.ACCEPTED)
+                .build();
+
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/status",
+                "op", "replace"
+        );
+
+        final String givenAsString = objectMapper.writeValueAsString(patchAsMap);
+        final String expectedAsString = objectMapper.writeValueAsString(expectedShipment);
+
+        given(shipmentService.update(any(), any()))
+                .willReturn(expectedShipment);
+
+        // Act & Assert
+        mockMvc.perform(patch("/shipments/" + VALID_SHIPMENT_UUID)
+                .contentType(JSON_PATCH)
+                .content(givenAsString))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(expectedAsString));
+
+        verify(shipmentService, times(1)).update(any(), any());
+    }
 }
