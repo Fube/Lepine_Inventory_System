@@ -113,4 +113,32 @@ public class NotifierTests {
         verify(userService, never()).findByUuid(any());
         verify(mailerService, never()).sendHTML(any(), any(), any());
     }
+
+    @Test
+    @DisplayName("ZPjZwUveJJ: Given unable to find user, do nothing")
+    void invalid_NoUser() {
+
+        // Arrange
+        final Shipment expectedOldShipment = Shipment.builder()
+                .uuid(UUID.randomUUID())
+                .createdBy(VALID_USER_UUID)
+                .status(ShipmentStatus.PENDING)
+                .build();
+
+        final Shipment expectedNewShipment = expectedOldShipment.toBuilder()
+                .status(ShipmentStatus.ACCEPTED)
+                .build();
+
+        final ShipmentUpdateEvent expectedUpdateShipmentEvent =
+                new ShipmentUpdateEvent(this, expectedOldShipment, expectedNewShipment);
+
+        given(userService.findByUuid(VALID_USER_UUID)).willReturn(Optional.empty());
+
+        // Act
+        applicationEventPublisher.publishEvent(expectedUpdateShipmentEvent);
+
+        // Assert
+        verify(userService, times(1)).findByUuid(VALID_USER_UUID);
+        verify(mailerService, never()).sendHTML(any(), any(), any());
+    }
 }
