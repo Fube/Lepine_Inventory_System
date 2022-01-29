@@ -1,6 +1,5 @@
 package com.lepine.transfers.config;
 
-import com.lepine.transfers.services.mailer.MailerService;
 import com.sendgrid.SendGrid;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
