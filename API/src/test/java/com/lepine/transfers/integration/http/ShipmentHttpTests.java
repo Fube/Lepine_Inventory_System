@@ -623,4 +623,18 @@ public class ShipmentHttpTests {
 
         verify(shipmentService, never()).update(any(), any());
     }
+
+    @Test
+    @DisplayName("LvNjdzxruh: Given PATCH on /shipments/{uuid} as clerk, then deny update (401, error)")
+    @WithUserDetails(value = VALID_CLERK_EMAIL)
+    void update_AsClerk_DenyUpdate() throws Exception {
+
+        // Act & Assert
+        mockMvc.perform(patch("/shipments/" + VALID_SHIPMENT_UUID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("")) // Does not matter
+                .andExpect(status().isForbidden());
+
+        verify(shipmentService, never()).update(any(), any());
+    }
 }
