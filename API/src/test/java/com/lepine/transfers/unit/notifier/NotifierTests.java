@@ -19,8 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes= {
         Notifier.class,
@@ -87,5 +86,31 @@ public class NotifierTests {
         verify(userService, times(1)).findByUuid(VALID_USER_UUID);
         verify(mailerService, times(1))
                 .sendHTML(VALID_USER_EMAIL, expectedSubject, expectedBody);
+    }
+
+    @Test
+    @DisplayName("eiSoWSJgxZ: Given shipment with no status update, do nothing")
+    void valid_NoShipmentUpdate() {
+
+        // Arrange
+        final Shipment expectedOldShipment = Shipment.builder()
+                .uuid(UUID.randomUUID())
+                .createdBy(VALID_USER_UUID)
+                .status(ShipmentStatus.PENDING)
+                .build();
+
+        final Shipment expectedNewShipment = expectedOldShipment.toBuilder()
+                .status(ShipmentStatus.PENDING)
+                .build();
+
+        final ShipmentUpdateEvent expectedUpdateShipmentEvent =
+                new ShipmentUpdateEvent(this, expectedOldShipment, expectedNewShipment);
+
+        // Act
+        applicationEventPublisher.publishEvent(expectedUpdateShipmentEvent);
+
+        // Assert
+        verify(userService, never()).findByUuid(any());
+        verify(mailerService, never()).sendHTML(any(), any(), any());
     }
 }
