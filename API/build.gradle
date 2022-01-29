@@ -33,6 +33,8 @@ dependencies {
     implementation 'org.apache.johnzon:johnzon-core:1.2.15'
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr353:${jacksonDataTypeVersion}"
 
+    implementation 'com.sendgrid:sendgrid-java:4.8.2'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
