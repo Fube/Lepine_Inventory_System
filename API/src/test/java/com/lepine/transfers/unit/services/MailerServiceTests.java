@@ -30,11 +30,11 @@ public class MailerServiceTests {
     void valid_Mail() {
 
         // Arrange
-        given(mailerService.send(VALID_ADDRESS, VALID_SUBJECT, VALID_BODY))
+        given(mailerService.sendHTML(VALID_ADDRESS, VALID_SUBJECT, VALID_BODY))
                 .willReturn(true);
 
         // Act
-        final boolean result = mailerService.send(VALID_ADDRESS, VALID_SUBJECT, VALID_BODY);
+        final boolean result = mailerService.sendHTML(VALID_ADDRESS, VALID_SUBJECT, VALID_BODY);
 
         // Assert
         assertThat(result).isTrue();

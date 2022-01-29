@@ -1,5 +1,5 @@
 package com.lepine.transfers.services.mailer;
 
 public interface MailerService {
-    boolean send(String to, String subject, String content);
+    boolean sendHTML(String to, String subject, String content);
 }
