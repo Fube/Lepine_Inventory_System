@@ -594,7 +594,7 @@ public class ShipmentHttpTests {
                 "op", "replace"
         );
 
-        final String givenAsString = objectMapper.writeValueAsString(patchAsMap);
+        final String givenAsString = objectMapper.writeValueAsString(List.of(patchAsMap));
         final String expectedAsString = objectMapper.writeValueAsString(expectedShipment);
 
         given(shipmentService.update(any(), any()))
@@ -605,7 +605,7 @@ public class ShipmentHttpTests {
                 .contentType(JSON_PATCH)
                 .content(givenAsString))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value(expectedAsString));
+                .andExpect(content().json(expectedAsString));
 
         verify(shipmentService, times(1)).update(any(), any());
     }
