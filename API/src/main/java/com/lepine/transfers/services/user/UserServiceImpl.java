@@ -85,6 +85,12 @@ public class UserServiceImpl implements UserService, AuthService {
     }
 
     @Override
+    public Optional<User> findByUuid(UUID uuid) {
+        log.info("Getting User with UUID {}", uuid);
+        return userRepo.findById(uuid);
+    }
+
+    @Override
     public Pair<User, String> login(UserLogin userLogin) {
 
         log.info("Logging in user {}", userLogin.getEmail());

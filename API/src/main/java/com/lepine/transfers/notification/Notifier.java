@@ -31,6 +31,8 @@ public class Notifier implements ShipmentUpdateHandler {
         final Shipment old = event.getOld();
         final Shipment current = event.getUpdated();
 
+        // NOTE: In the future, we might care about the diff between the old and the current shipment
+        //      but for now, we just care if the shipment is accepted or denied. No need to over-engineer this
         if(old.getStatus() == current.getStatus()) {
             log.info("Uninterested in change, ignoring");
             return;
