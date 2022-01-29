@@ -148,6 +148,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Applying patch {} to shipment {}", jsonPatch, uuid);
         final Shipment shipment = shipmentRepo.findById(uuid)
                 .orElseThrow(() -> new ShipmentNotFoundException(uuid));
+        final Shipment shipmentClone = shipment.toBuilder().build();
 
         if(shipment.getStatus() != ShipmentStatus.PENDING) {
             log.info("Shipment {} is not pending, cannot be updated", uuid);
@@ -165,14 +166,14 @@ public class ShipmentServiceImpl implements ShipmentService {
             throw new ConstraintViolationException(violations);
         }
 
-        final Shipment updated = shipmentMapper.toEntity(backDTO, shipment.toBuilder().build());
+        final Shipment updated = shipmentMapper.toEntity(backDTO, shipment);
 
         final Shipment saved = shipmentRepo.save(updated);
 
         log.info("Updated shipment");
 
         log.info("Publishing update event for shipment {}", uuid);
-        applicationEventPublisher.publishEvent(new ShipmentUpdateEvent(this, shipment, saved));
+        applicationEventPublisher.publishEvent(new ShipmentUpdateEvent(this, shipmentClone, saved));
 
         return saved;
 
