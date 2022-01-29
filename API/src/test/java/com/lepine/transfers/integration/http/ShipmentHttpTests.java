@@ -578,9 +578,9 @@ public class ShipmentHttpTests {
     }
 
     @Test
-    @DisplayName("SJprQfZCVn: Given PATCH on /shipments/{uuid} with valid JsonPatch, then update (200, success)")
+    @DisplayName("SJprQfZCVn: Given PATCH on /shipments/{uuid} with valid JsonPatch as manager, then update (200, success)")
     @WithUserDetails(value = VALID_MANAGER_EMAIL)
-    void update_ValidJsonPatch_Success() throws Exception {
+    void update_ValidJsonPatch_AsManager() throws Exception {
 
         // Arrange
 
