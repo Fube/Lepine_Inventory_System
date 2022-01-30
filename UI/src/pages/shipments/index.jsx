@@ -25,6 +25,14 @@ export default function ShowShipments({ shipments, totalPages, pageNumber }) {
         </h2>
     );
 
+    const handleAccept = async (uuid) => {
+        console.log(`Accepting shipment ${uuid}`);
+    };
+
+    const handleDeny = async (uuid) => {
+        console.log(`Denying shipment ${uuid}`);
+    };
+
     const head = (
         <tr>
             <th>Order Number</th>
@@ -81,6 +89,8 @@ export default function ShowShipments({ shipments, totalPages, pageNumber }) {
                         <tbody>
                             {shipments.map((shipment) => (
                                 <ShipmentTableRow
+                                    onAccept={handleAccept}
+                                    onDeny={handleDeny}
                                     {...shipment}
                                     key={shipment.uuid}
                                 />
@@ -114,6 +124,8 @@ function ShipmentTableRow({
     to,
     transfers,
     expectedDate,
+    onAccept = () => {},
+    onDeny = () => {},
 }) {
     return (
         // <Link key={uuid} href={`/shipments/${uuid}`} passHref>
@@ -124,10 +136,16 @@ function ShipmentTableRow({
             <td>
                 {thou(
                     <>
-                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <button
+                            onClick={() => onAccept(uuid)}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        >
                             Accept
                         </button>
-                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4">
+                        <button
+                            onClick={() => onDeny(uuid)}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4"
+                        >
                             Deny
                         </button>
                     </>
