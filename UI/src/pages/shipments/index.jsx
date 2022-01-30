@@ -5,6 +5,7 @@ import Paginate from "../../components/Pagination";
 import { axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
+import capitalize from "capitalize";
 
 /**
  * @param {{ shipments: import('@lepine/ui-types').Shipment[] } & import("@lepine/ui-types").Pagination} param0
@@ -27,10 +28,12 @@ export default function ShowShipments({ shipments, totalPages, pageNumber }) {
     const head = (
         <tr>
             <th>Order Number</th>
+            <th>Shipment Date</th>
+            <th>Status</th>
             <th className="flex justify-between">
                 {thou(
                     <>
-                        <div className="self-center">Shipment Date</div>
+                        <div className="self-center">Actions</div>
                         <button>
                             <Link href="/shipments/new" passHref>
                                 <Icon icon="si-glyph:button-plus" width="32" />
@@ -38,7 +41,7 @@ export default function ShowShipments({ shipments, totalPages, pageNumber }) {
                         </button>
                     </>
                 )
-                    .or("Shipment Date")
+                    .or("Actions")
                     .if(role === "MANAGER" || role === "SALESPERSON")}
             </th>
         </tr>
@@ -117,6 +120,15 @@ function ShipmentTableRow({
         <tr className="hover">
             <td>{orderNumber}</td>
             <td>{new Date(expectedDate).toDateString()}</td>
+            <td>{capitalize(status)}</td>
+            <td>
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Accept
+                </button>
+                <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4">
+                    Deny
+                </button>
+            </td>
         </tr>
         // </Link>
     );
