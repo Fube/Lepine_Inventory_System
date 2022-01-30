@@ -122,12 +122,18 @@ function ShipmentTableRow({
             <td>{new Date(expectedDate).toDateString()}</td>
             <td>{capitalize(status)}</td>
             <td>
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Accept
-                </button>
-                <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4">
-                    Deny
-                </button>
+                {thou(
+                    <>
+                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Accept
+                        </button>
+                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4">
+                            Deny
+                        </button>
+                    </>
+                )
+                    .or("None Available")
+                    .if(status.toUpperCase() === "PENDING")}
             </td>
         </tr>
         // </Link>
