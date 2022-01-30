@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useState } from "react";
 import { Icon } from "@iconify/react";
 import Paginate from "../../components/Pagination";
 import { axiosBackendAuth } from "../../config/axios";
@@ -127,33 +128,82 @@ function ShipmentTableRow({
     onAccept = () => {},
     onDeny = () => {},
 }) {
+    const [showTransfers, setShowTransfers] = useState(false);
+
     return (
         // <Link key={uuid} href={`/shipments/${uuid}`} passHref>
-        <tr className="hover">
-            <td>{orderNumber}</td>
-            <td>{new Date(expectedDate).toDateString()}</td>
-            <td>{capitalize(status)}</td>
-            <td>
-                {thou(
-                    <>
-                        <button
-                            onClick={() => onAccept(uuid)}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                            Accept
-                        </button>
-                        <button
-                            onClick={() => onDeny(uuid)}
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4"
-                        >
-                            Deny
-                        </button>
-                    </>
-                )
-                    .or("None Available")
-                    .if(status.toUpperCase() === "PENDING")}
-            </td>
-        </tr>
+
+        // On click of tr, expand to show transfers
+        <>
+            <tr
+                onClick={() => setShowTransfers(!showTransfers)}
+                className="hover"
+            >
+                <td>{orderNumber}</td>
+                <td>{new Date(expectedDate).toDateString()}</td>
+                <td>{capitalize(status)}</td>
+                <td>
+                    {thou(
+                        <>
+                            <button
+                                onClick={() => onAccept(uuid)}
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            >
+                                Accept
+                            </button>
+                            <button
+                                onClick={() => onDeny(uuid)}
+                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4"
+                            >
+                                Deny
+                            </button>
+                        </>
+                    )
+                        .or("None Available")
+                        .if(status.toUpperCase() === "PENDING")}
+                </td>
+            </tr>
+
+            {showTransfers && (
+                <>
+                    <tr>
+                        <td colSpan="4">
+                            <table className="table table-zebra w-full sm:table-fixed">
+                                <thead>
+                                    <tr>
+                                        <th>From</th>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {transfers.map((transfer) => (
+                                        <tr
+                                            className="hover"
+                                            key={transfer.uuid}
+                                        >
+                                            <td>
+                                                {transfer.stock.warehouse.city}{" "}
+                                                -{" "}
+                                                {
+                                                    transfer.stock.warehouse
+                                                        .zipCode
+                                                }
+                                            </td>
+                                            <td>
+                                                {transfer.stock.item.name} -{" "}
+                                                {transfer.stock.item.sku}
+                                            </td>
+                                            <td>{transfer.quantity}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </>
+            )}
+        </>
         // </Link>
     );
 }
@@ -172,7 +222,7 @@ export async function getServerSideProps(context) {
     return res
         .refine(({ content: shipments, totalPages, number: pageNumber }) => ({
             props: {
-                shipments,
+                shipments: [...shipments, ...shipments],
                 totalPages,
                 pageNumber,
             },
