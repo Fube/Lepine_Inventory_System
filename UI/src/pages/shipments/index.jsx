@@ -3,10 +3,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import Paginate from "../../components/Pagination";
-import { axiosBackendAuth } from "../../config/axios";
+import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
 import capitalize from "capitalize";
+import axios from "axios";
 
 /**
  * @param {{ shipments: import('@lepine/ui-types').Shipment[] } & import("@lepine/ui-types").Pagination} param0
@@ -26,12 +27,32 @@ export default function ShowShipments({ shipments, totalPages, pageNumber }) {
         </h2>
     );
 
+    const patchStatus = async (uuid, status) => {
+        try {
+            await axiosAPI.patch(
+                `/shipments/${uuid}`,
+                [
+                    {
+                        op: "replace",
+                        path: "/status",
+                        value: status,
+                    },
+                ],
+                {
+                    headers: { "Content-Type": "application/json-patch+json" },
+                }
+            );
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const handleAccept = async (uuid) => {
-        console.log(`Accepting shipment ${uuid}`);
+        return patchStatus(uuid, "ACCEPTED");
     };
 
     const handleDeny = async (uuid) => {
-        console.log(`Denying shipment ${uuid}`);
+        return patchStatus(uuid, "DENIED");
     };
 
     const head = (
