@@ -133,12 +133,8 @@ function ShipmentTableRow({
     return (
         // <Link key={uuid} href={`/shipments/${uuid}`} passHref>
 
-        // On click of tr, expand to show transfers
         <>
-            <tr
-                onClick={() => setShowTransfers(!showTransfers)}
-                className="hover"
-            >
+            <tr onClick={() => setShowTransfers(true)} className="hover">
                 <td>{orderNumber}</td>
                 <td>{new Date(expectedDate).toDateString()}</td>
                 <td>{capitalize(status)}</td>
@@ -164,45 +160,49 @@ function ShipmentTableRow({
                 </td>
             </tr>
 
-            {showTransfers && (
-                <>
-                    <tr>
-                        <td colSpan="4">
-                            <table className="table table-zebra w-full sm:table-fixed">
-                                <thead>
-                                    <tr>
-                                        <th>From</th>
-                                        <th>Item</th>
-                                        <th>Quantity</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {transfers.map((transfer) => (
-                                        <tr
-                                            className="hover"
-                                            key={transfer.uuid}
-                                        >
-                                            <td>
-                                                {transfer.stock.warehouse.city}{" "}
-                                                -{" "}
-                                                {
-                                                    transfer.stock.warehouse
-                                                        .zipCode
-                                                }
-                                            </td>
-                                            <td>
-                                                {transfer.stock.item.name} -{" "}
-                                                {transfer.stock.item.sku}
-                                            </td>
-                                            <td>{transfer.quantity}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                </>
-            )}
+            <input
+                type="checkbox"
+                id={`${uuid}-transfers`}
+                className="modal-toggle"
+                checked={showTransfers}
+            />
+            <div onClick={() => setShowTransfers(false)} className="modal">
+                <div onClick={(e) => e.stopPropagation()} className="modal-box">
+                    <table className="table table-zebra w-full sm:table-fixed">
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {transfers.map((transfer) => (
+                                <tr className="hover" key={transfer.uuid}>
+                                    <td>
+                                        {transfer.stock.warehouse.city} -{" "}
+                                        {transfer.stock.warehouse.zipCode}
+                                    </td>
+                                    <td>
+                                        {transfer.stock.item.name} -{" "}
+                                        {transfer.stock.item.sku}
+                                    </td>
+                                    <td>{transfer.quantity}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <div className="modal-action">
+                        <label
+                            onClick={() => setShowTransfers(false)}
+                            htmlFor={`${uuid}-transfers`}
+                            className="btn"
+                        >
+                            Close
+                        </label>
+                    </div>
+                </div>
+            </div>
         </>
         // </Link>
     );
