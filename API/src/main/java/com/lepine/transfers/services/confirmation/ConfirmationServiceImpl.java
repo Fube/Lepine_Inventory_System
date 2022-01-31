@@ -1,5 +1,6 @@
 package com.lepine.transfers.services.confirmation;
 
+import com.lepine.transfers.data.confirmation.Confirmation;
 import com.lepine.transfers.data.confirmation.ConfirmationRepo;
 import com.lepine.transfers.data.transfer.TransferRepo;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     private final TransferRepo transferRepo;
 
     @Override
-    public void confirm(UUID transferUuid, int quantity) {
+    public Confirmation confirm(UUID transferUuid, int quantity) {
         throw new RuntimeException("Not implemented");
     }
 }
