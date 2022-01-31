@@ -9,6 +9,8 @@ import com.lepine.transfers.data.transfer.TransferRepo;
 import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
 import com.lepine.transfers.services.confirmation.ConfirmationServiceImpl;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
+import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,9 +19,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,6 +49,8 @@ public class ConfirmationServiceTests {
             .stock(VALID_STOCK)
             .build();
 
+    private String TRANSFER_UUID_NOT_NULL_MESSAGE;
+
     @Autowired
     private ConfirmationService confirmationService;
 
@@ -58,6 +65,10 @@ public class ConfirmationServiceTests {
 
     @BeforeEach
     void setUp() {
+
+        final MessageSourceUtils.ForLocaleWrapper wrapper = wrapperFor(messageSource);
+        TRANSFER_UUID_NOT_NULL_MESSAGE = wrapper.getMessage("transfer.uuid.not_null");
+
         given(transferRepo.findById(VALID_TRANSFER_UUID))
                 .willReturn(Optional.of(VALID_TRANSFER));
 
@@ -108,5 +119,23 @@ public class ConfirmationServiceTests {
         // Assert
         assertThat(transferNotFoundException).isNotNull();
         assertThat(transferNotFoundException).hasMessage(new TransferNotFoundException(transferUuid).getMessage());
+    }
+
+    @Test
+    @DisplayName("zqzYlkxLwC: Given null transfer UUID when confirm, then throw ConstractViolationException")
+    void null_transfer_UUID_Confirm() {
+
+        // Arrange
+        final int toConfirm = VALID_QUANTITY / 2;
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                catchThrowableOfType(
+                        () -> confirmationService.confirm(null, toConfirm),
+                        ConstraintViolationException.class);
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(TRANSFER_UUID_NOT_NULL_MESSAGE);
     }
 }
