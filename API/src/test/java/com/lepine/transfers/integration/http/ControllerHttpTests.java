@@ -21,6 +21,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.UUID;
 
@@ -71,17 +72,22 @@ public class ControllerHttpTests {
     @MockBean
     private ConfirmationService confirmationService;
 
-    private void create() throws Exception {
+    private ResultActions create() throws Exception {
         // Arrange
         final String givenAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION_UUID_LESS_DTO);
-        final String expectedAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION);
 
         // Act & Assert
-        mockMvc.perform(post("/confirmations")
-                        .content(givenAsString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+        return mockMvc.perform(post("/confirmations")
+                        .content(givenAsString).contentType(MediaType.APPLICATION_JSON));
+    }
+
+    private void assertValidCreate(final ResultActions resultActions) throws Exception {
+        final String expectedAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION);
+
+         resultActions.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedAsString));
+
     }
 
     @BeforeEach
@@ -102,13 +108,13 @@ public class ControllerHttpTests {
     @DisplayName("xjMcYtXrjW: Given POST on /confirmations, with valid DTO as manager, then return confirmation")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void valid_Create_AsManager() throws Exception {
-        create();
+        assertValidCreate(create());
     }
 
     @Test
     @DisplayName("cVSjDHhmfY: Given POST on /confirmations, with valid DTO as clerk, then return confirmation")
     @WithMockUser(username = "some-clerk", roles = "CLERK")
     void valid_Create_AsClerk() throws Exception {
-        create();
+        assertValidCreate(create());
     }
 }
