@@ -16,6 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +28,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,21 +95,31 @@ public class ConfirmationServiceTests {
     @Test
     void contextLoads(){}
 
-    @Test
+    @ParameterizedTest(name = "{displayName} - Context: confirmed {0} confirming {1}")
     @DisplayName("XJDnsjBgMl: Given UUID of existing transfer and valid quantity when confirm, then return confirmation")
-    void valid_Confirm() {
+    @MethodSource("validConfirmations")
+    void valid_Confirm(final int alreadyConfirmed, final int confirming) {
 
         // Arrange
-        given(confirmationRepo.sumQuantityByTransferUuid(VALID_TRANSFER_UUID)).willReturn(0);
-        final int toConfirm = VALID_QUANTITY / 2;
+        given(confirmationRepo.sumQuantityByTransferUuid(VALID_TRANSFER_UUID)).willReturn(alreadyConfirmed);
 
         // Act
-        final Confirmation confirmation = confirmationService.confirm(VALID_TRANSFER_UUID, toConfirm);
+        final Confirmation confirmation = confirmationService.confirm(VALID_TRANSFER_UUID, confirming);
 
         // Assert
         assertThat(confirmation).isNotNull();
         assertThat(confirmation.getTransferUuid()).isEqualTo(VALID_TRANSFER_UUID);
-        assertThat(confirmation.getQuantity()).isEqualTo(toConfirm);
+        assertThat(confirmation.getQuantity()).isEqualTo(confirming);
+    }
+
+    private static Stream<Arguments> validConfirmations() {
+        final Arguments[] arguments = new Arguments[VALID_QUANTITY];
+
+        for (int i = 0; i < VALID_QUANTITY; i++) {
+            arguments[i] = Arguments.of(i, VALID_QUANTITY - i);
+        }
+
+        return Stream.of(arguments);
     }
 
     @Test
