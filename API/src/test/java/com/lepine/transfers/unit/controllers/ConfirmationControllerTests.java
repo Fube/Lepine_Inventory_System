@@ -9,6 +9,8 @@ import com.lepine.transfers.services.confirmation.ConfirmationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -60,7 +62,7 @@ public class ConfirmationControllerTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("ZSdEdDwCnP: Given POST on /confirmations with valid DTO, then return created confirmation (201, confirmation)")
+    @DisplayName("ZSdEdDwCnP: Given confirm with valid DTO, then return created confirmation")
     void valid_Create() {
 
         // Act
@@ -68,5 +70,22 @@ public class ConfirmationControllerTests {
 
         // Assert
         assertThat(gotten).isEqualTo(VALID_CONFIRMATION);
+    }
+
+    @ParameterizedTest(name = "{displayName} - {0}")
+    @DisplayName("bysvsSIdkN: Given confirm with quantity <= 0, then throw ConstraintViolationException")
+    @ValueSource(ints = {0, -1})
+    void invalid_Create_quantity_less_than_zero(int quantity) {
+
+        // Arrange
+        final ConfirmationUuidLessDTO invalidDTO = VALID_CONFIRMATION_UUID_LESS_DTO.toBuilder()
+                .quantity(quantity)
+                .build();
+
+        // Act
+        final Confirmation gotten = confirmationController.create(invalidDTO);
+
+        // Assert
+        assertThat(gotten).isNull();
     }
 }
