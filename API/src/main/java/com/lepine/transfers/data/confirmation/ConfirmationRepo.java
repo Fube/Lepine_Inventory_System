@@ -10,5 +10,5 @@ import java.util.UUID;
 public interface ConfirmationRepo extends JpaRepository<Confirmation, UUID> {
 
     @Query("select sum(c.quantity) from Confirmation c where c.transferUuid = :transferUuid")
-    int sumQuantityByTransferUuid(final UUID transferUuid);
+    Integer sumQuantityByTransferUuid(final UUID transferUuid);
 }

@@ -31,7 +31,11 @@ public class ConfirmationServiceImpl implements ConfirmationService {
                 .orElseThrow(() -> new TransferNotFoundException(transferUuid));
         log.info("Found transfer with quantity {}", transfer.getQuantity());
 
-        final int alreadyConfirmed = confirmationRepo.sumQuantityByTransferUuid(transferUuid);
+        Integer alreadyConfirmed = confirmationRepo.sumQuantityByTransferUuid(transferUuid);
+
+        if(alreadyConfirmed == null) {
+            alreadyConfirmed = 0;
+        }
 
         if (alreadyConfirmed + quantity > transfer.getQuantity()) {
             log.error("Transfer quantity {} is less than confirmation quantity {}", transfer.getQuantity(), quantity);

@@ -194,6 +194,9 @@ function ShipmentTableRow({
 }) {
     const [showTransfers, setShowTransfers] = useState(false);
     const [isInConfirmationMode, setIsInConfirmationMode] = useState(false);
+    const [confirmations, setConfirmations] = useState(new Map());
+    const [responseError, setResponseError] = useState(null);
+
     const { role } = useAuth();
     const withNoPropagation = (fn) => (e) => {
         e.stopPropagation();
@@ -208,6 +211,36 @@ function ShipmentTableRow({
     const handleCloseModal = () => {
         setIsInConfirmationMode(false);
         setShowTransfers(false);
+    };
+
+    const handleConfirmationChange = (uuid, quantity) => {
+        if (quantity <= 0) {
+            confirmations.delete(uuid);
+            return setConfirmations(new Map(confirmations));
+        }
+
+        confirmations.set(uuid, quantity);
+    };
+
+    const handleSubmitConfirmations = async () => {
+        try {
+            const reses = await Promise.all(
+                [...confirmations].map(([transferUuid, quantity]) =>
+                    axiosAPI.post("/confirmations", {
+                        transferUuid,
+                        quantity,
+                    })
+                )
+            );
+            setResponseError(null);
+            setConfirmations(new Map());
+            setIsInConfirmationMode(false);
+            setShowTransfers(false);
+        } catch (error) {
+            setResponseError(
+                error?.response?.data?.message ?? "Something went wrong"
+            );
+        }
     };
 
     return (
@@ -271,6 +304,16 @@ function ShipmentTableRow({
                         width: "700px",
                     }}
                 >
+                    <div className="flex justify-between items-center">
+                        <h1 className="text-2xl">Order {orderNumber}</h1>
+                    </div>
+
+                    {isInConfirmationMode && responseError !== null && (
+                        <div className="text-red-500 text-center">
+                            {responseError}
+                        </div>
+                    )}
+
                     <table className="table table-zebra w-full sm:table-fixed">
                         <thead>
                             <tr>
@@ -297,6 +340,12 @@ function ShipmentTableRow({
                                                     .number()
                                                     .min(0)
                                                     .max(transfer.quantity)}
+                                                onChange={(quantity) =>
+                                                    handleConfirmationChange(
+                                                        transfer.uuid,
+                                                        quantity
+                                                    )
+                                                }
                                             />
                                         )
                                             .or(transfer.quantity)
@@ -307,13 +356,25 @@ function ShipmentTableRow({
                         </tbody>
                     </table>
                     <div className="modal-action">
-                        <label
-                            onClick={handleCloseModal}
-                            htmlFor={`${uuid}-transfers`}
-                            className="btn"
-                        >
-                            Close
-                        </label>
+                        {thou(
+                            <label
+                                onClick={handleSubmitConfirmations}
+                                htmlFor={`${uuid}-transfers`}
+                                className="btn"
+                            >
+                                Confirm
+                            </label>
+                        )
+                            .or(
+                                <label
+                                    onClick={handleCloseModal}
+                                    htmlFor={`${uuid}-transfers`}
+                                    className="btn"
+                                >
+                                    Close
+                                </label>
+                            )
+                            .if(isInConfirmationMode)}
                     </div>
                 </div>
             </div>
@@ -322,7 +383,10 @@ function ShipmentTableRow({
     );
 }
 
-function NumberInputWithButtons({ validationSchema = null }) {
+function NumberInputWithButtons({
+    validationSchema = null,
+    onChange = () => {},
+}) {
     const [input, setInput] = useState(0);
 
     const increment = () => validateAndUpdate(input + 1);
@@ -333,6 +397,7 @@ function NumberInputWithButtons({ validationSchema = null }) {
         try {
             if (validationSchema) await validationSchema.validate(value);
             setInput(value);
+            onChange(value);
         } catch (e) {
             console.error(e);
         }
