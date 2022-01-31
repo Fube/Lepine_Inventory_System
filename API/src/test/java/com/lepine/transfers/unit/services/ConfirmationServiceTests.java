@@ -51,7 +51,9 @@ public class ConfirmationServiceTests {
             .stock(VALID_STOCK)
             .build();
 
-    private String TRANSFER_UUID_NOT_NULL_MESSAGE;
+    private String
+            TRANSFER_UUID_NOT_NULL_MESSAGE,
+            TRANSFER_MIN_MESSAGE;
 
     @Autowired
     private ConfirmationService confirmationService;
@@ -70,6 +72,7 @@ public class ConfirmationServiceTests {
 
         final MessageSourceUtils.ForLocaleWrapper wrapper = wrapperFor(messageSource);
         TRANSFER_UUID_NOT_NULL_MESSAGE = wrapper.getMessage("transfer.uuid.not_null");
+        TRANSFER_MIN_MESSAGE = wrapper.getMessage("transfer.quantity.min");
 
         given(transferRepo.findById(VALID_TRANSFER_UUID))
                 .willReturn(Optional.of(VALID_TRANSFER));
@@ -154,6 +157,6 @@ public class ConfirmationServiceTests {
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
-        assertThat(collect).containsExactlyInAnyOrder(TRANSFER_UUID_NOT_NULL_MESSAGE);
+        assertThat(collect).containsExactlyInAnyOrder(TRANSFER_MIN_MESSAGE);
     }
 }
