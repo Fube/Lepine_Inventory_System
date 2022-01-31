@@ -12,8 +12,13 @@ import axios from "axios";
 /**
  * @param {{ shipments: import('@lepine/ui-types').Shipment[] } & import("@lepine/ui-types").Pagination} param0
  */
-export default function ShowShipments({ shipments, totalPages, pageNumber }) {
+export default function ShowShipments({
+    shipments: rawShipments,
+    totalPages,
+    pageNumber,
+}) {
     const { role } = useAuth();
+    const [shipments, setShipments] = useState(rawShipments);
 
     const header = (
         <Head>
@@ -44,15 +49,34 @@ export default function ShowShipments({ shipments, totalPages, pageNumber }) {
             );
         } catch (error) {
             console.error(error);
+            return false;
         }
+
+        return true;
     };
 
     const handleAccept = async (uuid) => {
-        return patchStatus(uuid, "ACCEPTED");
+        const success = await patchStatus(uuid, "ACCEPTED");
+        if (!success) return;
+
+        const target = shipments.findIndex(
+            (shipment) => shipment.uuid === uuid
+        );
+        shipments[target].status = "ACCEPTED";
+
+        setShipments([...shipments]);
     };
 
     const handleDeny = async (uuid) => {
-        return patchStatus(uuid, "DENIED");
+        const success = await patchStatus(uuid, "DENIED");
+        if (!success) return;
+
+        const target = shipments.findIndex(
+            (shipment) => shipment.uuid === uuid
+        );
+        shipments[target].status = "DENIED";
+
+        setShipments([...shipments]);
     };
 
     const head = (
