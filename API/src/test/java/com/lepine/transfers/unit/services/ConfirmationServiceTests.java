@@ -6,6 +6,7 @@ import com.lepine.transfers.data.confirmation.ConfirmationRepo;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
+import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
 import com.lepine.transfers.services.confirmation.ConfirmationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
