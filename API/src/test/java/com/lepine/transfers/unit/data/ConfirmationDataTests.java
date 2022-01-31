@@ -84,18 +84,15 @@ public class ConfirmationDataTests {
             .password("somepassword")
             .build();
 
-    private final static Shipment VALID_SHIPMENT = Shipment.builder()
-            .status(VALID_SHIPMENT_STATUS)
-            .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
-            .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
-            .build();
-
     private final static Transfer VALID_TRANSFER = Transfer.builder()
             .stock(VALID_STOCK)
             .quantity(VALID_STOCK_QUANTITY)
             .build();
 
-    private final static Shipment VALID_SHIPMENT_WITH_TRANSFER = VALID_SHIPMENT.toBuilder()
+    private final static Shipment VALID_SHIPMENT = Shipment.builder()
+            .status(VALID_SHIPMENT_STATUS)
+            .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
+            .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
             .transfers(List.of(VALID_TRANSFER))
             .build();
 
