@@ -174,7 +174,9 @@ public class ConfirmationDataTests {
         entityManager.flush();
 
         VALID_SHIPMENT.setUuid(VALID_SHIPMENT_UUID);
-        VALID_TRANSFER_UUID = VALID_SHIPMENT.getTransfers().get(0).getUuid();
+
+        VALID_TRANSFER_UUID = transferRepo.findAll().get(0).getUuid();
+        VALID_TRANSFER.setUuid(VALID_TRANSFER_UUID);
         // End of Shipment persist
     }
 
@@ -219,18 +221,20 @@ public class ConfirmationDataTests {
 
         // Arrange
         final Confirmation confirmation = Confirmation.builder()
-                .transferUuid(VALID_TRANSFER_UUID)
+                .transferUuid(VALID_TRANSFER.getUuid())
                 .quantity(VALID_STOCK_QUANTITY) // Fully confirm
                 .build();
 
-        final Confirmation saved = confirmationRepo.save(confirmation);
+        confirmationRepo.save(confirmation);
         entityManager.flush();
 
         // Act
-        final List<Confirmation> confirmations = transferRepo.findAllFullyConfirmed();
+        final List<Transfer> confirmations = transferRepo.findAllFullyConfirmed();
 
         // Assert
         assertThat(confirmations).isNotEmpty();
-        assertThat(confirmations).containsExactlyInAnyOrder(saved);
+        assertThat(confirmations)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(VALID_TRANSFER);
     }
 }

@@ -17,5 +17,5 @@ public interface TransferRepo extends JpaRepository<Transfer, UUID> {
                         "group by t.uuid " +
                             "having sum(c.quantity) = t.quantity"
     )
-    List<Confirmation> findAllFullyConfirmed();
+    List<Transfer> findAllFullyConfirmed();
 }
