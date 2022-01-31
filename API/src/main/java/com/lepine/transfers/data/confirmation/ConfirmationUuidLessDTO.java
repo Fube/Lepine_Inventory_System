@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public class ConfirmationUuidLessDTO {
 
+    @NotNull(message = "{transfer.uuid.not_null}")
     private UUID transferUuid;
 
     @Min(value = 1, message = "{transfer.quantity.min}")
