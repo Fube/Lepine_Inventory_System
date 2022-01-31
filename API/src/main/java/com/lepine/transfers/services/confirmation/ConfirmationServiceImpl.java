@@ -36,11 +36,6 @@ public class ConfirmationServiceImpl implements ConfirmationService {
             throw new QuantityExceededException(transfer.getQuantity(), quantity);
         }
 
-        log.info("Updating transfer");
-        transfer.setQuantity(transfer.getQuantity() - quantity);
-        transfer = transferRepo.save(transfer);
-        log.info("Updated transfer with quantity {}", transfer.getQuantity());
-
         log.info("Confirming transfer");
         final Confirmation confirmation = confirmationRepo.save(Confirmation.builder()
                 .transferUuid(transferUuid)

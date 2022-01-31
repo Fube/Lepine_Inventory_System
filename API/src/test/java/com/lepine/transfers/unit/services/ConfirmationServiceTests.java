@@ -105,7 +105,7 @@ public class ConfirmationServiceTests {
         // Assert
         assertThat(confirmation).isNotNull();
         assertThat(confirmation.getTransferUuid()).isEqualTo(VALID_TRANSFER_UUID);
-        assertThat(confirmation.getQuantity()).isEqualTo(VALID_QUANTITY - toConfirm);
+        assertThat(confirmation.getQuantity()).isEqualTo(toConfirm);
     }
 
     @Test
