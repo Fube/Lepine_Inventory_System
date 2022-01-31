@@ -14,6 +14,8 @@ import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -132,6 +134,22 @@ public class ConfirmationServiceTests {
         final ConstraintViolationException constraintViolationException =
                 catchThrowableOfType(
                         () -> confirmationService.confirm(null, toConfirm),
+                        ConstraintViolationException.class);
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(TRANSFER_UUID_NOT_NULL_MESSAGE);
+    }
+
+    @ParameterizedTest(name = "{displayName} - {0}")
+    @DisplayName("EEFODQzUOB: Given quantity <= 0 when confirm, then throw ConstraintViolationException")
+    @ValueSource(ints = {-1, 0})
+    void invalid_quantity_Confirm(final int quantity) {
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                catchThrowableOfType(
+                        () -> confirmationService.confirm(VALID_TRANSFER_UUID, quantity),
                         ConstraintViolationException.class);
 
         // Assert
