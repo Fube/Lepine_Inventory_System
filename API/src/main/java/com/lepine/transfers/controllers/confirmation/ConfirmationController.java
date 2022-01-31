@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
@@ -18,7 +19,7 @@ public class ConfirmationController {
 
     private final ConfirmationService confirmationService;
 
-    public Confirmation create(ConfirmationUuidLessDTO confirmationUuidLessDto) {
+    public Confirmation create(@Valid ConfirmationUuidLessDTO confirmationUuidLessDto) {
 
         final UUID transferUuid = confirmationUuidLessDto.getTransferUuid();
         final int quantity = confirmationUuidLessDto.getQuantity();
