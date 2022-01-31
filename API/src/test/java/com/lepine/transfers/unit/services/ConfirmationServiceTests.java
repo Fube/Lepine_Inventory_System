@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -87,5 +88,24 @@ public class ConfirmationServiceTests {
         assertThat(confirmation).isNotNull();
         assertThat(confirmation.getTransferUuid()).isEqualTo(VALID_TRANSFER_UUID);
         assertThat(confirmation.getQuantity()).isEqualTo(VALID_QUANTITY - toConfirm);
+    }
+
+    @Test
+    @DisplayName("dFgIhpBgzK: Given UUID of non-existing transfer when confirm, then throw TransferNotFoundException")
+    void non_existing_transfer_Confirm() {
+
+        // Arrange
+        final int toConfirm = VALID_QUANTITY / 2;
+        final UUID transferUuid = UUID.randomUUID();
+
+        // Act
+        final TransferNotFoundException transferNotFoundException =
+                catchThrowableOfType(
+                        () -> confirmationService.confirm(transferUuid, toConfirm),
+                        TransferNotFoundException.class);
+
+        // Assert
+        assertThat(transferNotFoundException).isNotNull();
+        assertThat(transferNotFoundException).hasMessage(new TransferNotFoundException(transferUuid).getMessage());
     }
 }
