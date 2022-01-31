@@ -4,6 +4,7 @@ import com.lepine.transfers.data.confirmation.Confirmation;
 import com.lepine.transfers.data.confirmation.ConfirmationRepo;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
+import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,8 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         log.info("Confirming {} of transfer {}", quantity, transferUuid);
 
         log.info("Looking for transfer");
-        Transfer transfer = transferRepo.findById(transferUuid).get();
+        Transfer transfer = transferRepo.findById(transferUuid)
+                .orElseThrow(() -> new TransferNotFoundException(transferUuid));
         log.info("Found transfer with quantity {}", transfer.getQuantity());
 
         log.info("Updating transfer");
