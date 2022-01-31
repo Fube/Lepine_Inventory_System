@@ -74,12 +74,15 @@ public class ConfirmationServiceTests {
     @DisplayName("XJDnsjBgMl: Given UUID of existing transfer and valid quantity when cofirm, then return confirmation")
     void valid_Confirm() {
 
+        // Arrange
+        final int toConfirm = VALID_QUANTITY / 2;
+
         // Act
-        final Confirmation confirmation = confirmationService.confirm(VALID_TRANSFER_UUID, VALID_QUANTITY);
+        final Confirmation confirmation = confirmationService.confirm(VALID_TRANSFER_UUID, toConfirm);
 
         // Assert
         assertThat(confirmation).isNotNull();
         assertThat(confirmation.getTransferUuid()).isEqualTo(VALID_TRANSFER_UUID);
-        assertThat(confirmation.getQuantity()).isEqualTo(VALID_QUANTITY);
+        assertThat(confirmation.getQuantity()).isEqualTo(VALID_QUANTITY - toConfirm);
     }
 }
