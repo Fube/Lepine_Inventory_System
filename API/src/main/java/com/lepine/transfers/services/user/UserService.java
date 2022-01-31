@@ -18,5 +18,9 @@ public interface UserService {
 
     Page<User> findAll(PageRequest pageRequest);
 
+    void delete(UUID uuid);
+
+    User update(UUID uuid,@Valid UserUUIDLessDTO userUUIDLessDTO);
+  
     Optional<User> findByUuid(UUID uuid);
 }
