@@ -4,6 +4,7 @@ import com.lepine.transfers.exceptions.DuplicateResourceException;
 import com.lepine.transfers.exceptions.NotFoundException;
 import com.lepine.transfers.exceptions.auth.DefaultLoginNotAllowedException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
+import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import lombok.Data;
 import lombok.Getter;
@@ -71,6 +72,7 @@ public class GlobalAdvice {
             SameWarehouseException.class,
             StockTooLowException.class,
             DefaultLoginNotAllowedException.class,
+            QuantityExceededException.class,
     })
     @ResponseStatus(value = BAD_REQUEST)
     public HTTPErrorMessage handleGenericBusinessLogicRuntimeException(RuntimeException e) {
