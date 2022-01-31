@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(classes = {
@@ -57,6 +58,13 @@ public class ConfirmationServiceTests {
     void setUp() {
         given(transferRepo.findById(VALID_TRANSFER_UUID))
                 .willReturn(Optional.of(VALID_TRANSFER));
+
+        given(confirmationRepo.save(any()))
+                .willAnswer(invocation -> {
+                    final Confirmation argument = (Confirmation) invocation.getArgument(0);
+                    argument.setUuid(UUID.randomUUID());
+                    return argument;
+                });
     }
 
     @Test
