@@ -84,7 +84,7 @@ public class ControllerHttpTests {
     private void assertValidCreate(final ResultActions resultActions) throws Exception {
         final String expectedAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION);
 
-         resultActions.andExpect(status().isOk())
+         resultActions.andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedAsString));
 
