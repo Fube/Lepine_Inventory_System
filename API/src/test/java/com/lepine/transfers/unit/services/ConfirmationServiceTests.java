@@ -159,4 +159,22 @@ public class ConfirmationServiceTests {
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
         assertThat(collect).containsExactlyInAnyOrder(TRANSFER_MIN_MESSAGE);
     }
+
+    @Test
+    @DisplayName("StAtWXDfCo: Given quantity > transger quantity when confirm, then throw QuantityExceededException")
+    void quantity_exceeded_Confirm() {
+
+        // Arrange
+        final int toConfirm = VALID_QUANTITY + 1;
+
+        // Act
+        final QuantityExceededException quantityExceededException =
+                catchThrowableOfType(
+                        () -> confirmationService.confirm(VALID_TRANSFER_UUID, toConfirm),
+                        QuantityExceededException.class);
+
+        // Assert
+        assertThat(quantityExceededException).isNotNull();
+        assertThat(quantityExceededException).hasMessage(new QuantityExceededException(VALID_QUANTITY).getMessage());
+    }
 }
