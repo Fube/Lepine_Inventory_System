@@ -6,6 +6,8 @@ import com.lepine.transfers.controllers.confirmation.ConfirmationController;
 import com.lepine.transfers.data.confirmation.Confirmation;
 import com.lepine.transfers.data.confirmation.ConfirmationUuidLessDTO;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
+import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
+import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,11 +16,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.validation.ConstraintViolationException;
+import java.util.Set;
 import java.util.UUID;
 
+import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(classes = {
@@ -46,14 +53,26 @@ public class ConfirmationControllerTests {
             .quantity(VALID_QUANTITY)
             .build();
 
+    private String
+            TRANSFER_UUID_NOT_NULL_MESSAGE,
+            TRANSFER_MIN_MESSAGE;
+
     @Autowired
     private ConfirmationController confirmationController;
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
 
     @MockBean
     private ConfirmationService confirmationService;
 
     @BeforeEach
     void setUp() {
+
+        final MessageSourceUtils.ForLocaleWrapper wrapper = wrapperFor(messageSource);
+        TRANSFER_UUID_NOT_NULL_MESSAGE = wrapper.getMessage("transfer.uuid.not_null");
+        TRANSFER_MIN_MESSAGE = wrapper.getMessage("transfer.quantity.min");
+
         given(confirmationService.confirm(VALID_TRANSFER_UUID, VALID_QUANTITY))
                 .willReturn(VALID_CONFIRMATION);
     }
@@ -83,9 +102,13 @@ public class ConfirmationControllerTests {
                 .build();
 
         // Act
-        final Confirmation gotten = confirmationController.create(invalidDTO);
+        final ConstraintViolationException constraintViolationException =
+                catchThrowableOfType(
+                        () -> confirmationController.create(invalidDTO),
+                        ConstraintViolationException.class);
 
         // Assert
-        assertThat(gotten).isNull();
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(TRANSFER_MIN_MESSAGE);
     }
 }
