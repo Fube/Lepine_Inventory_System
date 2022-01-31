@@ -1,6 +1,7 @@
 package com.lepine.transfers.unit.data;
 
 import com.lepine.transfers.data.auth.Role;
+import com.lepine.transfers.data.confirmation.Confirmation;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.role.RoleRepo;
@@ -198,20 +199,18 @@ public class ConfirmationDataTests {
     void testConfirmTransfer(final int quantity) {
 
         // Arrange
-        final Confirmation confirmation = Confirmation.builder()
+        final Confirmation given = Confirmation.builder()
                 .transferUuid(VALID_TRANSFER_UUID)
                 .quantity(quantity)
                 .build();
 
         // Act
-        final Confirmation confirmation = confirmationRepo.save(Confirmation.builder()
-                .transfer(VALID_TRANSFER)
-                .build());
+        final Confirmation confirmation = confirmationRepo.save(given);
 
         // Assert
         assertThat(confirmation).isNotNull();
         assertThat(confirmation.getUuid()).isNotNull();
-        assertThat(confirmation.getTransferUuid).isEqualTo(VALID_TRANSFER_UUID);
+        assertThat(confirmation.getTransferUuid()).isEqualTo(VALID_TRANSFER_UUID);
         assertThat(confirmation.getQuantity()).isEqualTo(quantity);
     }
 }
