@@ -105,16 +105,23 @@ public class ControllerHttpTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("xjMcYtXrjW: Given POST on /confirmations, with valid DTO as manager, then return confirmation")
+    @DisplayName("xjMcYtXrjW: Given POST on /confirmations, with valid DTO as manager, then return confirmation (201, confirmation)")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
     void valid_Create_AsManager() throws Exception {
         assertValidCreate(create());
     }
 
     @Test
-    @DisplayName("cVSjDHhmfY: Given POST on /confirmations, with valid DTO as clerk, then return confirmation")
+    @DisplayName("cVSjDHhmfY: Given POST on /confirmations, with valid DTO as clerk, then return confirmation (201, confirmation)")
     @WithMockUser(username = "some-clerk", roles = "CLERK")
     void valid_Create_AsClerk() throws Exception {
         assertValidCreate(create());
+    }
+
+    @Test
+    @DisplayName("bXwwRKKRPA: Given POST on /confirmations, with valid DTO as salesperson, then deny access (403, error)")
+    @WithMockUser(username = "some-salesperson", roles = "SALESPERSON")
+    void valid_Create_AsSalesperson() throws Exception {
+        create().andExpect(status().isForbidden());
     }
 }
