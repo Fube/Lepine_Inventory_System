@@ -111,4 +111,24 @@ public class ConfirmationControllerTests {
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
         assertThat(collect).containsExactlyInAnyOrder(TRANSFER_MIN_MESSAGE);
     }
+
+    @Test
+    @DisplayName("oHhTveeFeE: Given null transfer UUID, then throw ConstraintViolationException")
+    void invalid_Create_transfer_uuid_null() {
+
+        // Arrange
+        final ConfirmationUuidLessDTO invalidDTO = VALID_CONFIRMATION_UUID_LESS_DTO.toBuilder()
+                .transferUuid(null)
+                .build();
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                catchThrowableOfType(
+                        () -> confirmationController.create(invalidDTO),
+                        ConstraintViolationException.class);
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+        assertThat(collect).containsExactlyInAnyOrder(TRANSFER_UUID_NOT_NULL_MESSAGE);
+    }
 }
