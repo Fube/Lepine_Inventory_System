@@ -1,5 +1,6 @@
 package com.lepine.transfers.integration.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.AuthConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
@@ -9,18 +10,24 @@ import com.lepine.transfers.data.confirmation.ConfirmationUuidLessDTO;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { ConfirmationController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class})
@@ -49,7 +56,13 @@ public class ControllerHttpTests {
             TRANSFER_MIN_MESSAGE;
 
     @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
     private ConfirmationController confirmationController;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
@@ -70,4 +83,19 @@ public class ControllerHttpTests {
 
     @Test
     void contextLoads(){}
+
+    @Test
+    @DisplayName("xjMcYtXrjW: Given POST on /confirmations, when valid request, then return confirmation")
+    void valid_Create() throws Exception {
+
+        // Arrange
+        final String givenAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION_UUID_LESS_DTO);
+        final String expectedAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION);
+
+        // Act & Assert
+        mockMvc.perform(post("/confirmations").content(givenAsString))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedAsString));
+    }
 }
