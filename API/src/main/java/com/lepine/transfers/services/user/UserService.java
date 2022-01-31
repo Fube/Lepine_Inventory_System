@@ -21,6 +21,6 @@ public interface UserService {
     void delete(UUID uuid);
 
     User update(UUID uuid,@Valid UserUUIDLessDTO userUUIDLessDTO);
-
+  
     Optional<User> findByUuid(UUID uuid);
 }

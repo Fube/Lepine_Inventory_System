@@ -1,12 +1,13 @@
 package com.lepine.transfers.services.shipment;
 
-import com.lepine.transfers.data.shipment.Shipment;
-import com.lepine.transfers.data.shipment.ShipmentMapper;
-import com.lepine.transfers.data.shipment.ShipmentRepo;
-import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.data.shipment.*;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.events.shipment.ShipmentCreateEvent;
+import com.lepine.transfers.events.shipment.ShipmentUpdateEvent;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotFoundException;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotPendingException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
@@ -21,8 +22,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.json.JsonPatch;
+import javax.json.JsonStructure;
 import javax.transaction.Transactional;
-import java.util.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +44,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final StockService stockService;
     private final WarehouseService warehouseService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ObjectMapper objectMapper;
+    private final Validator validator;
 
     @Override
     @Transactional
@@ -130,5 +141,41 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Found {} shipments for user {} for page {}", all.getTotalElements(), userUuid, pageRequest);
 
         return all;
+    }
+
+    @Override
+    public Shipment update(UUID uuid, JsonPatch jsonPatch) {
+        log.info("Applying patch {} to shipment {}", jsonPatch, uuid);
+        final Shipment shipment = shipmentRepo.findById(uuid)
+                .orElseThrow(() -> new ShipmentNotFoundException(uuid));
+        final Shipment shipmentClone = shipment.toBuilder().build();
+
+        if(shipment.getStatus() != ShipmentStatus.PENDING) {
+            log.info("Shipment {} is not pending, cannot be updated", uuid);
+            throw new ShipmentNotPendingException(uuid);
+        }
+
+        final ShipmentPatchDTO shipmentPatchDTO = shipmentMapper.toPatchDTO(shipment);
+        JsonStructure target = objectMapper.convertValue(shipmentPatchDTO, JsonStructure.class);
+        JsonStructure patched = jsonPatch.apply(target);
+
+        final ShipmentPatchDTO backDTO = objectMapper.convertValue(patched, ShipmentPatchDTO.class);
+
+        Set<ConstraintViolation<ShipmentPatchDTO>> violations = validator.validate(backDTO);
+        if(!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        final Shipment updated = shipmentMapper.toEntity(backDTO, shipment);
+
+        final Shipment saved = shipmentRepo.save(updated);
+
+        log.info("Updated shipment");
+
+        log.info("Publishing update event for shipment {}", uuid);
+        applicationEventPublisher.publishEvent(new ShipmentUpdateEvent(this, shipmentClone, saved));
+
+        return saved;
+
     }
 }

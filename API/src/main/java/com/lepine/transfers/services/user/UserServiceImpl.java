@@ -91,11 +91,19 @@ public class UserServiceImpl implements UserService, AuthService {
     }
 
     @Override
+    public Optional<User> findByUuid(UUID uuid) {
+        log.info("Getting User with UUID {}", uuid);
+        return userRepo.findById(uuid);
+    }
+  
     @Transactional
     public void delete(UUID uuid) {
+        log.info("Deleting User with UUID {}", uuid);
         final Integer deleted = userRepo.deleteByUuid(uuid);
         if(deleted <= 0) {
-            return;
+            log.info("User with UUID {} not found, nothing to delete", uuid);
+        } else {
+            log.info("Deleted {} User with UUID {}", deleted, uuid);
         }
     }
 
@@ -121,16 +129,6 @@ public class UserServiceImpl implements UserService, AuthService {
 
         return updated;
     }
-
-
-    @Override
-    public Optional<User> findByUuid(UUID uuid) {
-        log.info("retrieving user");
-        final Optional<User> user = userRepo.findById(uuid);
-        log.info("retrieved user");
-
-        return user;    }
-
 
     @Override
     public Pair<User, String> login(UserLogin userLogin) {

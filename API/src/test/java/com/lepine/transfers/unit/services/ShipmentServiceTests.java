@@ -1,14 +1,20 @@
 package com.lepine.transfers.unit.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.config.ApplicationEventPublisherConfig;
+import com.lepine.transfers.config.JacksonConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
+import com.lepine.transfers.data.shipment.ShipmentStatus;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotFoundException;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotPendingException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.shipment.ShipmentService;
@@ -22,10 +28,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
+import javax.json.JsonException;
+import javax.json.JsonPatch;
 import javax.validation.ConstraintViolationException;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -36,13 +46,15 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {
         ShipmentServiceImpl.class,
         MapperConfig.class,
         ValidationConfig.class,
+        JacksonAutoConfiguration.class,
+        JacksonConfig.class,
+        ApplicationEventPublisherConfig.class,
 })
 public class ShipmentServiceTests {
 
@@ -102,6 +114,7 @@ public class ShipmentServiceTests {
     private String
             SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE,
             SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE,
+            SHIPMENT_PATCH_DTO_STATUS_INVALID_MESSAGE,
             ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL;
 
     @Autowired
@@ -109,6 +122,9 @@ public class ShipmentServiceTests {
 
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private ShipmentRepo shipmentRepo;
@@ -119,11 +135,15 @@ public class ShipmentServiceTests {
     @MockBean
     private WarehouseService warehouseService;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @BeforeEach
     void setUp() {
         final MessageSourceUtils.ForLocaleWrapper w = wrapperFor(messageSource);
         SHIPMENT_TRANSFER_QUANTITY_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE = w.getMessage("transfer.quantity.min");
         SHIPMENT_TRANSFERS_SIZE_LESS_THAN_OR_EQUAL_TO_ZERO_ERROR_MESSAGE = w.getMessage("shipment.transfers.size.min");
+        SHIPMENT_PATCH_DTO_STATUS_INVALID_MESSAGE = w.getMessage("shipment.patch.status.in_enum");
         ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL = w.getMessage("shipment.transfers.not_null");
     }
 
@@ -242,5 +262,135 @@ public class ShipmentServiceTests {
 
         assertThat(collect).containsExactly(ERROR_MESSAGE_SHIPMENT_TRANSFERS_NULL);
         verify(warehouseService, never()).findByUuid(any());
+    }
+
+    @Test
+    @DisplayName("bsfviHubzM: Given JsonPatch when update, then update and return updated entity")
+    void valid_Update_JsonPatch() {
+
+        // Arrange
+        final Shipment expected = VALID_SHIPMENT.toBuilder().status(ShipmentStatus.ACCEPTED).build();
+
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/status",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentRepo.save(any())).willAnswer(invocation -> invocation.getArgument(0)); // Return as is
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT));
+
+        // Act
+        final Shipment updatedShipment = shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch);
+
+        // Assert
+        assertThat(updatedShipment).usingRecursiveComparison().isEqualTo(expected);
+        verify(shipmentRepo, times(1)).save(refEq(expected));
+        verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
+        verify(applicationEventPublisher, times(1)).publishEvent(any());
+    }
+
+    @Test
+    @DisplayName("RVIhyPdeLK: Given non-existing entity when update, then throw ShipmentNotFoundException")
+    void invalid_Update_NonExistingEntity() {
+
+        // Arrange
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/status",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.empty());
+
+        // Act & Assert
+        final ShipmentNotFoundException shipmentNotFoundException =
+                catchThrowableOfType(
+                        () -> shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch), ShipmentNotFoundException.class);
+
+        assertThat(shipmentNotFoundException.getMessage())
+                .isEqualTo(new ShipmentNotFoundException(VALID_SHIPMENT_UUID).getMessage());
+        verify(shipmentRepo, never()).save(any());
+        verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
+    }
+
+    @Test
+    @DisplayName("gQZVHDBSPg: Given JsonPatch with invalid path when update, then throw JsonException")
+    void invalid_Update_InvalidPath() {
+
+        // Arrange
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/invalid",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT));
+
+        // Act & Assert
+        final JsonException jsonException =
+                catchThrowableOfType(() -> shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch), JsonException.class);
+
+        assertThat(jsonException)
+                .hasMessageContaining("contains no value for name 'invalid'");
+        verify(shipmentRepo, never()).save(any());
+        verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
+    }
+
+    @Test
+    @DisplayName("vtKrSaYebx: Given JsonPatch with invalid value when update, then throw ConstraintViolationException")
+    void invalid_Update_InvalidValue() {
+
+        // Arrange
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", "invalid",
+                "path", "/status",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT));
+
+        // Act
+        final ConstraintViolationException constraintViolationException =
+                catchThrowableOfType(() -> shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch), ConstraintViolationException.class);
+
+        // Assert
+        final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
+
+        assertThat(collect).containsExactlyInAnyOrder(SHIPMENT_PATCH_DTO_STATUS_INVALID_MESSAGE);
+
+        verify(shipmentRepo, never()).save(any());
+        verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
+    }
+
+    @Test
+    @DisplayName("AqfTQwkxYA: Given non-pending shipment when update, then throw ShipmentNotPendingException")
+    void invalid_Update_NonPendingShipment() {
+
+        // Arrange
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/status",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentRepo.findById(VALID_SHIPMENT_UUID)).willReturn(Optional.of(VALID_SHIPMENT.toBuilder()
+                .status(ShipmentStatus.ACCEPTED)
+                .build()));
+
+        // Act & Assert
+        final ShipmentNotPendingException shipmentNotPendingException =
+                catchThrowableOfType(
+                        () -> shipmentService.update(VALID_SHIPMENT_UUID, jsonPatch), ShipmentNotPendingException.class);
+
+        assertThat(shipmentNotPendingException)
+                .hasMessage(new ShipmentNotPendingException(VALID_SHIPMENT_UUID).getMessage());
+        verify(shipmentRepo, never()).save(any());
+        verify(shipmentRepo, times(1)).findById(VALID_SHIPMENT_UUID);
     }
 }

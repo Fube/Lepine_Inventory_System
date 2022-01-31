@@ -1,12 +1,12 @@
 package com.lepine.transfers.unit.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lepine.transfers.config.JacksonConfig;
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.shipment.ShipmentController;
 import com.lepine.transfers.data.auth.Role;
-import com.lepine.transfers.data.shipment.Shipment;
-import com.lepine.transfers.data.shipment.ShipmentStatusLessCreatedByLessUuidLessDTO;
-import com.lepine.transfers.data.shipment.ShipmentStatusLessUuidLessDTO;
+import com.lepine.transfers.data.shipment.*;
 import com.lepine.transfers.data.transfer.TransferUuidLessDTO;
 import com.lepine.transfers.data.user.User;
 import com.lepine.transfers.exceptions.auth.DefaultLoginNotAllowedException;
@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -26,12 +27,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.json.JsonPatch;
 import javax.validation.ConstraintViolationException;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +38,13 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = { MapperConfig.class, ValidationConfig.class, ShipmentController.class })
+@SpringBootTest(classes = {
+        MapperConfig.class,
+        ValidationConfig.class,
+        ShipmentController.class,
+        JacksonAutoConfiguration.class,
+        JacksonConfig.class
+})
 @ActiveProfiles({"test"})
 public class ShipmentControllerTests {
 
@@ -120,6 +125,8 @@ public class ShipmentControllerTests {
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private ShipmentService shipmentService;
@@ -400,5 +407,33 @@ public class ShipmentControllerTests {
         assertThat(collect).containsExactlyInAnyOrder(ERROR_MESSAGE_SHIPMENT_TRANSFERS_EMPTY);
 
         verify(shipmentService, never()).create(any());
+    }
+
+    @Test
+    @DisplayName("IUzlatAQRL: Given JsonPatch when update, then return updated shipment")
+    void valid_Update() {
+        // Arrange
+        final Shipment expected = VALID_SHIPMENT.toBuilder().status(ShipmentStatus.ACCEPTED).build();
+        final ShipmentPatchDTO expectedPatchDTO = ShipmentPatchDTO.builder()
+                .status("ACCEPTED")
+                .build();
+
+        final Map<String, Object> patchAsMap = Map.of(
+                "value", ShipmentStatus.ACCEPTED.toString(),
+                "path", "/status",
+                "op", "replace"
+        );
+        final JsonPatch jsonPatch = objectMapper.convertValue(List.of(patchAsMap), JsonPatch.class);
+
+        given(shipmentService
+                .update(expected.getUuid(), jsonPatch))
+                .willReturn(expected);
+
+        // Act
+        final Shipment updatedShipment = shipmentController.update(VALID_SHIPMENT_UUID, jsonPatch);
+
+        // Assert
+        assertThat(updatedShipment).usingRecursiveComparison().isEqualTo(expected);
+        verify(shipmentService, times(1)).update(VALID_SHIPMENT_UUID, jsonPatch);
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.json.JsonPatch;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.UUID;
@@ -74,9 +75,21 @@ public class ShipmentController {
 
         log.info("Mapping shipment status less created by less uuid less DTO to shipment");
         final ShipmentStatusLessUuidLessDTO mapped =
-            shipmentMapper.toDTO(shipmentStatusLessCreatedByLessUuidLessDTO, user);
+            shipmentMapper.toStatusLessUuidLessDTO(shipmentStatusLessCreatedByLessUuidLessDTO, user);
         log.info("Mapped shipment status less uuid less DTO to shipment");
 
         return shipmentService.create(mapped);
+    }
+
+    @PatchMapping(
+            path = "/{uuid}",
+            consumes = "application/json-patch+json",
+            produces = "application/json"
+    )
+    public Shipment update(
+            @PathVariable UUID uuid,
+            @RequestBody JsonPatch jsonPatch) {
+        log.info("Updating shipment with uuid {}", uuid);
+        return shipmentService.update(uuid, jsonPatch);
     }
 }
