@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
+import * as yup from "yup";
 import Paginate from "../../components/Pagination";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
@@ -99,12 +100,21 @@ export default function ShowShipments({
 
             {(role === "MANAGER" || role === "CLERK") && (
                 <th className="flex justify-between">
-                    <div className="self-center">Actions</div>
-                    <button>
-                        <Link href="/shipments/new" passHref>
-                            <Icon icon="si-glyph:button-plus" width="32" />
-                        </Link>
-                    </button>
+                    {thou(
+                        <>
+                            <div className="self-center">Actions</div>
+                            <button>
+                                <Link href="/shipments/new" passHref>
+                                    <Icon
+                                        icon="si-glyph:button-plus"
+                                        width="32"
+                                    />
+                                </Link>
+                            </button>
+                        </>
+                    )
+                        .or("Actions")
+                        .if(role === "MANAGER")}
                 </th>
             )}
         </tr>
@@ -183,10 +193,21 @@ function ShipmentTableRow({
     onDeny = () => {},
 }) {
     const [showTransfers, setShowTransfers] = useState(false);
+    const [isInConfirmationMode, setIsInConfirmationMode] = useState(false);
     const { role } = useAuth();
     const withNoPropagation = (fn) => (e) => {
         e.stopPropagation();
         return fn(e);
+    };
+
+    const handleConfirm = () => {
+        setIsInConfirmationMode(true);
+        setShowTransfers(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsInConfirmationMode(false);
+        setShowTransfers(false);
     };
 
     return (
@@ -223,6 +244,16 @@ function ShipmentTableRow({
                             .if(status.toUpperCase() === "PENDING")}
                     </td>
                 )}
+                {role === "CLERK" && (
+                    <td className="flex justify-center">
+                        <button
+                            onClick={withNoPropagation(handleConfirm)}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Confirm
+                        </button>
+                    </td>
+                )}
             </tr>
 
             <input
@@ -231,8 +262,15 @@ function ShipmentTableRow({
                 className="modal-toggle"
                 checked={showTransfers}
             />
-            <div onClick={() => setShowTransfers(false)} className="modal">
-                <div onClick={(e) => e.stopPropagation()} className="modal-box">
+            <div onClick={handleCloseModal} className="modal">
+                <div
+                    onClick={withNoPropagation(() => {})}
+                    className="modal-box"
+                    style={{
+                        maxWidth: "unset",
+                        width: "700px",
+                    }}
+                >
                     <table className="table table-zebra w-full sm:table-fixed">
                         <thead>
                             <tr>
@@ -252,14 +290,25 @@ function ShipmentTableRow({
                                         {transfer.stock.item.name} -{" "}
                                         {transfer.stock.item.sku}
                                     </td>
-                                    <td>{transfer.quantity}</td>
+                                    <td>
+                                        {thou(
+                                            <NumberInputWithButtons
+                                                validationSchema={yup
+                                                    .number()
+                                                    .min(0)
+                                                    .max(transfer.quantity)}
+                                            />
+                                        )
+                                            .or(transfer.quantity)
+                                            .if(isInConfirmationMode)}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                     <div className="modal-action">
                         <label
-                            onClick={() => setShowTransfers(false)}
+                            onClick={handleCloseModal}
                             htmlFor={`${uuid}-transfers`}
                             className="btn"
                         >
@@ -270,6 +319,50 @@ function ShipmentTableRow({
             </div>
         </>
         // </Link>
+    );
+}
+
+function NumberInputWithButtons({ validationSchema = null }) {
+    const [input, setInput] = useState(0);
+
+    const increment = () => validateAndUpdate(input + 1);
+    const decrement = () => validateAndUpdate(input - 1);
+
+    const validateAndUpdate = async (value) => {
+        if (!validationSchema) return setInput(value);
+        try {
+            if (validationSchema) await validationSchema.validate(value);
+            setInput(value);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const handleOnChange = (e) => validateAndUpdate(e.target.value);
+
+    return (
+        <>
+            <div className="relative">
+                <button
+                    onClick={decrement}
+                    className="absolute left-0 top-0 rounded-r-none btn btn-square"
+                >
+                    -
+                </button>
+                <input
+                    value={input}
+                    onChange={handleOnChange}
+                    type="text"
+                    className="w-full text-center px-12 input input-bordered"
+                />
+                <button
+                    onClick={increment}
+                    className="absolute right-0 top-0 rounded-l-none btn btn-square"
+                >
+                    +
+                </button>
+            </div>
+        </>
     );
 }
 
