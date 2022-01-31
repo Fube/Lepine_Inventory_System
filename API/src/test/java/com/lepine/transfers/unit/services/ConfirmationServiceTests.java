@@ -93,10 +93,11 @@ public class ConfirmationServiceTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("XJDnsjBgMl: Given UUID of existing transfer and valid quantity when cofirm, then return confirmation")
+    @DisplayName("XJDnsjBgMl: Given UUID of existing transfer and valid quantity when confirm, then return confirmation")
     void valid_Confirm() {
 
         // Arrange
+        given(confirmationRepo.sumQuantityByTransferUuid(VALID_TRANSFER_UUID)).willReturn(0);
         final int toConfirm = VALID_QUANTITY / 2;
 
         // Act
