@@ -17,7 +17,10 @@ import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.data.warehouse.WarehouseRepo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -27,6 +30,8 @@ import javax.persistence.EntityManager;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles({"test"})
@@ -100,6 +105,7 @@ public class ConfirmationDataTests {
             VALID_ITEM_UUID,
             VALID_STOCK_UUID,
             VALID_USER_UUID,
+            VALID_TRANSFER_UUID,
             VALID_SHIPMENT_UUID;
 
     final Shipment shipment = VALID_SHIPMENT.toBuilder()
@@ -108,6 +114,9 @@ public class ConfirmationDataTests {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private ConfirmationRepo confirmationRepo;
 
     @Autowired
     private ShipmentRepo shipmentRepo;
@@ -158,7 +167,7 @@ public class ConfirmationDataTests {
         VALID_USER.setUuid(VALID_USER_UUID);
         // End of User persist
 
-        // Shipment persist
+        // Shipment & transfer persist
         VALID_SHIPMENT.setCreatedBy(VALID_USER_UUID);
         VALID_SHIPMENT.setTo(VALID_TARGET_WAREHOUSE_UUID);
 
@@ -166,6 +175,7 @@ public class ConfirmationDataTests {
         entityManager.flush();
 
         VALID_SHIPMENT.setUuid(VALID_SHIPMENT_UUID);
+        VALID_TRANSFER_UUID = VALID_SHIPMENT.getTransfers().get(0).getUuid();
         // End of Shipment persist
     }
 
@@ -181,4 +191,27 @@ public class ConfirmationDataTests {
 
     @Test
     void contextLoads() {}
+
+    @ParameterizedTest(name = "{displayName} - {0}")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+    @DisplayName("ebQHEVReTB: Given a valid transfer when confirm, then add confirmation for transfer")
+    void testConfirmTransfer(final int quantity) {
+
+        // Arrange
+        final Confirmation confirmation = Confirmation.builder()
+                .transferUuid(VALID_TRANSFER_UUID)
+                .quantity(quantity)
+                .build();
+
+        // Act
+        final Confirmation confirmation = confirmationRepo.save(Confirmation.builder()
+                .transfer(VALID_TRANSFER)
+                .build());
+
+        // Assert
+        assertThat(confirmation).isNotNull();
+        assertThat(confirmation.getUuid()).isNotNull();
+        assertThat(confirmation.getTransferUuid).isEqualTo(VALID_TRANSFER_UUID);
+        assertThat(confirmation.getQuantity()).isEqualTo(quantity);
+    }
 }
