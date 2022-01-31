@@ -60,10 +60,6 @@ public class ControllerHttpTests {
             .quantity(VALID_QUANTITY)
             .build();
 
-    private String
-            TRANSFER_UUID_NOT_NULL_MESSAGE,
-            TRANSFER_MIN_MESSAGE;
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -72,9 +68,6 @@ public class ControllerHttpTests {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private ReloadableResourceBundleMessageSource messageSource;
 
     @MockBean
     private ConfirmationService confirmationService;
@@ -104,11 +97,6 @@ public class ControllerHttpTests {
 
     @BeforeEach
     void setUp() {
-
-        final MessageSourceUtils.ForLocaleWrapper wrapper = wrapperFor(messageSource);
-        TRANSFER_UUID_NOT_NULL_MESSAGE = wrapper.getMessage("transfer.uuid.not_null");
-        TRANSFER_MIN_MESSAGE = wrapper.getMessage("transfer.quantity.min");
-
         given(confirmationService.confirm(VALID_TRANSFER_UUID, VALID_QUANTITY))
                 .willReturn(VALID_CONFIRMATION);
 
