@@ -27,11 +27,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.UUID;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(controllers = { ConfirmationController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class, })
@@ -151,7 +149,7 @@ public class ControllerHttpTests {
 
         // Act & Assert
         create(given).andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors.quantity").isArray())
-                .andExpect(jsonPath("$.errors.quantity[*]", containsInAnyOrder(TRANSFER_MIN_MESSAGE)));
+                .andExpect(jsonPath("$.message")
+                        .value(new QuantityExceededException(VALID_QUANTITY, EXCEEDING_QUANTITY).getMessage()));
     }
 }
