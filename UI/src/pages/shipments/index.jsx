@@ -184,6 +184,10 @@ function ShipmentTableRow({
 }) {
     const [showTransfers, setShowTransfers] = useState(false);
     const { role } = useAuth();
+    const withNoPropagation = (fn) => (e) => {
+        e.stopPropagation();
+        return fn(e);
+    };
 
     return (
         // <Link key={uuid} href={`/shipments/${uuid}`} passHref>
@@ -198,13 +202,17 @@ function ShipmentTableRow({
                         {thou(
                             <>
                                 <button
-                                    onClick={() => onAccept(uuid)}
+                                    onClick={withNoPropagation(() =>
+                                        onAccept(uuid)
+                                    )}
                                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                                 >
                                     Accept
                                 </button>
                                 <button
-                                    onClick={() => onDeny(uuid)}
+                                    onClick={withNoPropagation(() =>
+                                        onDeny(uuid)
+                                    )}
                                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4"
                                 >
                                     Deny
