@@ -8,6 +8,7 @@ import com.lepine.transfers.controllers.confirmation.ConfirmationController;
 import com.lepine.transfers.data.confirmation.Confirmation;
 import com.lepine.transfers.data.confirmation.ConfirmationUuidLessDTO;
 import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
+import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.UUID;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,7 +42,8 @@ public class ControllerHttpTests {
     private final static UUID
             VALID_CONFIRMATION_UUID = UUID.randomUUID(),
             VALID_TRANSFER_UUID = UUID.randomUUID(),
-            EXCEEDING_TRANSFER_UUID = UUID.randomUUID();
+            EXCEEDING_TRANSFER_UUID = UUID.randomUUID(),
+            NON_EXISTING_TRANSFER_UUID = UUID.randomUUID();
 
     private final static int
             VALID_QUANTITY = 10,
@@ -110,6 +114,9 @@ public class ControllerHttpTests {
 
         given(confirmationService.confirm(EXCEEDING_TRANSFER_UUID, EXCEEDING_QUANTITY))
                 .willThrow(new QuantityExceededException(VALID_QUANTITY, EXCEEDING_QUANTITY));
+
+        given(confirmationService.confirm(eq(NON_EXISTING_TRANSFER_UUID), anyInt()))
+                .willThrow(new TransferNotFoundException(NON_EXISTING_TRANSFER_UUID));
     }
 
     @Test
@@ -151,5 +158,22 @@ public class ControllerHttpTests {
         create(given).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
                         .value(new QuantityExceededException(VALID_QUANTITY, EXCEEDING_QUANTITY).getMessage()));
+    }
+
+    @Test
+    @DisplayName("qNVVLJFLye: Given POST on /confirmations, with transferUuid for non-existing transfer, return not found (404, error)")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void nonExisting_Create() throws Exception {
+
+        // Arrange
+        final ConfirmationUuidLessDTO given = ConfirmationUuidLessDTO.builder()
+                .transferUuid(NON_EXISTING_TRANSFER_UUID)
+                .quantity(VALID_QUANTITY)
+                .build();
+
+        // Act & Assert
+        create(given).andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message")
+                        .value(new TransferNotFoundException(NON_EXISTING_TRANSFER_UUID).getMessage()));
     }
 }
