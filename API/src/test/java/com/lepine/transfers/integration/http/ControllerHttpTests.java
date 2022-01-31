@@ -71,6 +71,19 @@ public class ControllerHttpTests {
     @MockBean
     private ConfirmationService confirmationService;
 
+    private void create() throws Exception {
+        // Arrange
+        final String givenAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION_UUID_LESS_DTO);
+        final String expectedAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION);
+
+        // Act & Assert
+        mockMvc.perform(post("/confirmations")
+                        .content(givenAsString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedAsString));
+    }
+
     @BeforeEach
     void setUp() {
 
@@ -88,16 +101,14 @@ public class ControllerHttpTests {
     @Test
     @DisplayName("xjMcYtXrjW: Given POST on /confirmations, with valid DTO as manager, then return confirmation")
     @WithMockUser(username = "some-manager", roles = "MANAGER")
-    void valid_Create() throws Exception {
-        // Arrange
-        final String givenAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION_UUID_LESS_DTO);
-        final String expectedAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION);
+    void valid_Create_AsManager() throws Exception {
+        create();
+    }
 
-        // Act & Assert
-        mockMvc.perform(post("/confirmations")
-                        .content(givenAsString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedAsString));
+    @Test
+    @DisplayName("cVSjDHhmfY: Given POST on /confirmations, with valid DTO as clerk, then return confirmation")
+    @WithMockUser(username = "some-clerk", roles = "CLERK")
+    void valid_Create_AsClerk() throws Exception {
+        create();
     }
 }
