@@ -2,6 +2,7 @@ package com.lepine.transfers.unit.data;
 
 import com.lepine.transfers.data.auth.Role;
 import com.lepine.transfers.data.confirmation.Confirmation;
+import com.lepine.transfers.data.confirmation.ConfirmationRepo;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.role.RoleRepo;
@@ -183,6 +184,7 @@ public class ConfirmationDataTests {
     @AfterEach
     void cleanUp() {
         entityManager.clear();
+        confirmationRepo.deleteAll();
         shipmentRepo.deleteAll();
         transferRepo.deleteAll();
         stockRepo.deleteAll();
