@@ -4,6 +4,7 @@ import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.confirmation.ConfirmationController;
 import com.lepine.transfers.data.confirmation.Confirmation;
+import com.lepine.transfers.data.confirmation.ConfirmationUuidLessDTO;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
