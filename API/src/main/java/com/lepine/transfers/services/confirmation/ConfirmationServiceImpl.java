@@ -25,8 +25,13 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         log.info("Confirming {} of transfer {}", quantity, transferUuid);
 
         log.info("Looking for transfer");
-        final Transfer transfer = transferRepo.findById(transferUuid).get();
+        Transfer transfer = transferRepo.findById(transferUuid).get();
         log.info("Found transfer with quantity {}", transfer.getQuantity());
+
+        log.info("Updating transfer");
+        transfer.setQuantity(transfer.getQuantity() - quantity);
+        transfer = transferRepo.save(transfer);
+        log.info("Updated transfer with quantity {}", transfer.getQuantity());
 
         log.info("Confirming transfer");
         final Confirmation confirmation = confirmationRepo.save(Confirmation.builder()

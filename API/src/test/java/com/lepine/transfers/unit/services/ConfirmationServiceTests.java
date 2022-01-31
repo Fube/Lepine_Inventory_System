@@ -61,10 +61,13 @@ public class ConfirmationServiceTests {
 
         given(confirmationRepo.save(any()))
                 .willAnswer(invocation -> {
-                    final Confirmation argument = (Confirmation) invocation.getArgument(0);
+                    final Confirmation argument = invocation.getArgument(0);
                     argument.setUuid(UUID.randomUUID());
                     return argument;
                 });
+
+        given(transferRepo.save(any()))
+                .willAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test
