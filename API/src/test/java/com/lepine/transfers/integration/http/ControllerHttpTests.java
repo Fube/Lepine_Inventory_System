@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { ConfirmationController.class })
-@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class})
+@ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class, })
 @ActiveProfiles("test")
 public class ControllerHttpTests {
 
@@ -85,15 +86,16 @@ public class ControllerHttpTests {
     void contextLoads(){}
 
     @Test
-    @DisplayName("xjMcYtXrjW: Given POST on /confirmations, when valid request, then return confirmation")
+    @DisplayName("xjMcYtXrjW: Given POST on /confirmations, with valid DTO as manager, then return confirmation")
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
     void valid_Create() throws Exception {
-
         // Arrange
         final String givenAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION_UUID_LESS_DTO);
         final String expectedAsString = objectMapper.writeValueAsString(VALID_CONFIRMATION);
 
         // Act & Assert
-        mockMvc.perform(post("/confirmations").content(givenAsString))
+        mockMvc.perform(post("/confirmations")
+                        .content(givenAsString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedAsString));
