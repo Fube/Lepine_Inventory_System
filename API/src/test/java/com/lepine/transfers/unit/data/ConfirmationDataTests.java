@@ -237,4 +237,24 @@ public class ConfirmationDataTests {
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrder(VALID_TRANSFER);
     }
+
+    @Test
+    @DisplayName("cGaIxbLWaw: Given partially confirmed transfer when findAllFullyConfirmed, then return empty list")
+    void testFindAllFullyConfirmedEmpty() {
+
+        // Arrange
+        final Confirmation confirmation = Confirmation.builder()
+                .transferUuid(VALID_TRANSFER.getUuid())
+                .quantity(VALID_STOCK_QUANTITY / 2) // Partially confirm
+                .build();
+
+        confirmationRepo.save(confirmation);
+        entityManager.flush();
+
+        // Act
+        final List<Transfer> confirmations = transferRepo.findAllFullyConfirmed();
+
+        // Assert
+        assertThat(confirmations).isEmpty();
+    }
 }
