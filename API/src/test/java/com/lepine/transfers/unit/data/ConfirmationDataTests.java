@@ -212,4 +212,25 @@ public class ConfirmationDataTests {
         assertThat(confirmation.getTransferUuid()).isEqualTo(VALID_TRANSFER_UUID);
         assertThat(confirmation.getQuantity()).isEqualTo(quantity);
     }
+
+    @Test
+    @DisplayName("BEzvsXbzvO: Given fully confirmed transfer when findAllFullyConfirmed, then return all fully confirmed transfers")
+    void testFindAllFullyConfirmed() {
+
+        // Arrange
+        final Confirmation confirmation = Confirmation.builder()
+                .transferUuid(VALID_TRANSFER_UUID)
+                .quantity(VALID_STOCK_QUANTITY) // Fully confirm
+                .build();
+
+        final Confirmation saved = confirmationRepo.save(confirmation);
+        entityManager.flush();
+
+        // Act
+        final List<Confirmation> confirmations = transferRepo.findAllFullyConfirmed();
+
+        // Assert
+        assertThat(confirmations).isNotEmpty();
+        assertThat(confirmations).containsExactlyInAnyOrder(saved);
+    }
 }
