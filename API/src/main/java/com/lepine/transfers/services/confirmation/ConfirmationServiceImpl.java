@@ -4,6 +4,7 @@ import com.lepine.transfers.data.confirmation.Confirmation;
 import com.lepine.transfers.data.confirmation.ConfirmationRepo;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
+import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
 import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,11 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         Transfer transfer = transferRepo.findById(transferUuid)
                 .orElseThrow(() -> new TransferNotFoundException(transferUuid));
         log.info("Found transfer with quantity {}", transfer.getQuantity());
+
+        if(transfer.getQuantity() < quantity) {
+            log.error("Transfer quantity {} is less than confirmation quantity {}", transfer.getQuantity(), quantity);
+            throw new QuantityExceededException(transfer.getQuantity(), quantity);
+        }
 
         log.info("Updating transfer");
         transfer.setQuantity(transfer.getQuantity() - quantity);

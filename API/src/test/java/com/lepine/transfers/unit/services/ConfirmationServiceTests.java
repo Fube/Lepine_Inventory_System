@@ -162,7 +162,7 @@ public class ConfirmationServiceTests {
     }
 
     @Test
-    @DisplayName("StAtWXDfCo: Given quantity > transger quantity when confirm, then throw QuantityExceededException")
+    @DisplayName("StAtWXDfCo: Given quantity > transfer.quantity when confirm, then throw QuantityExceededException")
     void quantity_exceeded_Confirm() {
 
         // Arrange
