@@ -209,6 +209,7 @@ function ShipmentTableRow({
     };
 
     const handleCloseModal = () => {
+        setResponseError(null);
         setIsInConfirmationMode(false);
         setShowTransfers(false);
     };
@@ -358,7 +359,7 @@ function ShipmentTableRow({
                         </tbody>
                     </table>
                     <div className="modal-action">
-                        {thou(
+                        {isInConfirmationMode && (
                             <label
                                 onClick={handleSubmitConfirmations}
                                 htmlFor={`${uuid}-transfers`}
@@ -366,17 +367,15 @@ function ShipmentTableRow({
                             >
                                 Confirm
                             </label>
-                        )
-                            .or(
-                                <label
-                                    onClick={handleCloseModal}
-                                    htmlFor={`${uuid}-transfers`}
-                                    className="btn"
-                                >
-                                    Close
-                                </label>
-                            )
-                            .if(isInConfirmationMode)}
+                        )}
+
+                        <label
+                            onClick={handleCloseModal}
+                            htmlFor={`${uuid}-transfers`}
+                            className="btn"
+                        >
+                            Close
+                        </label>
                     </div>
                 </div>
             </div>
