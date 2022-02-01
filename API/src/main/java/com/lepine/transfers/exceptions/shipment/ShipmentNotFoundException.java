@@ -11,4 +11,8 @@ public class ShipmentNotFoundException extends NotFoundException {
     public ShipmentNotFoundException(UUID uuid) {
         super(String.format(FORMAT, uuid));
     }
+
+    public ShipmentNotFoundException(String message) {
+        super(message);
+    }
 }

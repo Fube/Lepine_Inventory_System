@@ -211,10 +211,14 @@ public class ConfirmationServiceTests {
         // Arrange
         final int toConfirm = VALID_QUANTITY / 2;
 
+        given(transferRepo.findById(NOT_ACCEPTED_SHIPMENT_UUID))
+                .willReturn(Optional.ofNullable(VALID_TRANSFER));
+
         given(shipmentRepo.findByTransferUuid(NOT_ACCEPTED_SHIPMENT_UUID)).willReturn(Optional.of(Shipment.builder()
                 .uuid(NOT_ACCEPTED_SHIPMENT_UUID)
                 .status(status)
                 .build()));
+
 
         // Act
         final ShipmentNotAcceptedException shipmentNotAcceptedException =
@@ -225,7 +229,7 @@ public class ConfirmationServiceTests {
         // Assert
         assertThat(shipmentNotAcceptedException).isNotNull();
         assertThat(shipmentNotAcceptedException)
-                .hasMessage(new ShipmentNotAcceptedException(NOT_ACCEPTED_SHIPMENT_UUID, status).getMessage());
+                .hasMessage(new ShipmentNotAcceptedException(NOT_ACCEPTED_SHIPMENT_UUID, status.name()).getMessage());
     }
 
 }
