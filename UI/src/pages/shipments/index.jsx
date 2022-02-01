@@ -276,16 +276,19 @@ function ShipmentTableRow({
                             .if(status.toUpperCase() === "PENDING")}
                     </td>
                 )}
-                {role === "CLERK" && (
-                    <td className="flex justify-center">
-                        <button
-                            onClick={withNoPropagation(handleConfirm)}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                            Confirm
-                        </button>
-                    </td>
-                )}
+                {role === "CLERK" &&
+                    thou(
+                        <td className="flex justify-center">
+                            <button
+                                onClick={withNoPropagation(handleConfirm)}
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            >
+                                Confirm
+                            </button>
+                        </td>
+                    )
+                        .or("None Available")
+                        .if(status.toUpperCase() === "ACCEPTED")}
             </tr>
 
             <input
