@@ -273,14 +273,14 @@ public class ShipmentHttpTests {
     }
 
     @Test
-    @DisplayName("BIyMmmlbaJ: Given GET on /shipments as clerk, then return page of shipments (200, shipments)")
+    @DisplayName("BIyMmmlbaJ: Given GET on /shipments as clerk, then return page of ACCEPTED shipments (200, shipments)")
     @WithUserDetails(value = VALID_CLERK_EMAIL)
     void findAll_AsClerk() throws Exception {
 
         // Arrange
         final PageRequest expectedPageRequest = PageRequest.of(0, 10, Sort.by("expectedDate").descending());
         final Page<Shipment> shipments = createPageFor(List.of(VALID_SHIPMENT), expectedPageRequest);
-        given(shipmentService.findAll(expectedPageRequest)).willReturn(shipments);
+        given(shipmentService.findAllAccepted(expectedPageRequest)).willReturn(shipments);
 
         // Act & Assert
         mockMvc.perform(get("/shipments"))
@@ -288,7 +288,7 @@ public class ShipmentHttpTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(shipments)));
 
-        verify(shipmentService, times(1)).findAll(expectedPageRequest);
+        verify(shipmentService, times(1)).findAllAccepted(expectedPageRequest);
         verify(shipmentService, never()).findAllByUserUuid(any(), any());
     }
 
