@@ -178,4 +178,13 @@ public class ShipmentServiceImpl implements ShipmentService {
         return saved;
 
     }
+
+    @Override
+    public Page<Shipment> findAllAccepted(PageRequest pageRequest) {
+        log.info("Finding all accepted shipments for page {}", pageRequest);
+        final Page<Shipment> all = shipmentRepo.findAllByStatus(ShipmentStatus.ACCEPTED, pageRequest);
+        log.info("Found {} accepted shipments for page {}", all.getTotalElements(), pageRequest);
+
+        return all;
+    }
 }

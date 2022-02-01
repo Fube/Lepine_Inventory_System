@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,4 +30,7 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
 
     @Query("select s from Transfer t join Shipment s on t.shipmentUuid=s.uuid where t.uuid = :transferUuid")
     Optional<Shipment> findByTransferUuid(UUID transferUuid);
+
+    @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
+    Page<Shipment> findAllByStatus(ShipmentStatus status, Pageable pageable);
 }
