@@ -3,6 +3,9 @@ package com.lepine.transfers.unit.services;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.confirmation.Confirmation;
 import com.lepine.transfers.data.confirmation.ConfirmationRepo;
+import com.lepine.transfers.data.shipment.Shipment;
+import com.lepine.transfers.data.shipment.ShipmentRepo;
+import com.lepine.transfers.data.shipment.ShipmentStatus;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +47,8 @@ import static org.mockito.BDDMockito.given;
 public class ConfirmationServiceTests {
 
     private final static UUID
-        VALID_TRANSFER_UUID = UUID.randomUUID();
+        VALID_TRANSFER_UUID = UUID.randomUUID(),
+        NOT_ACCEPTED_SHIPMENT_UUID = UUID.randomUUID();
 
     private final static int VALID_QUANTITY = 10;
 
@@ -70,6 +75,9 @@ public class ConfirmationServiceTests {
 
     @MockBean
     private TransferRepo transferRepo;
+
+    @MockBean
+    private ShipmentRepo shipmentRepo;
 
     @BeforeEach
     void setUp() {
@@ -193,4 +201,30 @@ public class ConfirmationServiceTests {
         assertThat(quantityExceededException)
                 .hasMessage(new QuantityExceededException(VALID_QUANTITY, toConfirm).getMessage());
     }
+
+    @ParameterizedTest(name = "{displayName} - Status: {0}")
+    @DisplayName("xiUSpqwuHx: Given not ACCEPTED transfer when confirm, then throw ShipmentNotAcceptedException")
+    @EnumSource(value = ShipmentStatus.class, names = {"DENIED", "PENDING"})
+    void not_ACCEPTED_transfer_Confirm(final ShipmentStatus status) {
+
+        // Arrange
+        final int toConfirm = VALID_QUANTITY / 2;
+
+        given(shipmentRepo.findByTransferUuid(NOT_ACCEPTED_SHIPMENT_UUID)).willReturn(Optional.of(Shipment.builder()
+                .uuid(NOT_ACCEPTED_SHIPMENT_UUID)
+                .status(status)
+                .build()));
+
+        // Act
+        final ShipmentNotAcceptedException shipmentNotAcceptedException =
+                catchThrowableOfType(
+                        () -> confirmationService.confirm(NOT_ACCEPTED_SHIPMENT_UUID, toConfirm),
+                        ShipmentNotAcceptedException.class);
+
+        // Assert
+        assertThat(shipmentNotAcceptedException).isNotNull();
+        assertThat(shipmentNotAcceptedException)
+                .hasMessage(new ShipmentNotAcceptedException(NOT_ACCEPTED_SHIPMENT_UUID, status).getMessage());
+    }
+
 }
