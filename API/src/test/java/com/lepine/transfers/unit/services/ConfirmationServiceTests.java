@@ -9,6 +9,7 @@ import com.lepine.transfers.data.shipment.ShipmentStatus;
 import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
 import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
 import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
