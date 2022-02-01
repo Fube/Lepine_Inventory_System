@@ -224,14 +224,13 @@ function ShipmentTableRow({
 
     const handleSubmitConfirmations = async () => {
         try {
-            const reses = await Promise.all(
-                [...confirmations].map(([transferUuid, quantity]) =>
-                    axiosAPI.post("/confirmations", {
-                        transferUuid,
-                        quantity,
-                    })
-                )
-            );
+            for (const [transferUuid, quantity] of confirmations) {
+                await axiosAPI.post("/confirmations", {
+                    transferUuid,
+                    quantity,
+                });
+            }
+
             setResponseError(null);
             setConfirmations(new Map());
             setIsInConfirmationMode(false);
