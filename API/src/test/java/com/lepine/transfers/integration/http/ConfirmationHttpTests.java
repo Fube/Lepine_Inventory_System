@@ -7,17 +7,19 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.confirmation.ConfirmationController;
 import com.lepine.transfers.data.confirmation.Confirmation;
 import com.lepine.transfers.data.confirmation.ConfirmationUuidLessDTO;
+import com.lepine.transfers.data.shipment.ShipmentStatus;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
 import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
 import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
-import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,9 +29,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.UUID;
 
-import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,13 +37,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = { ConfirmationController.class })
 @ContextConfiguration(classes = { MapperConfig.class, ValidationConfig.class, AuthConfig.class, })
 @ActiveProfiles("test")
-public class ControllerHttpTests {
+public class ConfirmationHttpTests {
 
     private final static UUID
             VALID_CONFIRMATION_UUID = UUID.randomUUID(),
             VALID_TRANSFER_UUID = UUID.randomUUID(),
             EXCEEDING_TRANSFER_UUID = UUID.randomUUID(),
-            NON_EXISTING_TRANSFER_UUID = UUID.randomUUID();
+            NON_EXISTING_TRANSFER_UUID = UUID.randomUUID(),
+            NON_ACCEPTED_TRANSFER_UUID = UUID.randomUUID();
 
     private final static int
             VALID_QUANTITY = 10,
@@ -163,5 +164,29 @@ public class ControllerHttpTests {
         create(given).andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message")
                         .value(new TransferNotFoundException(NON_EXISTING_TRANSFER_UUID).getMessage()));
+    }
+
+    @ParameterizedTest(name = "{displayName} - Status: {0}")
+    @DisplayName("PnWmFkHyrc: Given POST on /confirmations, for non ACCEPTED shipment, return error (400, error)")
+    @EnumSource(value = ShipmentStatus.class, names = {"DENIED", "PENDING"})
+    @WithMockUser(username = "some-manager", roles = "MANAGER")
+    void nonAccepted_Create(final ShipmentStatus status) throws Exception {
+
+        // Arrange
+        final ConfirmationUuidLessDTO given = ConfirmationUuidLessDTO.builder()
+                .transferUuid(NON_ACCEPTED_TRANSFER_UUID)
+                .quantity(VALID_QUANTITY)
+                .build();
+
+        final String name = status.name();
+        given(confirmationService.confirm(any(), anyInt()))
+                .willThrow(new ShipmentNotAcceptedException(NON_ACCEPTED_TRANSFER_UUID, name));
+
+        // Act & Assert
+        create(given).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value(new ShipmentNotAcceptedException(NON_ACCEPTED_TRANSFER_UUID, name).getMessage()))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 }
