@@ -12,7 +12,6 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
@@ -29,4 +28,8 @@ public class Transfer {
     private Stock stock;
 
     private int quantity;
+
+    @JoinColumn(name = "shipment_uuid", referencedColumnName = "uuid", nullable = false)
+    @Column(name = "shipment_uuid", insertable = false, updatable = false)
+    private UUID shipmentUuid;
 }

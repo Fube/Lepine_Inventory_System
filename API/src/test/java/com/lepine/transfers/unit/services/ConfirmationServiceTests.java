@@ -99,6 +99,11 @@ public class ConfirmationServiceTests {
 
         given(transferRepo.save(any()))
                 .willAnswer(invocation -> invocation.getArgument(0));
+
+        given(shipmentRepo.findByTransferUuid(VALID_TRANSFER_UUID))
+                .willReturn(Optional.of(Shipment.builder()
+                        .status(ShipmentStatus.ACCEPTED)
+                        .build()));
     }
 
     @Test

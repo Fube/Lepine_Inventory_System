@@ -27,6 +27,6 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
     @Query("select s from Shipment s where s.createdBy = :createdBy")
     Page<Shipment> findAllByCreatedBy(@Param("createdBy") UUID createdBy, Pageable pageable);
 
-    @Query("select s from Transfer t join Shipment s where t.uuid = :transferUuid")
+    @Query("select s from Transfer t join Shipment s on t.shipmentUuid=s.uuid where t.uuid = :transferUuid")
     Optional<Shipment> findByTransferUuid(UUID transferUuid);
 }
