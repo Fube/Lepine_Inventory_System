@@ -3,6 +3,7 @@ package com.lepine.transfers.config.controllers;
 import com.lepine.transfers.exceptions.DuplicateResourceException;
 import com.lepine.transfers.exceptions.NotFoundException;
 import com.lepine.transfers.exceptions.auth.DefaultLoginNotAllowedException;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
 import com.lepine.transfers.exceptions.stock.StockTooLowException;
 import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
 import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
@@ -73,6 +74,7 @@ public class GlobalAdvice {
             StockTooLowException.class,
             DefaultLoginNotAllowedException.class,
             QuantityExceededException.class,
+            ShipmentNotAcceptedException.class,
     })
     @ResponseStatus(value = BAD_REQUEST)
     public HTTPErrorMessage handleGenericBusinessLogicRuntimeException(RuntimeException e) {
