@@ -14,4 +14,5 @@ public interface ShipmentService {
     Page<Shipment> findAll(PageRequest pageRequest);
     Page<Shipment> findAllByUserUuid(UUID userUuid, PageRequest pageRequest);
     Shipment update(UUID uuid, JsonPatch jsonPatch);
+    Page<Shipment> findAllAccepted(PageRequest pageRequest);
 }

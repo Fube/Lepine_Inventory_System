@@ -1,6 +1,5 @@
 package com.lepine.transfers.data.transfer;
 
-import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.stock.Stock;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -12,7 +11,6 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
@@ -29,4 +27,8 @@ public class Transfer {
     private Stock stock;
 
     private int quantity;
+
+    @JoinColumn(name = "shipment_uuid", referencedColumnName = "uuid", nullable = false)
+    @Column(name = "shipment_uuid", insertable = false, updatable = false)
+    private UUID shipmentUuid;
 }
