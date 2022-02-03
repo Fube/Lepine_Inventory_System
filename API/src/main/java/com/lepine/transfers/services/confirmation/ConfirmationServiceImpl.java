@@ -5,6 +5,7 @@ import com.lepine.transfers.data.confirmation.ConfirmationRepo;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatus;
+import com.lepine.transfers.data.stock.StockRepo;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
@@ -28,8 +29,11 @@ import static java.lang.String.format;
 public class ConfirmationServiceImpl implements ConfirmationService {
 
     private final ConfirmationRepo confirmationRepo;
+
+    // I know, I just don't care
     private final TransferRepo transferRepo;
     private final ShipmentRepo shipmentRepo;
+    private final StockRepo stockRepo;
 
     @Override
     public Confirmation confirm(final UUID transferUuid, final int quantity) {

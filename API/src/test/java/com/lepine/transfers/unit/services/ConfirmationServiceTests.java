@@ -7,6 +7,7 @@ import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatus;
 import com.lepine.transfers.data.stock.Stock;
+import com.lepine.transfers.data.stock.StockRepo;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
@@ -40,6 +41,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest(classes = {
         ConfirmationServiceImpl.class,
@@ -79,6 +82,9 @@ public class ConfirmationServiceTests {
 
     @MockBean
     private ShipmentRepo shipmentRepo;
+
+    @MockBean
+    private StockRepo stockRepo;
 
     @BeforeEach
     void setUp() {
@@ -124,6 +130,12 @@ public class ConfirmationServiceTests {
         assertThat(confirmation).isNotNull();
         assertThat(confirmation.getTransferUuid()).isEqualTo(VALID_TRANSFER_UUID);
         assertThat(confirmation.getQuantity()).isEqualTo(confirming);
+
+        verify(transferRepo, times(1)).findById(VALID_TRANSFER_UUID);
+        verify(confirmationRepo, times(1)).sumQuantityByTransferUuid(VALID_TRANSFER_UUID);
+        verify(confirmationRepo, times(1)).save(confirmation);
+        verify(stockRepo, times(1))
+                .findByWarehouseUuidAndItemUuid(VALID_STOCK.getWarehouse().getUuid(), VALID_STOCK.getItem().getUuid());
     }
 
     private static Stream<Arguments> validConfirmations() {
@@ -156,7 +168,7 @@ public class ConfirmationServiceTests {
     }
 
     @Test
-    @DisplayName("zqzYlkxLwC: Given null transfer UUID when confirm, then throw ConstractViolationException")
+    @DisplayName("zqzYlkxLwC: Given null transfer UUID when confirm, then throw ConstraintViolationException")
     void null_transfer_UUID_Confirm() {
 
         // Arrange
@@ -236,5 +248,4 @@ public class ConfirmationServiceTests {
         assertThat(shipmentNotAcceptedException)
                 .hasMessage(new ShipmentNotAcceptedException(NOT_ACCEPTED_SHIPMENT_UUID, status.name()).getMessage());
     }
-
 }
