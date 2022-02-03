@@ -9,6 +9,7 @@ import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockRepo;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
+import com.lepine.transfers.data.warehouse.Warehouse;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotFoundException;
 import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
@@ -79,18 +80,29 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         log.info("Updating stock");
         final Stock stock = transfer.getStock();
 
+        final UUID to = byTransferUuid.get().getTo();
         final Optional<Stock> byWarehouseUuidAndItemUuid =
-                stockRepo.findByWarehouseUuidAndItemUuid(byTransferUuid.get().getTo(), stock.getItem().getUuid());
+                stockRepo.findByWarehouseUuidAndItemUuid(to, stock.getItem().getUuid());
 
         int newQuantity = quantity;
+
+        final Stock toSave = Stock.builder()
+                .warehouse(Warehouse.builder().uuid(to).build())
+                .item(stock.getItem())
+                .build();
+
         if(byWarehouseUuidAndItemUuid.isPresent()) {
-            final int existingQuantity = byWarehouseUuidAndItemUuid.get().getQuantity();
+            final Stock existingTarget = byWarehouseUuidAndItemUuid.get();
+
+            final int existingQuantity = existingTarget.getQuantity();
             log.info("Stock found with quantity {}", existingQuantity);
             newQuantity += existingQuantity;
+
+            toSave.setUuid(existingTarget.getUuid());
         }
 
-        stock.setQuantity(newQuantity);
-        stockRepo.save(stock);
+        toSave.setQuantity(newQuantity);
+        stockRepo.save(toSave);
         log.info("Stock updated");
 
         return confirmation;
