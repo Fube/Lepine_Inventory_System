@@ -5,6 +5,7 @@ import com.lepine.transfers.data.confirmation.ConfirmationRepo;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatus;
+import com.lepine.transfers.data.stock.Stock;
 import com.lepine.transfers.data.stock.StockRepo;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
@@ -74,6 +75,23 @@ public class ConfirmationServiceImpl implements ConfirmationService {
                 .quantity(quantity)
                 .build());
         log.info("Transfer confirmed");
+
+        log.info("Updating stock");
+        final Stock stock = transfer.getStock();
+
+        final Optional<Stock> byWarehouseUuidAndItemUuid =
+                stockRepo.findByWarehouseUuidAndItemUuid(byTransferUuid.get().getTo(), stock.getItem().getUuid());
+
+        int newQuantity = quantity;
+        if(byWarehouseUuidAndItemUuid.isPresent()) {
+            final int existingQuantity = byWarehouseUuidAndItemUuid.get().getQuantity();
+            log.info("Stock found with quantity {}", existingQuantity);
+            newQuantity += existingQuantity;
+        }
+
+        stock.setQuantity(newQuantity);
+        stockRepo.save(stock);
+        log.info("Stock updated");
 
         return confirmation;
     }

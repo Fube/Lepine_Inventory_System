@@ -3,6 +3,7 @@ package com.lepine.transfers.unit.services;
 import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.confirmation.Confirmation;
 import com.lepine.transfers.data.confirmation.ConfirmationRepo;
+import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatus;
@@ -52,11 +53,15 @@ public class ConfirmationServiceTests {
 
     private final static UUID
         VALID_TRANSFER_UUID = UUID.randomUUID(),
-        NOT_ACCEPTED_SHIPMENT_UUID = UUID.randomUUID();
+        NOT_ACCEPTED_SHIPMENT_UUID = UUID.randomUUID(),
+        VALID_TO_UUID = UUID.randomUUID(),
+        VALID_ITEM_UUID = UUID.randomUUID();
 
     private final static int VALID_QUANTITY = 10;
 
-    private final static Stock VALID_STOCK = new Stock();
+    private final static Stock VALID_STOCK = Stock.builder()
+            .item(Item.builder().uuid(VALID_ITEM_UUID).build())
+            .build();
 
     private final static Transfer VALID_TRANSFER = Transfer.builder()
             .uuid(VALID_TRANSFER_UUID)
@@ -109,6 +114,7 @@ public class ConfirmationServiceTests {
         given(shipmentRepo.findByTransferUuid(VALID_TRANSFER_UUID))
                 .willReturn(Optional.of(Shipment.builder()
                         .status(ShipmentStatus.ACCEPTED)
+                        .to(VALID_TO_UUID)
                         .build()));
     }
 
@@ -122,6 +128,8 @@ public class ConfirmationServiceTests {
 
         // Arrange
         given(confirmationRepo.sumQuantityByTransferUuid(VALID_TRANSFER_UUID)).willReturn(alreadyConfirmed);
+        given(stockRepo.findByWarehouseUuidAndItemUuid(VALID_TO_UUID, VALID_ITEM_UUID))
+                .willReturn(Optional.of(VALID_STOCK.toBuilder().quantity(alreadyConfirmed).build()));
 
         // Act
         final Confirmation confirmation = confirmationService.confirm(VALID_TRANSFER_UUID, confirming);
@@ -135,7 +143,7 @@ public class ConfirmationServiceTests {
         verify(confirmationRepo, times(1)).sumQuantityByTransferUuid(VALID_TRANSFER_UUID);
         verify(confirmationRepo, times(1)).save(confirmation);
         verify(stockRepo, times(1))
-                .findByWarehouseUuidAndItemUuid(VALID_STOCK.getWarehouse().getUuid(), VALID_STOCK.getItem().getUuid());
+                .findByWarehouseUuidAndItemUuid(VALID_TO_UUID, VALID_ITEM_UUID);
     }
 
     private static Stream<Arguments> validConfirmations() {
