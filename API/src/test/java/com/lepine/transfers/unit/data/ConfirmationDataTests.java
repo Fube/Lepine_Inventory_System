@@ -22,6 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -32,6 +34,8 @@ import javax.persistence.EntityManager;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -279,5 +283,31 @@ public class ConfirmationDataTests {
         assertThat(confirmations)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrder(VALID_SHIPMENT);
+    }
+
+    @ParameterizedTest(name = "{displayName} - {0}")
+    @MethodSource("findAllFullyConfirmedShipmentEmptyProvider")
+    @DisplayName("nkStVOFWWg: Given partially confirmed Shipment when findAllFullyConfirmed, then return empty list")
+    void testFindAllFullyConfirmedShipmentEmpty(final int quantity) {
+
+        // Arrange
+        final Confirmation confirmation = Confirmation.builder()
+                .transferUuid(VALID_TRANSFER.getUuid())
+                .quantity(quantity) // Partially confirm
+                .build();
+
+        confirmationRepo.save(confirmation);
+        entityManager.flush();
+
+        // Act
+        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed();
+
+        // Assert
+        assertThat(confirmations).isEmpty();
+    }
+
+    public static Stream<Arguments> findAllFullyConfirmedShipmentEmptyProvider() {
+        return IntStream.range(1, VALID_STOCK_QUANTITY)
+                .mapToObj(Arguments::of);
     }
 }
