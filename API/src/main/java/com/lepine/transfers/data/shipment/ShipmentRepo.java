@@ -34,5 +34,14 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
     Page<Shipment> findAllByStatus(ShipmentStatus status, Pageable pageable);
 
+    @Query("select s from Shipment s " +
+            "join Transfer t " +
+                "on s.uuid = t.shipmentUuid " +
+            "join Confirmation c " +
+                "on t.uuid = c.transferUuid " +
+            "group by t.uuid " +
+                "having sum(c.quantity) = t.quantity"
+    )
+    @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
     List<Shipment> findAllFullyConfirmed();
 }
