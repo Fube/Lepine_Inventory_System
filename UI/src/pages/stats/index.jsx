@@ -1,9 +1,11 @@
-import { useState } from "react";
-import Head from "next/head";
 import { DateTime } from "luxon-business-days";
-import { axiosBackendAuth } from "../../config/axios";
+import Head from "next/head";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
 import Paginate from "../../components/Pagination";
-
+import { axiosBackendAuth } from "../../config/axios";
 /**
  * @param {{
  * shipments: import('@lepine/ui-types').Shipment[],
@@ -20,6 +22,46 @@ export default function ShowStats({
     from,
     to,
 }) {
+    const router = useRouter();
+    const [dateRange, setDateRange] = useState([null, null]);
+
+    const [startDate, endDate] = dateRange;
+    const [uriFrom, uriTo] = [from, to].map(encodeURIComponent);
+
+    useEffect(() => {
+        const [start, end] = dateRange;
+
+        console.log(start, end);
+
+        if (start === null || end === null) {
+            return;
+        }
+
+        router.push({
+            pathname: "/stats",
+            query: {
+                from: start.toISOString(),
+                to: end.toISOString(),
+            },
+        });
+    }, [dateRange]);
+
+    const getNextURL = () => {
+        // +One week from 'to'
+        const nextTo = DateTime.fromISO(to).plus({ days: 7 });
+        const nextFrom = to;
+
+        return `/stats?from=${nextFrom}&to=${nextTo.toISO()}`;
+    };
+
+    const getPrevURL = () => {
+        // -One week from 'from'
+        const prevTo = from;
+        const prevFrom = DateTime.fromISO(from).minus({ days: 7 });
+
+        return `/stats?from=${prevFrom.toISO()}&to=${prevTo}`;
+    };
+
     const header = (
         <Head>
             <title>Stats</title>
@@ -32,6 +74,22 @@ export default function ShowStats({
         </h2>
     );
 
+    const picker = (
+        <div>
+            <h2 className="text-2xl mb-2">Select a different time range</h2>
+            <DatePicker
+                className="text-black"
+                selectsRange={true}
+                startDate={startDate}
+                endDate={endDate}
+                onChange={(update) => {
+                    setDateRange(update);
+                }}
+                isClearable={true}
+            />
+        </div>
+    );
+
     if (shipments.length <= 0) {
         return (
             <>
@@ -39,6 +97,7 @@ export default function ShowStats({
                 <main className="flex justify-center">
                     <div className="text-center">
                         <div className="mt-12">{fallback}</div>
+                        {picker}
                     </div>
                 </main>
             </>
@@ -59,8 +118,21 @@ export default function ShowStats({
             <div className="overflow-x-auto justify-center flex">
                 <div className="md:w-3/4 lg:w-1/2 w-full">
                     <div className="md:flex justify-around my-4">
-                        <h1 className="text-4xl md:mb-0 mb-4">Shipments</h1>
+                        <h1 className="text-4xl md:mb-0 mb-4 text-center">
+                            <p className="mb-2">Fully Confirmed Shipments</p>
+                            <p className="text-lg">
+                                <Link className="text-3xl" href={getPrevURL()}>
+                                    {"< "}
+                                </Link>
+                                Between {new Date(from).toDateString()} and{" "}
+                                {new Date(from).toDateString()}
+                                <Link className="text-3xl" href={getNextURL()}>
+                                    {" >"}
+                                </Link>
+                            </p>
+                        </h1>
                     </div>
+
                     <table className="table table-zebra w-full sm:table-fixed">
                         <thead>{head}</thead>
                         <tbody>
