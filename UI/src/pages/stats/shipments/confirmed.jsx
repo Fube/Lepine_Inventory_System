@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-import Paginate from "../../components/Pagination";
-import WithClientSideAuth from "../../components/WithClientSideAuth";
-import { axiosBackendAuth } from "../../config/axios";
+import Paginate from "../../../components/Pagination";
+import WithClientSideAuth from "../../../components/WithClientSideAuth";
+import { axiosBackendAuth } from "../../../config/axios";
 /**
  * @param {{
  * shipments: import('@lepine/ui-types').Shipment[],
@@ -46,7 +46,7 @@ function ShowStatsTabular({ shipments, totalPages, pageNumber, from, to }) {
         const nextTo = DateTime.fromISO(to).plus({ days: 7 });
         const nextFrom = to;
 
-        return `/stats?from=${nextFrom}&to=${nextTo.toISO()}`;
+        return `?from=${nextFrom}&to=${nextTo.toISO()}`;
     };
 
     const getPrevURL = () => {
@@ -54,19 +54,13 @@ function ShowStatsTabular({ shipments, totalPages, pageNumber, from, to }) {
         const prevTo = from;
         const prevFrom = DateTime.fromISO(from).minus({ days: 7 });
 
-        return `/stats?from=${prevFrom.toISO()}&to=${prevTo}`;
+        return `?from=${prevFrom.toISO()}&to=${prevTo}`;
     };
 
     const header = (
         <Head>
             <title>Stats</title>
         </Head>
-    );
-
-    const fallback = (
-        <h2 className="text-2xl text-center text-yellow-400">
-            No shipments to show 😢
-        </h2>
     );
 
     const picker = (
@@ -84,20 +78,6 @@ function ShowStatsTabular({ shipments, totalPages, pageNumber, from, to }) {
             />
         </div>
     );
-
-    if (shipments.length <= 0) {
-        return (
-            <>
-                {header}
-                <main className="flex justify-center">
-                    <div className="text-center">
-                        <div className="mt-12">{fallback}</div>
-                        {picker}
-                    </div>
-                </main>
-            </>
-        );
-    }
 
     const head = (
         <tr>

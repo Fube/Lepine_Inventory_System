@@ -35,15 +35,14 @@ function ShowStats({}) {
                         </h1>
                     </div>
                     <div className="flex flex-col gap-2">
-                        <Link href="/stats/tabular" passHref>
-                            <button className="btn text-lg">Tabular</button>
+                        <Link href="/stats/shipments/confirmed" passHref>
+                            <button className="btn text-lg">
+                                Fully Confirmed Shipments
+                            </button>
                         </Link>
                         <Link href="/stats/graph" passHref>
-                            <button className="btn text-lg">Graph</button>
-                        </Link>
-                        <Link href="/stats/printer" passHref>
                             <button className="btn text-lg">
-                                Printer Friendly
+                                Best Selling Items By Week
                             </button>
                         </Link>
                     </div>

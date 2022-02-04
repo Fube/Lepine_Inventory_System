@@ -26,6 +26,6 @@ roleRouteMappings.set("/shipments/new", ["manager", "salesperson"]);
 
 // Stats mappings
 roleRouteMappings.set("/stats", managerOnly);
-roleRouteMappings.set("/stats/tabular", managerOnly);
+roleRouteMappings.set("/stats/shipments/confirmed", managerOnly);
 
 export default roleRouteMappings;
