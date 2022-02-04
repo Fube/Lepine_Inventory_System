@@ -337,4 +337,28 @@ public class ConfirmationDataTests {
                 .containsExactlyInAnyOrder(VALID_SHIPMENT);
     }
 
+    @ParameterizedTest(name = "{displayName} - {0}")
+    @MethodSource("findAllFullyConfirmedShipmentEmptyProvider")
+    @DisplayName("DpHuQIdXkT: Given partially confirmed Shipment and time range when findAllFullyConfirmedInTimeRange, then return empty list")
+    void testFindAllFullyConfirmedInTimeRangeEmpty(final int quantity) {
+
+        // Arrange
+        final Confirmation confirmation = Confirmation.builder()
+                .transferUuid(VALID_TRANSFER.getUuid())
+                .quantity(quantity) // Partially confirm
+                .build();
+
+        confirmationRepo.save(confirmation);
+        entityManager.flush();
+
+        // Act
+        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmedInTimeRange(
+                VALID_SHIPMENT.getExpectedDate().minusDays(1),
+                VALID_SHIPMENT.getExpectedDate().plusDays(1)
+        );
+
+        // Assert
+        assertThat(confirmations).isEmpty();
+    }
+
 }
