@@ -346,3 +346,6 @@ E2E/storage.json
 .vercel
 TestIder/*
 TestIder/
+
+# For docker-compose volumnes
+data/
