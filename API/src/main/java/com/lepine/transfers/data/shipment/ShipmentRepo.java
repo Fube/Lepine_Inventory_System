@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,4 +45,16 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
     )
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
     List<Shipment> findAllFullyConfirmed();
+
+    @Query("select s from Shipment s " +
+            "join Transfer t " +
+                "on s.uuid = t.shipmentUuid " +
+                    "and s.expectedDate between :start and :end " +
+            "join Confirmation c " +
+                "on t.uuid = c.transferUuid " +
+            "group by t.uuid " +
+                "having sum(c.quantity) = t.quantity"
+    )
+    @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
+    List<Shipment> findAllFullyConfirmedInTimeRange(ZonedDateTime start, ZonedDateTime end);
 }

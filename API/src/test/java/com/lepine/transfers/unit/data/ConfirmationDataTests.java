@@ -310,4 +310,31 @@ public class ConfirmationDataTests {
         return IntStream.range(1, VALID_STOCK_QUANTITY)
                 .mapToObj(Arguments::of);
     }
+
+    @Test
+    @DisplayName("xkWjXJpKkd: Given fully confirmed Shipment and time range when findAllFullyConfirmedInTimeRange, then return all fully confirmed shipments in time range")
+    void testFindAllFullyConfirmedInTimeRange() {
+
+        // Arrange
+        final Confirmation confirmation = Confirmation.builder()
+                .transferUuid(VALID_TRANSFER.getUuid())
+                .quantity(VALID_STOCK_QUANTITY) // Fully confirm
+                .build();
+
+        confirmationRepo.save(confirmation);
+        entityManager.flush();
+
+        // Act
+        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmedInTimeRange(
+                VALID_SHIPMENT.getExpectedDate().minusDays(1),
+                VALID_SHIPMENT.getExpectedDate().plusDays(1)
+        );
+
+        // Assert
+        assertThat(confirmations).isNotEmpty();
+        assertThat(confirmations)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(VALID_SHIPMENT);
+    }
+
 }
