@@ -27,6 +27,7 @@ export default function NavWrapper({ children }) {
         pages.push("warehouses");
         pages.push("stocks");
         pages.push("shipments");
+        pages.push("stats");
     }
 
     return (
