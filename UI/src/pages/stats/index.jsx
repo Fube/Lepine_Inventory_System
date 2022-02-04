@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import Paginate from "../../components/Pagination";
+import WithClientSideAuth from "../../components/WithClientSideAuth";
 import { axiosBackendAuth } from "../../config/axios";
 /**
  * @param {{
@@ -15,13 +16,7 @@ import { axiosBackendAuth } from "../../config/axios";
  * to: string,
  * }}
  */
-export default function ShowStats({
-    shipments,
-    totalPages,
-    pageNumber,
-    from,
-    to,
-}) {
+function ShowStats({ shipments, totalPages, pageNumber, from, to }) {
     const router = useRouter();
     const [dateRange, setDateRange] = useState([null, null]);
 
@@ -125,7 +120,7 @@ export default function ShowStats({
                                     {"< "}
                                 </Link>
                                 Between {new Date(from).toDateString()} and{" "}
-                                {new Date(from).toDateString()}
+                                {new Date(to).toDateString()}
                                 <Link className="text-3xl" href={getNextURL()}>
                                     {" >"}
                                 </Link>
@@ -280,3 +275,5 @@ export async function getServerSideProps(context) {
         }))
         .get();
 }
+
+export default WithClientSideAuth(ShowStats);
