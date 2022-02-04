@@ -28,6 +28,7 @@ import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -184,6 +185,27 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Finding all accepted shipments for page {}", pageRequest);
         final Page<Shipment> all = shipmentRepo.findAllByStatus(ShipmentStatus.ACCEPTED, pageRequest);
         log.info("Found {} accepted shipments for page {}", all.getTotalElements(), pageRequest);
+
+        return all;
+    }
+
+    @Override
+    public Page<Shipment> findAllFullyConfirmed(final PageRequest pageRequest) {
+        log.info("Finding all fully confirmed shipments for page {}", pageRequest);
+        final Page<Shipment> all = shipmentRepo.findAllFullyConfirmed(pageRequest);
+        log.info("Found {} fully confirmed shipments for page {}", all.getTotalElements(), pageRequest);
+
+        return all;
+    }
+
+    @Override
+    public Page<Shipment> findAllFullyConfirmed(final ZonedDateTime from,
+                                                final ZonedDateTime to,
+                                                final PageRequest pageRequest
+    ) {
+        log.info("Finding all fully confirmed shipments for page {}", pageRequest);
+        final Page<Shipment> all = shipmentRepo.findAllFullyConfirmedInTimeRange(from, to, pageRequest);
+        log.info("Found {} fully confirmed shipments for page {}", all.getTotalElements(), pageRequest);
 
         return all;
     }

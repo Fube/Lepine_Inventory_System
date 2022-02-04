@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.json.JsonPatch;
 import javax.validation.Valid;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public interface ShipmentService {
@@ -15,4 +16,6 @@ public interface ShipmentService {
     Page<Shipment> findAllByUserUuid(UUID userUuid, PageRequest pageRequest);
     Shipment update(UUID uuid, JsonPatch jsonPatch);
     Page<Shipment> findAllAccepted(PageRequest pageRequest);
+    Page<Shipment> findAllFullyConfirmed(PageRequest pageRequest);
+    Page<Shipment> findAllFullyConfirmed(ZonedDateTime from, ZonedDateTime to, PageRequest pageRequest);
 }

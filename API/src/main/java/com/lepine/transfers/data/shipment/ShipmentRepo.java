@@ -44,7 +44,7 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
                 "having sum(c.quantity) = t.quantity"
     )
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
-    List<Shipment> findAllFullyConfirmed(Pageable pageable);
+    Page<Shipment> findAllFullyConfirmed(Pageable pageable);
 
     @Query("select s from Shipment s " +
             "join Transfer t " +
@@ -56,5 +56,5 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
                 "having sum(c.quantity) = t.quantity"
     )
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
-    List<Shipment> findAllFullyConfirmedInTimeRange(ZonedDateTime start, ZonedDateTime end, Pageable pageable);
+    Page<Shipment> findAllFullyConfirmedInTimeRange(ZonedDateTime start, ZonedDateTime end, Pageable pageable);
 }

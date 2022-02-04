@@ -278,7 +278,7 @@ public class ConfirmationDataTests {
         entityManager.flush();
 
         // Act
-        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed(PageRequest.of(0, 10));
+        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed(PageRequest.of(0, 10)).getContent();
 
         // Assert
         assertThat(confirmations).isNotEmpty();
@@ -302,7 +302,7 @@ public class ConfirmationDataTests {
         entityManager.flush();
 
         // Act
-        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed(PageRequest.of(0, 10));
+        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed(PageRequest.of(0, 10)).getContent();
 
         // Assert
         assertThat(confirmations).isEmpty();
@@ -331,7 +331,7 @@ public class ConfirmationDataTests {
                 VALID_SHIPMENT.getExpectedDate().minusDays(1),
                 VALID_SHIPMENT.getExpectedDate().plusDays(1),
                 PageRequest.of(0, 10)
-        );
+        ).getContent();
 
         // Assert
         assertThat(confirmations).isNotEmpty();
@@ -359,7 +359,7 @@ public class ConfirmationDataTests {
                 VALID_SHIPMENT.getExpectedDate().minusDays(1),
                 VALID_SHIPMENT.getExpectedDate().plusDays(1),
                 PageRequest.of(0, 10)
-        );
+        ).getContent();
 
         // Assert
         assertThat(confirmations).isEmpty();
