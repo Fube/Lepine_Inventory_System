@@ -28,6 +28,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
@@ -276,7 +278,7 @@ public class ConfirmationDataTests {
         entityManager.flush();
 
         // Act
-        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed();
+        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed(PageRequest.of(0, 10));
 
         // Assert
         assertThat(confirmations).isNotEmpty();
@@ -300,7 +302,7 @@ public class ConfirmationDataTests {
         entityManager.flush();
 
         // Act
-        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed();
+        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed(PageRequest.of(0, 10));
 
         // Assert
         assertThat(confirmations).isEmpty();
@@ -327,7 +329,8 @@ public class ConfirmationDataTests {
         // Act
         final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmedInTimeRange(
                 VALID_SHIPMENT.getExpectedDate().minusDays(1),
-                VALID_SHIPMENT.getExpectedDate().plusDays(1)
+                VALID_SHIPMENT.getExpectedDate().plusDays(1),
+                PageRequest.of(0, 10)
         );
 
         // Assert
@@ -354,7 +357,8 @@ public class ConfirmationDataTests {
         // Act
         final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmedInTimeRange(
                 VALID_SHIPMENT.getExpectedDate().minusDays(1),
-                VALID_SHIPMENT.getExpectedDate().plusDays(1)
+                VALID_SHIPMENT.getExpectedDate().plusDays(1),
+                PageRequest.of(0, 10)
         );
 
         // Assert

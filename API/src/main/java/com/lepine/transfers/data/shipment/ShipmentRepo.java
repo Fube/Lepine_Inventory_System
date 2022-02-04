@@ -23,7 +23,7 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
 
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
     @Query("select s from Shipment s")
-    Page<Shipment> findAll(PageRequest pageRequest);
+    Page<Shipment> findAll(Pageable pageable);
 
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
     @Query("select s from Shipment s where s.createdBy = :createdBy")
@@ -44,7 +44,7 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
                 "having sum(c.quantity) = t.quantity"
     )
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
-    List<Shipment> findAllFullyConfirmed();
+    List<Shipment> findAllFullyConfirmed(Pageable pageable);
 
     @Query("select s from Shipment s " +
             "join Transfer t " +
@@ -56,5 +56,5 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
                 "having sum(c.quantity) = t.quantity"
     )
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
-    List<Shipment> findAllFullyConfirmedInTimeRange(ZonedDateTime start, ZonedDateTime end);
+    List<Shipment> findAllFullyConfirmedInTimeRange(ZonedDateTime start, ZonedDateTime end, Pageable pageable);
 }
