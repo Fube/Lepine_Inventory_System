@@ -33,4 +33,6 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
 
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
     Page<Shipment> findAllByStatus(ShipmentStatus status, Pageable pageable);
+
+    List<Shipment> findAllFullyConfirmed();
 }

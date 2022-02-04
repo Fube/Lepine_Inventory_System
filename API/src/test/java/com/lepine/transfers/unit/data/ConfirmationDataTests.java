@@ -257,4 +257,27 @@ public class ConfirmationDataTests {
         // Assert
         assertThat(confirmations).isEmpty();
     }
+
+    @Test
+    @DisplayName("yHpDGvyadY: Given fully confirmed Shipment when findAllFullyConfirmed, then return all fully confirmed shipments")
+    void testFindAllFullyConfirmedShipment() {
+
+        // Arrange
+        final Confirmation confirmation = Confirmation.builder()
+                .transferUuid(VALID_TRANSFER.getUuid())
+                .quantity(VALID_STOCK_QUANTITY) // Fully confirm
+                .build();
+
+        confirmationRepo.save(confirmation);
+        entityManager.flush();
+
+        // Act
+        final List<Shipment> confirmations = shipmentRepo.findAllFullyConfirmed();
+
+        // Assert
+        assertThat(confirmations).isNotEmpty();
+        assertThat(confirmations)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(VALID_SHIPMENT);
+    }
 }
