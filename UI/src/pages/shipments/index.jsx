@@ -8,7 +8,6 @@ import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
 import capitalize from "capitalize";
-import axios from "axios";
 
 /**
  * @param {{ shipments: import('@lepine/ui-types').Shipment[] } & import("@lepine/ui-types").Pagination} param0
@@ -165,7 +164,7 @@ export default function ShowShipments({
                     <div className="flex justify-center mt-4">
                         <Paginate
                             onPageChange={(page) =>
-                                router.push(`/warehouses?page=${page}`)
+                                router.push(`/shipments?page=${page}`)
                             }
                             totalPages={totalPages}
                             pageNumber={pageNumber}
