@@ -658,7 +658,7 @@ public class UserHttpTests {
         updateWith(VALID_UUID, userUUIDLessDTO, expected)
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
+                .andExpect(content().json(objectMapper.writeValueAsString(userMapper.toPasswordLessDTO(expected))));
 
         verify(userService, times(1)).update(VALID_UUID, userUUIDLessDTO);
 
