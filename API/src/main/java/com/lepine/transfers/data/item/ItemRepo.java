@@ -19,13 +19,11 @@ public interface ItemRepo extends JpaRepository<Item, UUID> {
 
     Optional<Item> findBySkuIgnoreCase(String sku);
 
-    @Query("select new com.lepine.transfers.data.item.ItemQuantityTuple(item, sum(transfer.quantity)) from Transfer transfer " +
-            "join Item item " +
-                "on transfer.stock.item.uuid = item.uuid " +
+    @Query("select new com.lepine.transfers.data.item.ItemQuantityTuple(transfer.stock.item, sum(transfer.quantity)) from Transfer transfer " +
             "join Shipment shipment " +
                 "on transfer.shipmentUuid = shipment.uuid " +
             "where shipment.expectedDate between :start and :end " +
-            "group by item.uuid " +
+            "group by transfer.stock.item " +
                 "order by sum(transfer.quantity) desc"
     )
     Page<ItemQuantityTuple> mostTransferredItemsInRange(ZonedDateTime start, ZonedDateTime end, Pageable pageable);

@@ -120,7 +120,7 @@ public class ItemServiceImpl implements ItemService, ApplicationEventPublisherAw
     public Page<ItemQuantityTuple> findBestSellerForRange(ZonedDateTime from, ZonedDateTime to, PageRequest pageRequest) {
         log.info("Retrieving best seller items in time range {} - {}", from, to);
         final var bestSeller = itemRepo.mostTransferredItemsInRange(from, to, pageRequest);
-//        log.info("Retrieved {} items", bestSeller.getTotalElements());
+        log.info("Retrieved {} items", bestSeller.getTotalElements());
 
         return bestSeller;
     }
