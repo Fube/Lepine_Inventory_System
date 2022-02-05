@@ -6,8 +6,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,5 +59,40 @@ public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO, UU
 
         // Assert
         verify(searchIndex, times(1)).deleteObject(asString);
+    }
+
+    @Override
+    @Test
+    @DisplayName("NNDaMLIeMs: Given list of items, issue batch update")
+    public void testPartialUpdateAllInBatch() {
+
+        // Arrange
+        final ItemSearchDTO given = ItemSearchDTO.builder().build();
+
+        given(searchIndex.partialUpdateObjects(any())).willReturn(null);
+
+        // Act
+        searchService.partialUpdateAllInBatch(List.of(given));
+
+        // Assert
+        verify(searchIndex, times(1)).batch(any());
+    }
+
+    @Override
+    @Test
+    @DisplayName("KSzEUwhKer: Given list of items, issue batch delete")
+    public void testDeleteAllInBatch() {
+
+        // Arrange
+        final ItemSearchDTO given = ItemSearchDTO.builder().build();
+        final String asString = given.toString();
+
+        given(searchIndex.deleteObjects(List.of(asString))).willReturn(null);
+
+        // Act
+        searchService.deleteAllInBatch(List.of(given));
+
+        // Assert
+        verify(searchIndex, times(1)).batch(any());
     }
 }

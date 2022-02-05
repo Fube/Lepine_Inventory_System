@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -666,6 +667,25 @@ public class WarehouseServiceTests {
         assertThat(result).isEqualTo(expected);
 
         verify(warehouseRepo, times(1)).save(argThat(zipMatcher));
+        verify(warehouseRepo, never()).findAll();
+    }
+
+    @Test
+    @DisplayName("rRJnihcvnV: Given valid example and pagerequest when findAll, then return all warehouses")
+    void findAll_ValidExample_ReturnAllWarehouses() {
+        // Arrange
+        final PageRequest pageable = PageRequest.of(0, 5);
+        final Page<Warehouse> expected = Page.empty(pageable);
+        final Example<Warehouse> example = Example.of(Warehouse.builder().build());
+
+        when(warehouseRepo.findAll(example, pageable)).thenReturn(expected);
+
+        // Act
+        final Page<Warehouse> result = warehouseService.findAll(example, pageable);
+
+        // Assert
+        assertThat(result).isEqualTo(expected);
+        verify(warehouseRepo).findAll(example, pageable);
         verify(warehouseRepo, never()).findAll();
     }
 }

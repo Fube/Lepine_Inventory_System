@@ -61,12 +61,13 @@ public class UserController {
         return passwordLessDTOPage;
     }
     @PutMapping("/{uuid}")
-    public User update(
+    public UserPasswordLessDTO update(
             @PathVariable UUID uuid,
             @RequestBody @Valid UserUUIDLessDTO userUUIDLessDTO){
         log.info("Update user");
-        return userService.update(uuid, userUUIDLessDTO);
+        return userMapper.toPasswordLessDTO(userService.update(uuid, userUUIDLessDTO));
     }
+
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{uuid}")
     public void delete(@PathVariable  UUID uuid) {
@@ -74,7 +75,7 @@ public class UserController {
     }
 
     @GetMapping("/{uuid}")
-    public User getByUuid(@PathVariable @NotNull UUID uuid) {
+    public UserPasswordLessDTO getByUuid(@PathVariable @NotNull UUID uuid) {
         log.info("retrieving user by uuid {}", uuid);
 
         final Optional<User> byUuid = userService.findByUuid(uuid);
@@ -86,6 +87,6 @@ public class UserController {
         final User user = byUuid.get();
         log.info("retrieved user by uuid {}", user.getUuid());
 
-        return user;
+        return userMapper.toPasswordLessDTO(user);
     }
 }

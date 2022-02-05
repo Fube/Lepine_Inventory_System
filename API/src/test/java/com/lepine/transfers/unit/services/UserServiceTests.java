@@ -11,6 +11,7 @@ import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.exceptions.user.RoleNotFoundException;
+import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.services.user.UserServiceImpl;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
@@ -60,6 +61,13 @@ public class UserServiceTests {
             .name(VALID_ROLE_NAME)
             .build();
 
+    private final static User VALID_USER = User.builder()
+            .uuid(UUID.randomUUID())
+            .email(VALID_EMAIL)
+            .password(VALID_HASHED_PASSWORD)
+            .role(VALID_ROLE)
+            .build();
+
     private final Function<String, String> messageSourceHelper = name ->
             this.messageSource.getMessage(name, null, Locale.getDefault());
 
@@ -67,7 +75,7 @@ public class UserServiceTests {
         List<User> items = new ArrayList<>();
         for (int i = 0; i < num; i++) {
             items.add(User.builder()
-                    .email(i+VALID_EMAIL)
+                    .email(i + VALID_EMAIL)
                     .password(VALID_PASSWORD)
                     .build());
         }
@@ -99,7 +107,8 @@ public class UserServiceTests {
     }
 
     @Test
-    void contextLoads() {}
+    void contextLoads() {
+    }
 
     @Test
     @DisplayName("VuVJsyfGna: Given a UserUUIDLessDTO, then create a User with a hashed password")
@@ -368,5 +377,131 @@ public class UserServiceTests {
         assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_valid"));
 
         verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("NjjNwcZFIt: Given UUID when findByUuid, then return User")
+    void findByUuid_ValidUuid() {
+
+        // Arrange
+        final User user = VALID_USER;
+        final UUID VALID_USER_UUID = VALID_USER.getUuid();
+
+        when(userRepo.findById(VALID_USER_UUID)).thenReturn(Optional.of(user));
+
+        // Act
+        final Optional<User> result = userService.findByUuid(VALID_USER_UUID);
+
+        // Assert
+        assertThat(result).isPresent().get().isEqualTo(user);
+    }
+
+    @Test
+    @DisplayName("lLqvEWGSan: Given UUID when findByUuid, then return empty")
+    void findByUuid_InvalidUuid() {
+
+        // Arrange
+        final UUID INVALID_USER_UUID = UUID.randomUUID();
+
+        when(userRepo.findById(INVALID_USER_UUID)).thenReturn(Optional.empty());
+
+        // Act
+        final Optional<User> result = userService.findByUuid(INVALID_USER_UUID);
+
+        // Assert
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("GQWLDlLyDV: Given UUID when delete, delete User")
+    void delete_ValidUuid() {
+
+        // Arrange
+        final UUID VALID_USER_UUID = VALID_USER.getUuid();
+        given(userRepo.deleteByUuid(VALID_USER_UUID)).willReturn(1);
+
+        // Act
+        userService.delete(VALID_USER_UUID);
+
+        // Assert
+        verify(userRepo, times(1)).deleteByUuid(VALID_USER_UUID);
+    }
+
+    @Test
+    @DisplayName("uaaAULWaMX: Given UUID when delete, do nothing")
+    void delete_InvalidUuid() {
+
+        // Arrange
+        final UUID INVALID_USER_UUID = UUID.randomUUID();
+        given(userRepo.deleteByUuid(INVALID_USER_UUID)).willReturn(0);
+
+        // Act
+        userService.delete(INVALID_USER_UUID);
+
+        // Assert
+        verify(userRepo, times(1)).deleteByUuid(INVALID_USER_UUID);
+    }
+
+    @Test
+    @DisplayName("xOflLOcxIh: Given no user when update, then throw UserNotFoundException")
+    void update_NoUser() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        when(userRepo.findById(VALID_USER.getUuid())).thenReturn(Optional.empty());
+
+        // Act
+        final UserNotFoundException e = assertThrows(UserNotFoundException.class, () -> userService.update(VALID_USER.getUuid(), userUUIDLessDTO));
+
+        // Assert
+        assertThat(e.getMessage()).isEqualTo(new UserNotFoundException(VALID_USER.getUuid()).getMessage());
+
+        verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("YHgQkyajvu: Given no role when update, then throw RoleNotFoundException")
+    void update_NoRole() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        when(userRepo.findById(VALID_USER.getUuid())).thenReturn(Optional.of(VALID_USER));
+        when(roleRepo.findByName(any())).thenReturn(Optional.empty());
+
+        // Act
+        final RoleNotFoundException e = assertThrows(RoleNotFoundException.class, () -> userService.update(VALID_USER.getUuid(), userUUIDLessDTO));
+
+        // Assert
+        assertThat(e.getMessage()).isEqualTo(new RoleNotFoundException(VALID_ROLE_NAME).getMessage());
+
+        verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("bmRRljuEJN: Given valid uuid and role name when update, then update User")
+    void update_ValidUuidAndRoleName() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        when(userRepo.findById(VALID_USER.getUuid())).thenReturn(Optional.of(VALID_USER));
+        when(roleRepo.findByName(VALID_ROLE_NAME)).thenReturn(Optional.of(VALID_ROLE));
+
+        // Act
+        userService.update(VALID_USER.getUuid(), userUUIDLessDTO);
+
+        // Assert
+        verify(userRepo, times(1)).save(any());
     }
 }

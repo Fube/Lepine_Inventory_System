@@ -108,19 +108,25 @@ public class UserServiceImpl implements UserService, AuthService {
     }
 
     @Override
-    public User update(UUID uuid,UserUUIDLessDTO userUUIDLessDTO) {
+    public User update(UUID uuid, UserUUIDLessDTO userUUIDLessDTO) {
         log.info("updating user");
         Optional<User> byId = userRepo.findById(uuid);
+
         if(byId.isEmpty()){
             log.info("user with {} doesn't exist",uuid);
             throw new UserNotFoundException(uuid);
         }
+
+
         log.info("Looking for a role {}",userUUIDLessDTO.getRole());
         Optional<Role> byName = roleRepo.findByName(userUUIDLessDTO.getRole());
+
         if(byName.isEmpty()){
             log.info("Role not found");
             throw new RoleNotFoundException(userUUIDLessDTO.getRole());
         }
+
+
         final User mapped = userMapper.toEntity(userUUIDLessDTO);
         mapped.setUuid(uuid);
         mapped.setRole(byName.get());
@@ -142,10 +148,11 @@ public class UserServiceImpl implements UserService, AuthService {
 
             final Object rawPrincipal = authentication.getPrincipal();
             User principal;
-            if(rawPrincipal instanceof User) {
 
+            if(rawPrincipal instanceof User) {
                 principal = (User) authentication.getPrincipal();
             } else {
+
                 final UserDetails userDetails = (UserDetails) rawPrincipal;
                 principal = User.builder()
                         .uuid(UUID.fromString("00000000-0000-0000-0000-000000000000"))

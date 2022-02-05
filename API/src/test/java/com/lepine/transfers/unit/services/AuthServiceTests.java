@@ -21,18 +21,21 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.Locale;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -163,5 +166,47 @@ public class AuthServiceTests {
 
         verify(authenticationManager, atLeastOnce())
                 .authenticate(any(UsernamePasswordAuthenticationToken.class));
+    }
+
+    @Test
+    @DisplayName("YRaGFNNQEh: Given non-User when login, then return default login-ish User")
+    void login_NonUser() {
+
+        // Arrange
+        final Authentication authentication = mock(Authentication.class);
+        given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+            .willReturn(authentication);
+
+        final UserDetails userDetails = mock(UserDetails.class);
+        given(authentication.getPrincipal())
+            .willReturn(userDetails);
+
+        given(userDetails.getUsername())
+            .willReturn("non-user");
+
+        given(userDetails.getPassword())
+            .willReturn("password");
+
+        final Collection<? extends GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("USER"));
+        given(userDetails.getAuthorities())
+            .willAnswer((a) -> authorities); // It is cursed
+
+        given(jwtUtil.encode(any()))
+            .willReturn(VALID_JWT);
+
+        final UserLogin userLogin = new UserLogin(VALID_EMAIL, VALID_PASSWORD);
+
+        // Act
+        final Pair<User, String> login = authService.login(userLogin);
+
+        // Assert
+        assertTrue(login.getValue0().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER")));
+        assertThat(login.getValue0().getEmail()).isEqualTo("non-user");
+        assertThat(login.getValue0().getPassword()).isEqualTo("password");
+        assertThat(login.getValue0().getUuid()).isEqualTo(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        assertThat(login.getValue1()).isEqualTo(VALID_JWT);
+
+        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(jwtUtil, times(1)).encode(any(User.class));
     }
 }

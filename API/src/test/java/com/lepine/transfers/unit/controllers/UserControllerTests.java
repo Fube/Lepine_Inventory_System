@@ -377,13 +377,12 @@ public class UserControllerTests {
                         .role(VALID_ROLE)
                         .build());
         // Act
-        final User updated= userController.update(VALID_UUID,userUUIDLessDTO);
+        final UserPasswordLessDTO updated = userController.update(VALID_UUID, userUUIDLessDTO);
 
         // Assert
         assertThat(updated.getUuid()).isEqualTo(VALID_UUID);
         assertThat(updated.getEmail()).isEqualTo(VALID_EMAIL);
-        assertThat(updated.getPassword()).isEqualTo(VALID_PASSWORD);
-        assertThat(updated.getRole()).isEqualTo(VALID_ROLE);
+        assertThat(updated.getRole()).isEqualTo(VALID_ROLE.getName());
 
         verify(userService, atMostOnce()).update(VALID_UUID, userUUIDLessDTO);
     }

@@ -3,6 +3,8 @@ package com.lepine.transfers.integration.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.data.auth.Role;
+import com.lepine.transfers.data.confirmation.Confirmation;
+import com.lepine.transfers.data.confirmation.ConfirmationRepo;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.role.RoleRepo;
@@ -89,15 +91,16 @@ public class ShipmentServiceTests {
             .quantity(VALID_STOCK_QUANTITY)
             .build();
 
+    private final static Transfer VALID_TRANSFER = Transfer.builder()
+            .stock(VALID_STOCK)
+            .quantity(VALID_STOCK_QUANTITY)
+            .build();
+
     private final static Shipment VALID_SHIPMENT = Shipment.builder()
             .status(VALID_SHIPMENT_STATUS)
             .expectedDate(VALID_SHIPMENT_EXPECTED_DATE)
             .orderNumber(VALID_SHIPMENT_ORDER_NUMBER)
-            .build();
-
-    private final static Transfer VALID_TRANSFER = Transfer.builder()
-            .stock(VALID_STOCK)
-            .quantity(VALID_STOCK_QUANTITY)
+            .transfers(List.of(VALID_TRANSFER))
             .build();
 
     private UUID
@@ -106,7 +109,8 @@ public class ShipmentServiceTests {
             VALID_ITEM_UUID,
             VALID_STOCK_UUID,
             VALID_USER_UUID,
-            VALID_SHIPMENT_UUID;
+            VALID_SHIPMENT_UUID,
+            VALID_TRANSFER_UUID;
 
     private final TransferUuidLessDTO VALID_TRANSFER_UUID_LESS_DTO = TransferUuidLessDTO.builder()
             .stockUuid(VALID_STOCK_UUID)
@@ -149,6 +153,9 @@ public class ShipmentServiceTests {
     private UserRepo userRepo;
 
     @Autowired
+    private ConfirmationRepo confirmationRepo;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -156,6 +163,14 @@ public class ShipmentServiceTests {
 
     @MockBean
     private SearchService<StockSearchDTO, UUID> stockSearchService;
+
+    private Shipment acceptDefaultShipment() {
+        var shipment = shipmentRepo.findById(VALID_SHIPMENT_UUID).get();
+        shipment.setStatus(ShipmentStatus.ACCEPTED);
+
+        final Shipment saved = shipmentRepo.save(shipment);
+        return shipmentRepo.findOneByUuidEagerLoad(saved.getUuid());
+    }
 
     @Test
     void contextLoads() {}
@@ -185,16 +200,22 @@ public class ShipmentServiceTests {
 
         VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.setCreatedBy(VALID_USER_UUID);
         VALID_SHIPMENT_STATUS_LESS_UUID_LESS_DTO.setTo(VALID_TARGET_WAREHOUSE_UUID);
+
+        final Shipment savedShipment = shipmentRepo.save(VALID_SHIPMENT);
+        VALID_SHIPMENT_UUID = savedShipment.getUuid();
+
+        VALID_TRANSFER_UUID = savedShipment.getTransfers().get(0).getUuid();
     }
 
     @AfterEach
     void cleanUp() {
-        shipmentRepo.deleteAllInBatch();
-        warehouseRepo.deleteAllInBatch();
-        itemRepo.deleteAllInBatch();
-        stockRepo.deleteAllInBatch();
-        transferRepo.deleteAllInBatch();
-        userRepo.deleteAllInBatch();
+        confirmationRepo.deleteAll();
+        stockRepo.deleteAll();
+        transferRepo.deleteAll();
+        shipmentRepo.deleteAll();
+        userRepo.deleteAll();
+        warehouseRepo.deleteAll();
+        itemRepo.deleteAll();
     }
 
     @Test
@@ -288,7 +309,7 @@ public class ShipmentServiceTests {
 
         // Arrange
         final PageRequest of = PageRequest.of(0, 10);
-        final Shipment saved = shipmentRepo.save(VALID_SHIPMENT.toBuilder().build());
+        final Shipment expected = acceptDefaultShipment();
 
         // Act
         Page<Shipment> shipments = shipmentService.findAll(of);
@@ -297,7 +318,7 @@ public class ShipmentServiceTests {
         assertThat(shipments.getTotalElements()).isEqualTo(1);
         assertThat(shipments.getContent().get(0))
                 .usingRecursiveComparison()
-                .isEqualTo(saved);
+                .isEqualTo(expected);
     }
 
     @Test
@@ -321,7 +342,7 @@ public class ShipmentServiceTests {
 
         // Arrange
         final PageRequest of = PageRequest.of(0, 10);
-        final Shipment saved = shipmentRepo.save(VALID_SHIPMENT.toBuilder().build());
+        final Shipment expected = acceptDefaultShipment();
 
         // Act
         Page<Shipment> shipments = shipmentService.findAllByUserUuid(VALID_USER_UUID, of);
@@ -330,6 +351,77 @@ public class ShipmentServiceTests {
         assertThat(shipments.getTotalElements()).isEqualTo(1);
         assertThat(shipments.getContent().get(0))
                 .usingRecursiveComparison()
+                .isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("nXnvkoJALc: Given ACCEPTED shipments when findAllAccepted, then return Page of Shipments")
+    void valid_findAllAccepted() {
+
+        // Arrange
+        final PageRequest of = PageRequest.of(0, 10);
+        final Shipment saved = acceptDefaultShipment();
+
+        // Act
+        Page<Shipment> shipments = shipmentService.findAllAccepted(of);
+
+        // Assert
+        assertThat(shipments.getTotalElements()).isEqualTo(1);
+        assertThat(shipments.getContent().get(0))
+                .usingRecursiveComparison()
                 .isEqualTo(saved);
     }
+
+    @Test
+    @DisplayName("fAHCBpnsGa: Given fully confirmed shipments when findAllFullyConfirmed, then return Page of Shipments")
+    void valid_findAllFullyConfirmed() {
+
+        // Arrange
+        final PageRequest of = PageRequest.of(0, 10);
+
+        acceptDefaultShipment();
+        final Shipment expected = shipmentRepo.findOneByUuidEagerLoad(VALID_SHIPMENT_UUID);
+
+        confirmationRepo.save(
+                Confirmation.builder()
+                        .transferUuid(VALID_TRANSFER_UUID)
+                        .quantity(VALID_STOCK_QUANTITY)
+                        .build());
+
+        // Act
+        Page<Shipment> shipments = shipmentService.findAllFullyConfirmed(of);
+
+        // Assert
+        assertThat(shipments.getTotalElements()).isEqualTo(1);
+        assertThat(shipments.getContent().get(0))
+                .usingRecursiveComparison()
+                .isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("fcnvVtYRYK: Given fully confirmed shipment and valid time range when findAllFullyConfirmed, then return Page of Shipments")
+    void valid_findAllFullyConfirmed_with_time_range() {
+
+        // Arrange
+        final PageRequest of = PageRequest.of(0, 10);
+        final Shipment saved = acceptDefaultShipment();
+        final ZonedDateTime from = ZonedDateTime.now().minusYears(100);
+        final ZonedDateTime to = ZonedDateTime.now().plusYears(100);
+
+        confirmationRepo.save(
+                Confirmation.builder()
+                        .transferUuid(VALID_TRANSFER_UUID)
+                        .quantity(VALID_STOCK_QUANTITY)
+                        .build());
+
+        // Act
+        Page<Shipment> shipments = shipmentService.findAllFullyConfirmed(from, to, of);
+
+        // Assert
+        assertThat(shipments.getTotalElements()).isEqualTo(1);
+        assertThat(shipments.getContent().get(0))
+                .usingRecursiveComparison()
+                .isEqualTo(saved);
+    }
+
 }

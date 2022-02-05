@@ -5,6 +5,10 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.events.item.ItemDeleteEvent;
+import com.lepine.transfers.events.item.ItemDeleteHandler;
+import com.lepine.transfers.events.item.ItemUpdateEvent;
+import com.lepine.transfers.events.item.ItemUpdateHandler;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
@@ -23,22 +27,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {
         MapperConfig.class,
@@ -104,6 +108,12 @@ public class StockServiceTests {
 
     @Autowired
     private StockService stockService;
+
+    @Autowired
+    private ItemUpdateHandler itemUpdateHandler;
+
+    @Autowired
+    private ItemDeleteHandler itemDeleteHandler;
 
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
@@ -260,5 +270,109 @@ public class StockServiceTests {
         assertThatThrownBy(() -> stockService.update(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS))
                 .isInstanceOf(StockNotFoundException.class)
                 .hasMessage(format(STOCK_NOT_FOUND_ERROR_FORMAT, VALID_STOCK_UUID));
+    }
+
+    @Test
+    @DisplayName("ZssguxpnKc: Given pagerequest when findAll, then return page of Stocks")
+    void findAll_PageRequest() {
+        // Arrange
+        final PageRequest pageRequest = PageRequest.of(0, 10);
+        final Page<Stock> page = Page.empty();
+        given(stockRepo.findAll(pageRequest))
+                .willReturn(page);
+
+        // Act
+        final Page<Stock> result = stockService.findAll(pageRequest);
+
+        // Assert
+        assertThat(result).isEqualTo(page);
+    }
+
+    @Test
+    @DisplayName("JTNEbMKTSI: Given Stock not found when update, then throw StockNotFoundException")
+    void update_StockNotFound() {
+        // Arrange
+        given(stockRepo.getById(VALID_STOCK_UUID))
+                .willReturn(null);
+
+        // Act & Assert
+        assertThatThrownBy(() -> stockService.update(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS))
+                .isInstanceOf(StockNotFoundException.class)
+                .hasMessage(format(STOCK_NOT_FOUND_ERROR_FORMAT, VALID_STOCK_UUID));
+    }
+
+    @Test
+    @DisplayName("NNuilXzxIY: Given Stock exists when update, then update Stock")
+    void update_StockExists() {
+        // Arrange
+        given(stockRepo.findById(VALID_STOCK_UUID))
+                .willReturn(Optional.of(VALID_STOCK));
+
+        // Act
+        stockService.update(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS);
+
+        // Assert
+        verify(stockRepo).save(VALID_STOCK);
+    }
+
+    @Test
+    @DisplayName("cxNmnupMLs: Given Item when updateSearchIndexFor, speak to searchService")
+    void updateSearchIndexFor_Item() {
+        // Arrange
+        final List<Stock> items = Collections.singletonList(VALID_STOCK);
+        given(stockRepo.findByItemUuid(VALID_ITEM_UUID))
+                .willReturn(items);
+
+        // Act
+        stockService.updateSearchIndexFor(VALID_ITEM);
+
+        // Assert
+        verify(searchService, times(1)).partialUpdateAllInBatch(any(List.class));
+    }
+
+    @Test
+    @DisplayName("nxpvxADoPc: Given ItemUpdateEvent when onItemUpdate, speak to searchService")
+    void onItemUpdate_ItemUpdateEvent() {
+        // Arrange
+        final ItemUpdateEvent event = new ItemUpdateEvent(this, VALID_ITEM);
+        final List<Stock> items = Collections.singletonList(VALID_STOCK);
+        given(stockRepo.findByItemUuid(VALID_ITEM_UUID))
+                .willReturn(items);
+
+        // Act
+        itemUpdateHandler.onItemUpdate(event);
+
+        // Assert
+        verify(searchService, times(1)).partialUpdateAllInBatch(any(List.class));
+    }
+
+    @Test
+    @DisplayName("QGioNqZLdi: Given ItemDeleteEvent when onItemDelete, speak to searchService")
+    void onItemDelete_ItemDeleteEvent() {
+        // Arrange
+        final ItemDeleteEvent event = new ItemDeleteEvent(this, VALID_ITEM_UUID);
+        final List<Stock> items = Collections.singletonList(VALID_STOCK);
+        given(stockRepo.findByItemUuid(VALID_ITEM_UUID))
+                .willReturn(items);
+
+        // Act
+        itemDeleteHandler.onItemDelete(event);
+
+        // Assert
+        verify(searchService, times(1)).deleteAllInBatch(any(List.class));
+    }
+
+    @Test
+    @DisplayName("UChRCJfqct: Given UUID when delete, then delete Stock")
+    void delete_UUID() {
+        // Arrange
+        given(stockRepo.deleteByUuid(VALID_STOCK_UUID))
+                .will(n -> null);
+
+        // Act
+        stockService.delete(VALID_STOCK_UUID);
+
+        // Assert
+        verify(stockRepo, times(1)).deleteByUuid(VALID_STOCK_UUID);
     }
 }

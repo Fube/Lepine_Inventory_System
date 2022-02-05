@@ -2,6 +2,7 @@ package com.lepine.transfers.unit.services;
 
 import com.lepine.transfers.config.MapperConfig;
 import com.lepine.transfers.data.item.Item;
+import com.lepine.transfers.data.item.ItemQuantityTuple;
 import com.lepine.transfers.data.item.ItemRepo;
 import com.lepine.transfers.data.item.ItemSearchDTO;
 import com.lepine.transfers.events.item.ItemDeleteEvent;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -317,5 +319,26 @@ public class ItemServiceTests {
         assertEquals(format(ERROR_FORMAT_DUPLICATE_SKU, item.getSku()), throwable.getMessage());
         verify(itemRepo, times(1)).findBySkuIgnoreCase(item.getSku());
         verify(itemRepo, never()).save(item);
+    }
+
+    @Test
+    @DisplayName("uUhknjZFwC: Given valid pagerequest and time range when findBestSellerForRange, then return page of ItemsQuantityTuple")
+    void mostTransferredItemsInRange() {
+
+        // Arrange
+        final PageRequest pageRequest = PageRequest.of(0, 10);
+        final ZonedDateTime start = ZonedDateTime.now().minusDays(1);
+        final ZonedDateTime end = ZonedDateTime.now();
+        final List<ItemQuantityTuple> itemQuantityTuples = new ArrayList<>();
+
+        final Page<ItemQuantityTuple> expectedPage = createPageFor(itemQuantityTuples, pageRequest);
+        given(itemRepo.mostTransferredItemsInRange(start, end, pageRequest)).willReturn(expectedPage);
+
+        // Act
+        final Page<ItemQuantityTuple> retrieved = itemService.findBestSellerForRange(start, end, pageRequest);
+
+        // Assert
+        assertEquals(itemQuantityTuples, retrieved.getContent());
+        verify(itemRepo, times(1)).mostTransferredItemsInRange(start, end, pageRequest);
     }
 }

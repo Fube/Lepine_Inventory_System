@@ -1,5 +1,6 @@
 package com.lepine.transfers.controllers.shipment;
 
+import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentMapper;
 import com.lepine.transfers.data.shipment.ShipmentStatusLessCreatedByLessUuidLessDTO;
@@ -19,9 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.json.JsonPatch;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @Slf4j
@@ -38,11 +41,23 @@ public class ShipmentController {
     @GetMapping
     public Page<Shipment> findAll(@AuthenticationPrincipal User user,
 
+                                  @RequestParam(required = false, name = "confirmed") Optional<Boolean> isConfirmed,
+                                  @RequestParam(required = false, name = "from") Optional<String> from,
+                                  @RequestParam(required = false, name = "to") Optional<String> to,
+
                                   @RequestParam(required = false, defaultValue = "1")
                                   @Min(value = 1, message = "{pagination.page.min}") final int page,
 
                                   @RequestParam(required = false, defaultValue = "10")
                                   @Min(value = 1, message = "{pagination.size.min}") final int size) {
+
+        if(isConfirmed.isPresent() && isConfirmed.get()) {
+            return OneIndexedPageAdapter.of(findAllFullyConfirmed(from, to, PageRequest.of(page - 1, size)));
+        } else if(from.isPresent() || to.isPresent()) {
+            log.info("Trying to use from and / or to without confirmed flag being set or being set to false");
+            throw new RuntimeException("No");
+        }
+
         final PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by("expectedDate").descending());
 
         log.info("Fetching all shipments for user {} with page request {}", user.getUsername(), pageRequest);
@@ -59,6 +74,23 @@ public class ShipmentController {
         log.info("User is a salesperson, fetching only relevant shipments");
 
         return shipmentService.findAllByUserUuid(user.getUuid(), pageRequest);
+    }
+
+    public Page<Shipment> findAllFullyConfirmed(
+            final Optional<String> from,
+            final Optional<String> to,
+            final PageRequest pageRequest
+    ){
+        log.info("Fetching all fully confirmed shipments with page request {} and time range {} - {}", pageRequest, from, to);
+        if(from.isPresent() && to.isPresent()) {
+            return OneIndexedPageAdapter.of(shipmentService.findAllFullyConfirmed(
+                    ZonedDateTime.parse(from.get()),
+                    ZonedDateTime.parse(to.get()),
+                    pageRequest)
+            );
+        }
+
+        return OneIndexedPageAdapter.of(shipmentService.findAllFullyConfirmed(pageRequest));
     }
 
     @PostMapping

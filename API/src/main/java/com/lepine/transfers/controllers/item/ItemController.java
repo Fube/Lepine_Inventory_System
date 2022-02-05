@@ -3,6 +3,7 @@ package com.lepine.transfers.controllers.item;
 import com.lepine.transfers.data.OneIndexedPageAdapter;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
+import com.lepine.transfers.data.item.ItemQuantityTuple;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,6 +47,32 @@ public class ItemController {
         log.info("retrieved all items");
 
         return all;
+    }
+
+    @GetMapping("/bestseller")
+    public Page<ItemQuantityTuple> getBestseller(
+            @RequestParam(required = false, defaultValue = "1")
+            @Min(value = 1, message = "{pagination.page.min}") int page,
+            @RequestParam(required = false, defaultValue = "10")
+            @Min(value = 1, message = "{pagination.size.min}") int size,
+            @RequestParam(required = true, name = "from") String from,
+            @RequestParam(required = true, name = "to") String to
+    ) {
+
+        ZonedDateTime parsedFrom;
+        ZonedDateTime parsedTo;
+
+        try {
+            parsedFrom = ZonedDateTime.parse(from);
+            parsedTo = ZonedDateTime.parse(to);
+        } catch (Exception e) {
+            // TODO: Extract to a custom exception for handling
+            throw new IllegalArgumentException("invalid date format");
+        }
+
+        log.info("Retrieving bestseller items");
+        return OneIndexedPageAdapter
+                .of(itemService.findBestSellerForRange(parsedFrom, parsedTo, PageRequest.of(page - 1, size)));
     }
 
     @GetMapping("/{uuid}")

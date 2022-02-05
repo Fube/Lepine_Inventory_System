@@ -166,7 +166,7 @@ public class ShipmentControllerTests {
                 .willReturn(givenShipments);
 
         // Act
-        final Page<Shipment> response = shipmentController.findAll(givenUser, page, size);
+        final Page<Shipment> response = shipmentController.findAll(givenUser, Optional.empty(), Optional.empty(), Optional.empty(), page, size);
 
         // Assert
         assertThat(response).isEqualTo(givenShipments);
@@ -201,7 +201,7 @@ public class ShipmentControllerTests {
                 .willReturn(givenShipments);
 
         // Act
-        final Page<Shipment> response = shipmentController.findAll(givenUser, page, size);
+        final Page<Shipment> response = shipmentController.findAll(givenUser, Optional.empty(), Optional.empty(), Optional.empty(), page, size);
 
         // Assert
         assertThat(response).isEqualTo(givenShipments);
@@ -231,7 +231,7 @@ public class ShipmentControllerTests {
 
         // Act
         final ConstraintViolationException constraintViolationException = catchThrowableOfType(
-                () -> shipmentController.findAll(givenUser, page, size), ConstraintViolationException.class);
+                () -> shipmentController.findAll(givenUser, Optional.empty(), Optional.empty(), Optional.empty(), page, size), ConstraintViolationException.class);
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
@@ -258,7 +258,7 @@ public class ShipmentControllerTests {
 
         // Act
         final ConstraintViolationException constraintViolationException = catchThrowableOfType(
-                () -> shipmentController.findAll(givenUser, page, size), ConstraintViolationException.class);
+                () -> shipmentController.findAll(givenUser, Optional.empty(), Optional.empty(), Optional.empty(), page, size), ConstraintViolationException.class);
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);
@@ -285,7 +285,7 @@ public class ShipmentControllerTests {
 
         // Act
         final ConstraintViolationException constraintViolationException = catchThrowableOfType(
-                () -> shipmentController.findAll(givenUser, page, size), ConstraintViolationException.class);
+                () -> shipmentController.findAll(givenUser, Optional.empty(), Optional.empty(), Optional.empty(), page, size), ConstraintViolationException.class);
 
         // Assert
         final Set<String> collect = ConstraintViolationExceptionUtils.extractMessages(constraintViolationException);

@@ -12,6 +12,7 @@ import com.lepine.transfers.data.stock.StockRepo;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotFoundException;
 import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
 import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
@@ -38,6 +39,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,7 +57,8 @@ public class ConfirmationServiceTests {
         VALID_TRANSFER_UUID = UUID.randomUUID(),
         NOT_ACCEPTED_SHIPMENT_UUID = UUID.randomUUID(),
         VALID_TO_UUID = UUID.randomUUID(),
-        VALID_ITEM_UUID = UUID.randomUUID();
+        VALID_ITEM_UUID = UUID.randomUUID(),
+        NOT_FOUND_SHIPMENT_UUID = UUID.randomUUID();
 
     private final static int VALID_QUANTITY = 10;
 
@@ -255,5 +258,66 @@ public class ConfirmationServiceTests {
         assertThat(shipmentNotAcceptedException).isNotNull();
         assertThat(shipmentNotAcceptedException)
                 .hasMessage(new ShipmentNotAcceptedException(NOT_ACCEPTED_SHIPMENT_UUID, status.name()).getMessage());
+    }
+
+    @Test
+    @DisplayName("aEPiYSoTwl: Given shipment not found when confirm, then throw ShipmentNotFoundException")
+    void shipment_not_found_Confirm() {
+
+        // Arrange
+        final int toConfirm = VALID_QUANTITY / 2;
+
+        given(transferRepo.findById(NOT_FOUND_SHIPMENT_UUID))
+                .willReturn(Optional.ofNullable(VALID_TRANSFER));
+
+        given(shipmentRepo.findByTransferUuid(NOT_FOUND_SHIPMENT_UUID)).willReturn(Optional.empty());
+
+        // Act
+        final ShipmentNotFoundException shipmentNotFoundException =
+                catchThrowableOfType(
+                        () -> confirmationService.confirm(NOT_FOUND_SHIPMENT_UUID, toConfirm)
+                        , ShipmentNotFoundException.class);
+
+        // Assert
+        assertThat(shipmentNotFoundException).isNotNull();
+        assertThat(shipmentNotFoundException)
+                .hasMessage(
+                        new ShipmentNotFoundException(
+                                format("Shipment for transfer %s is not found", NOT_FOUND_SHIPMENT_UUID)).getMessage());
+
+        verify(transferRepo, times(1)).findById(NOT_FOUND_SHIPMENT_UUID);
+        verify(shipmentRepo, times(1)).findByTransferUuid(NOT_FOUND_SHIPMENT_UUID);
+    }
+
+    @Test
+    @DisplayName("sOvUBacHTt: Given sumQuantityByTransferUuid is null, set quantity to 0, then return confirmation")
+    void sumQuantityByTransferUuid_null_Confirm() {
+
+        // Arrange
+        final int toConfirm = VALID_QUANTITY / 2;
+
+        given(transferRepo.findById(VALID_TRANSFER_UUID))
+                .willReturn(Optional.ofNullable(VALID_TRANSFER));
+
+        given(shipmentRepo.findByTransferUuid(VALID_TRANSFER_UUID)).willReturn(Optional.of(Shipment.builder()
+                .uuid(VALID_TRANSFER_UUID)
+                .status(ShipmentStatus.ACCEPTED)
+                .build()));
+
+        given(confirmationRepo.sumQuantityByTransferUuid(VALID_TRANSFER_UUID))
+                .willReturn(null);
+
+        // Act
+        final Confirmation confirmation = confirmationService.confirm(VALID_TRANSFER_UUID, toConfirm);
+
+        // Assert
+        assertThat(confirmation).isNotNull();
+        assertThat(confirmation.getTransferUuid()).isEqualTo(VALID_TRANSFER_UUID);
+        assertThat(confirmation.getQuantity()).isEqualTo(toConfirm);
+
+        verify(transferRepo, times(1)).findById(VALID_TRANSFER_UUID);
+        verify(shipmentRepo, times(1)).findByTransferUuid(VALID_TRANSFER_UUID);
+        verify(confirmationRepo, times(1))
+                .sumQuantityByTransferUuid(VALID_TRANSFER_UUID);
     }
 }
