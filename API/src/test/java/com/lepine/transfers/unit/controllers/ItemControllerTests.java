@@ -5,6 +5,7 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.controllers.item.ItemController;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.item.ItemMapper;
+import com.lepine.transfers.data.item.ItemQuantityTuple;
 import com.lepine.transfers.data.item.ItemUUIDLessDTO;
 import com.lepine.transfers.exceptions.item.DuplicateSkuException;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
@@ -21,7 +22,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
+import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -479,5 +483,45 @@ public class ItemControllerTests {
         // Assert
         assertThat(exception.getMessage()).contains("SKU");
         verify(itemService, times(1)).update(any(Item.class));
+    }
+
+    @Test
+    @DisplayName("frjNpNTaWy: Given valid pagination and temporal arguments, retrieve best selling Items")
+    void retrieveBestSellingItems() {
+
+        // Arrange
+        final PageRequest pageRequest = PageRequest.of(0, 10);
+        ZonedDateTime start = ZonedDateTime.now().minusDays(1);
+        ZonedDateTime end = ZonedDateTime.now();
+        final List<ItemQuantityTuple> items = Stream.of(
+                Item.builder()
+                        .uuid(UUID.randomUUID())
+                        .name("name")
+                        .description("description")
+                        .sku("SKU")
+                        .build(),
+                Item.builder()
+                        .uuid(UUID.randomUUID())
+                        .name("name")
+                        .description("description")
+                        .sku("SKU")
+                        .build(),
+                Item.builder()
+                        .uuid(UUID.randomUUID())
+                        .name("name")
+                        .description("description")
+                        .sku("SKU")
+                        .build()
+        ).map(item -> new ItemQuantityTuple(item, 1L)).collect(Collectors.toList());
+        final Page<ItemQuantityTuple> expectedPage = com.lepine.transfers.utils.PageUtils.createPageFor(items, pageRequest);
+
+        given(itemService.findBestSellerForRange(start, end, pageRequest)).willReturn(expectedPage);
+
+        // Act
+        final Page<ItemQuantityTuple> got = itemController.getBestseller(1, 10, start.toString(), end.toString());
+
+        // Assert
+        assertEquals(items, got.getContent());
+        verify(itemService, times(1)).findBestSellerForRange(start, end, pageRequest);
     }
 }
