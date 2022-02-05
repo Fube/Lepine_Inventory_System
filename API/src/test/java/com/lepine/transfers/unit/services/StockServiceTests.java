@@ -42,8 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {
         MapperConfig.class,
@@ -361,5 +360,19 @@ public class StockServiceTests {
 
         // Assert
         verify(searchService, times(1)).deleteAllInBatch(any(List.class));
+    }
+
+    @Test
+    @DisplayName("UChRCJfqct: Given UUID when delete, then delete Stock")
+    void delete_UUID() {
+        // Arrange
+        given(stockRepo.deleteByUuid(VALID_STOCK_UUID))
+                .will(n -> null);
+
+        // Act
+        stockService.delete(VALID_STOCK_UUID);
+
+        // Assert
+        verify(stockRepo, times(1)).deleteByUuid(VALID_STOCK_UUID);
     }
 }
