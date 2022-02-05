@@ -463,7 +463,7 @@ public class UserServiceTests {
     }
 
     @Test
-    @DisplayName("YHgQkyajvu: Guven no role when update, then throw RoleNotFoundException")
+    @DisplayName("YHgQkyajvu: Given no role when update, then throw RoleNotFoundException")
     void update_NoRole() {
 
         // Arrange
@@ -482,5 +482,25 @@ public class UserServiceTests {
         assertThat(e.getMessage()).isEqualTo(new RoleNotFoundException(VALID_ROLE_NAME).getMessage());
 
         verify(userRepo, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("bmRRljuEJN: Given valid uuid and role name when update, then update User")
+    void update_ValidUuidAndRoleName() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        when(userRepo.findById(VALID_USER.getUuid())).thenReturn(Optional.of(VALID_USER));
+        when(roleRepo.findByName(VALID_ROLE_NAME)).thenReturn(Optional.of(VALID_ROLE));
+
+        // Act
+        userService.update(VALID_USER.getUuid(), userUUIDLessDTO);
+
+        // Assert
+        verify(userRepo, times(1)).save(any());
     }
 }
