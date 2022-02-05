@@ -28,15 +28,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.lepine.transfers.utils.MessageSourceUtils.wrapperFor;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -305,5 +304,20 @@ public class StockServiceTests {
 
         // Assert
         verify(stockRepo).save(VALID_STOCK);
+    }
+
+    @Test
+    @DisplayName("cxNmnupMLs: Given Item when updateSearchIndexFor, speak to searchService")
+    void updateSearchIndexFor_Item() {
+        // Arrange
+        final List<Stock> items = Collections.singletonList(VALID_STOCK);
+        given(stockRepo.findByItemUuid(VALID_ITEM_UUID))
+                .willReturn(items);
+
+        // Act
+        stockService.updateSearchIndexFor(VALID_ITEM);
+
+        // Assert
+        verify(searchService, times(1)).partialUpdateAllInBatch(any(List.class));
     }
 }
