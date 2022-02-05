@@ -63,7 +63,7 @@ public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO, UU
 
     @Override
     @Test
-    @DisplayName("NNDaMLIeMs: Given list of item UUIDs, issue partial update")
+    @DisplayName("NNDaMLIeMs: Given list of items, issue batch update")
     public void testPartialUpdateAllInBatch() {
 
         // Arrange
@@ -79,7 +79,20 @@ public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO, UU
     }
 
     @Override
+    @Test
+    @DisplayName("KSzEUwhKer: Given list of items, issue batch delete")
     public void testDeleteAllInBatch() {
 
+        // Arrange
+        final ItemSearchDTO given = ItemSearchDTO.builder().build();
+        final String asString = given.toString();
+
+        given(searchIndex.deleteObjects(List.of(asString))).willReturn(null);
+
+        // Act
+        searchService.deleteAllInBatch(List.of(given));
+
+        // Assert
+        verify(searchIndex, times(1)).batch(any());
     }
 }
