@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.validation.ConstraintViolationException;
@@ -260,5 +262,21 @@ public class StockServiceTests {
         assertThatThrownBy(() -> stockService.update(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS))
                 .isInstanceOf(StockNotFoundException.class)
                 .hasMessage(format(STOCK_NOT_FOUND_ERROR_FORMAT, VALID_STOCK_UUID));
+    }
+
+    @Test
+    @DisplayName("ZssguxpnKc: Given pagerequest when findAll, then return page of Shipments")
+    void findAll_PageRequest() {
+        // Arrange
+        final PageRequest pageRequest = PageRequest.of(0, 10);
+        final Page<Stock> page = Page.empty();
+        given(stockRepo.findAll(pageRequest))
+                .willReturn(page);
+
+        // Act
+        final Page<Stock> result = stockService.findAll(pageRequest);
+
+        // Assert
+        assertThat(result).isEqualTo(page);
     }
 }
