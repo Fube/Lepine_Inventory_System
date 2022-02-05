@@ -348,4 +348,4 @@ TestIder/*
 TestIder/
 
 # For docker-compose volumnes
-data/
+/data
