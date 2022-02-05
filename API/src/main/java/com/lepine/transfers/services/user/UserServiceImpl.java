@@ -148,10 +148,11 @@ public class UserServiceImpl implements UserService, AuthService {
 
             final Object rawPrincipal = authentication.getPrincipal();
             User principal;
-            if(rawPrincipal instanceof User) {
 
+            if(rawPrincipal instanceof User) {
                 principal = (User) authentication.getPrincipal();
             } else {
+
                 final UserDetails userDetails = (UserDetails) rawPrincipal;
                 principal = User.builder()
                         .uuid(UUID.fromString("00000000-0000-0000-0000-000000000000"))

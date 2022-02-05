@@ -75,7 +75,7 @@ public class UserServiceTests {
         List<User> items = new ArrayList<>();
         for (int i = 0; i < num; i++) {
             items.add(User.builder()
-                    .email(i+VALID_EMAIL)
+                    .email(i + VALID_EMAIL)
                     .password(VALID_PASSWORD)
                     .build());
         }
@@ -107,7 +107,8 @@ public class UserServiceTests {
     }
 
     @Test
-    void contextLoads() {}
+    void contextLoads() {
+    }
 
     @Test
     @DisplayName("VuVJsyfGna: Given a UserUUIDLessDTO, then create a User with a hashed password")
@@ -423,7 +424,7 @@ public class UserServiceTests {
         userService.delete(VALID_USER_UUID);
 
         // Assert
-        verify(userRepo, times(1)).deleteById(VALID_USER_UUID);
+        verify(userRepo, times(1)).deleteByUuid(VALID_USER_UUID);
     }
 
     @Test
