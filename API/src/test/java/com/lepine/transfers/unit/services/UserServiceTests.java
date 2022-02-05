@@ -377,7 +377,6 @@ public class UserServiceTests {
         verify(userRepo, times(0)).save(any());
     }
 
-
     @Test
     @DisplayName("NjjNwcZFIt: Given UUID when findByUuid, then return User")
     void findByUuid_ValidUuid() {
@@ -393,5 +392,21 @@ public class UserServiceTests {
 
         // Assert
         assertThat(result).isPresent().get().isEqualTo(user);
+    }
+
+    @Test
+    @DisplayName("lLqvEWGSan: Given UUID when findByUuid, then return empty")
+    void findByUuid_InvalidUuid() {
+
+        // Arrange
+        final UUID INVALID_USER_UUID = UUID.randomUUID();
+
+        when(userRepo.findById(INVALID_USER_UUID)).thenReturn(Optional.empty());
+
+        // Act
+        final Optional<User> result = userService.findByUuid(INVALID_USER_UUID);
+
+        // Assert
+        assertThat(result).isEmpty();
     }
 }
