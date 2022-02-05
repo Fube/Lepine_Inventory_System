@@ -19,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -85,4 +86,31 @@ public class MailerServiceTests {
                         request.getBody().equals(expectedBuilt)));
     }
 
+    @Test
+    @DisplayName("WBWuEjImaG: Given IOEXception when send, then return false")
+    void send_IOException() throws IOException {
+
+        // Arrange
+        final Content expectedContent = new Content("text/html", VALID_BODY);
+        final Mail expectedMail = new Mail(VALID_FROM_EMAIL, VALID_SUBJECT, VALID_TO_EMAIL, expectedContent);
+
+        final Request expectedRequest = new Request();
+        expectedRequest.setMethod(Method.POST);
+        expectedRequest.setEndpoint("mail/send");
+        final String expectedBuilt = expectedMail.build();
+        expectedRequest.setBody(expectedBuilt);
+
+        given(sendGrid.api(any())).willThrow(new IOException());
+
+        // Act
+        final boolean result = mailerService.sendHTML(VALID_TO_ADDRESS, VALID_SUBJECT, VALID_BODY);
+
+        // Assert
+        assertThat(result).isFalse();
+
+        verify(sendGrid, times(1))
+                .api(argThat(request -> request.getMethod() == Method.POST &&
+                        request.getEndpoint().equals("mail/send") &&
+                        request.getBody().equals(expectedBuilt)));
+    }
 }
