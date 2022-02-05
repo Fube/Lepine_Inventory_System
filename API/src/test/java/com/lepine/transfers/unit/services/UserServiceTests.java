@@ -60,6 +60,13 @@ public class UserServiceTests {
             .name(VALID_ROLE_NAME)
             .build();
 
+    private final static User VALID_USER = User.builder()
+            .uuid(UUID.randomUUID())
+            .email(VALID_EMAIL)
+            .password(VALID_HASHED_PASSWORD)
+            .role(VALID_ROLE)
+            .build();
+
     private final Function<String, String> messageSourceHelper = name ->
             this.messageSource.getMessage(name, null, Locale.getDefault());
 
@@ -368,5 +375,23 @@ public class UserServiceTests {
         assertThat(collect).containsExactly(messageSourceHelper.apply("user.password.not_valid"));
 
         verify(userRepo, times(0)).save(any());
+    }
+
+
+    @Test
+    @DisplayName("NjjNwcZFIt: Given UUID when findByUuid, then return User")
+    void findByUuid_ValidUuid() {
+
+        // Arrange
+        final User user = VALID_USER;
+        final UUID VALID_USER_UUID = VALID_USER.getUuid();
+
+        when(userRepo.findById(VALID_USER_UUID)).thenReturn(Optional.of(user));
+
+        // Act
+        final Optional<User> result = userService.findByUuid(VALID_USER_UUID);
+
+        // Assert
+        assertThat(result).isPresent().get().isEqualTo(user);
     }
 }
