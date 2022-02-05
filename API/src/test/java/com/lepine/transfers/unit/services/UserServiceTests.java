@@ -11,6 +11,7 @@ import com.lepine.transfers.data.user.UserRepo;
 import com.lepine.transfers.data.user.UserUUIDLessDTO;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.exceptions.user.RoleNotFoundException;
+import com.lepine.transfers.exceptions.user.UserNotFoundException;
 import com.lepine.transfers.services.user.UserService;
 import com.lepine.transfers.services.user.UserServiceImpl;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
@@ -438,5 +439,26 @@ public class UserServiceTests {
 
         // Assert
         verify(userRepo, times(1)).deleteByUuid(INVALID_USER_UUID);
+    }
+
+    @Test
+    @DisplayName("xOflLOcxIh: Given no user when update, then throw UserNotFoundException")
+    void update_NoUser() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        when(userRepo.findById(VALID_USER.getUuid())).thenReturn(Optional.empty());
+
+        // Act
+        final UserNotFoundException e = assertThrows(UserNotFoundException.class, () -> userService.update(VALID_USER.getUuid(), userUUIDLessDTO));
+
+        // Assert
+        assertThat(e.getMessage()).isEqualTo(new UserNotFoundException(VALID_USER.getUuid()).getMessage());
+
+        verify(userRepo, times(0)).save(any());
     }
 }
