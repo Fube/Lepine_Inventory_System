@@ -5,6 +5,8 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.events.item.ItemUpdateEvent;
+import com.lepine.transfers.events.item.ItemUpdateHandler;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
@@ -105,6 +107,9 @@ public class StockServiceTests {
 
     @Autowired
     private StockService stockService;
+
+    @Autowired
+    private ItemUpdateHandler itemUpdateHandler;
 
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
@@ -316,6 +321,22 @@ public class StockServiceTests {
 
         // Act
         stockService.updateSearchIndexFor(VALID_ITEM);
+
+        // Assert
+        verify(searchService, times(1)).partialUpdateAllInBatch(any(List.class));
+    }
+
+    @Test
+    @DisplayName("nxpvxADoPc: Given ItemUpdateEvent when onItemUpdate, speak to searchService")
+    void onItemUpdate_ItemUpdateEvent() {
+        // Arrange
+        final ItemUpdateEvent event = new ItemUpdateEvent(this, VALID_ITEM);
+        final List<Stock> items = Collections.singletonList(VALID_STOCK);
+        given(stockRepo.findByItemUuid(VALID_ITEM_UUID))
+                .willReturn(items);
+
+        // Act
+        itemUpdateHandler.onItemUpdate(event);
 
         // Assert
         verify(searchService, times(1)).partialUpdateAllInBatch(any(List.class));
