@@ -1,6 +1,5 @@
 package com.lepine.transfers.data.transfer;
 
-import com.lepine.transfers.data.confirmation.Confirmation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

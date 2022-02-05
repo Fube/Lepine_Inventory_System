@@ -1,9 +1,6 @@
 package com.lepine.transfers.services.item;
 
-import com.lepine.transfers.data.item.Item;
-import com.lepine.transfers.data.item.ItemMapper;
-import com.lepine.transfers.data.item.ItemRepo;
-import com.lepine.transfers.data.item.ItemSearchDTO;
+import com.lepine.transfers.data.item.*;
 import com.lepine.transfers.events.item.ItemDeleteEvent;
 import com.lepine.transfers.events.item.ItemUpdateEvent;
 import com.lepine.transfers.exceptions.item.DuplicateSkuException;
@@ -17,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -115,6 +114,15 @@ public class ItemServiceImpl implements ItemService, ApplicationEventPublisherAw
         log.info("retrieved item");
 
         return item;
+    }
+
+    @Override
+    public Page<ItemQuantityTuple> findBestSellerForRange(ZonedDateTime from, ZonedDateTime to, PageRequest pageRequest) {
+        log.info("Retrieving best seller items in time range {} - {}", from, to);
+        final var bestSeller = itemRepo.mostTransferredItemsInRange(from, to, pageRequest);
+//        log.info("Retrieved {} items", bestSeller.getTotalElements());
+
+        return bestSeller;
     }
 
     @Override

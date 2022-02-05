@@ -53,3 +53,8 @@ export type Transfer = {
     stock: Stock;
     quantity: number;
 };
+
+export type ItemQuantityTuple = {
+    item: Item;
+    quantity: number;
+};

@@ -40,7 +40,7 @@ function ShowStats({}) {
                                 Fully Confirmed Shipments
                             </button>
                         </Link>
-                        <Link href="/stats/graph" passHref>
+                        <Link href="/stats/shipments/sold" passHref>
                             <button className="btn text-lg">
                                 Best Selling Items By Week
                             </button>
