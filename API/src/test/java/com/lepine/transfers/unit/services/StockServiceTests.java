@@ -265,7 +265,7 @@ public class StockServiceTests {
     }
 
     @Test
-    @DisplayName("ZssguxpnKc: Given pagerequest when findAll, then return page of Shipments")
+    @DisplayName("ZssguxpnKc: Given pagerequest when findAll, then return page of Stocks")
     void findAll_PageRequest() {
         // Arrange
         final PageRequest pageRequest = PageRequest.of(0, 10);
@@ -278,5 +278,32 @@ public class StockServiceTests {
 
         // Assert
         assertThat(result).isEqualTo(page);
+    }
+
+    @Test
+    @DisplayName("JTNEbMKTSI: Given Stock not found when update, then throw StockNotFoundException")
+    void update_StockNotFound() {
+        // Arrange
+        given(stockRepo.getById(VALID_STOCK_UUID))
+                .willReturn(null);
+
+        // Act & Assert
+        assertThatThrownBy(() -> stockService.update(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS))
+                .isInstanceOf(StockNotFoundException.class)
+                .hasMessage(format(STOCK_NOT_FOUND_ERROR_FORMAT, VALID_STOCK_UUID));
+    }
+
+    @Test
+    @DisplayName("NNuilXzxIY: Given Stock exists when update, then update Stock")
+    void update_StockExists() {
+        // Arrange
+        given(stockRepo.findById(VALID_STOCK_UUID))
+                .willReturn(Optional.of(VALID_STOCK));
+
+        // Act
+        stockService.update(VALID_STOCK_UUID, VALID_STOCK_UUID_LESS_ITEM_LESS_WAREHOUSE_LESS);
+
+        // Assert
+        verify(stockRepo).save(VALID_STOCK);
     }
 }
