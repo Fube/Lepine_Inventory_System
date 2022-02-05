@@ -288,4 +288,36 @@ public class ConfirmationServiceTests {
         verify(transferRepo, times(1)).findById(NOT_FOUND_SHIPMENT_UUID);
         verify(shipmentRepo, times(1)).findByTransferUuid(NOT_FOUND_SHIPMENT_UUID);
     }
+
+    @Test
+    @DisplayName("sOvUBacHTt: Given sumQuantityByTransferUuid is null, set quantity to 0, then return confirmation")
+    void sumQuantityByTransferUuid_null_Confirm() {
+
+        // Arrange
+        final int toConfirm = VALID_QUANTITY / 2;
+
+        given(transferRepo.findById(VALID_TRANSFER_UUID))
+                .willReturn(Optional.ofNullable(VALID_TRANSFER));
+
+        given(shipmentRepo.findByTransferUuid(VALID_TRANSFER_UUID)).willReturn(Optional.of(Shipment.builder()
+                .uuid(VALID_TRANSFER_UUID)
+                .status(ShipmentStatus.ACCEPTED)
+                .build()));
+
+        given(confirmationRepo.sumQuantityByTransferUuid(VALID_TRANSFER_UUID))
+                .willReturn(null);
+
+        // Act
+        final Confirmation confirmation = confirmationService.confirm(VALID_TRANSFER_UUID, toConfirm);
+
+        // Assert
+        assertThat(confirmation).isNotNull();
+        assertThat(confirmation.getTransferUuid()).isEqualTo(VALID_TRANSFER_UUID);
+        assertThat(confirmation.getQuantity()).isEqualTo(toConfirm);
+
+        verify(transferRepo, times(1)).findById(VALID_TRANSFER_UUID);
+        verify(shipmentRepo, times(1)).findByTransferUuid(VALID_TRANSFER_UUID);
+        verify(confirmationRepo, times(1))
+                .sumQuantityByTransferUuid(VALID_TRANSFER_UUID);
+    }
 }
