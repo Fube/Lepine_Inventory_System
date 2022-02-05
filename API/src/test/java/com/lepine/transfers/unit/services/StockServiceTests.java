@@ -5,6 +5,8 @@ import com.lepine.transfers.config.ValidationConfig;
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
 import com.lepine.transfers.data.warehouse.Warehouse;
+import com.lepine.transfers.events.item.ItemDeleteEvent;
+import com.lepine.transfers.events.item.ItemDeleteHandler;
 import com.lepine.transfers.events.item.ItemUpdateEvent;
 import com.lepine.transfers.events.item.ItemUpdateHandler;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
@@ -110,6 +112,9 @@ public class StockServiceTests {
 
     @Autowired
     private ItemUpdateHandler itemUpdateHandler;
+
+    @Autowired
+    private ItemDeleteHandler itemDeleteHandler;
 
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
@@ -340,5 +345,21 @@ public class StockServiceTests {
 
         // Assert
         verify(searchService, times(1)).partialUpdateAllInBatch(any(List.class));
+    }
+
+    @Test
+    @DisplayName("QGioNqZLdi: Given ItemDeleteEvent when onItemDelete, speak to searchService")
+    void onItemDelete_ItemDeleteEvent() {
+        // Arrange
+        final ItemDeleteEvent event = new ItemDeleteEvent(this, VALID_ITEM_UUID);
+        final List<Stock> items = Collections.singletonList(VALID_STOCK);
+        given(stockRepo.findByItemUuid(VALID_ITEM_UUID))
+                .willReturn(items);
+
+        // Act
+        itemDeleteHandler.onItemDelete(event);
+
+        // Assert
+        verify(searchService, times(1)).deleteAllInBatch(any(List.class));
     }
 }
