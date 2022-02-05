@@ -47,13 +47,11 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         log.info("Found transfer with quantity {}", transfer.getQuantity());
 
         log.info("Checking if shipment is ACCEPTED");
-        final Optional<Shipment> byTransferUuid = shipmentRepo.findByTransferUuid(transferUuid);
-        if (byTransferUuid.isEmpty()) {
-            log.info("Shipment is not found");
-            throw new ShipmentNotFoundException(format("Shipment for transfer %s is not found", transferUuid));
-        }
+        final Shipment byTransferUuid = shipmentRepo.findByTransferUuid(transferUuid)
+                .orElseThrow(() ->
+                        new ShipmentNotFoundException(format("Shipment for transfer %s is not found", transferUuid)));
 
-        final ShipmentStatus status = byTransferUuid.get().getStatus();
+        final ShipmentStatus status = byTransferUuid.getStatus();
         if (status != ShipmentStatus.ACCEPTED) {
             log.info("Shipment is not ACCEPTED");
             throw new ShipmentNotAcceptedException(transferUuid, status.name());
@@ -80,7 +78,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         log.info("Updating stock");
         final Stock stock = transfer.getStock();
 
-        final UUID to = byTransferUuid.get().getTo();
+        final UUID to = byTransferUuid.getTo();
         final Optional<Stock> byWarehouseUuidAndItemUuid =
                 stockRepo.findByWarehouseUuidAndItemUuid(to, stock.getItem().getUuid());
 
