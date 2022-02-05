@@ -409,4 +409,34 @@ public class UserServiceTests {
         // Assert
         assertThat(result).isEmpty();
     }
+
+    @Test
+    @DisplayName("GQWLDlLyDV: Given UUID when delete, delete User")
+    void delete_ValidUuid() {
+
+        // Arrange
+        final UUID VALID_USER_UUID = VALID_USER.getUuid();
+        given(userRepo.deleteByUuid(VALID_USER_UUID)).willReturn(1);
+
+        // Act
+        userService.delete(VALID_USER_UUID);
+
+        // Assert
+        verify(userRepo, times(1)).deleteById(VALID_USER_UUID);
+    }
+
+    @Test
+    @DisplayName("uaaAULWaMX: Given UUID when delete, do nothing")
+    void delete_InvalidUuid() {
+
+        // Arrange
+        final UUID INVALID_USER_UUID = UUID.randomUUID();
+        given(userRepo.deleteByUuid(INVALID_USER_UUID)).willReturn(0);
+
+        // Act
+        userService.delete(INVALID_USER_UUID);
+
+        // Assert
+        verify(userRepo, times(1)).deleteByUuid(INVALID_USER_UUID);
+    }
 }
