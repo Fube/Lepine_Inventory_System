@@ -6,8 +6,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,5 +59,27 @@ public class ItemSearchServiceTests extends SearchServiceTests<ItemSearchDTO, UU
 
         // Assert
         verify(searchIndex, times(1)).deleteObject(asString);
+    }
+
+    @Override
+    @Test
+    @DisplayName("NNDaMLIeMs: Given list of item UUIDs, issue partial update")
+    public void testPartialUpdateAllInBatch() {
+
+        // Arrange
+        final ItemSearchDTO given = ItemSearchDTO.builder().build();
+
+        given(searchIndex.partialUpdateObjects(any())).willReturn(null);
+
+        // Act
+        searchService.partialUpdateAllInBatch(List.of(given));
+
+        // Assert
+        verify(searchIndex, times(1)).batch(any());
+    }
+
+    @Override
+    public void testDeleteAllInBatch() {
+
     }
 }

@@ -33,4 +33,10 @@ public abstract class SearchServiceTests<T, I> {
 
     @Test
     public abstract void testDelete();
+
+    @Test
+    public abstract void testPartialUpdateAllInBatch();
+
+    @Test
+    public abstract void testDeleteAllInBatch();
 }
