@@ -461,4 +461,26 @@ public class UserServiceTests {
 
         verify(userRepo, times(0)).save(any());
     }
+
+    @Test
+    @DisplayName("YHgQkyajvu: Guven no role when update, then throw RoleNotFoundException")
+    void update_NoRole() {
+
+        // Arrange
+        final UserUUIDLessDTO userUUIDLessDTO = VALID_USER_DTO.toBuilder()
+                .email(VALID_EMAIL)
+                .password(VALID_PASSWORD)
+                .build();
+
+        when(userRepo.findById(VALID_USER.getUuid())).thenReturn(Optional.of(VALID_USER));
+        when(roleRepo.findByName(any())).thenReturn(Optional.empty());
+
+        // Act
+        final RoleNotFoundException e = assertThrows(RoleNotFoundException.class, () -> userService.update(VALID_USER.getUuid(), userUUIDLessDTO));
+
+        // Assert
+        assertThat(e.getMessage()).isEqualTo(new RoleNotFoundException(VALID_ROLE_NAME).getMessage());
+
+        verify(userRepo, times(0)).save(any());
+    }
 }
