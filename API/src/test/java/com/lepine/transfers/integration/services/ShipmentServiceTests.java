@@ -397,4 +397,31 @@ public class ShipmentServiceTests {
                 .usingRecursiveComparison()
                 .isEqualTo(expected);
     }
+
+    @Test
+    @DisplayName("fcnvVtYRYK: Given fully confirmed shipment and valid time range when findAllFullyConfirmed, then return Page of Shipments")
+    void valid_findAllFullyConfirmed_with_time_range() {
+
+        // Arrange
+        final PageRequest of = PageRequest.of(0, 10);
+        final Shipment saved = acceptDefaultShipment();
+        final ZonedDateTime from = ZonedDateTime.now().minusYears(100);
+        final ZonedDateTime to = ZonedDateTime.now().plusYears(100);
+
+        confirmationRepo.save(
+                Confirmation.builder()
+                        .transferUuid(VALID_TRANSFER_UUID)
+                        .quantity(VALID_STOCK_QUANTITY)
+                        .build());
+
+        // Act
+        Page<Shipment> shipments = shipmentService.findAllFullyConfirmed(from, to, of);
+
+        // Assert
+        assertThat(shipments.getTotalElements()).isEqualTo(1);
+        assertThat(shipments.getContent().get(0))
+                .usingRecursiveComparison()
+                .isEqualTo(saved);
+    }
+
 }
