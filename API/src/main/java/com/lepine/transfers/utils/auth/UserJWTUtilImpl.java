@@ -32,6 +32,7 @@ public class UserJWTUtilImpl implements JWTUtil<User> {
     public String encode(User payload) {
         Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("role", payload.getRole());
+        claimsMap.put("uuid", payload.getUuid());
 
         return Jwts.builder()
                 .setSubject(payload.getEmail())

@@ -13,7 +13,7 @@ export default function WithClientSideAuth(WrappedComponent) {
             if (!role) return;
 
             const mapped = roleRouteMappings
-                .get(router.asPath)
+                .get(router.pathname)
                 .includes(role.toLocaleLowerCase());
             if (!mapped) {
                 router.push("/login");

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
 import { Formik } from "formik";
-import * as yup from "yup";
+import { useEffect, useState } from "react";
 import GooglePlacesAutocomplete, {
     geocodeByPlaceId,
 } from "react-google-places-autocomplete";
+import * as yup from "yup";
 import {
     GenericErrorStatus,
     GenericForm,
@@ -30,9 +30,9 @@ const rawSchema = {
  * editable: boolean,
  * deletable: boolean,
  * handleDelete: (uuid: string) => void,
- * handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void }
- * title: string,
- * & import('../../types').Warehouse } )
+ * handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void
+ * title: string, }
+ * & import('@lepine/ui-types').Warehouse } )
  */
 export default function WarehouseForm({
     uuid,

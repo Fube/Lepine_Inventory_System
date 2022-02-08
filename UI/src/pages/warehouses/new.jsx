@@ -1,6 +1,5 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Nav from "../../components/Nav";
 import WarehouseForm from "../../components/WarehouseForm";
 import WithClientSideAuth from "../../components/WithClientSideAuth";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";

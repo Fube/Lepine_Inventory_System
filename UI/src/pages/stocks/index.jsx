@@ -8,8 +8,8 @@ import { axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
 /**
-*@param {{ stock: import('@lepine/types').Stock[] } & import("@lepine/types").Pagination} param0
-*/
+ *@param {{ stock: import('@lepine/ui-types').Stock[] } & import("@lepine/ui-types").Pagination} param0
+ */
 export default function ShowStock({ stocks, totalPages, pageNumber }) {
     const router = useRouter();
     const { role } = useAuth();
@@ -26,7 +26,7 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
             <th>Warehouse</th>
             <th>Quantity</th>
             <th className="md:rounded-r-none rounded-r-lg flex justify-between md:table-cell">
-            <button className="md:hidden">
+                <button className="md:hidden">
                     <Link href="/stocks/new" passHref>
                         <Icon icon="si-glyph:button-plus" width="32" />
                     </Link>
@@ -45,7 +45,7 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
         return (
             <>
                 {header}
-    
+
                 <main className="flex justify-center">
                     <div className="text-center">
                         <div className="mt-12">{fallback}</div>
@@ -67,7 +67,7 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
             {header}
 
             <div className="overflow-x-auto justify-center flex">
-            <div className="md:w-1/2 w-3/4">
+                <div className="md:w-1/2 w-3/4">
                     <div className="md:flex justify-around my-4">
                         <h1 className="text-4xl md:mb-0 mb-4">Stock</h1>
                     </div>
@@ -92,7 +92,7 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
             </div>
         </>
     );
-} 
+}
 
 /**
  *
@@ -100,12 +100,12 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
  */
 function StockTableRow({ uuid, item, warehouse, quantity }) {
     return (
-        <Link key={uuid} href={`/stocks/${uuid}`} passHref> 
-        <tr className="hover">
-            <td className="td-wrap">{item}</td>
-            <td className="td-wrap">{warehouse}</td>
-            <td className="td-wrap">{quantity}</td>
-        </tr>
+        <Link key={uuid} href={`/stocks/${uuid}`} passHref>
+            <tr className="hover">
+                <td className="td-wrap">{item}</td>
+                <td className="td-wrap">{warehouse}</td>
+                <td className="td-wrap">{quantity}</td>
+            </tr>
         </Link>
     );
 }

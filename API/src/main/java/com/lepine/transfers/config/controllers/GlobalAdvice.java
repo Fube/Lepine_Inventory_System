@@ -2,7 +2,11 @@ package com.lepine.transfers.config.controllers;
 
 import com.lepine.transfers.exceptions.DuplicateResourceException;
 import com.lepine.transfers.exceptions.NotFoundException;
-import com.lepine.transfers.exceptions.user.DuplicateEmailException;
+import com.lepine.transfers.exceptions.auth.DefaultLoginNotAllowedException;
+import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
+import com.lepine.transfers.exceptions.stock.StockTooLowException;
+import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
+import com.lepine.transfers.exceptions.transfer.SameWarehouseException;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -64,9 +68,16 @@ public class GlobalAdvice {
         return new HTTPConstraintViolationError(e.getBindingResult());
     }
 
-    @ExceptionHandler(DuplicateResourceException.class)
+    @ExceptionHandler({
+            DuplicateResourceException.class,
+            SameWarehouseException.class,
+            StockTooLowException.class,
+            DefaultLoginNotAllowedException.class,
+            QuantityExceededException.class,
+            ShipmentNotAcceptedException.class,
+    })
     @ResponseStatus(value = BAD_REQUEST)
-    public HTTPErrorMessage handleDuplicateResourceException(DuplicateResourceException e) {
+    public HTTPErrorMessage handleGenericBusinessLogicRuntimeException(RuntimeException e) {
         return new HTTPErrorMessage(BAD_REQUEST.value(), e.getMessage());
     }
 }

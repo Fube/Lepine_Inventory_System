@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface StockService {
@@ -22,4 +23,6 @@ public interface StockService {
     void updateSearchIndexFor(Item item);
 
     void delete(UUID dto);
+
+    Set<Stock> findByUuidIn(Set<UUID> uuids);
 }

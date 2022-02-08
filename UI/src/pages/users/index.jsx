@@ -9,7 +9,7 @@ import { axiosBackendAuth } from "../../config/axios";
 
 /**
  *
- * @param {{ users: import("@lepine/types").User[] } & import("@lepine/types").Pagination} param0
+ * @param {{ users: import("@lepine/ui-types").User[] } & import("@lepine/ui-types").Pagination} param0
  * @returns
  */
 export default function ShowUsers({ users, totalPages, pageNumber }) {
@@ -94,12 +94,12 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
 
 function UserTableRow({ uuid, email, role }) {
     return (
-        // <Link href={`/users/${uuid}`} passHref>
+         <Link href={`/users/${uuid}`} passHref>
         <tr className="hover">
             <td>{email}</td>
             <td>{capitalize(role.toLowerCase())}</td>
         </tr>
-        // </Link>
+         </Link>
     );
 }
 

@@ -22,10 +22,12 @@ export default function NavWrapper({ children }) {
     if (isLoggedIn) {
         if (role === "MANAGER") {
             pages.push("users");
+            pages.push("stats");
         }
         pages.push("items");
         pages.push("warehouses");
         pages.push("stocks");
+        pages.push("shipments");
     }
 
     return (

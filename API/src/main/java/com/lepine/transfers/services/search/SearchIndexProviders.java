@@ -27,8 +27,10 @@ public class SearchIndexProviders {
     @Bean
     public SearchIndex<StockSearchDTO> getStockSearchIndex() {
         final SearchIndex<StockSearchDTO> index = searchClient.initIndex("stocks", StockSearchDTO.class);
-        index.setSettings(new IndexSettings().setSearchableAttributes(
-                Arrays.asList("sku", "name", "description", "zipCode", "quantity")));
+        index.setSettings(new IndexSettings()
+                .setSearchableAttributes(Arrays.asList("sku", "name", "description", "zipCode", "quantity"))
+                .setAttributesForFaceting(Arrays.asList("searchable(zipCode)", "searchable(sku)", "searchable(warehouseUuid)", "searchable(objectID)"))
+        );
         return index;
     }
 }
