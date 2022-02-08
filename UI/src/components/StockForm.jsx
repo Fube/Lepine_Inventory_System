@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Formik } from "formik";
+import { useEffect, useState, useContext } from "react";
+import { Formik, FieldArray } from "formik";
 import * as yup from "yup";
 import {
     GenericErrorStatus,
@@ -7,6 +7,9 @@ import {
     GenericFormInputErrorCombo,
     GenericSubmitButton,
 } from "./FormikGenericComponents";
+import { connectHits, InstantSearch } from "react-instantsearch-core";
+import { SearchBox, Configure } from "react-instantsearch-dom";
+import { AlgoliaContext } from "../pages/_app";
 
 const rawSchema= {
     item: yup.string().required("Item is required"),
@@ -46,6 +49,52 @@ export default function StockForm({
         }, {});
     };
 
+    const { searchClient } = useContext(AlgoliaContext);
+    const [algoliaFilter, setAlgoliaFilter] = useState("quantity > 0");
+    const [selectedItemUuids, setSelectedItemUuids] = useState(new Set());
+    const [selectedWarehouseUuid, setSelectedWarehouseUuid] = useState("");
+
+    // This needs to return active warehouse.
+
+    // useEffect(() => {
+    //     if (!selectedItemUuids || !selectedWarehouseUuid) return;
+
+    //     let baseQuery = `quantity > 0`;
+
+    //     if (selectedWarehouseUuid.length > 0) {
+    //         baseQuery += ` AND NOT warehouseUuid:"${selectedWarehouseUuid}"`;
+    //     }
+
+    //     if (selectedStockUuids.size > 0) {
+    //         for (const stockUuid of selectedStockUuids) {
+    //             baseQuery += ` AND NOT objectID:"${stockUuid}"`;
+    //         }
+    //     }
+
+    //     console.log(baseQuery);
+    //     setAlgoliaFilter(baseQuery);
+    // }, [selectedStockUuids, selectedWarehouseUuid]);
+    
+     const mappedWarehouses = warehouses.map((warehouse) => ({
+        key: `${warehouse.city}, ${warehouse.province} - ${warehouse.zipCode}`,
+        value: warehouse.uuid,
+    }));
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     const stockSchema = yup.object().shape(filterOut(rawSchema));
 
     const fields = {
