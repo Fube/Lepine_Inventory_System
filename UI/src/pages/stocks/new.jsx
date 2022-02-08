@@ -42,7 +42,7 @@ import checkEmptyAuth from "../../utils/checkEmptyAuth";
                         <StockForm
                             title={"Create Stock"}
                             handleSubmit={handleSubmit}
-                            blackList={["active"]}
+                            items={["itemsExist"]}
                             editable
                         />
                     </div>
@@ -59,6 +59,20 @@ export default WithClientSideAuth(CreateStock);
  * @param {import("next/types").GetServerSidePropsContext} context
  * @returns
  */
-export async function getServerSideProps(context) {
-    return checkEmptyAuth(axiosBackendAuth, context);
+// export async function getServerSideProps(context) {
+//     return checkEmptyAuth(axiosBackendAuth, context);
+// }
+
+export async function getServerSideProps(ctx) {
+    const res = await axiosBackendAuth.get(`/items?size=100`, {
+        headers: { cookie: ctx?.req?.headers?.cookie ?? "" },
+    });
+
+    return res
+        .refine(({ content: itemsExist }) => ({
+            props: {
+                itemsExist,
+            },
+        }))
+        .get();
 }
