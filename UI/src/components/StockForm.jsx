@@ -6,10 +6,13 @@ import {
     GenericForm,
     GenericFormInputErrorCombo,
     GenericSubmitButton,
+    GenericFormSelectErrorCombo,
 } from "./FormikGenericComponents";
+
 import { connectHits, InstantSearch } from "react-instantsearch-core";
 import { SearchBox, Configure } from "react-instantsearch-dom";
 import { AlgoliaContext } from "../pages/_app";
+import thou from "../utils/thou";
 
 const rawSchema= {
     item: yup.string().required("Item is required"),
@@ -24,30 +27,32 @@ const rawSchema= {
  * handleDelete: (uuid: string) => void,
  * handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void }
  * title: string,
- * & import('../../types').Stock } )
+ * warehouses: import('@lepine/ui-types').Warehouse[],
+ * items: import('@lepine/ui-types').Item[], 
+ * import('@lepine/ui-types').Stock } )
  */
 
 export default function StockForm({
     uuid,
-    item = "",
-    warehouse = "",
+    item = [],
+    warehouse = [],
     quantity = "",
     editable,
     deletable,
     title,
     handleDelete = () => {},
     handleSubmit = () => {},
-    blackList = [],
 }) {
-    const filterOut = (toFilter) => {
-        return Object.entries(toFilter).reduce((acc, [key, value]) => {
-            if (blackList.includes(key)) return acc;
-            return {
-                ...acc,
-                [key]: value,
-            };
-        }, {});
-    };
+
+    // const filterOut = (toFilter) => {
+    //     return Object.entries(toFilter).reduce((acc, [key, value]) => {
+    //         if (blackList.includes(key)) return acc;
+    //         return {
+    //             ...acc,
+    //             [key]: value,
+    //         };
+    //     }, {});
+    // };
 
     const { searchClient } = useContext(AlgoliaContext);
     const [algoliaFilter, setAlgoliaFilter] = useState("quantity > 0");
@@ -65,36 +70,27 @@ export default function StockForm({
     //         baseQuery += ` AND NOT warehouseUuid:"${selectedWarehouseUuid}"`;
     //     }
 
-    //     if (selectedStockUuids.size > 0) {
-    //         for (const stockUuid of selectedStockUuids) {
-    //             baseQuery += ` AND NOT objectID:"${stockUuid}"`;
+    //     if (selectedItemUuids.size > 0) {
+    //         for (const itemUuid of selectedItemUuids) {
+    //             baseQuery += ` AND NOT objectID:"${itemUuid}"`;
     //         }
     //     }
 
     //     console.log(baseQuery);
     //     setAlgoliaFilter(baseQuery);
-    // }, [selectedStockUuids, selectedWarehouseUuid]);
+    // }, [selectedItemUuids, selectedWarehouseUuid]);
     
      const mappedWarehouses = warehouses.map((warehouse) => ({
         key: `${warehouse.city}, ${warehouse.province} - ${warehouse.zipCode}`,
         value: warehouse.uuid,
     }));
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    const mappedItems = items.map((item) => ({
+        key: `${item.sku}, ${item.name}, ${item.sku}`,
+        value: item.uuid,
+    }));
+
+
     const stockSchema = yup.object().shape(filterOut(rawSchema));
 
     const fields = {
@@ -107,12 +103,23 @@ export default function StockForm({
             />
         ),
         warehouse: (
-            <GenericFormInputErrorCombo
-                disabled={!editable}
-                name="warehouse"
-                type="text"
-                placeholder="Warehouse"
-            />
+            <GenericFormSelectErrorCombo
+            disabled={!editable}
+            name="warehouse"
+            title="Select a warehouse"
+            options={mappedWarehouses}
+            onChange={(e) => {
+                const warehouseUuid = e.target.value;
+
+                // Send to end of event loop
+                setTimeout(
+                    () => setFieldValue("to", warehouseUuid),
+                    0
+                );
+
+                setSelectedWarehouseUuid(warehouseUuid);
+            }}
+        />
         ),
         quantity: (
             <GenericFormInputErrorCombo

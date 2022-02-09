@@ -59,6 +59,9 @@ export default WithClientSideAuth(CreateStock);
  * @param {import("next/types").GetServerSidePropsContext} context
  * @returns
  */
+
+//commented for now. 
+
 // export async function getServerSideProps(context) {
 //     return checkEmptyAuth(axiosBackendAuth, context);
 // }
