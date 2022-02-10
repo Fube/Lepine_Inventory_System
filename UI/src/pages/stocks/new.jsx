@@ -43,7 +43,6 @@ import { axiosAPI, axiosBackendAuth } from "../../config/axios";
                         <StockForm
                             title={"Create Stock"}
                             handleSubmit={handleSubmit}
-                            items={["itemsExist"]}
                             warehouses={activeWarehouses}
                             editable
                         />

@@ -111,13 +111,12 @@ export default function StockForm({
                             placeholder="Item"
                         /> */}
 
-                        
 
                         <GenericFormSelectErrorCombo
                             disabled={!editable}
-                            name="warehouse"
+                            name="Warehouse"
                             placeholder="Warehouse"
-                            title="Select a warehouse"
+                            title="Select a Warehouse"
                             options={mappedWarehouses}
                             onChange={(e) => {
                                 const warehouseUuid = e.target.value;
@@ -126,8 +125,11 @@ export default function StockForm({
                                 setTimeout(
                                     () => setFieldValue("to", warehouseUuid),
                                     0
+                                
                                 );
+                                
                                 setSelectedWarehouseUuid(warehouseUuid);
+                               
                             }}
                         />
                         
@@ -135,10 +137,10 @@ export default function StockForm({
 
                         {values.to && values.to.length > 0 && (
                             <>
-                                <span className="block text-gray-700 text-lg font-bold mb-2">
+                                <span className="block text-gray-700 text-sm font-bold mb-2">
                                     Items
                                 </span>
-
+                                
                                 <FieldArray name="items">
                                     {({ remove, push }) => (
                                         <>
@@ -180,9 +182,9 @@ export default function StockForm({
                                                                 );
                                                             }}
                                                             onSelect={(hit) => {
-                                                                setSelectedStockUuids(
+                                                                setSelectedItemUuids(
                                                                     new Set([
-                                                                        ...selectedStockUuids,
+                                                                        ...selectedItemUuids,
                                                                         hit.objectID,
                                                                     ])
                                                                 );
@@ -190,12 +192,12 @@ export default function StockForm({
                                                             onReset={(
                                                                 lastHit
                                                             ) => {
-                                                                selectedStockUuids.delete(
+                                                                selectedItemUuids.delete(
                                                                     lastHit.objectID
                                                                 );
-                                                                setSelectedStockUuids(
+                                                                setSelectedItemUuids(
                                                                     [
-                                                                        ...selectedStockUuids,
+                                                                        ...selectedItemUuids,
                                                                     ]
                                                                 );
                                                             }}
@@ -230,7 +232,6 @@ export default function StockForm({
                                         </>
                                     )}
                                 </FieldArray>
-                                <div className="divider before:!bg-base-300 after:!bg-base-300 mt-2 mb-0" />
                             </>
                         )}
 
