@@ -1,5 +1,6 @@
 import { Formik, FieldArray } from "formik";
 import { useEffect, useState, useContext } from "react";
+import Link from "next/link";
 import * as yup from "yup";
 import {
     GenericErrorStatus,
@@ -8,11 +9,14 @@ import {
     GenericSubmitButton,
     GenericFormSelectErrorCombo,
 } from "./FormikGenericComponents";
-
 import { connectHits, InstantSearch } from "react-instantsearch-core";
 import { SearchBox, Configure } from "react-instantsearch-dom";
 import { AlgoliaContext } from "../pages/_app";
 import thou from "../utils/thou";
+import {
+    PaginateAdapter,
+    TableHitsAdapter,
+} from "./AlgoliaAdapters";
 
 // const rawSchema= {
 //     item: yup.string().required("Item is required"),
@@ -34,7 +38,7 @@ import thou from "../utils/thou";
 
 export default function StockForm({
     uuid,
-    items = [],
+    items = [ { name: "", description: "", sku: "" } ],
     warehouses = [],
     quantity = "",
     editable,
@@ -75,20 +79,12 @@ export default function StockForm({
         value: warehouse.uuid,
     }));
     
-    // const mappedItems = items.map((item) => ({
-    //     key: `${item.sku}, ${item.name}, ${item.description}`,
-    //     value: item.uuid,
-    // }));
-
-
-
     const stockSchema=  yup.object().shape({
         item: yup.string().required("Item is required"),
         warehouse: yup.string().required("Warehouse is required"),
         quantity: yup.number().required("Quantity is required"),  
     });
 
-    
     return (
         <>
             <Formik
@@ -133,16 +129,39 @@ export default function StockForm({
                             }}
                         />
                         
-                       
 
-                        {values.to && values.to.length > 0 && (
+                        <InstantSearch
+                            searchClient={searchClient}
+                            indexName="items"
+                            >
+                             <SearchBox
+                                onChange={(a) =>
+                                    setIsSearching(
+                                        a.currentTarget.value.length > 0
+                                    )
+                                }
+                            />
+
+                                <>
+                                <Configure hitsPerPage={1} />
+                                <TableHitsAdapter
+                                    hitComponent={ItemHitAdapter}
+                                    fallbackComponent={fallback}
+                                />
+                            </>
+
+
+                            </InstantSearch>
+
+
+                        {/* {values.to && values.to.length > 0 && (
                             <>
                                 <span className="block text-gray-700 text-sm font-bold mb-2">
-                                    Items
+                                    Item
                                 </span>
                                 
                                 <FieldArray name="items">
-                                    {({ remove, push }) => (
+                                    {({ push }) => (
                                         <>
                                             {values.items.map(
                                                 (item, index) => (
@@ -184,7 +203,7 @@ export default function StockForm({
                                                             onSelect={(hit) => {
                                                                 setSelectedItemUuids(
                                                                     new Set([
-                                                                        ...selectedItemUuids,
+                                                                        ...mappedItems,
                                                                         hit.objectID,
                                                                     ])
                                                                 );
@@ -206,7 +225,7 @@ export default function StockForm({
                                                         <GenericFormInputErrorCombo
                                                         
                                                             disabled={!editable}
-                                                            name="quantity"
+                                                            name={`items[${index}].quantity`}
                                                             type="number"
                                                             placeholder="Quantity"
                                                             min={1}
@@ -222,7 +241,7 @@ export default function StockForm({
                                                     onClick={() =>
                                                         push({
                                                             quantity: 1,
-                                                            stock: "",
+                                                            item: "",
                                                         })
                                                     }
                                                 >
@@ -233,7 +252,7 @@ export default function StockForm({
                                     )}
                                 </FieldArray>
                             </>
-                        )}
+                        )} */}
 
 
                         
@@ -260,6 +279,18 @@ export default function StockForm({
     );
 }
 
+function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
+    return (
+        <Link key={uuid} href={`/items/${uuid}`} passHref>
+            <tr className="hover ">
+                <td className="td-wrap">{sku}</td>
+                <td className="td-wrap">{name}</td>
+                <td className="td-wrap">{description}</td>
+            </tr>
+        </Link>
+    );
+}
+
 function AlgoliaItemOptionHit({ 
     hit: {objectID: uuid, sku, description, name },
 }) {
@@ -280,6 +311,12 @@ function AlgoliaItemOptionHit({
         </li>
     );
 }
+
+const fallback = (
+
+    <span className="text-red-500">Nothing found 😢</span>
+
+)
 
 function AlgoliaSelectHitsInternal({
     hits,
@@ -313,11 +350,11 @@ function AlgoliaSearchAsDropDown({
     searchClient,
     onSelect = () => {},
     onReset = () => {},
-    filter = "",
 }) {
     const [showHits, setShowHits] = useState(false);
     const [dummySearch, setDummySearch] = useState(null);
     const [lastHit, setLastHit] = useState(null);
+    const [refresh, setRefresh] = useState(false);
 
     const handleSelect = (hit) => {
         setShowHits(false);
@@ -333,8 +370,8 @@ function AlgoliaSearchAsDropDown({
 
     return thou(<div onClick={handleDummyClick}>{dummySearch}</div>)
         .or(
-            <InstantSearch searchClient={searchClient} indexName={indexName}>
-                <Configure filters={filter} />
+            <InstantSearch searchClient={searchClient} indexName={indexName} refresh={refresh}>
+                <Configure/>
                 <SearchBox
                     className="text-black"
                     onChange={(e) =>
