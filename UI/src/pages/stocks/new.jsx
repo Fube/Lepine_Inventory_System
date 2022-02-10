@@ -5,7 +5,7 @@ import WithClientSideAuth from "../../components/WithClientSideAuth";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 
 
- function CreateStock(activeWarehouses){
+ function CreateStock({activeWarehouses}){
     const router = useRouter();
 
     const handleSubmit = async (values, {setSubmitting, setStatus}) => {

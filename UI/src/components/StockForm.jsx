@@ -14,11 +14,11 @@ import { SearchBox, Configure } from "react-instantsearch-dom";
 import { AlgoliaContext } from "../pages/_app";
 import thou from "../utils/thou";
 
-const rawSchema= {
-    item: yup.string().required("Item is required"),
-    warehouse: yup.string().required("Warehouse is required"),
-    quantity: yup.number().required("Quantity is required"),  
-};
+// const rawSchema= {
+//     item: yup.string().required("Item is required"),
+//     warehouse: yup.string().required("Warehouse is required"),
+//     quantity: yup.number().required("Quantity is required"),  
+// };
 
 /**
  * @param {{
@@ -42,18 +42,8 @@ export default function StockForm({
     title,
     handleDelete = () => {},
     handleSubmit = () => {},
-    // blackList = [],
 }) {
 
-    // const filterOut = (toFilter) => {
-    //     return Object.entries(toFilter).reduce((acc, [key, value]) => {
-    //         if (blackList.includes(key)) return acc;
-    //         return {
-    //             ...acc,
-    //             [key]: value,
-    //         };
-    //     }, {});
-    // };
 
     const { searchClient } = useContext(AlgoliaContext);
     const [algoliaFilter, setAlgoliaFilter] = useState("quantity > 0");
@@ -91,7 +81,6 @@ export default function StockForm({
     // }));
 
 
-    //const stockSchema = yup.object().shape(filterOut(rawSchema));
 
     const stockSchema=  yup.object().shape({
         item: yup.string().required("Item is required"),
@@ -115,12 +104,14 @@ export default function StockForm({
                     <GenericForm title={title}>
                         <GenericErrorStatus />
 
-                        <GenericFormInputErrorCombo
+                        {/* <GenericFormInputErrorCombo
                             disabled={!editable}
                             name="item"
                             type="text"
                             placeholder="Item"
-                        />
+                        /> */}
+
+                        
 
                         <GenericFormSelectErrorCombo
                             disabled={!editable}
@@ -140,25 +131,19 @@ export default function StockForm({
                             }}
                         />
                         
-                        <GenericFormInputErrorCombo
-                            disabled={!editable}
-                            name="quantity"
-                            type="number"
-                            placeholder="Quantity"
-                        />
+                       
 
-{values.to && values.to.length > 0 && (
+                        {values.to && values.to.length > 0 && (
                             <>
-                                <div className="divider before:!bg-base-300 after:!bg-base-300 mt-2" />
                                 <span className="block text-gray-700 text-lg font-bold mb-2">
-                                    Transfers
+                                    Items
                                 </span>
 
-                                <FieldArray name="transfers">
+                                <FieldArray name="items">
                                     {({ remove, push }) => (
                                         <>
-                                            {values.transfers.map(
-                                                (transfer, index) => (
+                                            {values.items.map(
+                                                (item, index) => (
                                                     <div
                                                         key={index}
                                                         className="mb-6"
@@ -168,18 +153,18 @@ export default function StockForm({
                                                                 algoliaFilter
                                                             }
                                                             hitComponent={
-                                                                AlgoliaStockOptionHit
+                                                                AlgoliaItemOptionHit
                                                             }
-                                                            indexName="stocks"
+                                                            indexName="items"
                                                             searchClient={
                                                                 searchClient
                                                             }
-                                                            selectName={`transfers[${index}].stockUuid`}
+                                                            selectName={`items[${index}].itemUuid`}
                                                             hitAsDummy={(
                                                                 hit
                                                             ) => {
                                                                 setFieldValue(
-                                                                    `transfers[${index}].stockUuid`,
+                                                                    `items[${index}].itemUuid`,
                                                                     hit.objectID
                                                                 );
                                                                 return (
@@ -217,28 +202,14 @@ export default function StockForm({
                                                         />
 
                                                         <GenericFormInputErrorCombo
+                                                        
                                                             disabled={!editable}
-                                                            name={`transfers.${index}.quantity`}
+                                                            name="quantity"
                                                             type="number"
                                                             placeholder="Quantity"
                                                             min={1}
                                                         />
-                                                        {editable && (
-                                                            <button
-                                                                type="button"
-                                                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2"
-                                                                onClick={() =>
-                                                                    remove(
-                                                                        index
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    !editable
-                                                                }
-                                                            >
-                                                                <Icon icon="gridicons:trash" />
-                                                            </button>
-                                                        )}
+                                                        
                                                     </div>
                                                 )
                                             )}
