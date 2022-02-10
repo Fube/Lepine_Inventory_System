@@ -67,11 +67,26 @@ export default function StockDetails({ stock }) {
  * @param {import("next/types").GetServerSidePropsContext} context
  * @returns
  */
-export async function getServerSideProps(context) {
+ export async function getServerSideProps(context) {
     const { uuid } = context.query;
-    const res = await axiosBackendAuth(`/stockss/${uuid}`, {
-        headers: { cookie: context?.req?.headers?.cookie ?? "" },
-    });
 
-    return res.refine((stock) => ({ props: { stock } })).get();
+    const headers = { cookie: context?.req?.headers?.cookie ?? "" };
+    const [stockRes, warehouseRes] = await Promise.all([
+        axiosBackendAuth(`/stocks/${uuid}`, {
+            headers,
+        }),
+        axiosBackendAuth(`/warehouses?size=100&active=true`, {
+            headers,
+        }),
+    ]);
+
+    const stock = stockRes.refine((n) => n).get();
+    const activeWarehouses = warehouseRes.refine((page) => page.content).get();
+
+    return {
+        props: {
+            stock,
+            activeWarehouses,
+        },
+    };
 }

@@ -1,15 +1,15 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Nav from "../../components/Nav";
 import StockForm from "../../components/StockForm";
 import WithClientSideAuth from "../../components/WithClientSideAuth";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
-import checkEmptyAuth from "../../utils/checkEmptyAuth";
 
- function CreateStock(){
+
+ function CreateStock(activeWarehouses){
     const router = useRouter();
 
     const handleSubmit = async (values, {setSubmitting, setStatus}) => {
+        console.log(values);
         setSubmitting(true);
         try {
             await axiosAPI.post("/stocks", values);
@@ -28,6 +28,7 @@ import checkEmptyAuth from "../../utils/checkEmptyAuth";
         } finally {
             setSubmitting(false);
         }
+        setSubmitting(false);
     };
 
     return (
@@ -43,6 +44,7 @@ import checkEmptyAuth from "../../utils/checkEmptyAuth";
                             title={"Create Stock"}
                             handleSubmit={handleSubmit}
                             items={["itemsExist"]}
+                            warehouses={activeWarehouses}
                             editable
                         />
                     </div>
@@ -60,21 +62,15 @@ export default WithClientSideAuth(CreateStock);
  * @returns
  */
 
-//commented for now. 
-
-// export async function getServerSideProps(context) {
-//     return checkEmptyAuth(axiosBackendAuth, context);
-// }
-
 export async function getServerSideProps(ctx) {
-    const res = await axiosBackendAuth.get(`/items?size=100`, {
+    const res = await axiosBackendAuth.get(`/warehouses?size=100&active=true`, {
         headers: { cookie: ctx?.req?.headers?.cookie ?? "" },
     });
 
     return res
-        .refine(({ content: itemsExist }) => ({
+        .refine(({ content: activeWarehouses }) => ({
             props: {
-                itemsExist,
+                activeWarehouses,
             },
         }))
         .get();
