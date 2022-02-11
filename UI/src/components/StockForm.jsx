@@ -291,13 +291,20 @@ export default function StockForm({
 
 function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     return (
-        <Link key={uuid} href={`/stocks/${uuid}`} passHref>
-            <tr className="hover ">
-                <td className="td-wrap">{sku}</td>
-                <td className="td-wrap">{name}</td>
-                <td className="td-wrap">{description}</td>
-            </tr>
-        </Link>
+        <li value={uuid} className="border-2 hover:bg-blue-300 mb-2 p-2">
+        <div className="flex items-center">
+            <div className="ml-2">
+                <div className="text-sm leading-5 font-medium text-base-300">
+                    {sku}
+                </div>
+                <div className="text-base-200">
+                    <div className="text-sm leading-5">
+                        {name} - {description}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </li>
     );
 }
 
@@ -305,20 +312,18 @@ function AlgoliaItemOptionHit({
     hit: {objectID: uuid, sku, description, name },
 }) {
     return (
-        <li value={uuid} className="border-2 hover:bg-blue-300 mb-2 p-2">
-            <div className="flex items-center">
-                <div className="ml-2">
-                    <div className="text-sm leading-5 font-medium text-base-300">
-                        {sku}
-                    </div>
-                    <div className="text-base-200">
-                        <div className="text-sm leading-5">
-                            {name} - {description}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </li>
+        
+        // old code from ItemHitAdapter
+        <Link key={uuid} href={`/stocks/${uuid}`} passHref>
+        <tr className="hover ">
+            <td className="td-wrap">{sku}</td>
+            <td className="td-wrap">{name}</td>
+            <td className="td-wrap">{description}</td>
+        </tr>
+         </Link>
+
+
+       
     );
 }
 
