@@ -87,17 +87,21 @@ export default function StockForm({
                             Item
                         </span>
 
-                        <AlgoliaSearchAsDropDown
-                            searchClient={searchClient}
-                            indexName="items"
-                            hitComponent={ItemHitAdapter}
-                            initialDummyValue={item && wrapAsDummy(item)}
-                            hitAsDummy={wrapAsDummy}
-                            onSelect={(hit) =>
-                                setFieldValue("itemUuid", hit.objectID)
-                            }
-                            onReset={() => setFieldValue("itemUuid", "")}
-                        />
+                        {thou(
+                            <AlgoliaSearchAsDropDown
+                                searchClient={searchClient}
+                                indexName="items"
+                                hitComponent={ItemHitAdapter}
+                                initialDummyValue={item && wrapAsDummy(item)}
+                                hitAsDummy={wrapAsDummy}
+                                onSelect={(hit) =>
+                                    setFieldValue("itemUuid", hit.objectID)
+                                }
+                                onReset={() => setFieldValue("itemUuid", "")}
+                            />
+                        )
+                            .or(item ? wrapAsDummy(item) : "Unknown item")
+                            .if(editable)}
 
                         <GenericFormInputErrorCombo
                             disabled={!editable}
