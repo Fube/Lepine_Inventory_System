@@ -6,10 +6,10 @@ import useAuth from "../../hooks/useAuth";
 import StockForm from "../../components/StockForm";
 /**
  *
- * @param {{ stock: import("@lepine/ui-types").Stock }} param0
+ * @param {{ stock: import("@lepine/ui-types").Stock, activeWarehouses: import('@lepine/ui-types').Warehouse[] }} param0
  * @returns
  */
-export default function StockDetails({ stock }) {
+export default function StockDetails({ stock, activeWarehouses }) {
     const { role } = useAuth();
     const router = useRouter();
 
@@ -54,6 +54,7 @@ export default function StockDetails({ stock }) {
                             {...stock}
                             handleDelete={handleDelete}
                             handleSubmit={handleSubmit}
+                            warehouses={activeWarehouses}
                         />
                     </div>
                 </div>
@@ -67,7 +68,7 @@ export default function StockDetails({ stock }) {
  * @param {import("next/types").GetServerSidePropsContext} context
  * @returns
  */
- export async function getServerSideProps(context) {
+export async function getServerSideProps(context) {
     const { uuid } = context.query;
 
     const headers = { cookie: context?.req?.headers?.cookie ?? "" };

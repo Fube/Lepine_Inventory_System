@@ -1,6 +1,5 @@
 import { Formik } from "formik";
 import { useState, useContext } from "react";
-import Link from "next/link";
 import * as yup from "yup";
 import {
     GenericErrorStatus,
@@ -38,7 +37,6 @@ export default function StockForm({
     handleSubmit = () => {},
 }) {
     const { searchClient } = useContext(AlgoliaContext);
-    const [isSearching, setIsSearching] = useState(false);
 
     const mappedWarehouses = warehouses.map((warehouse) => ({
         key: `${warehouse.city}, ${warehouse.province} - ${warehouse.zipCode}`,
@@ -57,6 +55,12 @@ export default function StockForm({
         quantity: quantity,
     };
 
+    const wrapAsDummy = (hit) => (
+        <span className="text-black">
+            {hit.sku} - {hit.name}
+        </span>
+    );
+
     return (
         <>
             <Formik
@@ -64,13 +68,13 @@ export default function StockForm({
                 validationSchema={stockSchema}
                 onSubmit={handleSubmit}
             >
-                {({ values, setFieldValue }) => (
+                {({ setFieldValue }) => (
                     <GenericForm title={title}>
                         <GenericErrorStatus />
 
                         <GenericFormSelectErrorCombo
                             disabled={!editable}
-                            name="Warehouse"
+                            name="warehouseUuid"
                             placeholder="Warehouse"
                             title="Select a Warehouse"
                             options={mappedWarehouses}
@@ -87,11 +91,8 @@ export default function StockForm({
                             searchClient={searchClient}
                             indexName="items"
                             hitComponent={ItemHitAdapter}
-                            hitAsDummy={(hit) => (
-                                <span className="text-black">
-                                    {hit.sku} - {hit.name}
-                                </span>
-                            )}
+                            initialDummyValue={item && wrapAsDummy(item)}
+                            hitAsDummy={wrapAsDummy}
                             onSelect={(hit) =>
                                 setFieldValue("itemUuid", hit.objectID)
                             }
@@ -177,13 +178,14 @@ function AlgoliaSearchAsDropDown({
     selectName,
     indexName,
     hitComponent,
+    initialDummyValue,
     hitAsDummy,
     searchClient,
     onSelect = () => {},
     onReset = () => {},
 }) {
     const [showHits, setShowHits] = useState(false);
-    const [dummySearch, setDummySearch] = useState(null);
+    const [dummySearch, setDummySearch] = useState(initialDummyValue || null);
     const [lastHit, setLastHit] = useState(null);
 
     const handleSelect = (hit) => {
