@@ -51,6 +51,7 @@ export default function StockForm({
 
     const { searchClient } = useContext(AlgoliaContext);
     const [algoliaFilter, setAlgoliaFilter] = useState("quantity > 0");
+    const [isSearching, setIsSearching] = useState(false);
     const [selectedItemUuids, setSelectedItemUuids] = useState(new Set());
     const [selectedWarehouseUuid, setSelectedWarehouseUuid] = useState("");
 
@@ -100,14 +101,6 @@ export default function StockForm({
                     <GenericForm title={title}>
                         <GenericErrorStatus />
 
-                        {/* <GenericFormInputErrorCombo
-                            disabled={!editable}
-                            name="item"
-                            type="text"
-                            placeholder="Item"
-                        /> */}
-
-
                         <GenericFormSelectErrorCombo
                             disabled={!editable}
                             name="Warehouse"
@@ -129,36 +122,73 @@ export default function StockForm({
                             }}
                         />
                         
+                       
+                            <span className="block text-gray-700 text-sm font-bold mb-2">
+                                Item
+                            </span>
 
-                        <InstantSearch
-                            searchClient={searchClient}
-                            indexName="items"
-                            >
-                             <SearchBox
-                                onChange={(a) =>
-                                    setIsSearching(
-                                        a.currentTarget.value.length > 0
-                                    )
-                                }
-                            />
-
-                                <>
-                                <Configure hitsPerPage={1} />
-                                <TableHitsAdapter
-                                    hitComponent={ItemHitAdapter}
-                                    fallbackComponent={fallback}
-                                />
-                            </>
-
+                            <InstantSearch
+                                searchClient={searchClient}
+                                indexName="items"
+                                >
+                            
+                                <div className="overflow-x-auto flex">
+                                    <div className="md:w-4/5 w-3/4">
+                                            <SearchBox
+                                                onChange={(a) =>
+                                                    setIsSearching(
+                                                        a.currentTarget.value.length > 0
+                                                    )
+                                                }
+                                            />
+                                        {thou(
+                                                <>
+                                                <Configure hitsPerPage={1} />
+                                                <TableHitsAdapter
+                                                    hitComponent={ItemHitAdapter}
+                                                    fallbackComponent={fallback}
+                                                />
+                                            </>
+                                        ) 
+                                        .or(
+                                            <div className="flex justify-center">
+                                                {items.map(
+                                                    ({
+                                                    uuid,
+                                                    name,
+                                                    description,
+                                                    sku,
+                                                    })=> (
+                                                        <ItemHitAdapter
+                                                            key={uuid}
+                                                            hit={{
+                                                                objectID: uuid,
+                                                                name,
+                                                                description,
+                                                                sku,
+                                                            }}
+                                                        />   
+                                                    )
+                                                )}
+                                            </div>
+                                        ).if(isSearching)}
+                                    </div>
+                                </div>
 
                             </InstantSearch>
 
 
+                            <GenericFormInputErrorCombo
+                                                        
+                                disabled={!editable}
+                                name={`items.quantity`}
+                                type="number"
+                                placeholder="Quantity"
+                                min={1}
+                            />
+                        
+
                         {/* {values.to && values.to.length > 0 && (
-                            <>
-                                <span className="block text-gray-700 text-sm font-bold mb-2">
-                                    Item
-                                </span>
                                 
                                 <FieldArray name="items">
                                     {({ push }) => (
@@ -222,32 +252,12 @@ export default function StockForm({
                                                             }}
                                                         />
 
-                                                        <GenericFormInputErrorCombo
-                                                        
-                                                            disabled={!editable}
-                                                            name={`items[${index}].quantity`}
-                                                            type="number"
-                                                            placeholder="Quantity"
-                                                            min={1}
-                                                        />
+                                         
                                                         
                                                     </div>
                                                 )
                                             )}
-                                            <div className="flex justify-start mt-4">
-                                                <button
-                                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                                                    type="button"
-                                                    onClick={() =>
-                                                        push({
-                                                            quantity: 1,
-                                                            item: "",
-                                                        })
-                                                    }
-                                                >
-                                                    Add transfer
-                                                </button>
-                                            </div>
+
                                         </>
                                     )}
                                 </FieldArray>
@@ -281,7 +291,7 @@ export default function StockForm({
 
 function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     return (
-        <Link key={uuid} href={`/items/${uuid}`} passHref>
+        <Link key={uuid} href={`/stocks/${uuid}`} passHref>
             <tr className="hover ">
                 <td className="td-wrap">{sku}</td>
                 <td className="td-wrap">{name}</td>
