@@ -10,6 +10,7 @@ import com.lepine.transfers.events.item.ItemUpdateHandler;
 import com.lepine.transfers.events.shipment.ShipmentCreateEvent;
 import com.lepine.transfers.events.shipment.ShipmentCreateHandler;
 import com.lepine.transfers.exceptions.item.ItemNotFoundException;
+import com.lepine.transfers.exceptions.stock.StockAlreadyExistsException;
 import com.lepine.transfers.exceptions.stock.StockNotFoundException;
 import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.item.ItemService;
@@ -44,6 +45,14 @@ public class StockServiceImpl implements StockService, ItemUpdateHandler, ItemDe
     @Override
     public Stock create(StockUuidLessItemUuidWarehouseUuid dto) {
         log.info("Create stock {}", dto);
+
+        log.info("Checking for existing (item, warehouse) pair");
+        final Optional<Stock> foundStock = stockRepo
+                .findByItemUuidAndWarehouseUuid(dto.getItemUuid(), dto.getWarehouseUuid());
+        if(foundStock.isPresent()) {
+            log.info("Found existing (item, warehouse) pair");
+            throw new StockAlreadyExistsException(foundStock.get());
+        }
 
         log.info("Searching for item {}", dto.getItemUuid());
         itemService.findByUuid(dto.getItemUuid()).orElseThrow(() -> new ItemNotFoundException(dto.getItemUuid()));

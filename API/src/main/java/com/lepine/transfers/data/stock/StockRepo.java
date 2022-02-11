@@ -12,4 +12,5 @@ public interface StockRepo extends JpaRepository<Stock, UUID> {
     List<Stock> findByItemUuid(UUID itemUuid);
     Set<Stock> findDistinctByUuidIn(Set<UUID> uuids);
     Optional<Stock> findByWarehouseUuidAndItemUuid(UUID uuid, UUID uuid1);
+    Optional<Stock> findByItemUuidAndWarehouseUuid(UUID itemUuid, UUID warehouseUuid);
 }
