@@ -1,5 +1,5 @@
-import { Formik, FieldArray } from "formik";
-import { useEffect, useState, useContext } from "react";
+import { Formik } from "formik";
+import { useState, useContext } from "react";
 import Link from "next/link";
 import * as yup from "yup";
 import {
@@ -13,16 +13,6 @@ import { connectHits, InstantSearch } from "react-instantsearch-core";
 import { SearchBox, Configure } from "react-instantsearch-dom";
 import { AlgoliaContext } from "../pages/_app";
 import thou from "../utils/thou";
-import {
-    PaginateAdapter,
-    TableHitsAdapter,
-} from "./AlgoliaAdapters";
-
-// const rawSchema= {
-//     item: yup.string().required("Item is required"),
-//     warehouse: yup.string().required("Warehouse is required"),
-//     quantity: yup.number().required("Quantity is required"),  
-// };
 
 /**
  * @param {{
@@ -31,14 +21,14 @@ import {
  * handleDelete: (uuid: string) => void,
  * handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void
  * title: string,
- * warehouses: import('@lepine/ui-types').Warehouse[], 
- * items: import('@lepine/ui-types').Item[], }
+ * warehouses: import('@lepine/ui-types').Warehouse[] }
  * & import('@lepine/ui-types').Stock }
  */
 
 export default function StockForm({
     uuid,
-    items = [ { name: "", description: "", sku: "" } ],
+    item,
+    warehouse,
     warehouses = [],
     quantity = "",
     editable,
@@ -47,57 +37,34 @@ export default function StockForm({
     handleDelete = () => {},
     handleSubmit = () => {},
 }) {
-
-
     const { searchClient } = useContext(AlgoliaContext);
-    const [algoliaFilter, setAlgoliaFilter] = useState("quantity > 0");
     const [isSearching, setIsSearching] = useState(false);
-    const [selectedItemUuids, setSelectedItemUuids] = useState(new Set());
-    const [selectedWarehouseUuid, setSelectedWarehouseUuid] = useState("");
 
-
-    useEffect(() => {
-        if (!selectedItemUuids || !selectedWarehouseUuid) return;
-
-        let baseQuery = `quantity > 0`;
-
-        if (selectedWarehouseUuid.length > 0) {
-            baseQuery += ` AND NOT warehouseUuid:"${selectedWarehouseUuid}"`;
-        }
-
-        if (selectedItemUuids.size > 0) {
-            for (const itemUuid of selectedItemUuids) {
-                baseQuery += ` AND NOT objectID:"${itemUuid}"`;
-            }
-        }
-
-        console.log(baseQuery);
-        setAlgoliaFilter(baseQuery);
-    }, [selectedItemUuids, selectedWarehouseUuid]);
-    
     const mappedWarehouses = warehouses.map((warehouse) => ({
         key: `${warehouse.city}, ${warehouse.province} - ${warehouse.zipCode}`,
         value: warehouse.uuid,
     }));
-    
-    const stockSchema=  yup.object().shape({
-        item: yup.string().required("Item is required"),
-        warehouse: yup.string().required("Warehouse is required"),
-        quantity: yup.number().required("Quantity is required"),  
+
+    const stockSchema = yup.object().shape({
+        itemUuid: yup.string().required("Item is required"),
+        warehouseUuid: yup.string().required("Warehouse is required"),
+        quantity: yup.number().required("Quantity is required"),
     });
+
+    const initialValues = {
+        itemUuid: item?.uuid,
+        warehouseUuid: warehouse?.uuid,
+        quantity: quantity,
+    };
 
     return (
         <>
             <Formik
-                initialValues={{
-                        items,
-                        warehouses,
-                        quantity,
-                    }}
+                initialValues={initialValues}
                 validationSchema={stockSchema}
                 onSubmit={handleSubmit}
-                >
-                {({values, setFieldValue}) => (
+            >
+                {({ values, setFieldValue }) => (
                     <GenericForm title={title}>
                         <GenericErrorStatus />
 
@@ -107,168 +74,37 @@ export default function StockForm({
                             placeholder="Warehouse"
                             title="Select a Warehouse"
                             options={mappedWarehouses}
-                            onChange={(e) => {
-                                const warehouseUuid = e.target.value;
-
-                                // Send to end of event loop
-                                setTimeout(
-                                    () => setFieldValue("to", warehouseUuid),
-                                    0
-                                
-                                );
-                                
-                                setSelectedWarehouseUuid(warehouseUuid);
-                               
-                            }}
+                            onChange={(e) =>
+                                setFieldValue("warehouseUuid", e.target.value)
+                            }
                         />
-                        
-                       
-                            <span className="block text-gray-700 text-sm font-bold mb-2">
-                                Item
-                            </span>
 
-                            <InstantSearch
-                                searchClient={searchClient}
-                                indexName="items"
-                                >
-                            
-                                <div className="overflow-x-auto flex">
-                                    <div className="md:w-4/5 w-3/4">
-                                            <SearchBox
-                                                onChange={(a) =>
-                                                    setIsSearching(
-                                                        a.currentTarget.value.length > 0
-                                                    )
-                                                }
-                                            />
-                                        {thou(
-                                                <>
-                                                <Configure hitsPerPage={1} />
-                                                <TableHitsAdapter
-                                                    hitComponent={ItemHitAdapter}
-                                                    fallbackComponent={fallback}
-                                                />
-                                            </>
-                                        ) 
-                                        .or(
-                                            <div className="flex justify-center">
-                                                {items.map(
-                                                    ({
-                                                    uuid,
-                                                    name,
-                                                    description,
-                                                    sku,
-                                                    })=> (
-                                                        <ItemHitAdapter
-                                                            key={uuid}
-                                                            hit={{
-                                                                objectID: uuid,
-                                                                name,
-                                                                description,
-                                                                sku,
-                                                            }}
-                                                        />   
-                                                    )
-                                                )}
-                                            </div>
-                                        ).if(isSearching)}
-                                    </div>
-                                </div>
+                        <span className="block text-gray-700 text-sm font-bold mb-2">
+                            Item
+                        </span>
 
-                            </InstantSearch>
+                        <AlgoliaSearchAsDropDown
+                            searchClient={searchClient}
+                            indexName="items"
+                            hitComponent={ItemHitAdapter}
+                            hitAsDummy={(hit) => (
+                                <span className="text-black">
+                                    {hit.sku} - {hit.name}
+                                </span>
+                            )}
+                            onSelect={(hit) =>
+                                setFieldValue("itemUuid", hit.objectID)
+                            }
+                            onReset={() => setFieldValue("itemUuid", "")}
+                        />
 
-
-                            <GenericFormInputErrorCombo
-                                                        
-                                disabled={!editable}
-                                name={`items.quantity`}
-                                type="number"
-                                placeholder="Quantity"
-                                min={1}
-                            />
-                        
-
-                        {/* {values.to && values.to.length > 0 && (
-                                
-                                <FieldArray name="items">
-                                    {({ push }) => (
-                                        <>
-                                            {values.items.map(
-                                                (item, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="mb-6"
-                                                    >
-                                                        <AlgoliaSearchAsDropDown
-                                                            filter={
-                                                                algoliaFilter
-                                                            }
-                                                            hitComponent={
-                                                                AlgoliaItemOptionHit
-                                                            }
-                                                            indexName="items"
-                                                            searchClient={
-                                                                searchClient
-                                                            }
-                                                            selectName={`items[${index}].itemUuid`}
-                                                            hitAsDummy={(
-                                                                hit
-                                                            ) => {
-                                                                setFieldValue(
-                                                                    `items[${index}].itemUuid`,
-                                                                    hit.objectID
-                                                                );
-                                                                return (
-                                                                    <span className="text-black">
-                                                                        {
-                                                                            hit.sku
-                                                                        }{" "}
-                                                                        -{" "}
-                                                                        {
-                                                                            hit.name
-                                                                        }
-                                                                    </span>
-                                                                );
-                                                            }}
-                                                            onSelect={(hit) => {
-                                                                setSelectedItemUuids(
-                                                                    new Set([
-                                                                        ...mappedItems,
-                                                                        hit.objectID,
-                                                                    ])
-                                                                );
-                                                            }}
-                                                            onReset={(
-                                                                lastHit
-                                                            ) => {
-                                                                selectedItemUuids.delete(
-                                                                    lastHit.objectID
-                                                                );
-                                                                setSelectedItemUuids(
-                                                                    [
-                                                                        ...selectedItemUuids,
-                                                                    ]
-                                                                );
-                                                            }}
-                                                        />
-
-                                         
-                                                        
-                                                    </div>
-                                                )
-                                            )}
-
-                                        </>
-                                    )}
-                                </FieldArray>
-                            </>
-                        )} */}
-
-
-                        
-
-                        {/* before this  */}
-
+                        <GenericFormInputErrorCombo
+                            disabled={!editable}
+                            name={`quantity`}
+                            type="number"
+                            placeholder="Quantity"
+                            min={1}
+                        />
 
                         <div className="flex items-center justify-end p-6">
                             {editable && <GenericSubmitButton text="Save" />}
@@ -289,49 +125,29 @@ export default function StockForm({
     );
 }
 
+/**
+ *
+ * @param {{ hit: import('@lepine/ui-types').Item & { objectID: string } }} param0
+ * @returns
+ */
 function ItemHitAdapter({ hit: { objectID: uuid, description, name, sku } }) {
     return (
         <li value={uuid} className="border-2 hover:bg-blue-300 mb-2 p-2">
-        <div className="flex items-center">
-            <div className="ml-2">
-                <div className="text-sm leading-5 font-medium text-base-300">
-                    {sku}
-                </div>
-                <div className="text-base-200">
-                    <div className="text-sm leading-5">
-                        {name} - {description}
+            <div className="flex items-center">
+                <div className="ml-2">
+                    <div className="text-sm leading-5 font-medium text-base-300">
+                        {sku}
+                    </div>
+                    <div className="text-base-200">
+                        <div className="text-sm leading-5">
+                            {name} - {description}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </li>
+        </li>
     );
 }
-
-function AlgoliaItemOptionHit({ 
-    hit: {objectID: uuid, sku, description, name },
-}) {
-    return (
-        
-        // old code from ItemHitAdapter
-        <Link key={uuid} href={`/stocks/${uuid}`} passHref>
-        <tr className="hover ">
-            <td className="td-wrap">{sku}</td>
-            <td className="td-wrap">{name}</td>
-            <td className="td-wrap">{description}</td>
-        </tr>
-         </Link>
-
-
-       
-    );
-}
-
-const fallback = (
-
-    <span className="text-red-500">Nothing found 😢</span>
-
-)
 
 function AlgoliaSelectHitsInternal({
     hits,
@@ -369,7 +185,6 @@ function AlgoliaSearchAsDropDown({
     const [showHits, setShowHits] = useState(false);
     const [dummySearch, setDummySearch] = useState(null);
     const [lastHit, setLastHit] = useState(null);
-    const [refresh, setRefresh] = useState(false);
 
     const handleSelect = (hit) => {
         setShowHits(false);
@@ -385,8 +200,8 @@ function AlgoliaSearchAsDropDown({
 
     return thou(<div onClick={handleDummyClick}>{dummySearch}</div>)
         .or(
-            <InstantSearch searchClient={searchClient} indexName={indexName} refresh={refresh}>
-                <Configure/>
+            <InstantSearch searchClient={searchClient} indexName={indexName}>
+                <Configure />
                 <SearchBox
                     className="text-black"
                     onChange={(e) =>
