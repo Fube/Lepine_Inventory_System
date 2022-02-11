@@ -24,14 +24,18 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
         <tr>
             <th>Item</th>
             <th>Warehouse</th>
-            <th>Quantity</th>
-            <th className="md:rounded-r-none rounded-r-lg flex justify-between md:table-cell">
-                <button className="md:hidden">
-                    <Link href="/stocks/new" passHref>
-                        <Icon icon="si-glyph:button-plus" width="32" />
-                    </Link>
-                </button>
-            </th>
+            {thou(
+                <th className="flex justify-between">
+                    <span className="self-center">Quantity</span>
+                    <button>
+                        <Link href="/stocks/new" passHref>
+                            <Icon icon="si-glyph:button-plus" width="32" />
+                        </Link>
+                    </button>
+                </th>
+            )
+                .or(<th>Quantity</th>)
+                .if(role === "MANAGER")}
         </tr>
     );
 
@@ -96,14 +100,14 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
 
 /**
  *
- * @param {Stock} param0
+ * @param {import('@lepine/ui-types').Stock} param0
  */
 function StockTableRow({ uuid, item, warehouse, quantity }) {
     return (
         <Link key={uuid} href={`/stocks/${uuid}`} passHref>
             <tr className="hover">
-                <td className="td-wrap">{item}</td>
-                <td className="td-wrap">{warehouse}</td>
+                <td className="td-wrap">{item.sku}</td>
+                <td className="td-wrap">{warehouse.zipCode}</td>
                 <td className="td-wrap">{quantity}</td>
             </tr>
         </Link>

@@ -6,10 +6,10 @@ import useAuth from "../../hooks/useAuth";
 import StockForm from "../../components/StockForm";
 /**
  *
- * @param {{ stock: import("@lepine/ui-types").Stock }} param0
+ * @param {{ stock: import("@lepine/ui-types").Stock, activeWarehouses: import('@lepine/ui-types').Warehouse[] }} param0
  * @returns
  */
-export default function StockDetails({ stock }) {
+export default function StockDetails({ stock, activeWarehouses }) {
     const { role } = useAuth();
     const router = useRouter();
 
@@ -54,6 +54,7 @@ export default function StockDetails({ stock }) {
                             {...stock}
                             handleDelete={handleDelete}
                             handleSubmit={handleSubmit}
+                            warehouses={activeWarehouses}
                         />
                     </div>
                 </div>
@@ -69,9 +70,24 @@ export default function StockDetails({ stock }) {
  */
 export async function getServerSideProps(context) {
     const { uuid } = context.query;
-    const res = await axiosBackendAuth(`/stockss/${uuid}`, {
-        headers: { cookie: context?.req?.headers?.cookie ?? "" },
-    });
 
-    return res.refine((stock) => ({ props: { stock } })).get();
+    const headers = { cookie: context?.req?.headers?.cookie ?? "" };
+    const [stockRes, warehouseRes] = await Promise.all([
+        axiosBackendAuth(`/stocks/${uuid}`, {
+            headers,
+        }),
+        axiosBackendAuth(`/warehouses?size=100&active=true`, {
+            headers,
+        }),
+    ]);
+
+    const stock = stockRes.refine((n) => n).get();
+    const activeWarehouses = warehouseRes.refine((page) => page.content).get();
+
+    return {
+        props: {
+            stock,
+            activeWarehouses,
+        },
+    };
 }
