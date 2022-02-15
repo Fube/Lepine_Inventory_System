@@ -61,10 +61,6 @@ test.describe.parallel("Login tests", () => {
             page.click("button[type=submit]"),
         ]);
 
-        // Check that the page is loaded
-        const title = await page.title();
-        expect(title).toBe("Home");
-
         // Check that the user is logged in
         const localStorage = await page.evaluate(() => {
             return localStorage;
