@@ -4,11 +4,10 @@ import StockForm from "../../components/StockForm";
 import WithClientSideAuth from "../../components/WithClientSideAuth";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 
-
- function CreateStock({activeWarehouses}){
+function CreateStock({ activeWarehouses }) {
     const router = useRouter();
 
-    const handleSubmit = async (values, {setSubmitting, setStatus}) => {
+    const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         console.log(values);
         setSubmitting(true);
         try {
@@ -56,7 +55,7 @@ import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 export default WithClientSideAuth(CreateStock);
 
 /**
- * 
+ *
  * @param {import("next/types").GetServerSidePropsContext} context
  * @returns
  */
