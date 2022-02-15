@@ -19,7 +19,7 @@ export default function Nav({ pages, isActive }) {
             <div className="navbar mb-2 shadow-lg bg-neutral text-neutral-content">
                 <div className="flex-none px-2 mx-2">
                     <span className="text-lg font-bold">
-                        <Link href="/">Lepine</Link>
+                        <Link href="/items">Lepine</Link>
                     </span>
                 </div>
                 <div className="flex-1 px-2 mx-2 justify-between drawer">
