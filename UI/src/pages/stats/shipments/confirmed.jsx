@@ -46,7 +46,9 @@ function ShowStatsTabular({ shipments, totalPages, pageNumber, from, to }) {
         const nextTo = DateTime.fromISO(to).plus({ days: 7 });
         const nextFrom = to;
 
-        return `?from=${nextFrom}&to=${nextTo.toISO()}`;
+        return `?from=${encodeURIComponent(nextFrom)}&to=${encodeURIComponent(
+            nextTo.toISO()
+        )}`;
     };
 
     const getPrevURL = () => {
@@ -54,7 +56,9 @@ function ShowStatsTabular({ shipments, totalPages, pageNumber, from, to }) {
         const prevTo = from;
         const prevFrom = DateTime.fromISO(from).minus({ days: 7 });
 
-        return `?from=${prevFrom.toISO()}&to=${prevTo}`;
+        return `?from=${encodeURIComponent(
+            prevFrom.toISO()
+        )}&to=${encodeURIComponent(prevTo)}`;
     };
 
     const header = (
@@ -237,7 +241,9 @@ export async function getServerSideProps(context) {
     const to = context.query.to || DateTime.now().endOf("week").toISO();
 
     const res = await axiosBackendAuth.get(
-        `/shipments?confirmed=true&from=${from}&to=${to}&page=${page}`,
+        `/shipments?confirmed=true&from=${encodeURIComponent(
+            from
+        )}&to=${encodeURIComponent(to)}&page=${page}`,
         {
             headers: { cookie: context?.req?.headers?.cookie ?? "" },
         }
