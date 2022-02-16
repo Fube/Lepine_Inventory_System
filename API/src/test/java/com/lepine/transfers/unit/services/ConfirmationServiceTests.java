@@ -8,7 +8,9 @@ import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatus;
 import com.lepine.transfers.data.stock.Stock;
+import com.lepine.transfers.data.stock.StockMapper;
 import com.lepine.transfers.data.stock.StockRepo;
+import com.lepine.transfers.data.stock.StockSearchDTO;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
@@ -17,6 +19,7 @@ import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
 import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
 import com.lepine.transfers.services.confirmation.ConfirmationService;
 import com.lepine.transfers.services.confirmation.ConfirmationServiceImpl;
+import com.lepine.transfers.services.search.SearchService;
 import com.lepine.transfers.utils.ConstraintViolationExceptionUtils;
 import com.lepine.transfers.utils.MessageSourceUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,6 +96,12 @@ public class ConfirmationServiceTests {
 
     @MockBean
     private StockRepo stockRepo;
+
+    @MockBean
+    private SearchService<StockSearchDTO, UUID> searchService;
+
+    @MockBean
+    private StockMapper stockMapper;
 
     @BeforeEach
     void setUp() {
