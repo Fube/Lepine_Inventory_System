@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
+public interface ShipmentRepo extends JpaRepository<Shipment, UUID>, JpaSpecificationExecutor<Shipment> {
 
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
     @Query("select s from Shipment s where s.uuid = :uuid")
@@ -47,13 +48,14 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID> {
     Page<Shipment> findAllFullyConfirmed(Pageable pageable);
 
     @Query("select s from Shipment s " +
-            "join Transfer t " +
-                "on s.uuid = t.shipmentUuid " +
-                    "and s.expectedDate between :start and :end " +
-            "join Confirmation c " +
-                "on t.uuid = c.transferUuid " +
-            "group by s.uuid " +
-                "having sum(c.quantity) = t.quantity"
+            "where s.expectedDate between :start and :end " +
+            "and " +
+                "(select count(t) from Transfer t where t.shipmentUuid=s.uuid group by t.shipmentUuid) = " +
+                "(select count(distinct t.uuid) from Transfer t " +
+                    "join Confirmation c " +
+                        "on t.uuid = c.transferUuid " +
+                    "where t.shipmentUuid=s.uuid " +
+                    "group by t.uuid having sum(c.quantity) = t.quantity ) "
     )
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
     Page<Shipment> findAllFullyConfirmedInTimeRange(ZonedDateTime start, ZonedDateTime end, Pageable pageable);
