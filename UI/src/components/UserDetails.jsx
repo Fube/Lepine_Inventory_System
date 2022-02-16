@@ -1,10 +1,13 @@
-import * as yup from "yup";
 import { Formik } from "formik";
+import * as yup from "yup";
 import {
     GenericForm,
     GenericFormInputErrorCombo,
+    GenericFormSelectErrorCombo,
     GenericSubmitButton,
 } from "./FormikGenericComponents";
+
+const roles = ["Manager", "Clerk", "Salesperson"];
 
 /**
  *
@@ -19,15 +22,22 @@ export default function UserDetails({
     deletable,
     handleDelete = () => {},
     handleSubmit = () => {},
-                                 }) {
+}) {
     const userSchema = yup.object().shape({
-        email: yup.string().email("Must be a valid email").required("Email is required"),
-        password: yup.string().strongPassword().required("Password is required"),
+        email: yup
+            .string()
+            .email("Must be a valid email")
+            .required("Email is required"),
+        password: yup
+            .string()
+            .strongPassword()
+            .required("Password is required"),
         confirmPassword: yup
             .string()
             .test("passwords-match", "Passwords must match", function (value) {
                 return this.parent.password === value;
             }),
+        role: yup.string().required("Role is required").oneOf(roles),
     });
 
     return (
@@ -48,6 +58,17 @@ export default function UserDetails({
                             name="email"
                             type="text"
                             placeholder="Email"
+                        />
+
+                        <GenericFormSelectErrorCombo
+                            disabled={!editable}
+                            name="role"
+                            options={roles.map((role) => ({
+                                key: role,
+                                value: role,
+                            }))}
+                            title="Select a role"
+                            placeholder="Role"
                         />
 
                         <GenericFormInputErrorCombo
