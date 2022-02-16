@@ -32,6 +32,7 @@ export default function StockForm({
     quantity = "",
     editable,
     deletable,
+    disabled = new Set(),
     title,
     handleDelete = () => {},
     handleSubmit = () => {},
@@ -61,6 +62,8 @@ export default function StockForm({
         </span>
     );
 
+    console.log(disabled);
+
     return (
         <>
             <Formik
@@ -73,7 +76,9 @@ export default function StockForm({
                         <GenericErrorStatus />
 
                         <GenericFormSelectErrorCombo
-                            disabled={!editable}
+                            disabled={
+                                !editable || disabled.has("warehouseUuid")
+                            }
                             name="warehouseUuid"
                             placeholder="Warehouse"
                             title="Select a Warehouse"
@@ -101,10 +106,10 @@ export default function StockForm({
                             />
                         )
                             .or(item ? wrapAsDummy(item) : "Unknown item")
-                            .if(editable)}
+                            .if(editable && !disabled.has("itemUuid"))}
 
                         <GenericFormInputErrorCombo
-                            disabled={!editable}
+                            disabled={!editable || disabled.has("quantity")}
                             name={`quantity`}
                             type="number"
                             placeholder="Quantity"

@@ -55,6 +55,7 @@ export default function StockDetails({ stock, activeWarehouses }) {
                             handleDelete={handleDelete}
                             handleSubmit={handleSubmit}
                             warehouses={activeWarehouses}
+                            disabled={new Set(["itemUuid", "warehouseUuid"])}
                         />
                     </div>
                 </div>
