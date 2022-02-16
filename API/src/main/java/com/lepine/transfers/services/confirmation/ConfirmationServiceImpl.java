@@ -6,7 +6,9 @@ import com.lepine.transfers.data.shipment.Shipment;
 import com.lepine.transfers.data.shipment.ShipmentRepo;
 import com.lepine.transfers.data.shipment.ShipmentStatus;
 import com.lepine.transfers.data.stock.Stock;
+import com.lepine.transfers.data.stock.StockMapper;
 import com.lepine.transfers.data.stock.StockRepo;
+import com.lepine.transfers.data.stock.StockSearchDTO;
 import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.data.transfer.TransferRepo;
 import com.lepine.transfers.data.warehouse.Warehouse;
@@ -14,6 +16,7 @@ import com.lepine.transfers.exceptions.shipment.ShipmentNotAcceptedException;
 import com.lepine.transfers.exceptions.shipment.ShipmentNotFoundException;
 import com.lepine.transfers.exceptions.transfer.QuantityExceededException;
 import com.lepine.transfers.exceptions.transfer.TransferNotFoundException;
+import com.lepine.transfers.services.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,8 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     private final TransferRepo transferRepo;
     private final ShipmentRepo shipmentRepo;
     private final StockRepo stockRepo;
+    private final SearchService<StockSearchDTO, UUID> searchService;
+    private final StockMapper stockMapper;
 
     @Override
     public Confirmation confirm(final UUID transferUuid, final int quantity) {
@@ -100,7 +105,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         }
 
         toSave.setQuantity(newQuantity);
-        stockRepo.save(toSave);
+        searchService.index(stockMapper.toSearchDTO(stockRepo.save(toSave)));
         log.info("Stock updated");
 
         return confirmation;
