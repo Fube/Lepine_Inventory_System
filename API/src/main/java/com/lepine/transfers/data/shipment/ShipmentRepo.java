@@ -1,7 +1,6 @@
 package com.lepine.transfers.data.shipment;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,12 +48,12 @@ public interface ShipmentRepo extends JpaRepository<Shipment, UUID>, JpaSpecific
     @Query("select s from Shipment s " +
             "where s.expectedDate between :start and :end " +
             "and " +
-                "(select count(t) from Transfer t where t.shipmentUuid=s.uuid group by t.shipmentUuid) = " +
-                "(select count(distinct t.uuid) from Transfer t " +
+                "(select sum(t.quantity) from Transfer t where t.shipmentUuid=s.uuid group by t.shipmentUuid) = " +
+                "(select sum(c.quantity) from Transfer t " +
                     "join Confirmation c " +
                         "on t.uuid = c.transferUuid " +
                     "where t.shipmentUuid=s.uuid " +
-                    "group by t.uuid having sum(c.quantity) = t.quantity ) "
+                    "group by t.shipmentUuid)"
     )
     @EntityGraph(attributePaths = {"transfers.stock", "transfers.stock.item", "transfers.stock.warehouse"})
     Page<Shipment> findAllFullyConfirmedInTimeRange(ZonedDateTime start, ZonedDateTime end, Pageable pageable);
