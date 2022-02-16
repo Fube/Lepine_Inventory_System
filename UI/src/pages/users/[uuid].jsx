@@ -19,19 +19,24 @@ export default function User({ user }) {
         await axiosAPI.delete(`/users/${user.uuid}`);
         router.push("/users");
     };
-    const handleSubmit = async (values, { setSubmitting }) => {
+    const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         setSubmitting(true);
-        console.log(values);
-        axiosAPI
-            .put(`/users/${user.uuid}`, {
+        try {
+            await axiosAPI.put(`/users/${user.uuid}`, {
                 ...values,
                 role: values.role.toLocaleUpperCase(),
-            })
-            .then(() => {
-                setSubmitting(false);
-                router.push("/users");
-            })
-            .catch(console.log);
+            });
+            router.push("/users");
+        } catch (error) {
+            console.log(error);
+            setStatus({
+                isError: true,
+                message:
+                    error?.response?.data?.message ?? "Something went wrong",
+            });
+        } finally {
+            setSubmitting(false);
+        }
     };
     return (
         <>
