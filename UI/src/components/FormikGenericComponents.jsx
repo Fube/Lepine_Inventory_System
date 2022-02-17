@@ -129,9 +129,12 @@ export function GenericErrorStatus() {
  * @returns
  */
 export function GenericFormSelectErrorCombo(fieldAttributes) {
-    const [inputProps, { error, touched }, helperProps] = useField(
-        fieldAttributes.name
-    );
+    const [
+        inputProps,
+        { error, touched, initialTouched, initialValue },
+        helperProps,
+    ] = useField(fieldAttributes.name);
+
     return (
         <>
             <label
@@ -148,7 +151,11 @@ export function GenericFormSelectErrorCombo(fieldAttributes) {
                 component="select"
                 {...fieldAttributes}
             >
-                <option value="" disabled>
+                <option
+                    value=""
+                    disabled
+                    selected={!initialValue || initialValue === ""}
+                >
                     {fieldAttributes.title}
                 </option>
                 {fieldAttributes.options.map(({ key, value }) => (

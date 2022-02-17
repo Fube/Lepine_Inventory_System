@@ -27,9 +27,9 @@ test("Logout", async ({ page }) => {
         logout.click(),
     ]);
 
-    // Check that we are back to home
+    // Check that we are back items and then redirected to Login
     const title = await page.title();
-    expect(title).toBe("Home");
+    expect(title).toBe("Login");
 
     // Check that we are logged out
     const localStorage = await page.evaluate(() => {

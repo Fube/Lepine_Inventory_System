@@ -11,9 +11,7 @@ import useAuth from "../../hooks/useAuth";
  * @returns
  */
 
-
 export default function User({ user }) {
-
     const { role } = useAuth();
     const router = useRouter();
 
@@ -21,13 +19,24 @@ export default function User({ user }) {
         await axiosAPI.delete(`/users/${user.uuid}`);
         router.push("/users");
     };
-    const handleSubmit = async (values, { setSubmitting }) => {
+    const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         setSubmitting(true);
-        console.log(values)
-        axiosAPI.put(`/users/${user.uuid}`, {...values, role:values.role.name}).then(() => {
-            setSubmitting(false);
+        try {
+            await axiosAPI.put(`/users/${user.uuid}`, {
+                ...values,
+                role: values.role.toLocaleUpperCase(),
+            });
             router.push("/users");
-        }).catch(console.log)
+        } catch (error) {
+            console.log(error);
+            setStatus({
+                isError: true,
+                message:
+                    error?.response?.data?.message ?? "Something went wrong",
+            });
+        } finally {
+            setSubmitting(false);
+        }
     };
     return (
         <>

@@ -2,7 +2,6 @@ package com.lepine.transfers.services.stock;
 
 import com.lepine.transfers.data.item.Item;
 import com.lepine.transfers.data.stock.*;
-import com.lepine.transfers.data.transfer.Transfer;
 import com.lepine.transfers.events.item.ItemDeleteEvent;
 import com.lepine.transfers.events.item.ItemDeleteHandler;
 import com.lepine.transfers.events.item.ItemUpdateEvent;

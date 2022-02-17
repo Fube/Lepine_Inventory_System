@@ -1,12 +1,6 @@
-import { DateTime } from "luxon-business-days";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import Paginate from "../../components/Pagination";
 import WithClientSideAuth from "../../components/WithClientSideAuth";
-import { axiosBackendAuth } from "../../config/axios";
 /**
  * @param {{
  * shipments: import('@lepine/ui-types').Shipment[],
