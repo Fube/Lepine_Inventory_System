@@ -2,11 +2,13 @@ package com.lepine.transfers.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lepine.transfers.config.controllers.GlobalAdvice;
+import com.lepine.transfers.exceptions.I18nAble;
 import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -26,6 +28,7 @@ import java.io.IOException;
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
     private final ObjectMapper objectMapper;
+    private final ReloadableResourceBundleMessageSource messageSource;
 
     @Override
     @SneakyThrows
@@ -41,8 +44,19 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         } catch (JwtException | InvalidLoginException e) {
             log.error("Exception caught: {}", e.getMessage());
 
-            final GlobalAdvice.HTTPErrorMessage httpErrorMessage =
-                    new GlobalAdvice.HTTPErrorMessage(HttpStatus.FORBIDDEN.value(), e.getMessage());
+            GlobalAdvice.HTTPErrorMessage httpErrorMessage;
+
+
+            if(e instanceof I18nAble) {
+                httpErrorMessage = new GlobalAdvice.HTTPErrorMessage(
+                        messageSource,
+                        (I18nAble) e,
+                        request.getLocale(),
+                        HttpStatus.FORBIDDEN.value()
+                );
+            } else {
+                httpErrorMessage = new GlobalAdvice.HTTPErrorMessage(HttpStatus.FORBIDDEN.value(), e.getMessage());
+            }
 
             response.setStatus(httpErrorMessage.getStatus());
             response.setContentType("application/json");

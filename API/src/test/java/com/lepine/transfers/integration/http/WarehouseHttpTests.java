@@ -59,7 +59,7 @@ public class WarehouseHttpTests {
             VALID_CITY = "City",
             VALID_ZIP = "A1B2C3",
             VALID_PROVINCE = "Province",
-            ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP = "Zipcode %s already in use",
+            ERROR_FORMAT_MESSAGE_DUPLICATE_ZIP = "Warehouse with zipcode %s already exists",
             ERROR_FORMAT_MESSAGE_WAREHOUSE_NOT_FOUND = "Warehouse with uuid %s not found";
 
     private final static UUID
