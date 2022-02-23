@@ -20,5 +20,6 @@
     "between": "Entre {{x}} et {{y}}",
     "order": "Commande",
     "warehouse": "Entrepôt",
-    "stock": "Stock"
+    "stock": "Stock",
+    "role": "Rôle"
 }

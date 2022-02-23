@@ -20,5 +20,6 @@
     "between": "Between {{x}} and {{y}}",
     "order": "Order",
     "warehouse": "Warehouse",
-    "stock": "Stock"
+    "stock": "Stock",
+    "role": "Role"
 }

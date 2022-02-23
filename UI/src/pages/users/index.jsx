@@ -1,5 +1,7 @@
 import { Icon } from "@iconify/react";
 import capitalize from "capitalize";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -13,11 +15,14 @@ import { axiosBackendAuth } from "../../config/axios";
  * @returns
  */
 export default function ShowUsers({ users, totalPages, pageNumber }) {
+    const { t: tc } = useTranslation("common");
+    const { t: tu } = useTranslation("users");
+
     const router = useRouter();
 
     const header = (
         <Head>
-            <title>Users</title>
+            <title>{tu("index.title")}</title>
         </Head>
     );
 
@@ -25,7 +30,7 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
         <tr>
             <th>Email</th>
             <th className="flex justify-between">
-                <div className="self-center">Role</div>
+                <div className="self-center">{tc("role")}</div>
                 <button>
                     <Link href="/users/new" passHref>
                         <Icon icon="si-glyph:button-plus" width="32" />
@@ -36,9 +41,7 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
     );
 
     const fallback = (
-        <h2 className="text-2xl text-center text-yellow-400">
-            No users to show 😢
-        </h2>
+        <h2 className="text-2xl text-center text-yellow-400">{tu("none")}</h2>
     );
 
     if (users.length <= 0) {
@@ -51,7 +54,7 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
                         <div className="mt-12">{fallback}</div>
                         <Link href="/users/new" passHref>
                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
-                                Add One Now!
+                                {tc("add_one_now")}
                             </button>
                         </Link>
                     </div>
@@ -67,7 +70,9 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
             <div className="overflow-x-auto justify-center flex">
                 <div className="md:w-1/2 w-3/4">
                     <div className="md:flex justify-around my-4">
-                        <h1 className="text-4xl md:mb-0 mb-4">Users</h1>
+                        <h1 className="text-4xl md:mb-0 mb-4">
+                            {tu("index.title")}
+                        </h1>
                     </div>
                     <table className="table table-zebra w-full sm:table-fixed">
                         <thead>{head}</thead>
@@ -94,12 +99,12 @@ export default function ShowUsers({ users, totalPages, pageNumber }) {
 
 function UserTableRow({ uuid, email, role }) {
     return (
-         <Link href={`/users/${uuid}`} passHref>
-        <tr className="hover">
-            <td>{email}</td>
-            <td>{capitalize(role.toLowerCase())}</td>
-        </tr>
-         </Link>
+        <Link href={`/users/${uuid}`} passHref>
+            <tr className="hover">
+                <td>{email}</td>
+                <td>{capitalize(role.toLowerCase())}</td>
+            </tr>
+        </Link>
     );
 }
 
@@ -114,12 +119,18 @@ export async function getServerSideProps(context) {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
 
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "users",
+    ]);
+
     return res
         .refine(({ content: users, totalPages, number: pageNumber }) => ({
             props: {
                 users,
                 totalPages,
                 pageNumber,
+                ...i18n,
             },
         }))
         .get();
