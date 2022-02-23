@@ -64,5 +64,20 @@
         "number": {
             "min": "{{denom}} must be greater than or equal to {{min}}"
         }
+    },
+    "warehouse": {
+        "zipcode": {
+            "required": "Zipcode is required",
+            "valid": "Zipcode must be valid"
+        },
+        "city": {
+            "required": "City is required"
+        },
+        "province": {
+            "required": "Province is required"
+        },
+        "active": {
+            "required": "Active is required"
+        }
     }
 }

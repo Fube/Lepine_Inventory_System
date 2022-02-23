@@ -3,5 +3,8 @@
     "index": {
         "title": "Warehouses"
     },
+    "uuid": {
+        "title": "Warehouse Details"
+    },
     "none": "No warehouses to show 😢"
 }

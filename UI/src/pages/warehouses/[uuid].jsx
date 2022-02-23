@@ -1,15 +1,18 @@
-import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import Head from "next/head";
-import Nav from "../../components/Nav";
+import { useRouter } from "next/router";
+import WarehouseForm from "../../components/WarehouseForm";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
-import WarehouseForm from "../../components/WarehouseForm";
 /**
  *
  * @param {{ warehouse: import("@lepine/ui-types").Warehouse }} param0
  * @returns
  */
 export default function WarehouseDetails({ warehouse }) {
+    const { t: te } = useTranslation("errors");
+    const { t: tw } = useTranslation("warehouses");
+
     const { role } = useAuth();
     const router = useRouter();
 
@@ -32,8 +35,7 @@ export default function WarehouseDetails({ warehouse }) {
             console.log(error);
             setStatus({
                 isError: true,
-                message:
-                    error?.response?.data?.message ?? "Something went wrong",
+                message: error?.response?.data?.message ?? te("unknown"),
             });
         } finally {
             setSubmitting(false);
@@ -42,14 +44,14 @@ export default function WarehouseDetails({ warehouse }) {
     return (
         <>
             <Head>
-                <title>Warehouse Details</title>
+                <title>{tw("uuid.title")}</title>
             </Head>
             <div className="flex flex-col flex-1">
                 <div className="flex-shrink-0 flex-grow-0"></div>
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
                         <WarehouseForm
-                            title={"Warehouse Details"}
+                            title={tw("uuid.title")}
                             editable={role === "MANAGER"}
                             deletable={role === "MANAGER"}
                             {...warehouse}
@@ -74,5 +76,11 @@ export async function getServerSideProps(context) {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
 
-    return res.refine((warehouse) => ({ props: { warehouse } })).get();
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "errors",
+        "warehouses",
+    ]);
+
+    return res.refine((warehouse) => ({ props: { warehouse, ...i18n } })).get();
 }

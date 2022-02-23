@@ -3,5 +3,8 @@
     "index": {
         "title": "Entrepôts"
     },
+    "uuid": {
+        "title": "Détails de l'entrepôt"
+    },
     "none": "Aucun entrepôt"
 }
