@@ -4,9 +4,6 @@
     "expected_date": "Date d'expédition",
     "status": "Statut",
     "order": "Commande",
-    "warehouse": {
-        "select": "Sélectionnez le magasin"
-    },
     "index": {
         "title": "Commandes",
         "none": "Aucune commande"

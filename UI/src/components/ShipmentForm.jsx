@@ -52,6 +52,7 @@ export default function ShipmentForm({
     const { t: tc } = useTranslation("common");
     const { t: te } = useTranslation("errors");
     const { t: ts } = useTranslation("shipments");
+    const { t: tw } = useTranslation("warehouses");
 
     const { searchClient } = useContext(AlgoliaContext);
     const [algoliaFilter, setAlgoliaFilter] = useState("quantity > 0");
@@ -149,7 +150,7 @@ export default function ShipmentForm({
                             disabled={!editable}
                             name="to"
                             placeholder={tc("to")}
-                            title={ts("warehouse.select")}
+                            title={tw("select")}
                             options={mappedWarehouses}
                             onChange={(e) => {
                                 const warehouseUuid = e.target.value;

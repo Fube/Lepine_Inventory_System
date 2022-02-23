@@ -37,6 +37,17 @@
             "min": "At least one transfer is required"
         }
     },
+    "stock": {
+        "item": {
+            "required": "Item is required"
+        },
+        "quantity": {
+            "required": "Quantity is required"
+        },
+        "warehouse": {
+            "required": "Warehouse is required"
+        }
+    },
     "common": {
         "number": {
             "min": "{{denom}} must be greater than or equal to {{min}}"

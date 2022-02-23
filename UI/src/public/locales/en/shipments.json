@@ -4,9 +4,6 @@
     "expected_date": "Expected Date",
     "status": "Status",
     "order": "Order",
-    "warehouse": {
-        "select": "Select a Warehouse"
-    },
     "index": {
         "title": "Shipments",
         "none": "No shipments to show 😢"

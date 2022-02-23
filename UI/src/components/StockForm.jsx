@@ -12,6 +12,7 @@ import { connectHits, InstantSearch } from "react-instantsearch-core";
 import { SearchBox, Configure } from "react-instantsearch-dom";
 import { AlgoliaContext } from "../pages/_app";
 import thou from "../utils/thou";
+import { useTranslation } from "next-i18next";
 
 /**
  * @param {{
@@ -37,6 +38,10 @@ export default function StockForm({
     handleDelete = () => {},
     handleSubmit = () => {},
 }) {
+    const { t: tc } = useTranslation("common");
+    const { t: te } = useTranslation("errors");
+    const { t: tw } = useTranslation("warehouse");
+
     const { searchClient } = useContext(AlgoliaContext);
 
     const mappedWarehouses = warehouses.map((warehouse) => ({
@@ -45,9 +50,9 @@ export default function StockForm({
     }));
 
     const stockSchema = yup.object().shape({
-        itemUuid: yup.string().required("Item is required"),
-        warehouseUuid: yup.string().required("Warehouse is required"),
-        quantity: yup.number().required("Quantity is required"),
+        itemUuid: yup.string().required(te("stock.item.required")),
+        warehouseUuid: yup.string().required(te("stock.warehouse.required")),
+        quantity: yup.number().required(te("stock.quantity.required")),
     });
 
     const initialValues = {
@@ -61,8 +66,6 @@ export default function StockForm({
             {hit.sku} - {hit.name}
         </span>
     );
-
-    console.log(disabled);
 
     return (
         <>
@@ -81,7 +84,7 @@ export default function StockForm({
                             }
                             name="warehouseUuid"
                             placeholder="Warehouse"
-                            title="Select a Warehouse"
+                            title={tw("select")}
                             options={mappedWarehouses}
                             onChange={(e) =>
                                 setFieldValue("warehouseUuid", e.target.value)
@@ -89,7 +92,7 @@ export default function StockForm({
                         />
 
                         <span className="block text-gray-700 text-sm font-bold mb-2">
-                            Item
+                            {tc("item")}
                         </span>
 
                         {thou(
@@ -112,19 +115,21 @@ export default function StockForm({
                             disabled={!editable || disabled.has("quantity")}
                             name={`quantity`}
                             type="number"
-                            placeholder="Quantity"
+                            placeholder={tc("quantity")}
                             min={1}
                         />
 
                         <div className="flex items-center justify-end p-6">
-                            {editable && <GenericSubmitButton text="Save" />}
+                            {editable && (
+                                <GenericSubmitButton text={tc("save")} />
+                            )}
                             {deletable && (
                                 <button
                                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
                                     type="button"
                                     onClick={handleDelete}
                                 >
-                                    Delete
+                                    {tc("delete")}
                                 </button>
                             )}
                         </div>

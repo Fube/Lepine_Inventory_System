@@ -12,7 +12,6 @@ import { axiosAPI, axiosBackendAuth } from "../../config/axios";
  * @returns
  */
 function CreateShipment({ activeWarehouses }) {
-    const { t: tc } = useTranslation("common");
     const { t: te } = useTranslation("errors");
     const { t: ts } = useTranslation("shipments");
 
@@ -78,6 +77,7 @@ export async function getServerSideProps(ctx) {
         "common",
         "errors",
         "shipments",
+        "warehouses",
     ]);
 
     return res

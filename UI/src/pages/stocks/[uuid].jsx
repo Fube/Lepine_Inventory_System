@@ -1,15 +1,19 @@
-import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
-import Nav from "../../components/Nav";
+import { useRouter } from "next/router";
+import StockForm from "../../components/StockForm";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
-import StockForm from "../../components/StockForm";
 /**
  *
  * @param {{ stock: import("@lepine/ui-types").Stock, activeWarehouses: import('@lepine/ui-types').Warehouse[] }} param0
  * @returns
  */
 export default function StockDetails({ stock, activeWarehouses }) {
+    const { t: te } = useTranslation("errors");
+    const { t: ts } = useTranslation("stocks");
+
     const { role } = useAuth();
     const router = useRouter();
 
@@ -30,8 +34,7 @@ export default function StockDetails({ stock, activeWarehouses }) {
             console.log(error);
             setStatus({
                 isError: true,
-                message:
-                    error?.response?.data?.message ?? "Something went wrong",
+                message: error?.response?.data?.message ?? te("unknown"),
             });
         } finally {
             setSubmitting(false);
@@ -41,14 +44,14 @@ export default function StockDetails({ stock, activeWarehouses }) {
     return (
         <>
             <Head>
-                <title>Stock Details</title>
+                <title>{ts("uuid.title")}</title>
             </Head>
             <div className="flex flex-col flex-1">
                 <div className="flex-shrink-0 flex-grow-0"></div>
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
                         <StockForm
-                            title={"Stock Details"}
+                            title={ts("uuid.title")}
                             editable={role === "MANAGER"}
                             deletable={role === "MANAGER"}
                             {...stock}
@@ -85,10 +88,18 @@ export async function getServerSideProps(context) {
     const stock = stockRes.refine((n) => n).get();
     const activeWarehouses = warehouseRes.refine((page) => page.content).get();
 
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "errors",
+        "stocks",
+        "warehouses",
+    ]);
+
     return {
         props: {
             stock,
             activeWarehouses,
+            ...i18n,
         },
     };
 }
