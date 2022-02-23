@@ -3,5 +3,6 @@
     "login": "Connexion",
     "logout": "Déconnexion",
     "email": "Courriel",
-    "password": "Mot de passe"
+    "password": "Mot de passe",
+    "add_one_now": "Ajouter"
 }

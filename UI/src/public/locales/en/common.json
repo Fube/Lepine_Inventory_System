@@ -3,5 +3,6 @@
     "login": "Login",
     "logout": "Logout",
     "email": "Email",
-    "password": "Password"
+    "password": "Password",
+    "add_one_now": "Add One Now!"
 }
