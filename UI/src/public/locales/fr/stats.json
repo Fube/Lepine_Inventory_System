@@ -2,6 +2,10 @@
     "index": {
         "title": "Statistiques"
     },
+    "best_sellers": {
+        "title": "Meilleures ventes",
+        "transfered_quantity": "Quantité transféré"
+    },
     "shipments": {
         "fully_confirmed": "Expéditions complètés"
     },

@@ -2,6 +2,10 @@
     "index": {
         "title": "Stats"
     },
+    "best_sellers": {
+        "title": "Stats - Best Sellers",
+        "transfered_quantity": "Transfered Quantity"
+    },
     "shipments": {
         "fully_confirmed": "Fully Confirmed Shipments"
     },
