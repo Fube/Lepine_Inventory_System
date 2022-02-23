@@ -17,5 +17,7 @@
     "quantity": "Quantité",
     "item": "Article",
     "close": "Fermer",
-    "transfers": "Transferts"
+    "transfers": "Transferts",
+    "between": "Entre {{x}} et {{y}}",
+    "order": "Commande"
 }

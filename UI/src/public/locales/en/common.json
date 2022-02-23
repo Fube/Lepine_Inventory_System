@@ -17,5 +17,7 @@
     "quantity": "Quantity",
     "item": "Item",
     "close": "Close",
-    "transfers": "Transfers"
+    "transfers": "Transfers",
+    "between": "Between {{x}} and {{y}}",
+    "order": "Order"
 }
