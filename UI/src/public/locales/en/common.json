@@ -1,6 +1,7 @@
 {
     "login": "Login",
     "logout": "Logout",
+    "register": "Register",
     "email": "Email",
     "password": "Password",
     "confirm_password": "Confirm Password",

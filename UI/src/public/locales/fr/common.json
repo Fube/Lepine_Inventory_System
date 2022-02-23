@@ -1,6 +1,7 @@
 {
     "login": "Connexion",
     "logout": "Déconnexion",
+    "register": "Registrer",
     "email": "Courriel",
     "password": "Mot de passe",
     "confirm_password": "Confirmer le mot de passe",
