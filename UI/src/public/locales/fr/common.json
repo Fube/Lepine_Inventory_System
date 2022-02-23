@@ -23,5 +23,9 @@
     "order": "Commande",
     "warehouse": "Entrepôt",
     "stock": "Stock",
-    "role": "Rôle"
+    "role": "Rôle",
+    "zipcode": "Code postal",
+    "city": "Ville",
+    "province": "Province",
+    "active": "Actif"
 }

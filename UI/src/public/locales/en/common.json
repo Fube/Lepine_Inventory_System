@@ -23,5 +23,9 @@
     "order": "Order",
     "warehouse": "Warehouse",
     "stock": "Stock",
-    "role": "Role"
+    "role": "Role",
+    "zipcode": "Zipcode",
+    "city": "City",
+    "province": "Province",
+    "active": "Active"
 }

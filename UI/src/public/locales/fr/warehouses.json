@@ -1,3 +1,7 @@
 {
-    "select": "Sélectionnez le magasin"
+    "select": "Sélectionnez l'entrepôt",
+    "index": {
+        "title": "Entrepôts"
+    },
+    "none": "Aucun entrepôt"
 }

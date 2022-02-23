@@ -1,3 +1,7 @@
 {
-    "select": "Select a Warehouse"
+    "select": "Select a Warehouse",
+    "index": {
+        "title": "Warehouses"
+    },
+    "none": "No warehouses to show 😢"
 }
