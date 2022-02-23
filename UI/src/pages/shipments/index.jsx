@@ -8,6 +8,8 @@ import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
 import capitalize from "capitalize";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 
 /**
  * @param {{ shipments: import('@lepine/ui-types').Shipment[] } & import("@lepine/ui-types").Pagination} param0
@@ -17,18 +19,21 @@ export default function ShowShipments({
     totalPages,
     pageNumber,
 }) {
+    const { t: tc } = useTranslation("common");
+    const { t: ts } = useTranslation("shipments");
+
     const { role } = useAuth();
     const [shipments, setShipments] = useState(rawShipments);
 
     const header = (
         <Head>
-            <title>Shipments</title>
+            <title>{ts("index.title")}</title>
         </Head>
     );
 
     const fallback = (
         <h2 className="text-2xl text-center text-yellow-400">
-            No shipments to show 😢
+            {ts("index.none")}
         </h2>
     );
 
@@ -81,12 +86,12 @@ export default function ShowShipments({
 
     const head = (
         <tr>
-            <th>Order Number</th>
-            <th>Shipment Date</th>
+            <th>{ts("order_number")}</th>
+            <th>{ts("shipment_date")}</th>
 
             {thou(
                 <th className="flex justify-between">
-                    <div className="self-center">Status</div>
+                    <div className="self-center">{ts("status")}</div>
                     <button>
                         <Link href="/shipments/new" passHref>
                             <Icon icon="si-glyph:button-plus" width="32" />
@@ -94,14 +99,14 @@ export default function ShowShipments({
                     </button>
                 </th>
             )
-                .or(<th>Status</th>)
+                .or(<th>{ts("status")}</th>)
                 .if(role === "SALESPERSON")}
 
             {(role === "MANAGER" || role === "CLERK") && (
                 <th className="flex justify-between">
                     {thou(
                         <>
-                            <div className="self-center">Actions</div>
+                            <div className="self-center">{tc("actions")}</div>
                             <button>
                                 <Link href="/shipments/new" passHref>
                                     <Icon
@@ -112,7 +117,7 @@ export default function ShowShipments({
                             </button>
                         </>
                     )
-                        .or("Actions")
+                        .or(tc("actions"))
                         .if(role === "MANAGER")}
                 </th>
             )}
@@ -129,7 +134,7 @@ export default function ShowShipments({
                         {(role === "MANAGER" || role === "SALESPERSON") && (
                             <Link href="/shipments/new" passHref>
                                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
-                                    Add One Now!
+                                    {tc("add_one_now")}
                                 </button>
                             </Link>
                         )}
@@ -146,7 +151,9 @@ export default function ShowShipments({
             <div className="overflow-x-auto justify-center flex">
                 <div className="md:w-3/4 lg:w-1/2 w-full">
                     <div className="md:flex justify-around my-4">
-                        <h1 className="text-4xl md:mb-0 mb-4">Shipments</h1>
+                        <h1 className="text-4xl md:mb-0 mb-4">
+                            {ts("index.title")}
+                        </h1>
                     </div>
                     <table className="table table-zebra w-full sm:table-fixed">
                         <thead>{head}</thead>
@@ -191,6 +198,9 @@ function ShipmentTableRow({
     onAccept = () => {},
     onDeny = () => {},
 }) {
+    const { t: tc } = useTranslation("common");
+    const { t: te } = useTranslation("errors");
+
     const [showTransfers, setShowTransfers] = useState(false);
     const [isInConfirmationMode, setIsInConfirmationMode] = useState(false);
     const [confirmations, setConfirmations] = useState(new Map());
@@ -236,9 +246,7 @@ function ShipmentTableRow({
             setIsInConfirmationMode(false);
             setShowTransfers(false);
         } catch (error) {
-            setResponseError(
-                error?.response?.data?.message ?? "Something went wrong"
-            );
+            setResponseError(error?.response?.data?.message ?? te("unknown"));
         }
     };
 
@@ -260,7 +268,7 @@ function ShipmentTableRow({
                                     )}
                                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                                 >
-                                    Accept
+                                    {tc("accept")}
                                 </button>
                                 <button
                                     onClick={withNoPropagation(() =>
@@ -268,11 +276,11 @@ function ShipmentTableRow({
                                     )}
                                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4"
                                 >
-                                    Deny
+                                    {tc("deny")}
                                 </button>
                             </>
                         )
-                            .or("None Available")
+                            .or(tc("none_available"))
                             .if(status.toUpperCase() === "PENDING")}
                     </td>
                 )}
@@ -283,11 +291,11 @@ function ShipmentTableRow({
                                 onClick={withNoPropagation(handleConfirm)}
                                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                             >
-                                Confirm
+                                {tc("confirm")}
                             </button>
                         </td>
                     )
-                        .or("None Available")
+                        .or(tc("none_available"))
                         .if(status.toUpperCase() === "ACCEPTED")}
             </tr>
 
@@ -307,7 +315,9 @@ function ShipmentTableRow({
                     }}
                 >
                     <div className="flex justify-between items-center">
-                        <h1 className="text-2xl">Order {orderNumber}</h1>
+                        <h1 className="text-2xl">
+                            {ts("order")} {orderNumber}
+                        </h1>
                     </div>
 
                     {isInConfirmationMode && responseError !== null && (
@@ -319,9 +329,9 @@ function ShipmentTableRow({
                     <table className="table table-zebra w-full sm:table-fixed">
                         <thead>
                             <tr>
-                                <th>From</th>
-                                <th>Item</th>
-                                <th>Quantity</th>
+                                <th>{tc("from")}</th>
+                                <th>{tc("item")}</th>
+                                <th>{tc("quantity")}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -364,7 +374,7 @@ function ShipmentTableRow({
                                 htmlFor={`${uuid}-transfers`}
                                 className="btn"
                             >
-                                Confirm
+                                {tc("confirm")}
                             </label>
                         )}
 
@@ -373,7 +383,7 @@ function ShipmentTableRow({
                             htmlFor={`${uuid}-transfers`}
                             className="btn"
                         >
-                            Close
+                            {tc("close")}
                         </label>
                     </div>
                 </div>
@@ -442,12 +452,19 @@ export async function getServerSideProps(context) {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
 
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "errors",
+        "shipments",
+    ]);
+
     return res
         .refine(({ content: shipments, totalPages, number: pageNumber }) => ({
             props: {
                 shipments,
                 totalPages,
                 pageNumber,
+                ...i18n,
             },
         }))
         .get();

@@ -1,0 +1,10 @@
+{
+    "order_number": "No. De Commande",
+    "shipment_date": "Date d'expédition",
+    "status": "Statut",
+    "order": "Commande",
+    "index": {
+        "title": "Commandes",
+        "none": "Aucune commande"
+    }
+}

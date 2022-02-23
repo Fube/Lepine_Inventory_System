@@ -6,6 +6,7 @@ import {
     GenericSubmitButton,
     GenericErrorStatus,
 } from "./FormikGenericComponents";
+import { useTranslation } from "next-i18next";
 
 /**
  *
@@ -21,10 +22,11 @@ export default function ItemForm({
     deletable,
     handleDelete = () => {},
     handleSubmit = () => {},
-    te = () => {},
-    ti = () => {},
-    tc = () => {},
 }) {
+    const { t: tc } = useTranslation("common");
+    const { t: ti } = useTranslation("items");
+    const { t: te } = useTranslation("errors");
+
     const itemSchema = yup.object().shape({
         name: yup.string().required(te("item.name.required")),
         description: yup.string().required(te("item.description.required")),
@@ -66,7 +68,9 @@ export default function ItemForm({
                             placeholder={ti("sku")}
                         />
                         <div className="flex items-center justify-end p-6">
-                            {editable && <GenericSubmitButton text={tc("save")} />}
+                            {editable && (
+                                <GenericSubmitButton text={tc("save")} />
+                            )}
                             {deletable && (
                                 <button
                                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"

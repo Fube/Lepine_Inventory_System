@@ -8,7 +8,6 @@ import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import checkEmptyAuth from "../../utils/checkEmptyAuth";
 
 function CreateItem() {
-    const { t: tc } = useTranslation("common");
     const { t: ti } = useTranslation("items");
     const { t: te } = useTranslation("errors");
 
@@ -45,9 +44,6 @@ function CreateItem() {
                     <div className="w-full">
                         <ItemBase
                             title={ti("new.title")}
-                            ti={ti}
-                            tc={tc}
-                            te={te}
                             editable
                             handleSubmit={handleSubmit}
                         />

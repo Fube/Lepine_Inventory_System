@@ -6,5 +6,15 @@
     "password": "Mot de passe",
     "add_one_now": "Ajouter",
     "save": "Sauvegarder",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "actions": "Actions",
+    "accept": "Accepter",
+    "deny": "Refuser",
+    "confirm": "Confirmer",
+    "none_available": "Aucun disponible",
+    "from": "De",
+    "to": "À",
+    "quantity": "Quantité",
+    "item": "Article",
+    "close": "Fermer"
 }

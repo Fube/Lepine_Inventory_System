@@ -1,0 +1,10 @@
+{
+    "order_number": "Order Number",
+    "shipment_date": "Shipment Date",
+    "status": "Status",
+    "order": "Order",
+    "index": {
+        "title": "Shipments",
+        "none": "No shipments to show 😢"
+    }
+}

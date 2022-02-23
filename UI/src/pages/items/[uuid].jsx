@@ -12,7 +12,6 @@ import useAuth from "../../hooks/useAuth";
  * @returns
  */
 export default function Item({ item }) {
-    const { t: tc } = useTranslation("common");
     const { t: te } = useTranslation("errors");
     const { t: ti } = useTranslation("items");
 
@@ -55,9 +54,6 @@ export default function Item({ item }) {
                     <div className="w-full">
                         <ItemForm
                             title={ti("uuid.title")}
-                            ti={ti}
-                            tc={tc}
-                            te={te}
                             editable={role === "MANAGER"}
                             deletable={role === "MANAGER"}
                             {...item}
