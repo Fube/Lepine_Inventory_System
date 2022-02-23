@@ -6,5 +6,9 @@
     "uuid": {
         "title": "Détails de l'entrepôt"
     },
+    "new": {
+        "title": "Nouvel entrepôt",
+        "created": "Entrepôt créé"
+    },
     "none": "Aucun entrepôt"
 }
