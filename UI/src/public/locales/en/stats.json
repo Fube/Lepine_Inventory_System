@@ -1,0 +1,13 @@
+{
+    "index": {
+        "title": "Stats"
+    },
+    "shipments": {
+        "fully_confirmed": "Fully Confirmed Shipments"
+    },
+    "items": {
+        "best_selling": {
+            "by_week": "Best Selling Items By Week"
+        }
+    }
+}
