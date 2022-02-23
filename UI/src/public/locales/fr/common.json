@@ -1,5 +1,4 @@
 {
-    "test": "ce fut un test",
     "login": "Connexion",
     "logout": "Déconnexion",
     "email": "Courriel",
@@ -19,5 +18,7 @@
     "close": "Fermer",
     "transfers": "Transferts",
     "between": "Entre {{x}} et {{y}}",
-    "order": "Commande"
+    "order": "Commande",
+    "warehouse": "Entrepôt",
+    "stock": "Stock"
 }

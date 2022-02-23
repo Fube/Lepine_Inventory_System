@@ -1,9 +1,10 @@
+import { Icon } from "@iconify/react";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Icon } from "@iconify/react";
 import Paginate from "../../components/Pagination";
-import Nav from "../../components/Nav";
 import { axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 import thou from "../../utils/thou";
@@ -11,22 +12,25 @@ import thou from "../../utils/thou";
  *@param {{ stock: import('@lepine/ui-types').Stock[] } & import("@lepine/ui-types").Pagination} param0
  */
 export default function ShowStock({ stocks, totalPages, pageNumber }) {
+    const { t: tc } = useTranslation("common");
+    const { t: ts } = useTranslation("stocks");
+
     const router = useRouter();
     const { role } = useAuth();
 
     const header = (
         <Head>
-            <title>Stock</title>
+            <title>{ts("index.title")}</title>
         </Head>
     );
 
     const head = (
         <tr>
-            <th>Item</th>
-            <th>Warehouse</th>
+            <th>{tc("item")}</th>
+            <th>{tc("warehouse")}</th>
             {thou(
                 <th className="flex justify-between">
-                    <span className="self-center">Quantity</span>
+                    <span className="self-center">{tc("quantity")}</span>
                     <button>
                         <Link href="/stocks/new" passHref>
                             <Icon icon="si-glyph:button-plus" width="32" />
@@ -34,15 +38,13 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
                     </button>
                 </th>
             )
-                .or(<th>Quantity</th>)
+                .or(<th>{tc("quantity")}</th>)
                 .if(role === "MANAGER")}
         </tr>
     );
 
     const fallback = (
-        <h2 className="text-2xl text-center text-yellow-400">
-            No stock to show 😢
-        </h2>
+        <h2 className="text-2xl text-center text-yellow-400">{ts("none")}</h2>
     );
 
     if (stocks.length <= 0) {
@@ -56,7 +58,7 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
                         {role === "MANAGER" && (
                             <Link href="/stocks/new" passHref>
                                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
-                                    Add One Now!
+                                    {tc("add_one_now")}
                                 </button>
                             </Link>
                         )}
@@ -73,7 +75,9 @@ export default function ShowStock({ stocks, totalPages, pageNumber }) {
             <div className="overflow-x-auto justify-center flex">
                 <div className="md:w-1/2 w-3/4">
                     <div className="md:flex justify-around my-4">
-                        <h1 className="text-4xl md:mb-0 mb-4">Stock</h1>
+                        <h1 className="text-4xl md:mb-0 mb-4">
+                            {ts("index.title")}
+                        </h1>
                     </div>
                     <table className="table table-zebra w-full sm:table-fixed">
                         <thead>{head}</thead>
@@ -124,6 +128,13 @@ export async function getServerSideProps(context) {
     const res = await axiosBackendAuth.get(`/stocks?page=${page}`, {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
+
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "errors",
+        "stocks",
+        "warehouses",
+    ]);
 
     return res
         .refine(({ content: stocks, totalPages, number: pageNumber }) => ({

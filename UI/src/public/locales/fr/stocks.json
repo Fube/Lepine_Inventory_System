@@ -1,5 +1,9 @@
 {
+    "index": {
+        "title": "Stocks"
+    },
     "uuid": {
         "title": "Détails du stock"
-    }
+    },
+    "none": "Aucun stock"
 }

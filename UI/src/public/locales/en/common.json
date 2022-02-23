@@ -1,5 +1,4 @@
 {
-    "test": "english",
     "login": "Login",
     "logout": "Logout",
     "email": "Email",
@@ -19,5 +18,7 @@
     "close": "Close",
     "transfers": "Transfers",
     "between": "Between {{x}} and {{y}}",
-    "order": "Order"
+    "order": "Order",
+    "warehouse": "Warehouse",
+    "stock": "Stock"
 }
