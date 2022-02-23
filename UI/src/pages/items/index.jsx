@@ -201,6 +201,7 @@ export async function getServerSideProps(context) {
 
     return {
         ...res
+            .withContext(context) // Only needed here because it is the landing page kinda
             .refine(({ content: items, totalPages, number: pageNumber }) => ({
                 props: {
                     items,

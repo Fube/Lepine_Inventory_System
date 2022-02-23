@@ -36,11 +36,21 @@ class AxiosRedirectAwareResultChain {
         return this;
     }
 
+    withContext(context) {
+        this.#context = context;
+        return this;
+    }
+
     get() {
         if (this.#isRedirect) {
+            let pLocale = '';
+            if(this.#context?.locale) {
+                pLocale = '/' + this.#context.locale;
+            }
+
             return {
                 redirect: {
-                    destination: "login",
+                    destination: `${pLocale}/login`,
                     permanent: false,
                 },
             };
