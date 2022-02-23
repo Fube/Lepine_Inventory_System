@@ -29,5 +29,7 @@
             "url": "shipments",
             "display": "Shipments"
         }
-    }
+    },
+    "login": "Login",
+    "logout": "Logout"
 }

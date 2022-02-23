@@ -29,5 +29,7 @@
             "url": "shipments",
             "display": "Expéditions"
         }
-    }
+    },
+    "login": "Connexion",
+    "logout": "Déconnexion"
 }

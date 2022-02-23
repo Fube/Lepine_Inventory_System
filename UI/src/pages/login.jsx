@@ -9,7 +9,6 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function Login() {
-
     const { t: tc } = useTranslation("common");
     const { t: te } = useTranslation("errors");
     const { t: tl } = useTranslation("login");
@@ -52,14 +51,14 @@ export default function Login() {
     return (
         <>
             <Head>
-                <title>{tc('login')}</title>
+                <title>{tc("login")}</title>
             </Head>
 
             <main className="flex justify-center">
                 <div className="text-center">
                     <div className="mt-12">
                         <h2 className="text-2xl text-center text-yellow-400 mb-6">
-                            {tc('login')}
+                            {tc("login")}
                         </h2>
                         <Formik
                             initialValues={{
@@ -112,7 +111,9 @@ export default function Login() {
                                                         }
                                                         name="email"
                                                         type="text"
-                                                        placeholder={tc("email")}
+                                                        placeholder={tc(
+                                                            "email"
+                                                        )}
                                                     />
                                                     {errors.email &&
                                                         touched.email && (
@@ -137,7 +138,9 @@ export default function Login() {
                                                         }
                                                         name="password"
                                                         type="password"
-                                                        placeholder={tc("password")}
+                                                        placeholder={tc(
+                                                            "password"
+                                                        )}
                                                     />
                                                     {errors.password &&
                                                         touched.password && (
@@ -201,6 +204,11 @@ export async function getServerSideProps(context) {
         }
     }
 
-    const i18n = await serverSideTranslations(context.locale, ["common", "errors", "login"]);
-    return { props: {...i18n} };
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "errors",
+        "login",
+        "nav",
+    ]);
+    return { props: { ...i18n } };
 }

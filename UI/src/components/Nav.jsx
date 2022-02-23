@@ -1,10 +1,13 @@
 import { Icon } from "@iconify/react";
+import { useTranslation } from "next-i18next";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useAuth from "../hooks/useAuth";
 
 export default function Nav({ pages, isActive }) {
+    const { t: tn } = useTranslation("nav");
+
     const { isLoggedIn, logout } = useAuth();
     const router = useRouter();
 
@@ -51,12 +54,12 @@ export default function Nav({ pages, isActive }) {
                                     logout().then(() => router.push("/"))
                                 }
                             >
-                                logout
+                                {tn("logout")}
                             </a>
                         ) : (
                             <Link href="/login">
                                 <a className="btn btn-ghost btn-sm rounded-btn self-center">
-                                    login
+                                    {tn("login")}
                                 </a>
                             </Link>
                         )}
