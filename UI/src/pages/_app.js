@@ -1,10 +1,10 @@
-import "../styles/globals.css";
 import algoliasearch from "algoliasearch/lite";
-import { createContext, useEffect, useState } from "react";
-import { axiosAPI } from "../config/axios";
-import injectYupMethods from "../utils/injectYupMethods";
-import NavWrapper from "../components/NavWrapper";
 import { appWithTranslation } from "next-i18next";
+import { createContext, useEffect, useState } from "react";
+import NavWrapper from "../components/NavWrapper";
+import { axiosAPI } from "../config/axios";
+import "../styles/globals.css";
+import * as yupInjections from "../utils/injectYupMethods";
 
 const searchClient = algoliasearch(
     process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,

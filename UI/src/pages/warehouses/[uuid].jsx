@@ -80,6 +80,7 @@ export async function getServerSideProps(context) {
         "common",
         "errors",
         "warehouses",
+        "nav",
     ]);
 
     return res.refine((warehouse) => ({ props: { warehouse, ...i18n } })).get();

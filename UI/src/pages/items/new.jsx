@@ -67,6 +67,7 @@ export async function getServerSideProps(ctx) {
             "common",
             "items",
             "errors",
+            "nav",
         ])),
     });
 }

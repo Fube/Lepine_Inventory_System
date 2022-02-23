@@ -93,6 +93,7 @@ export async function getServerSideProps(context) {
         "errors",
         "stocks",
         "warehouses",
+        "nav",
     ]);
 
     return {

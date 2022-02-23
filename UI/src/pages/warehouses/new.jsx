@@ -67,6 +67,7 @@ export async function getServerSideProps(ctx) {
         "common",
         "errors",
         "warehouses",
+        "nav",
     ]);
     return checkEmptyAuth(axiosBackendAuth, ctx, {
         ...i18n,

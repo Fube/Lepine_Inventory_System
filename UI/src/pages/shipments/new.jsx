@@ -78,6 +78,7 @@ export async function getServerSideProps(ctx) {
         "errors",
         "shipments",
         "warehouses",
+        "nav",
     ]);
 
     return res

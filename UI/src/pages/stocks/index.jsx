@@ -134,6 +134,7 @@ export async function getServerSideProps(context) {
         "errors",
         "stocks",
         "warehouses",
+        "nav",
     ]);
 
     return res
@@ -142,6 +143,7 @@ export async function getServerSideProps(context) {
                 stocks,
                 totalPages,
                 pageNumber,
+                ...i18n,
             },
         }))
         .get();

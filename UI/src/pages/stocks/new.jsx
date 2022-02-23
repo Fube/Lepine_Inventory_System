@@ -74,12 +74,14 @@ export async function getServerSideProps(ctx) {
         "errors",
         "stocks",
         "warehouses",
+        "nav",
     ]);
 
     return res
         .refine(({ content: activeWarehouses }) => ({
             props: {
                 activeWarehouses,
+                ...i18n,
             },
         }))
         .get();

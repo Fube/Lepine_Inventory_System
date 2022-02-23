@@ -456,6 +456,7 @@ export async function getServerSideProps(context) {
         "common",
         "errors",
         "shipments",
+        "nav",
     ]);
 
     return res

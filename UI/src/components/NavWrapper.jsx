@@ -1,13 +1,20 @@
-import { useState, useEffect } from "react";
+import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import Nav from "./Nav";
 
 export default function NavWrapper({ children }) {
+    const { t: tn } = useTranslation("nav");
+
     const [isOpen, setIsOpen] = useState(false);
     const { isLoggedIn, role } = useAuth();
     const router = useRouter();
+
+    const i18nPages = tn("pages", {
+        returnObjects: true,
+    });
 
     useEffect(() => {
         setIsOpen(false);
@@ -21,13 +28,13 @@ export default function NavWrapper({ children }) {
     const pages = [];
     if (isLoggedIn) {
         if (role === "MANAGER") {
-            pages.push("users");
-            pages.push("stats");
+            pages.push(i18nPages["users"]);
+            pages.push(i18nPages["stats"]);
         }
-        pages.push("items");
-        pages.push("warehouses");
-        pages.push("stocks");
-        pages.push("shipments");
+        pages.push(i18nPages["items"]);
+        pages.push(i18nPages["warehouses"]);
+        pages.push(i18nPages["stocks"]);
+        pages.push(i18nPages["shipments"]);
     }
 
     return (
@@ -54,7 +61,7 @@ export default function NavWrapper({ children }) {
 function NavSideBar({ pages, isActive }) {
     return (
         <ul className="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content">
-            {pages.map((path, key) => (
+            {pages.map(({ url: path, display }, key) => (
                 <Link key={key} href={`/${path}`}>
                     <li>
                         <a
@@ -62,7 +69,7 @@ function NavSideBar({ pages, isActive }) {
                                 path
                             )}`}
                         >
-                            {path}
+                            {display}
                         </a>
                     </li>
                 </Link>

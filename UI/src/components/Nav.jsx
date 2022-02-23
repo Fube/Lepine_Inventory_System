@@ -31,14 +31,14 @@ export default function Nav({ pages, isActive }) {
                         <span className="ml-2">Navigation</span>
                     </label>
                     <div className="items-stretch sm:flex hidden">
-                        {pages.map((path, key) => (
+                        {pages.map(({ url: path, display }, key) => (
                             <Link key={key} href={`/${path}`}>
                                 <a
                                     className={`btn btn-ghost btn-sm rounded-btn ${isActive(
                                         path
                                     )}`}
                                 >
-                                    {path}
+                                    {display}
                                 </a>
                             </Link>
                         ))}

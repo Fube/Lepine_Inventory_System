@@ -122,6 +122,7 @@ export async function getServerSideProps(context) {
     const i18n = await serverSideTranslations(context.locale, [
         "common",
         "users",
+        "nav",
     ]);
 
     return res

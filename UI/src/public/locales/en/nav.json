@@ -1,0 +1,33 @@
+{
+    "self": "Navigation",
+    "pages": {
+        "home": {
+            "url": "",
+            "display": "Home"
+        },
+        "stats": {
+            "url": "stats",
+            "display": "Stats"
+        },
+        "users": {
+            "url": "users",
+            "display": "Users"
+        },
+        "items": {
+            "url": "items",
+            "display": "Items"
+        },
+        "warehouses": {
+            "url": "warehouses",
+            "display": "Warehouses"
+        },
+        "stocks": {
+            "url": "stocks",
+            "display": "Stocks"
+        },
+        "shipments": {
+            "url": "shipments",
+            "display": "Shipments"
+        }
+    }
+}

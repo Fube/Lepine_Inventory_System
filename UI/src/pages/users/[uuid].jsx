@@ -80,6 +80,7 @@ export async function getServerSideProps(context) {
         "common",
         "errors",
         "users",
+        "nav",
     ]);
 
     return res.refine((user) => ({ props: { user, ...i18n } })).get();

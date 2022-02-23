@@ -105,7 +105,9 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                 <div className="overflow-x-auto justify-center flex">
                     <div className="md:w-4/5 w-3/4">
                         <div className="md:flex justify-around my-4">
-                            <h1 className="text-4xl md:mb-0 mb-4">{ti("index.title")}</h1>
+                            <h1 className="text-4xl md:mb-0 mb-4">
+                                {ti("index.title")}
+                            </h1>
                             <SearchBox
                                 onChange={(a) =>
                                     setIsSearching(
@@ -197,6 +199,7 @@ export async function getServerSideProps(context) {
     const i18n = await serverSideTranslations(context.locale, [
         "common",
         "items",
+        "nav",
     ]);
 
     return {
