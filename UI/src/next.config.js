@@ -1,5 +1,8 @@
+const { i18n } = require("./next-i18next.config");
+
 module.exports = {
     reactStrictMode: true,
+    i18n,
     async rewrites() {
         return [
             {
@@ -13,7 +16,7 @@ module.exports = {
             {
                 source: "/",
                 destination: "/items",
-                permanent: true,
+                permanent: false,
             },
         ];
     },

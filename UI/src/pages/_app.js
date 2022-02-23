@@ -4,6 +4,7 @@ import { createContext, useEffect, useState } from "react";
 import { axiosAPI } from "../config/axios";
 import injectYupMethods from "../utils/injectYupMethods";
 import NavWrapper from "../components/NavWrapper";
+import { appWithTranslation } from "next-i18next";
 
 const searchClient = algoliasearch(
     process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
@@ -67,4 +68,4 @@ function MyApp({ Component, pageProps }) {
     );
 }
 
-export default MyApp;
+export default appWithTranslation(MyApp);

@@ -1,19 +1,20 @@
-import Nav from "../../components/Nav";
+import { Icon } from "@iconify/react";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import Head from "next/head";
-import { InstantSearch, SearchBox, Configure } from "react-instantsearch-dom";
 import { useContext, useEffect, useState } from "react";
-import { AlgoliaContext } from "../_app";
+import { Configure, InstantSearch, SearchBox } from "react-instantsearch-dom";
 import {
     PaginateAdapter,
     TableHitsAdapter,
 } from "../../components/AlgoliaAdapters";
 import Paginate from "../../components/Pagination";
-import thou from "../../utils/thou";
-import { Icon } from "@iconify/react";
 import { axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
+import thou from "../../utils/thou";
+import { AlgoliaContext } from "../_app";
 
 /**
  *
@@ -23,6 +24,10 @@ import useAuth from "../../hooks/useAuth";
 export default function ShowItems({ items, totalPages, pageNumber }) {
     const { role } = useAuth();
     const router = useRouter();
+    const { t: tc } = useTranslation("common");
+    const { t: ti } = useTranslation("items/index");
+
+    console.log(tc("test"));
 
     const { searchClient } = useContext(AlgoliaContext);
     const [isSearching, setIsSearching] = useState(false);
@@ -190,13 +195,21 @@ export async function getServerSideProps(context) {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
 
-    return res
-        .refine(({ content: items, totalPages, number: pageNumber }) => ({
-            props: {
-                items,
-                totalPages,
-                pageNumber,
-            },
-        }))
-        .get();
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "items/index",
+    ]);
+
+    return {
+        ...res
+            .refine(({ content: items, totalPages, number: pageNumber }) => ({
+                props: {
+                    items,
+                    totalPages,
+                    pageNumber,
+                    ...i18n,
+                },
+            }))
+            .get(),
+    };
 }

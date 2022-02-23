@@ -1,7 +1,6 @@
-import { useRouter } from "next/router";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import UserDetails from "../../components/UserDetails";
-import Nav from "../../components/Nav";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 
