@@ -4,5 +4,7 @@
     "logout": "Déconnexion",
     "email": "Courriel",
     "password": "Mot de passe",
-    "add_one_now": "Ajouter"
+    "add_one_now": "Ajouter",
+    "save": "Sauvegarder",
+    "delete": "Supprimer"
 }

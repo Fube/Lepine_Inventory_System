@@ -4,5 +4,7 @@
     "logout": "Logout",
     "email": "Email",
     "password": "Password",
-    "add_one_now": "Add One Now!"
+    "add_one_now": "Add One Now!",
+    "save": "Save",
+    "delete": "Delete"
 }

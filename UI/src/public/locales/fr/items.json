@@ -2,6 +2,12 @@
     "sku": "SKU",
     "name": "Nom",
     "description": "Description",
-    "none": "Aucun produit trouvé",
-    "title": "Inventaire"
+    "index": {
+        "none": "Aucun produit trouvé",
+        "title": "Inventaire"
+    },
+    "new": {
+        "title": "Nouveau produit",
+        "created": "Produit créé"
+    }
 }

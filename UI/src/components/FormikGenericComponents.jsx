@@ -83,7 +83,7 @@ export function GenericForm({ title, children }) {
     );
 }
 
-export function GenericSubmitButton() {
+export function GenericSubmitButton({text = "Save"}) {
     const { isValid, dirty, isSubmitting } = useFormikContext();
     return (
         <button
@@ -95,7 +95,7 @@ export function GenericSubmitButton() {
             type="submit"
             disabled={!isValid || !dirty || isSubmitting}
         >
-            Save
+            {text}
         </button>
     );
 }

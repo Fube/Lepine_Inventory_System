@@ -12,6 +12,7 @@ import {
  * @param {{editable: boolean, deletable: boolean, handleDelete: (uuid: string) => void, handleSubmit: ({ values, setSubmitting: (isSubmitting: boolean)=>void }) => void } & import('@lepine/ui-types').Item} arg0
  */
 export default function ItemForm({
+    title = "Item Details",
     uuid,
     name,
     description,
@@ -20,6 +21,9 @@ export default function ItemForm({
     deletable,
     handleDelete = () => {},
     handleSubmit = () => {},
+    te = () => {},
+    ti = () => {},
+    tc = () => {},
 }) {
     const itemSchema = yup.object().shape({
         name: yup.string().required("Name is required"),
@@ -39,37 +43,37 @@ export default function ItemForm({
                 onSubmit={handleSubmit}
             >
                 {() => (
-                    <GenericForm title="Item Details">
+                    <GenericForm title={title}>
                         <GenericErrorStatus />
                         <GenericFormInputErrorCombo
                             disabled={!editable}
                             name="name"
                             type="text"
-                            placeholder="Name"
+                            placeholder={ti("name")}
                         />
 
                         <GenericFormInputErrorCombo
                             disabled={!editable}
                             name="description"
                             type="text"
-                            placeholder="Description"
+                            placeholder={ti("description")}
                         />
 
                         <GenericFormInputErrorCombo
                             disabled={!editable}
                             name="sku"
                             type="text"
-                            placeholder="SKU"
+                            placeholder={ti("sku")}
                         />
                         <div className="flex items-center justify-end p-6">
-                            {editable && <GenericSubmitButton text="Save" />}
+                            {editable && <GenericSubmitButton text={tc("save")} />}
                             {deletable && (
                                 <button
                                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
                                     type="button"
                                     onClick={handleDelete}
                                 >
-                                    Delete
+                                    {tc("delete")}
                                 </button>
                             )}
                         </div>
