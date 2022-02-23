@@ -4,6 +4,7 @@ class AxiosRedirectAwareResultChain {
     #data;
     #isRedirect;
     #refinements;
+    #context;
 
     /**
      *
@@ -39,7 +40,7 @@ class AxiosRedirectAwareResultChain {
         if (this.#isRedirect) {
             return {
                 redirect: {
-                    destination: "/login",
+                    destination: "login",
                     permanent: false,
                 },
             };

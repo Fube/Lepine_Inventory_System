@@ -1,3 +1,7 @@
 {
-    "test": "english"
+    "test": "english",
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password"
 }

@@ -1,0 +1,9 @@
+{
+    "unknown": "Quelque chose s'est mal passé",
+    "email": {
+        "required": "Courriel requis"
+    },
+    "password": {
+        "required": "Mot de passe requis"
+    }
+}

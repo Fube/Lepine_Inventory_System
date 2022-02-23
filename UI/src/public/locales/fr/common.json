@@ -1,3 +1,7 @@
 {
-    "test": "ce fut un test"
+    "test": "ce fut un test",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "email": "Courriel",
+    "password": "Mot de passe"
 }
