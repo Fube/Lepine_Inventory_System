@@ -9,5 +9,9 @@
     "new": {
         "title": "New item",
         "created": "Item successfully created"
+    },
+    "uuid": {
+        "title": "Item Details",
+        "updated": "Item successfully updated"
     }
 }

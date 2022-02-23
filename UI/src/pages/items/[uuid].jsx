@@ -1,7 +1,8 @@
-import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import ItemForm from "../../components/ItemForm";
-import Nav from "../../components/Nav";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
 
@@ -11,6 +12,10 @@ import useAuth from "../../hooks/useAuth";
  * @returns
  */
 export default function Item({ item }) {
+    const { t: tc } = useTranslation("common");
+    const { t: te } = useTranslation("errors");
+    const { t: ti } = useTranslation("items");
+
     const { role } = useAuth();
     const router = useRouter();
 
@@ -27,14 +32,13 @@ export default function Item({ item }) {
             });
             setStatus({
                 isError: false,
-                message: "Item successfully updated",
+                message: ti("uuid.updated"),
             });
         } catch (error) {
             console.log(error);
             setStatus({
                 isError: true,
-                message:
-                    error?.response?.data?.message ?? "Something went wrong",
+                message: error?.response?.data?.message ?? te("unknown"),
             });
         } finally {
             setSubmitting(false);
@@ -43,13 +47,17 @@ export default function Item({ item }) {
     return (
         <>
             <Head>
-                <title>Item Details</title>
+                <title>{ti("uuid.title")}</title>
             </Head>
             <div className="flex flex-col flex-1">
                 <div className="flex-shrink-0 flex-grow-0"></div>
                 <div className="flex-grow flex justify-center items-center">
                     <div className="w-full">
                         <ItemForm
+                            title={ti("uuid.title")}
+                            ti={ti}
+                            tc={tc}
+                            te={te}
                             editable={role === "MANAGER"}
                             deletable={role === "MANAGER"}
                             {...item}
@@ -74,5 +82,11 @@ export async function getServerSideProps(context) {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
 
-    return res.refine((item) => ({ props: { item } })).get();
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "errors",
+        "items",
+    ]);
+
+    return res.refine((item) => ({ props: { item, ...i18n } })).get();
 }

@@ -8,11 +8,11 @@ import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import checkEmptyAuth from "../../utils/checkEmptyAuth";
 
 function CreateItem() {
-    const router = useRouter();
-
     const { t: tc } = useTranslation("common");
     const { t: ti } = useTranslation("items");
     const { t: te } = useTranslation("errors");
+
+    const router = useRouter();
 
     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         setSubmitting(true);
@@ -27,8 +27,7 @@ function CreateItem() {
             console.log(error);
             setStatus({
                 isError: true,
-                message:
-                    error?.response?.data?.message ?? te("unknown"),
+                message: error?.response?.data?.message ?? te("unknown"),
             });
         } finally {
             setSubmitting(false);
@@ -48,9 +47,10 @@ function CreateItem() {
                             title={ti("new.title")}
                             ti={ti}
                             tc={tc}
-                            te={te} 
-                            editable 
-                            handleSubmit={handleSubmit} />
+                            te={te}
+                            editable
+                            handleSubmit={handleSubmit}
+                        />
                     </div>
                 </div>
             </div>
@@ -67,10 +67,10 @@ export default WithClientSideAuth(CreateItem);
  */
 export async function getServerSideProps(ctx) {
     return checkEmptyAuth(axiosBackendAuth, ctx, {
-        ...await serverSideTranslations(ctx.locale, [
+        ...(await serverSideTranslations(ctx.locale, [
             "common",
             "items",
             "errors",
-        ])
+        ])),
     });
 }
