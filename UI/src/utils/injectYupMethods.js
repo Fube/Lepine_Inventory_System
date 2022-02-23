@@ -4,34 +4,34 @@ import { DateTime } from "luxon";
 yup.addMethod(yup.string, "strongPassword", strongPasswordMethod);
 yup.addMethod(yup.date, "businessDay", businessDay);
 
-function strongPasswordMethod() {
+function strongPasswordMethod({ messages }) {
     return this.test("strongPasswordTest", function (value) {
         const { path, createError } = this;
         switch (Boolean(value)) {
             case !/^(?=.*[a-z])/.test(value):
                 return createError({
                     path,
-                    message: "Password must include lowercase letter",
+                    message: messages.lowercase,
                 });
             case !/^(?=.*[A-Z])/.test(value):
                 return createError({
                     path,
-                    message: "Password must include uppercase letter",
+                    message: messages.uppercase,
                 });
             case !/^(?=.*[0-9])/.test(value):
                 return createError({
                     path,
-                    message: "Password must include digit",
+                    message: messages.number,
                 });
             case !/^(?=.*[!@#\$%\^&\*])/.test(value):
                 return createError({
                     path,
-                    message: "Password must include special character",
+                    message: messages.special,
                 });
             case value.length < 8:
                 return createError({
                     path,
-                    message: "Password must be at least 8 characters",
+                    message: messages.length,
                 });
             default:
                 return true;

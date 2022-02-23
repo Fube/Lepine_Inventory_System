@@ -2,5 +2,11 @@
     "index": {
         "title": "Utilisateurs"
     },
-    "none": "Aucun utilisateur"
+    "uuid": {
+        "title": "Détails de l'utilisateur"
+    },
+    "none": "Aucun utilisateur",
+    "role": {
+        "select": "Sélectionnez un rôle"
+    }
 }

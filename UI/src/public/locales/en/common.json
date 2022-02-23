@@ -3,6 +3,7 @@
     "logout": "Logout",
     "email": "Email",
     "password": "Password",
+    "confirm_password": "Confirm Password",
     "add_one_now": "Add One Now!",
     "save": "Save",
     "delete": "Delete",

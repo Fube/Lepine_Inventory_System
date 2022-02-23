@@ -1,4 +1,6 @@
 import { Field, Form, Formik } from "formik";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
@@ -8,6 +10,8 @@ import checkEmptyAuth from "../../utils/checkEmptyAuth";
 const roles = ["Manager", "Clerk", "Salesperson"];
 
 export default function CreateUser() {
+    const { t: te } = useTranslation("errors");
+
     const router = useRouter();
 
     const userSchema = yup.object().shape({
@@ -17,8 +21,12 @@ export default function CreateUser() {
             .required("Email is required"),
         password: yup
             .string()
-            .strongPassword()
-            .required("Password is required"),
+            .strongPassword({
+                messages: te("password.complexity", {
+                    returnObjects: true,
+                }),
+            })
+            .required(te("password.required")),
         confirmPassword: yup
             .string()
             .test("passwords-match", "Passwords must match", function (value) {
@@ -253,5 +261,13 @@ export default function CreateUser() {
  * @returns
  */
 export async function getServerSideProps(ctx) {
-    return checkEmptyAuth(axiosBackendAuth, ctx);
+    const i18n = await serverSideTranslations(ctx.locale, [
+        "common",
+        "errors",
+        "users",
+    ]);
+
+    return checkEmptyAuth(axiosBackendAuth, ctx, {
+        ...i18n,
+    });
 }

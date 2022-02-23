@@ -3,6 +3,7 @@
     "logout": "Déconnexion",
     "email": "Courriel",
     "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
     "add_one_now": "Ajouter",
     "save": "Sauvegarder",
     "delete": "Supprimer",

@@ -1,4 +1,5 @@
 import { Formik } from "formik";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 import {
     GenericForm,
@@ -23,21 +24,29 @@ export default function UserDetails({
     handleDelete = () => {},
     handleSubmit = () => {},
 }) {
+    const { t: tc } = useTranslation("common");
+    const { t: te } = useTranslation("errors");
+    const { t: tu } = useTranslation("users");
+
     const userSchema = yup.object().shape({
         email: yup
             .string()
-            .email("Must be a valid email")
-            .required("Email is required"),
+            .email(te("email.valid"))
+            .required(te("email.required")),
         password: yup
             .string()
-            .strongPassword()
-            .required("Password is required"),
+            .strongPassword({
+                messages: te("password.complexity", {
+                    returnObjects: true,
+                }),
+            })
+            .required(te("password.required")),
         confirmPassword: yup
             .string()
-            .test("passwords-match", "Passwords must match", function (value) {
+            .test("passwords-match", te("password.confirm"), function (value) {
                 return this.parent.password === value;
             }),
-        role: yup.string().required("Role is required").oneOf(roles),
+        role: yup.string().required(te("role.required")).oneOf(roles),
     });
 
     return (
@@ -52,12 +61,12 @@ export default function UserDetails({
                 onSubmit={handleSubmit}
             >
                 {() => (
-                    <GenericForm title="User Details">
+                    <GenericForm title={tu("uuid.title")}>
                         <GenericFormInputErrorCombo
                             disabled={!editable}
                             name="email"
                             type="text"
-                            placeholder="Email"
+                            placeholder={tc("email")}
                         />
 
                         <GenericFormSelectErrorCombo
@@ -67,32 +76,34 @@ export default function UserDetails({
                                 key: role,
                                 value: role,
                             }))}
-                            title="Select a role"
-                            placeholder="Role"
+                            title={tu("role.select")}
+                            placeholder={tc("role")}
                         />
 
                         <GenericFormInputErrorCombo
                             disabled={!editable}
                             name="password"
                             type="password"
-                            placeholder="Password"
+                            placeholder={tc("password")}
                         />
                         <GenericFormInputErrorCombo
                             disabled={!editable}
                             name="confirmPassword"
                             type="password"
-                            placeholder="Confirm Password"
+                            placeholder={tc("confirm_password")}
                         />
 
                         <div className="flex items-center justify-end p-6">
-                            {editable && <GenericSubmitButton text="Save" />}
+                            {editable && (
+                                <GenericSubmitButton text={tc("save")} />
+                            )}
                             {deletable && (
                                 <button
                                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
                                     type="button"
                                     onClick={handleDelete}
                                 >
-                                    Delete
+                                    {tc("delete")}
                                 </button>
                             )}
                         </div>

@@ -1,3 +1,5 @@
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import UserDetails from "../../components/UserDetails";
@@ -11,6 +13,10 @@ import useAuth from "../../hooks/useAuth";
  */
 
 export default function User({ user }) {
+    const { t: tc } = useTranslation("common");
+    const { t: te } = useTranslation("errors");
+    const { t: tu } = useTranslation("users");
+
     const { role } = useAuth();
     const router = useRouter();
 
@@ -30,8 +36,7 @@ export default function User({ user }) {
             console.log(error);
             setStatus({
                 isError: true,
-                message:
-                    error?.response?.data?.message ?? "Something went wrong",
+                message: error?.response?.data?.message ?? te("unknown"),
             });
         } finally {
             setSubmitting(false);
@@ -40,7 +45,7 @@ export default function User({ user }) {
     return (
         <>
             <Head>
-                <title>User Details</title>
+                <title>{tu("uuid.title")}</title>
             </Head>
             <div className="flex flex-col flex-1">
                 <div className="flex-shrink-0 flex-grow-0"></div>
@@ -71,5 +76,11 @@ export async function getServerSideProps(context) {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
 
-    return res.refine((user) => ({ props: { user } })).get();
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "errors",
+        "users",
+    ]);
+
+    return res.refine((user) => ({ props: { user, ...i18n } })).get();
 }

@@ -2,5 +2,11 @@
     "index": {
         "title": "Users"
     },
-    "none": "No users to show 😢"
+    "uuid": {
+        "title": "User Details"
+    },
+    "none": "No users to show 😢",
+    "role": {
+        "select": "Select a Role"
+    }
 }

@@ -1,10 +1,19 @@
 {
     "unknown": "Something went wrong",
     "email": {
-        "required": "Email is required"
+        "required": "Email is required",
+        "valid": "Email must be valid"
     },
     "password": {
-        "required": "Password is required"
+        "required": "Password is required",
+        "complexity": {
+            "length": "Password must be at least 8 characters long",
+            "uppercase": "Password must contain at least one uppercase letter",
+            "lowercase": "Password must contain at least one lowercase letter",
+            "number": "Password must contain at least one number",
+            "special": "Password must contain at least one special character"
+        },
+        "confirm": "Passwords must match"
     },
     "item": {
         "name": {
@@ -52,5 +61,8 @@
         "number": {
             "min": "{{denom}} must be greater than or equal to {{min}}"
         }
+    },
+    "role": {
+        "required": "Role is required"
     }
 }
