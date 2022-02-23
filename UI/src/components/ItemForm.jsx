@@ -26,9 +26,9 @@ export default function ItemForm({
     tc = () => {},
 }) {
     const itemSchema = yup.object().shape({
-        name: yup.string().required("Name is required"),
-        description: yup.string().required("Description is required"),
-        sku: yup.string().required("SKU is required"),
+        name: yup.string().required(te("item.name.required")),
+        description: yup.string().required(te("item.description.required")),
+        sku: yup.string().required(te("item.sku.required")),
     });
 
     return (

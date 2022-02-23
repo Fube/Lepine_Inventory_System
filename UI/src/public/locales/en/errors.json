@@ -5,5 +5,16 @@
     },
     "password": {
         "required": "Password is required"
+    },
+    "item": {
+        "name": {
+            "required": "Name is required"
+        },
+        "description": {
+            "required": "Description is required"
+        },
+        "sku": {
+            "required": "SKU is required"
+        }
     }
 }
