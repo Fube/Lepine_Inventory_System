@@ -16,5 +16,30 @@
         "sku": {
             "required": "SKU requis"
         }
+    },
+    "shipment": {
+        "order_number": {
+            "required": "Numéro de commande requis"
+        },
+        "expected_date": {
+            "required": "Date d'expédition requise"
+        },
+        "to": {
+            "required": "Destinataire requis"
+        },
+        "quantity": {
+            "required": "Quantité requise"
+        },
+        "stock": {
+            "required": "Stock requis"
+        },
+        "transfers": {
+            "min": "Vous devez transférer au moins 1 article"
+        }
+    },
+    "common": {
+        "number": {
+            "min": "{{denom}} doit être supérieur ou égal à {{min}}"
+        }
     }
 }

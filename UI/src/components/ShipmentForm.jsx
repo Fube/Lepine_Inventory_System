@@ -17,6 +17,7 @@ import { connectHits, InstantSearch } from "react-instantsearch-core";
 import { SearchBox, Configure } from "react-instantsearch-dom";
 import { AlgoliaContext } from "../pages/_app";
 import thou from "../utils/thou";
+import { useTranslation } from "next-i18next";
 
 /**
  * @param {{
@@ -48,6 +49,10 @@ export default function ShipmentForm({
     handleDelete = () => {},
     handleSubmit = () => {},
 }) {
+    const { t: tc } = useTranslation("common");
+    const { t: te } = useTranslation("errors");
+    const { t: ts } = useTranslation("shipments");
+
     const { searchClient } = useContext(AlgoliaContext);
     const [algoliaFilter, setAlgoliaFilter] = useState("quantity > 0");
     const [selectedStockUuids, setSelectedStockUuids] = useState(new Set());
@@ -78,24 +83,34 @@ export default function ShipmentForm({
     }));
 
     const shipmentSchema = yup.object().shape({
-        orderNumber: yup.string().required("Order Number is required"),
+        orderNumber: yup
+            .string()
+            .required(te("shipment.order_number.required")),
         expectedDate: yup
             .date()
             .businessDay()
-            .required("Expected Date is required"),
-        to: yup.string().required("To is required"),
+            .required(te("shipment.expected_date.required")),
+        to: yup.string().required(te("shipment.to.required")),
         transfers: yup
             .array()
             .of(
                 yup.object().shape({
                     quantity: yup
                         .number()
-                        .min(1, "Quantity must be greater than or equal to 1")
-                        .required("Quantity is required"),
-                    stockUuid: yup.string().required("Stock is required"),
+                        .min(
+                            1,
+                            te("common.number.min", {
+                                denom: "Quantity",
+                                min: 1,
+                            })
+                        )
+                        .required(te("shipment.quantity.required")),
+                    stockUuid: yup
+                        .string()
+                        .required(te("shipment.stock.required")),
                 })
             )
-            .min(1, "At least one transfer is required"),
+            .min(1, te("shipment.transfers.min")),
     });
 
     /**
@@ -128,13 +143,13 @@ export default function ShipmentForm({
                             disabled={!editable}
                             name="orderNumber"
                             type="text"
-                            placeholder="Order Number"
+                            placeholder={ts("order_number")}
                         />
                         <GenericFormSelectErrorCombo
                             disabled={!editable}
                             name="to"
-                            placeholder="To"
-                            title="Select a warehouse"
+                            placeholder={tc("to")}
+                            title={ts("warehouse.select")}
                             options={mappedWarehouses}
                             onChange={(e) => {
                                 const warehouseUuid = e.target.value;
@@ -151,7 +166,7 @@ export default function ShipmentForm({
 
                         <DatePickerField
                             name="expectedDate"
-                            placeholder="Expected Date"
+                            placeholder={ts("expected_date")}
                             minDate={DateTime.local()
                                 .endOf("day")
                                 .plusBusiness({ days: 4 })
@@ -162,7 +177,7 @@ export default function ShipmentForm({
                             <>
                                 <div className="divider before:!bg-base-300 after:!bg-base-300 mt-2" />
                                 <span className="block text-gray-700 text-lg font-bold mb-2">
-                                    Transfers
+                                    {tc("transfers")}
                                 </span>
 
                                 <FieldArray name="transfers">
@@ -231,7 +246,9 @@ export default function ShipmentForm({
                                                             disabled={!editable}
                                                             name={`transfers.${index}.quantity`}
                                                             type="number"
-                                                            placeholder="Quantity"
+                                                            placeholder={tc(
+                                                                "quantity"
+                                                            )}
                                                             min={1}
                                                         />
                                                         {editable && (
@@ -264,7 +281,7 @@ export default function ShipmentForm({
                                                         })
                                                     }
                                                 >
-                                                    Add transfer
+                                                    {ts("new.another")}
                                                 </button>
                                             </div>
                                         </>
@@ -275,7 +292,9 @@ export default function ShipmentForm({
                         )}
 
                         <div className="flex items-center justify-center p-6 pt-2">
-                            {editable && <GenericSubmitButton text="Save" />}
+                            {editable && (
+                                <GenericSubmitButton text={tc("save")} />
+                            )}
                         </div>
                     </GenericForm>
                 )}

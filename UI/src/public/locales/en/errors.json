@@ -16,5 +16,30 @@
         "sku": {
             "required": "SKU is required"
         }
+    },
+    "shipment": {
+        "order_number": {
+            "required": "Order number is required"
+        },
+        "expected_date": {
+            "required": "Expected date is required"
+        },
+        "to": {
+            "required": "To is required"
+        },
+        "quantity": {
+            "required": "Quantity is required"
+        },
+        "stock": {
+            "required": "Stock is required"
+        },
+        "transfers": {
+            "min": "At least one transfer is required"
+        }
+    },
+    "common": {
+        "number": {
+            "min": "{{denom}} must be greater than or equal to {{min}}"
+        }
     }
 }

@@ -1,10 +1,19 @@
 {
     "order_number": "No. De Commande",
     "shipment_date": "Date d'expédition",
+    "expected_date": "Date d'expédition",
     "status": "Statut",
     "order": "Commande",
+    "warehouse": {
+        "select": "Sélectionnez le magasin"
+    },
     "index": {
         "title": "Commandes",
         "none": "Aucune commande"
+    },
+    "new": {
+        "title": "Nouvelle Commande",
+        "created": "Commande créée",
+        "another": "Ajouter une autre"
     }
 }
