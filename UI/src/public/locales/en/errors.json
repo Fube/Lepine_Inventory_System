@@ -57,12 +57,12 @@
             "required": "Warehouse is required"
         }
     },
+    "role": {
+        "required": "Role is required"
+    },
     "common": {
         "number": {
             "min": "{{denom}} must be greater than or equal to {{min}}"
         }
-    },
-    "role": {
-        "required": "Role is required"
     }
 }

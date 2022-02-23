@@ -46,13 +46,23 @@
             "min": "Vous devez transférer au moins 1 article"
         }
     },
+    "stock": {
+        "item": {
+            "required": "Article requis"
+        },
+        "quantity": {
+            "required": "Quantité requise"
+        },
+        "warehouse": {
+            "required": "Entrepôt requis"
+        }
+    },
+    "role": {
+        "required": "Rôle requis"
+    },
     "common": {
         "number": {
             "min": "{{denom}} doit être supérieur ou égal à {{min}}"
         }
-    },
-
-    "role": {
-        "required": "Rôle requis"
     }
 }
