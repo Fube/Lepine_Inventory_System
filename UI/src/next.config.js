@@ -6,8 +6,9 @@ module.exports = {
     async rewrites() {
         return [
             {
-                source: "/api/:path*",
+                source: "/:locale?/api/:path*",
                 destination: `${process.env.SERVER_BACKEND_URL}/:path*`,
+                locale: false,
             },
         ];
     },
