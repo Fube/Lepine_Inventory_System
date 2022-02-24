@@ -1,17 +1,22 @@
+import { Field, Form, Formik } from "formik";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Nav from "../components/Nav";
-import * as yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { axiosAPI, axiosBackendNoAuth } from "../config/axios";
 import { useEffect } from "react";
+import * as yup from "yup";
+import { axiosAPI, axiosBackendNoAuth } from "../config/axios";
 import useAuth from "../hooks/useAuth";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function Login() {
+    const { t: tc } = useTranslation("common");
+    const { t: te } = useTranslation("errors");
+    const { t: tl } = useTranslation("login");
+
     const { setEmail, setIsLoggedIn, setRole, logout } = useAuth();
     const loginSchema = yup.object().shape({
-        email: yup.string().required("Email is required"),
-        password: yup.string().required("Password is required"),
+        email: yup.string().required(te("email.required")),
+        password: yup.string().required(te("password.required")),
     });
 
     useEffect(() => {
@@ -32,12 +37,12 @@ export default function Login() {
             setEmail(data.email);
             setRole(data.role);
 
-            setStatus({ isError: false, message: "Successfully logged in" });
+            setStatus({ isError: false, message: tl("successful") });
             router.push("/");
         } catch (e) {
             setStatus({
                 isError: true,
-                message: e?.response?.data?.message ?? "Something went wrong",
+                message: e?.response?.data?.message ?? te("unknown"),
             });
         }
         setSubmitting(false);
@@ -46,14 +51,14 @@ export default function Login() {
     return (
         <>
             <Head>
-                <title>Login</title>
+                <title>{tc("login")}</title>
             </Head>
 
             <main className="flex justify-center">
                 <div className="text-center">
                     <div className="mt-12">
                         <h2 className="text-2xl text-center text-yellow-400 mb-6">
-                            Login
+                            {tc("login")}
                         </h2>
                         <Formik
                             initialValues={{
@@ -76,7 +81,7 @@ export default function Login() {
                                         <div className="w-full max-w-sm">
                                             <div className="flex flex-col break-words bg-white border-2 rounded shadow-md">
                                                 <div className="font-semibold bg-gray-200 text-gray-700 py-3 px-6 mb-0">
-                                                    Login
+                                                    {tc("login")}
                                                 </div>
                                                 {dirty && status && (
                                                     <div
@@ -94,7 +99,7 @@ export default function Login() {
                                                         className="block text-gray-700 text-sm font-bold mb-2"
                                                         htmlFor="email"
                                                     >
-                                                        E-mail
+                                                        {tc("email")}
                                                     </label>
                                                     <Field
                                                         className={
@@ -106,7 +111,9 @@ export default function Login() {
                                                         }
                                                         name="email"
                                                         type="text"
-                                                        placeholder="E-mail"
+                                                        placeholder={tc(
+                                                            "email"
+                                                        )}
                                                     />
                                                     {errors.email &&
                                                         touched.email && (
@@ -119,7 +126,7 @@ export default function Login() {
                                                         className="block text-gray-700 text-sm font-bold mb-2"
                                                         htmlFor="password"
                                                     >
-                                                        Password
+                                                        {tc("password")}
                                                     </label>
                                                     <Field
                                                         className={
@@ -131,7 +138,9 @@ export default function Login() {
                                                         }
                                                         name="password"
                                                         type="password"
-                                                        placeholder="Password"
+                                                        placeholder={tc(
+                                                            "password"
+                                                        )}
                                                     />
                                                     {errors.password &&
                                                         touched.password && (
@@ -158,7 +167,7 @@ export default function Login() {
                                                                 isSubmitting
                                                             }
                                                         >
-                                                            Login
+                                                            {tc("login")}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -194,5 +203,12 @@ export async function getServerSideProps(context) {
             };
         }
     }
-    return { props: {} };
+
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "errors",
+        "login",
+        "nav",
+    ]);
+    return { props: { ...i18n } };
 }

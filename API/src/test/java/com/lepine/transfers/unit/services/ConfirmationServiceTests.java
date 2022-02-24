@@ -290,9 +290,7 @@ public class ConfirmationServiceTests {
         // Assert
         assertThat(shipmentNotFoundException).isNotNull();
         assertThat(shipmentNotFoundException)
-                .hasMessage(
-                        new ShipmentNotFoundException(
-                                format("Shipment for transfer %s is not found", NOT_FOUND_SHIPMENT_UUID)).getMessage());
+                .hasMessage(new ShipmentNotFoundException().getMessage());
 
         verify(transferRepo, times(1)).findById(NOT_FOUND_SHIPMENT_UUID);
         verify(shipmentRepo, times(1)).findByTransferUuid(NOT_FOUND_SHIPMENT_UUID);

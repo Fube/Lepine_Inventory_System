@@ -1,0 +1,16 @@
+{
+    "order_number": "Order Number",
+    "shipment_date": "Shipment Date",
+    "expected_date": "Expected Date",
+    "status": "Status",
+    "order": "Order",
+    "index": {
+        "title": "Shipments",
+        "none": "No shipments to show 😢"
+    },
+    "new": {
+        "title": "Create Shipment",
+        "created": "Shipment Created Successfully",
+        "another": "Add Transfer"
+    }
+}

@@ -1,9 +1,10 @@
 import { DateTime } from "luxon-business-days";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
+import { useState } from "react";
 import Paginate from "../../../components/Pagination";
 import WithClientSideAuth from "../../../components/WithClientSideAuth";
 import { axiosBackendAuth } from "../../../config/axios";
@@ -17,29 +18,11 @@ import { axiosBackendAuth } from "../../../config/axios";
  * }}
  */
 function ShowStatsTabular({ shipments, totalPages, pageNumber, from, to }) {
+    const { t: tc } = useTranslation("common");
+    const { t: tStats } = useTranslation("stats");
+    const { t: tShipments } = useTranslation("shipments");
+
     const router = useRouter();
-    const [dateRange, setDateRange] = useState([null, null]);
-
-    const [startDate, endDate] = dateRange;
-    const [uriFrom, uriTo] = [from, to].map(encodeURIComponent);
-
-    useEffect(() => {
-        const [start, end] = dateRange;
-
-        console.log(start, end);
-
-        if (start === null || end === null) {
-            return;
-        }
-
-        router.push({
-            pathname: "/stats",
-            query: {
-                from: start.toISOString(),
-                to: end.toISOString(),
-            },
-        });
-    }, [dateRange]);
 
     const getNextURL = () => {
         // +One week from 'to'
@@ -63,30 +46,14 @@ function ShowStatsTabular({ shipments, totalPages, pageNumber, from, to }) {
 
     const header = (
         <Head>
-            <title>Stats</title>
+            <title>{tStats("index.title")}</title>
         </Head>
-    );
-
-    const picker = (
-        <div>
-            <h2 className="text-2xl mb-2">Select a different time range</h2>
-            <DatePicker
-                className="text-black"
-                selectsRange={true}
-                startDate={startDate}
-                endDate={endDate}
-                onChange={(update) => {
-                    setDateRange(update);
-                }}
-                isClearable={true}
-            />
-        </div>
     );
 
     const head = (
         <tr>
-            <th>Order Number</th>
-            <th>Shipment Date</th>
+            <th>{tShipments("order_number")}</th>
+            <th>{tShipments("shipment_date")}</th>
         </tr>
     );
 
@@ -98,13 +65,17 @@ function ShowStatsTabular({ shipments, totalPages, pageNumber, from, to }) {
                 <div className="md:w-3/4 lg:w-1/2 w-full">
                     <div className="md:flex justify-around my-4">
                         <h1 className="text-4xl md:mb-0 mb-4 text-center">
-                            <p className="mb-2">Fully Confirmed Shipments</p>
+                            <p className="mb-2">
+                                {tStats("shipments.fully_confirmed")}
+                            </p>
                             <p className="text-lg">
                                 <Link className="text-3xl" href={getPrevURL()}>
                                     {"< "}
                                 </Link>
-                                Between {new Date(from).toDateString()} and{" "}
-                                {new Date(to).toDateString()}
+                                {tc("between", {
+                                    x: new Date(from).toLocaleDateString(),
+                                    y: new Date(to).toLocaleDateString(),
+                                })}
                                 <Link className="text-3xl" href={getNextURL()}>
                                     {" >"}
                                 </Link>
@@ -187,15 +158,17 @@ function ShipmentTableRow({
                     }}
                 >
                     <div className="flex justify-between items-center">
-                        <h1 className="text-2xl">Order {orderNumber}</h1>
+                        <h1 className="text-2xl">
+                            {tc("order")} {orderNumber}
+                        </h1>
                     </div>
 
                     <table className="table table-zebra w-full sm:table-fixed">
                         <thead>
                             <tr>
-                                <th>From</th>
-                                <th>Item</th>
-                                <th>Quantity</th>
+                                <th>{tc("from")}</th>
+                                <th>{tc("item")}</th>
+                                <th>{tc("quantity")}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -220,7 +193,7 @@ function ShipmentTableRow({
                             htmlFor={`${uuid}-transfers`}
                             className="btn"
                         >
-                            Close
+                            {tc("close")}
                         </label>
                     </div>
                 </div>
@@ -249,6 +222,13 @@ export async function getServerSideProps(context) {
         }
     );
 
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "stats",
+        "shipments",
+        "nav",
+    ]);
+
     return res
         .refine(({ content: shipments, totalPages, number: pageNumber }) => ({
             props: {
@@ -257,6 +237,7 @@ export async function getServerSideProps(context) {
                 pageNumber,
                 from,
                 to,
+                ...i18n,
             },
         }))
         .get();

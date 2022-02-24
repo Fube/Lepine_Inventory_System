@@ -1,0 +1,83 @@
+{
+    "unknown": "Something went wrong",
+    "email": {
+        "required": "Email is required",
+        "valid": "Email must be valid"
+    },
+    "password": {
+        "required": "Password is required",
+        "complexity": {
+            "length": "Password must be at least 8 characters long",
+            "uppercase": "Password must contain at least one uppercase letter",
+            "lowercase": "Password must contain at least one lowercase letter",
+            "number": "Password must contain at least one number",
+            "special": "Password must contain at least one special character"
+        },
+        "confirm": "Passwords must match"
+    },
+    "item": {
+        "name": {
+            "required": "Name is required"
+        },
+        "description": {
+            "required": "Description is required"
+        },
+        "sku": {
+            "required": "SKU is required"
+        }
+    },
+    "shipment": {
+        "order_number": {
+            "required": "Order number is required"
+        },
+        "expected_date": {
+            "required": "Expected date is required"
+        },
+        "to": {
+            "required": "To is required"
+        },
+        "quantity": {
+            "required": "Quantity is required"
+        },
+        "stock": {
+            "required": "Stock is required"
+        },
+        "transfers": {
+            "min": "At least one transfer is required"
+        }
+    },
+    "stock": {
+        "item": {
+            "required": "Item is required"
+        },
+        "quantity": {
+            "required": "Quantity is required"
+        },
+        "warehouse": {
+            "required": "Warehouse is required"
+        }
+    },
+    "role": {
+        "required": "Role is required"
+    },
+    "common": {
+        "number": {
+            "min": "{{denom}} must be greater than or equal to {{min}}"
+        }
+    },
+    "warehouse": {
+        "zipcode": {
+            "required": "Zipcode is required",
+            "valid": "Zipcode must be valid"
+        },
+        "city": {
+            "required": "City is required"
+        },
+        "province": {
+            "required": "Province is required"
+        },
+        "active": {
+            "required": "Active is required"
+        }
+    }
+}

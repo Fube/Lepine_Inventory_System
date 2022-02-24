@@ -1,0 +1,83 @@
+{
+    "unknown": "Quelque chose s'est mal passé",
+    "email": {
+        "required": "Courriel requis",
+        "valid": "Courriel invalide"
+    },
+    "password": {
+        "required": "Mot de passe requis",
+        "complexity": {
+            "length": "Le mot de passe doit contenir au moins 8 caractères",
+            "uppercase": "Le mot de passe doit contenir au moins une majuscule",
+            "lowercase": "Le mot de passe doit contenir au moins une minuscule",
+            "number": "Le mot de passe doit contenir au moins un chiffre",
+            "special": "Le mot de passe doit contenir au moins un caractère spécial"
+        },
+        "confirm": "Les mots de passe ne correspondent pas"
+    },
+    "item": {
+        "name": {
+            "required": "Nom requis"
+        },
+        "description": {
+            "required": "Description requise"
+        },
+        "sku": {
+            "required": "SKU requis"
+        }
+    },
+    "shipment": {
+        "order_number": {
+            "required": "Numéro de commande requis"
+        },
+        "expected_date": {
+            "required": "Date d'expédition requise"
+        },
+        "to": {
+            "required": "Destinataire requis"
+        },
+        "quantity": {
+            "required": "Quantité requise"
+        },
+        "stock": {
+            "required": "Stock requis"
+        },
+        "transfers": {
+            "min": "Vous devez transférer au moins 1 article"
+        }
+    },
+    "stock": {
+        "item": {
+            "required": "Article requis"
+        },
+        "quantity": {
+            "required": "Quantité requise"
+        },
+        "warehouse": {
+            "required": "Entrepôt requis"
+        }
+    },
+    "role": {
+        "required": "Rôle requis"
+    },
+    "common": {
+        "number": {
+            "min": "{{denom}} doit être supérieur ou égal à {{min}}"
+        }
+    },
+    "warehouse": {
+        "zipcode": {
+            "required": "Code postal requis",
+            "valid": "Code postal invalide"
+        },
+        "city": {
+            "required": "Ville requise"
+        },
+        "province": {
+            "required": "Province requise"
+        },
+        "active": {
+            "required": "Actif requis"
+        }
+    }
+}

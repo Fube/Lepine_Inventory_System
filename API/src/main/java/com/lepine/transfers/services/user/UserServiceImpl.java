@@ -13,7 +13,6 @@ import com.lepine.transfers.exceptions.auth.InvalidLoginException;
 import com.lepine.transfers.exceptions.user.DuplicateEmailException;
 import com.lepine.transfers.exceptions.user.RoleNotFoundException;
 import com.lepine.transfers.exceptions.user.UserNotFoundException;
-import com.lepine.transfers.exceptions.warehouse.WarehouseNotFoundException;
 import com.lepine.transfers.services.auth.AuthService;
 
 import com.lepine.transfers.utils.auth.JWTUtil;
@@ -130,6 +129,7 @@ public class UserServiceImpl implements UserService, AuthService {
         final User mapped = userMapper.toEntity(userUUIDLessDTO);
         mapped.setUuid(uuid);
         mapped.setRole(byName.get());
+        mapped.setPassword(passwordEncoder.encode(userUUIDLessDTO.getPassword()));
         final User updated = userRepo.save(mapped);
         log.info("updated user");
 

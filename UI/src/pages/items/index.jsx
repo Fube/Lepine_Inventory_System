@@ -1,19 +1,20 @@
-import Nav from "../../components/Nav";
+import { Icon } from "@iconify/react";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import Head from "next/head";
-import { InstantSearch, SearchBox, Configure } from "react-instantsearch-dom";
 import { useContext, useEffect, useState } from "react";
-import { AlgoliaContext } from "../_app";
+import { Configure, InstantSearch, SearchBox } from "react-instantsearch-dom";
 import {
     PaginateAdapter,
     TableHitsAdapter,
 } from "../../components/AlgoliaAdapters";
 import Paginate from "../../components/Pagination";
-import thou from "../../utils/thou";
-import { Icon } from "@iconify/react";
 import { axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
+import thou from "../../utils/thou";
+import { AlgoliaContext } from "../_app";
 
 /**
  *
@@ -21,6 +22,9 @@ import useAuth from "../../hooks/useAuth";
  * @returns
  */
 export default function ShowItems({ items, totalPages, pageNumber }) {
+    const { t: tc } = useTranslation("common");
+    const { t: ti } = useTranslation("items");
+
     const { role } = useAuth();
     const router = useRouter();
 
@@ -38,12 +42,12 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
 
     const head = (
         <tr>
-            <th>SKU</th>
-            <th>Name</th>
+            <th>{ti("sku")}</th>
+            <th>{ti("name")}</th>
             <th className="flex justify-between">
                 {thou(
                     <>
-                        <div className="self-center">Description</div>
+                        <div className="self-center">{ti("description")}</div>
                         <button>
                             <Link href="/items/new" passHref>
                                 <Icon icon="si-glyph:button-plus" width="32" />
@@ -51,7 +55,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                         </button>
                     </>
                 )
-                    .or("Description")
+                    .or(ti("description"))
                     .if(role === "MANAGER")}
             </th>
         </tr>
@@ -59,13 +63,13 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
 
     const fallback = (
         <h2 className="text-2xl text-center text-yellow-400">
-            No items to show 😢
+            {ti("index.none")}
         </h2>
     );
 
     const header = (
         <Head>
-            <title>Items</title>
+            <title>{ti("index.title")}</title>
         </Head>
     );
 
@@ -80,7 +84,7 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                         {role === "MANAGER" && (
                             <Link href="/items/new" passHref>
                                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-12">
-                                    Add One Now!
+                                    {tc("add_one_now")}
                                 </button>
                             </Link>
                         )}
@@ -101,7 +105,9 @@ export default function ShowItems({ items, totalPages, pageNumber }) {
                 <div className="overflow-x-auto justify-center flex">
                     <div className="md:w-4/5 w-3/4">
                         <div className="md:flex justify-around my-4">
-                            <h1 className="text-4xl md:mb-0 mb-4">Items</h1>
+                            <h1 className="text-4xl md:mb-0 mb-4">
+                                {ti("index.title")}
+                            </h1>
                             <SearchBox
                                 onChange={(a) =>
                                     setIsSearching(
@@ -190,13 +196,23 @@ export async function getServerSideProps(context) {
         headers: { cookie: context?.req?.headers?.cookie ?? "" },
     });
 
-    return res
-        .refine(({ content: items, totalPages, number: pageNumber }) => ({
-            props: {
-                items,
-                totalPages,
-                pageNumber,
-            },
-        }))
-        .get();
+    const i18n = await serverSideTranslations(context.locale, [
+        "common",
+        "items",
+        "nav",
+    ]);
+
+    return {
+        ...res
+            .withContext(context) // Only needed here because it is the landing page kinda
+            .refine(({ content: items, totalPages, number: pageNumber }) => ({
+                props: {
+                    items,
+                    totalPages,
+                    pageNumber,
+                    ...i18n,
+                },
+            }))
+            .get(),
+    };
 }

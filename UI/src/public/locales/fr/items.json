@@ -1,0 +1,17 @@
+{
+    "sku": "SKU",
+    "name": "Nom",
+    "description": "Description",
+    "index": {
+        "none": "Aucun produit trouvé",
+        "title": "Inventaire"
+    },
+    "new": {
+        "title": "Nouveau produit",
+        "created": "Produit créé"
+    },
+    "uuid": {
+        "title": "Détails de l'article",
+        "updated": "Article mis à jour"
+    }
+}

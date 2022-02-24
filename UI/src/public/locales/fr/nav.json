@@ -1,0 +1,35 @@
+{
+    "self": "Navigation",
+    "pages": {
+        "home": {
+            "url": "",
+            "display": "Maison"
+        },
+        "stats": {
+            "url": "stats",
+            "display": "Statistiques"
+        },
+        "users": {
+            "url": "users",
+            "display": "Utilisateurs"
+        },
+        "items": {
+            "url": "items",
+            "display": "Inventaire"
+        },
+        "warehouses": {
+            "url": "warehouses",
+            "display": "Entrepôts"
+        },
+        "stocks": {
+            "url": "stocks",
+            "display": "Stocks"
+        },
+        "shipments": {
+            "url": "shipments",
+            "display": "Expéditions"
+        }
+    },
+    "login": "Connexion",
+    "logout": "Déconnexion"
+}

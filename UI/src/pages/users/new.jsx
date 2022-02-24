@@ -1,4 +1,6 @@
 import { Field, Form, Formik } from "formik";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
@@ -8,23 +10,31 @@ import checkEmptyAuth from "../../utils/checkEmptyAuth";
 const roles = ["Manager", "Clerk", "Salesperson"];
 
 export default function CreateUser() {
+    const { t: tc } = useTranslation("common");
+    const { t: te } = useTranslation("errors");
+    const { t: tu } = useTranslation("users");
+
     const router = useRouter();
 
     const userSchema = yup.object().shape({
         email: yup
             .string()
-            .email("Must be a valid email")
-            .required("Email is required"),
+            .email(te("email.valid"))
+            .required(te("email.required")),
         password: yup
             .string()
-            .strongPassword()
-            .required("Password is required"),
+            .strongPassword({
+                messages: te("password.complexity", {
+                    returnObjects: true,
+                }),
+            })
+            .required(te("password.required")),
         confirmPassword: yup
             .string()
-            .test("passwords-match", "Passwords must match", function (value) {
+            .test("passwords-match", te("password.confirm"), function (value) {
                 return this.parent.password === value;
             }),
-        role: yup.string().required("Role is required").oneOf(roles),
+        role: yup.string().required(te("role.required")).oneOf(roles),
     });
 
     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
@@ -37,13 +47,13 @@ export default function CreateUser() {
                 role: role.toUpperCase(),
             });
 
-            setStatus({ isError: false, message: "Successfully logged in" });
+            setStatus({ isError: false, message: "" });
             router.push("/users");
         } catch (e) {
             console.log(e);
             setStatus({
                 isError: true,
-                message: e?.response?.data?.message ?? "Something went wrong",
+                message: e?.response?.data?.message ?? te("unknown"),
             });
         }
         setSubmitting(false);
@@ -52,7 +62,7 @@ export default function CreateUser() {
     return (
         <>
             <Head>
-                <title>Add User</title>
+                <title>{tu("new.title")}</title>
             </Head>
             <div className="flex flex-col flex-1">
                 <div className="flex-shrink-0 flex-grow-0"></div>
@@ -81,7 +91,7 @@ export default function CreateUser() {
                                         <div className="w-full max-w-sm">
                                             <div className="flex flex-col break-words bg-white border-2 rounded shadow-md">
                                                 <div className="font-semibold bg-gray-200 text-gray-700 py-3 px-6 mb-0">
-                                                    Register
+                                                    {tc("register")}
                                                 </div>
                                                 {dirty && status && (
                                                     <div
@@ -99,7 +109,7 @@ export default function CreateUser() {
                                                         className="block text-gray-700 text-sm font-bold mb-2"
                                                         htmlFor="email"
                                                     >
-                                                        E-mail
+                                                        {tc("email")}
                                                     </label>
                                                     <Field
                                                         className={
@@ -111,7 +121,9 @@ export default function CreateUser() {
                                                         }
                                                         name="email"
                                                         type="text"
-                                                        placeholder="E-mail"
+                                                        placeholder={tc(
+                                                            "email"
+                                                        )}
                                                     />
                                                     {errors.email &&
                                                         touched.email && (
@@ -124,7 +136,7 @@ export default function CreateUser() {
                                                         className="block text-gray-700 text-sm font-bold mb-2"
                                                         htmlFor="password"
                                                     >
-                                                        Password
+                                                        {tc("password")}
                                                     </label>
                                                     <Field
                                                         className={
@@ -136,7 +148,9 @@ export default function CreateUser() {
                                                         }
                                                         name="password"
                                                         type="password"
-                                                        placeholder="Password"
+                                                        placeholder={tc(
+                                                            "password"
+                                                        )}
                                                     />
                                                     {errors.password &&
                                                         touched.password && (
@@ -151,7 +165,7 @@ export default function CreateUser() {
                                                         className="block text-gray-700 text-sm font-bold mb-2"
                                                         htmlFor="confirmPassword"
                                                     >
-                                                        Confirm Password
+                                                        {tc("confirm_password")}
                                                     </label>
                                                     <Field
                                                         className={
@@ -163,7 +177,9 @@ export default function CreateUser() {
                                                         }
                                                         name="confirmPassword"
                                                         type="password"
-                                                        placeholder="Confirm Password"
+                                                        placeholder={tc(
+                                                            "confirm_password"
+                                                        )}
                                                     />
                                                     {errors.confirmPassword &&
                                                         touched.confirmPassword && (
@@ -179,7 +195,7 @@ export default function CreateUser() {
                                                         className="block text-gray-700 text-sm font-bold mb-2"
                                                         htmlFor="role"
                                                     >
-                                                        Role
+                                                        {tc("role")}
                                                     </label>
                                                     <Field
                                                         className={
@@ -196,7 +212,7 @@ export default function CreateUser() {
                                                             value=""
                                                             disabled
                                                         >
-                                                            Select Role
+                                                            {tu("role.select")}
                                                         </option>
                                                         {roles.map((role) => (
                                                             <option
@@ -230,7 +246,7 @@ export default function CreateUser() {
                                                                 isSubmitting
                                                             }
                                                         >
-                                                            Register
+                                                            {tc("register")}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -253,5 +269,14 @@ export default function CreateUser() {
  * @returns
  */
 export async function getServerSideProps(ctx) {
-    return checkEmptyAuth(axiosBackendAuth, ctx);
+    const i18n = await serverSideTranslations(ctx.locale, [
+        "common",
+        "errors",
+        "users",
+        "nav",
+    ]);
+
+    return checkEmptyAuth(axiosBackendAuth, ctx, {
+        ...i18n,
+    });
 }

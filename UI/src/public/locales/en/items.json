@@ -1,0 +1,17 @@
+{
+    "sku": "SKU",
+    "name": "Name",
+    "description": "Description",
+    "index": {
+        "title": "Items",
+        "none": "No items to show 😢"
+    },
+    "new": {
+        "title": "New item",
+        "created": "Item successfully created"
+    },
+    "uuid": {
+        "title": "Item Details",
+        "updated": "Item successfully updated"
+    }
+}

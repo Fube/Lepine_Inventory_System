@@ -1,0 +1,15 @@
+{
+    "index": {
+        "title": "Utilisateurs"
+    },
+    "uuid": {
+        "title": "Détails de l'utilisateur"
+    },
+    "new": {
+        "title": "Nouvel utilisateur"
+    },
+    "none": "Aucun utilisateur",
+    "role": {
+        "select": "Sélectionnez un rôle"
+    }
+}

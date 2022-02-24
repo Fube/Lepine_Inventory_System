@@ -1,0 +1,13 @@
+{
+    "index": {
+        "title": "Stocks"
+    },
+    "uuid": {
+        "title": "Détails du stock"
+    },
+    "new": {
+        "title": "Nouveau stock",
+        "created": "Stock créé"
+    },
+    "none": "Aucun stock"
+}

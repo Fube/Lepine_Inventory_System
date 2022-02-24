@@ -25,8 +25,6 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.lang.String.format;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -53,8 +51,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
 
         log.info("Checking if shipment is ACCEPTED");
         final Shipment byTransferUuid = shipmentRepo.findByTransferUuid(transferUuid)
-                .orElseThrow(() ->
-                        new ShipmentNotFoundException(format("Shipment for transfer %s is not found", transferUuid)));
+                .orElseThrow(ShipmentNotFoundException::new);
 
         final ShipmentStatus status = byTransferUuid.getStatus();
         if (status != ShipmentStatus.ACCEPTED) {

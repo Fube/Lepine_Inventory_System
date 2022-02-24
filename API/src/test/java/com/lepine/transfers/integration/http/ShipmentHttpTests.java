@@ -521,7 +521,7 @@ public class ShipmentHttpTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(givenAsString))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(expectedSameWarehouseException.getMessage()))
+                .andExpect(jsonPath("$.message").value("Cannot transfer to the same warehouse"))
                 .andExpect(jsonPath("$.timestamp").exists());
 
         verify(shipmentService, times(1)).create(any());

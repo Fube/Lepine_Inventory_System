@@ -12,19 +12,6 @@ import {
     GenericSubmitButton,
 } from "./FormikGenericComponents";
 
-const rawSchema = {
-    zipCode: yup
-        .string()
-        .required("Zip Code is required")
-        .matches(
-            /^[a-zA-Z][0-9][a-zA-Z] ?[0-9][a-zA-Z][0-9]$/,
-            "Zip Code must be valid"
-        ),
-    city: yup.string().required("City is required"),
-    province: yup.string().required("Province is required"),
-    active: yup.boolean(),
-};
-
 /**
  * @param {{
  * editable: boolean,
@@ -47,6 +34,22 @@ export default function WarehouseForm({
     handleSubmit = () => {},
     blackList = [],
 }) {
+    const { t: tc } = useTranslation("common");
+    const { t: te } = useTranslation("errors");
+
+    const rawSchema = {
+        zipCode: yup
+            .string()
+            .required(te("warehouse.zipcode.required"))
+            .matches(
+                /^[a-zA-Z][0-9][a-zA-Z] ?[0-9][a-zA-Z][0-9]$/,
+                te("warehouse.zipcode.valid")
+            ),
+        city: yup.string().required(te("warehouse.city.required")),
+        province: yup.string().required(te("warehouse.province.required")),
+        active: yup.boolean(),
+    };
+
     const filterOut = (toFilter) => {
         return Object.entries(toFilter).reduce((acc, [key, value]) => {
             if (blackList.includes(key)) return acc;
@@ -65,7 +68,7 @@ export default function WarehouseForm({
                 disabled={!editable}
                 name="zipCode"
                 type="text"
-                placeholder="Zip Code"
+                placeholder={tc("zipcode")}
             />
         ),
         city: (
@@ -73,7 +76,7 @@ export default function WarehouseForm({
                 disabled={!editable}
                 name="city"
                 type="text"
-                placeholder="City"
+                placeholder={tc("city")}
             />
         ),
         province: (
@@ -81,7 +84,7 @@ export default function WarehouseForm({
                 disabled={!editable}
                 name="province"
                 type="text"
-                placeholder="Province"
+                placeholder={tc("province")}
             />
         ),
         active: (
@@ -89,7 +92,7 @@ export default function WarehouseForm({
                 disabled={!editable}
                 name="active"
                 type="checkbox"
-                placeholder="Active"
+                placeholder={tc("active")}
             />
         ),
     };
@@ -123,14 +126,16 @@ export default function WarehouseForm({
                             </>
                         )}
                         <div className="flex items-center justify-end p-6">
-                            {editable && <GenericSubmitButton text="Save" />}
+                            {editable && (
+                                <GenericSubmitButton text={tc("save")} />
+                            )}
                             {deletable && (
                                 <button
                                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4 focus:outline-none focus:shadow-outline"
                                     type="button"
                                     onClick={handleDelete}
                                 >
-                                    Delete
+                                    {tc("delete")}
                                 </button>
                             )}
                         </div>

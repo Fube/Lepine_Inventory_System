@@ -1,0 +1,15 @@
+{
+    "index": {
+        "title": "Users"
+    },
+    "uuid": {
+        "title": "User Details"
+    },
+    "new": {
+        "title": "New User"
+    },
+    "none": "No users to show 😢",
+    "role": {
+        "select": "Select a Role"
+    }
+}

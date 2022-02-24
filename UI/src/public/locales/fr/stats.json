@@ -1,0 +1,17 @@
+{
+    "index": {
+        "title": "Statistiques"
+    },
+    "best_sellers": {
+        "title": "Meilleures ventes",
+        "transfered_quantity": "Quantité transféré"
+    },
+    "shipments": {
+        "fully_confirmed": "Expéditions complètés"
+    },
+    "items": {
+        "best_selling": {
+            "by_week": "Meilleures ventes par semaine"
+        }
+    }
+}

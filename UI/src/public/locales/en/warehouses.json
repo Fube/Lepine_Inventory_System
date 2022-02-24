@@ -1,0 +1,14 @@
+{
+    "select": "Select a Warehouse",
+    "index": {
+        "title": "Warehouses"
+    },
+    "uuid": {
+        "title": "Warehouse Details"
+    },
+    "new": {
+        "title": "Create Warehouse",
+        "created": "Warehouse successfully created"
+    },
+    "none": "No warehouses to show 😢"
+}
