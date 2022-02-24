@@ -1,9 +1,11 @@
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import WarehouseForm from "../../components/WarehouseForm";
 import { axiosAPI, axiosBackendAuth } from "../../config/axios";
 import useAuth from "../../hooks/useAuth";
+
 /**
  *
  * @param {{ warehouse: import("@lepine/ui-types").Warehouse }} param0

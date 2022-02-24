@@ -124,6 +124,8 @@ function ShipmentTableRow({
     transfers,
     expectedDate,
 }) {
+    const { t: tc } = useTranslation("common");
+
     const [showTransfers, setShowTransfers] = useState(false);
     const withNoPropagation = (fn) => (e) => {
         e.stopPropagation();

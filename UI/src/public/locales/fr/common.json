@@ -27,5 +27,8 @@
     "zipcode": "Code postal",
     "city": "Ville",
     "province": "Province",
-    "active": "Actif"
+    "active": "Actif",
+    "yes": "Oui",
+    "no": "Non",
+    "or": "Ou"
 }

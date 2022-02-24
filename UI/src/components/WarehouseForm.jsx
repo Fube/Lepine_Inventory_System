@@ -1,4 +1,5 @@
 import { Formik } from "formik";
+import { useTranslation } from "next-i18next";
 import { useEffect, useState } from "react";
 import GooglePlacesAutocomplete, {
     geocodeByPlaceId,
@@ -118,7 +119,7 @@ export default function WarehouseForm({
                         {editable && (
                             <>
                                 <h3 className="text-center text-4xl text-black">
-                                    OR
+                                    {tc("or").toUpperCase()}
                                 </h3>
                                 <GoogleLocationFormikCombo
                                     setFieldValue={setFieldValue}
@@ -147,6 +148,8 @@ export default function WarehouseForm({
 }
 
 function GoogleLocationFormikCombo({ setFieldValue }) {
+    const { t: tc } = useTranslation("common");
+
     const [autoComplete, setAutoComplete] = useState(null);
 
     const handleAutoComplete = async (placeId) => {
@@ -179,6 +182,7 @@ function GoogleLocationFormikCombo({ setFieldValue }) {
             <GooglePlacesAutocomplete
                 apiKey={process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}
                 selectProps={{
+                    placeholder: tc("warehouse"),
                     value: autoComplete,
                     onChange: setAutoComplete,
                 }}

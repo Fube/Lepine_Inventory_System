@@ -13,7 +13,6 @@ function CreateStock({ activeWarehouses }) {
     const router = useRouter();
 
     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
-        console.log(values);
         setSubmitting(true);
         try {
             await axiosAPI.post("/stocks", values);
@@ -69,7 +68,7 @@ export async function getServerSideProps(ctx) {
         headers: { cookie: ctx?.req?.headers?.cookie ?? "" },
     });
 
-    const i18n = serverSideTranslations(ctx.locale, [
+    const i18n = await serverSideTranslations(ctx.locale, [
         "common",
         "errors",
         "stocks",

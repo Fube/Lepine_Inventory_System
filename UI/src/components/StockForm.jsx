@@ -40,7 +40,7 @@ export default function StockForm({
 }) {
     const { t: tc } = useTranslation("common");
     const { t: te } = useTranslation("errors");
-    const { t: tw } = useTranslation("warehouse");
+    const { t: tw } = useTranslation("warehouses");
 
     const { searchClient } = useContext(AlgoliaContext);
 
@@ -83,7 +83,7 @@ export default function StockForm({
                                 !editable || disabled.has("warehouseUuid")
                             }
                             name="warehouseUuid"
-                            placeholder="Warehouse"
+                            placeholder={tc("warehouse")}
                             title={tw("select")}
                             options={mappedWarehouses}
                             onChange={(e) =>

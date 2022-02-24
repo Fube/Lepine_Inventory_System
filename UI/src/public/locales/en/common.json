@@ -27,5 +27,8 @@
     "zipcode": "Zipcode",
     "city": "City",
     "province": "Province",
-    "active": "Active"
+    "active": "Active",
+    "yes": "Yes",
+    "no": "No",
+    "or": "Or"
 }
