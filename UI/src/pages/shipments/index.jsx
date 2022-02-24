@@ -200,6 +200,7 @@ function ShipmentTableRow({
 }) {
     const { t: tc } = useTranslation("common");
     const { t: te } = useTranslation("errors");
+    const { t: ts } = useTranslation("shipments");
 
     const [showTransfers, setShowTransfers] = useState(false);
     const [isInConfirmationMode, setIsInConfirmationMode] = useState(false);
